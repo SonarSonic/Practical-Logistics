@@ -1,5 +1,5 @@
 Practical Logistics by Ollie Lansdell
-Minecraft Forge Mod
+
 
 Feel free to make commits, suggestions and general contributions to the mod.
 
