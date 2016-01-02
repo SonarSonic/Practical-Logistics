@@ -1,0 +1,64 @@
+package sonar.logistics.info.providers.tile;
+
+import ic2.api.reactor.IReactor;
+import ic2.api.reactor.IReactorChamber;
+
+import java.util.List;
+
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
+import sonar.logistics.api.Info;
+import sonar.logistics.api.StandardInfo;
+import sonar.logistics.api.data.TileProvider;
+
+public class IC2ReactorProvider extends TileProvider {
+
+	public static String name = "IC2-REACTOR";
+	public String[] categories = new String[] { "IC2 Reactor" };
+	public String[] subcategories = new String[] { "Is Active", "Heat", "Max Heat", "Energy Output", "Fluid Cooled" };
+
+	@Override
+	public String helperName() {
+		return name;
+	}
+
+	@Override
+	public boolean canProvideInfo(World world, int x, int y, int z, ForgeDirection dir) {
+		TileEntity target = world.getTileEntity(x, y, z);
+		return target != null && (target instanceof IReactor || target instanceof IReactorChamber);
+	}
+
+	@Override
+	public void getHelperInfo(List<Info> infoList, World world, int x, int y, int z, ForgeDirection dir) {
+		byte id = this.getID();
+		TileEntity target = world.getTileEntity(x, y, z);
+		IReactor reactor = null;
+		if (target instanceof IReactorChamber) {
+			IReactorChamber chamber = (IReactorChamber) target;
+			reactor = chamber.getReactor();
+		}
+		if (target instanceof IReactor) {
+			reactor = (IReactor) target;
+		}
+		if (reactor != null) {
+			infoList.add(new StandardInfo(id, 0, 0, reactor.produceEnergy()));
+			infoList.add(new StandardInfo(id, 0, 1, reactor.getHeat()));
+			infoList.add(new StandardInfo(id, 0, 2, reactor.getMaxHeat()));
+			infoList.add(new StandardInfo(id, 0, 3, (int) reactor.getReactorEUEnergyOutput()));
+			infoList.add(new StandardInfo(id, 0, 4, reactor.isFluidCooled()));
+
+		}
+
+	}
+
+	@Override
+	public String getCategory(byte id) {
+		return categories[id];
+	}
+
+	@Override
+	public String getSubCategory(byte id) {
+		return subcategories[id];
+	}
+}

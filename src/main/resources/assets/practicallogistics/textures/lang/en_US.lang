@@ -1,0 +1,26 @@
+itemGroup.Practical Logistics=Practical Logistics
+
+//blocks
+tile.SapphireOre.name=Sapphire Ore
+tile.InfoReader.name=Info Reader
+tile.Node.name=Node
+tile.EnergyScreenItem.name=Energy Screen
+tile.DisplayScreenItem.name=Display Screen
+tile.DataEmitter.name=Data Emitter
+tile.DataReceiver.name=Data Receiver
+tile.DataCable.name=Data Cable
+tile.InventoryReader.name=Inventory Reader
+tile.RedstoneSignaller.name=Redstone Signaller
+tile.HolographicDisplay.name=Holographic Display
+tile.DataModifier.name=Data Modifier
+tile.InfoCreator.name=Info Creator
+tile.Hammer.name=Forging Hammer
+tile.Hammer_Air.name=Forging Hammer
+tile.EntityNode.name=Entity Node
+
+//items
+item.EnergyScreenItem.name=Energy Screen
+item.DisplayScreenItem.name=Display Screen
+item.Sapphire.name=Sapphire
+item.SapphireDust.name=Sapphire Dust
+item.StonePlate.name=Stone Plate
