@@ -12,6 +12,8 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.common.block.SonarMaterials;
+import sonar.core.integration.fmp.FMPHelper;
+import sonar.core.integration.fmp.ITileHandler;
 import sonar.logistics.Logistics;
 import sonar.logistics.common.tileentity.TileEntityDataCable;
 import sonar.logistics.common.tileentity.TileEntityDataModifier;
@@ -28,29 +30,12 @@ public class BlockDataModifier extends BaseNode {
 	}
 
 	@Override
-	public void onNeighborChange(IBlockAccess world, int x, int y, int z, int tileX, int tileY, int tileZ) {
-		TileEntity tileentity = world.getTileEntity(x, y, z);
-		if (tileentity != null && tileentity instanceof TileEntityDataCable) {
-			TileEntityDataCable cable = (TileEntityDataCable) world.getTileEntity(x, y, z);
-			CableHelper.updateAdjacentCoords(cable, cable.coords, true);
-
-		}
-	}
-
-	@Override
-	public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase entity, ItemStack itemstack) {
-		super.onBlockPlacedBy(world, x, y, z, entity, itemstack);
-		TileEntity target = world.getTileEntity(x, y, z);
-		if (entity instanceof EntityPlayer && target instanceof TileEntityDataCable) {
-			TileEntityDataCable cable = (TileEntityDataCable) target;
-			// CableHelper.updateAdjacentCoords(cable,cable.coords, true);
-		}
-	}
-
-	@Override
 	public void breakBlock(World world, int x, int y, int z, Block oldblock, int oldMetadata) {
+		Object target =FMPHelper.getTile(world, x, y, z);		
+		if(target instanceof ITileHandler){
+			((ITileHandler)target).getTileHandler().removed(world, x, y, z, oldMetadata);
+		}
 		super.breakBlock(world, x, y, z, oldblock, oldMetadata);
-		CableHelper.updateAdjacentCoords(world, x, y, z, null, true);
 	}
 
 	@Override

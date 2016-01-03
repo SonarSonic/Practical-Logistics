@@ -7,9 +7,9 @@ import net.minecraft.util.ResourceLocation;
 
 import org.lwjgl.input.Keyboard;
 
+import sonar.core.SonarCore;
 import sonar.core.inventory.GuiSonar;
 import sonar.core.network.PacketTextField;
-import sonar.core.network.SonarPackets;
 import sonar.core.utils.helpers.FontHelper;
 import sonar.logistics.common.containers.ContainerEmptySync;
 import sonar.logistics.common.tileentity.TileEntityDataEmitter;
@@ -96,7 +96,7 @@ public abstract class GuiRenameEmitter extends GuiSonar {
 
 		@Override
 		public void setString(String string) {
-			SonarPackets.network.sendToServer(new PacketTextField(string, entity.xCoord, entity.yCoord, entity.zCoord, 0));
+			SonarCore.network.sendToServer(new PacketTextField(string, entity.xCoord, entity.yCoord, entity.zCoord, 0));
 			entity.clientName.setString(string);;
 		}
 

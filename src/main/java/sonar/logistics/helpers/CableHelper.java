@@ -74,6 +74,19 @@ public class CableHelper {
 		}
 	}
 
+	public static void removeAllBlockedAdjacentCoords(TileEntity tile) {
+		for (int i = 0; i < 6; i++) {
+			ForgeDirection dir = ForgeDirection.getOrientation(i);
+			Object target = tile.getWorldObj().getTileEntity(tile.xCoord + dir.offsetX, tile.yCoord + dir.offsetY, tile.zCoord + dir.offsetZ);
+			target = FMPHelper.checkObject(target);
+			if (target != null && target instanceof IDataCable) {
+				IDataCable cable = (IDataCable) target;
+				cable.setCoords(null);
+			}
+
+		}
+	}
+
 	public static Object getConnectedTile(TileEntity tile, ForgeDirection dir) {
 		Object target = SonarHelper.getAdjacentTileEntity(tile, dir);
 		target = FMPHelper.checkObject(target);

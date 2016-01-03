@@ -7,20 +7,26 @@ import net.minecraft.util.ResourceLocation;
 
 import org.lwjgl.input.Keyboard;
 
+import sonar.core.SonarCore;
 import sonar.core.inventory.GuiSonar;
 import sonar.core.network.PacketTextField;
-import sonar.core.network.SonarPackets;
 import sonar.core.utils.helpers.FontHelper;
 import sonar.logistics.common.containers.ContainerEmptySync;
+import sonar.logistics.common.handlers.DataModifierHandler;
+import sonar.logistics.common.handlers.InfoCreatorHandler;
 import sonar.logistics.common.tileentity.TileEntityDataModifier;
 
-public abstract class GuiDataModifier extends GuiSonar {
+public class GuiDataModifier extends GuiSonar {
 
 	public static final ResourceLocation bground = new ResourceLocation("PracticalLogistics:textures/gui/signaller.png");
 	private GuiTextField subCategory, prefix, suffix;
+	public DataModifierHandler handler;
+	public TileEntity entity;
 
-	public GuiDataModifier(Container container, TileEntity entity) {
-		super(container, entity);
+	public GuiDataModifier(DataModifierHandler handler, TileEntity entity) {
+		super(new ContainerEmptySync(handler, entity), entity);
+		this.handler = handler;
+		this.entity = entity;
 	}
 
 	@Override
@@ -39,7 +45,7 @@ public abstract class GuiDataModifier extends GuiSonar {
 		prefix = new GuiTextField(this.fontRendererObj, 42, 40, 126, 12);
 		prefix.setMaxStringLength(21);
 		prefix.setText(this.getText(1));
-		
+
 		suffix = new GuiTextField(this.fontRendererObj, 42, 60, 126, 12);
 		suffix.setMaxStringLength(21);
 		suffix.setText(this.getText(2));
@@ -80,7 +86,7 @@ public abstract class GuiDataModifier extends GuiSonar {
 				}
 
 			}
-		}else if (prefix.isFocused()) {
+		} else if (prefix.isFocused()) {
 			if (c == 13 || c == 27) {
 				prefix.setFocused(false);
 			} else {
@@ -93,7 +99,7 @@ public abstract class GuiDataModifier extends GuiSonar {
 				}
 
 			}
-		}else if (suffix.isFocused()) {
+		} else if (suffix.isFocused()) {
 			if (c == 13 || c == 27) {
 				suffix.setFocused(false);
 			} else {
@@ -116,43 +122,30 @@ public abstract class GuiDataModifier extends GuiSonar {
 		return bground;
 	}
 
-	public abstract String getText(int id);
-
-	public abstract void setString(String string, int id);
-
-	public static class Normal extends GuiDataModifier {
-
-		public TileEntityDataModifier entity;
-
-		public Normal(TileEntityDataModifier entity) {
-			super(new ContainerEmptySync(entity), entity);
-			this.entity = entity;
+	public String getText(int id) {
+		switch (id) {
+		case 1:
+			return handler.prefix.getString();
+		case 2:
+			return handler.suffix.getString();
+		default:
+			return handler.subCategory.getString();
 		}
-
-		@Override
-		public String getText(int id) {
-			switch (id) {
-			case 1:
-				return entity.prefix.getString();
-			case 2:
-				return entity.suffix.getString();
-			default:
-				return entity.subCategory.getString();
-			}
-		}
-
-		@Override
-		public void setString(String string, int id) {
-			SonarPackets.network.sendToServer(new PacketTextField(string, entity.xCoord, entity.yCoord, entity.zCoord, id));
-			switch (id) {
-			case 1:
-				entity.prefix.setString(string);
-			case 2:
-				entity.suffix.setString(string);
-			default:
-				entity.subCategory.setString(string);
-			}
-		}
-
 	}
+
+	public void setString(String string, int id) {
+		SonarCore.network.sendToServer(new PacketTextField(string, entity.xCoord, entity.yCoord, entity.zCoord, id));
+		switch (id) {
+		case 1:
+			handler.prefix.setString(string);
+			break;
+		case 2:
+			handler.suffix.setString(string);
+			break;
+		default:
+			handler.subCategory.setString(string);
+			break;
+		}
+	}
+
 }

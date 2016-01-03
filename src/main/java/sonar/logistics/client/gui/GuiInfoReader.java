@@ -23,6 +23,7 @@ import sonar.core.utils.helpers.FontHelper;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.Info;
 import sonar.logistics.common.containers.ContainerInfoNode;
+import sonar.logistics.common.handlers.InfoReaderHandler;
 import sonar.logistics.common.tileentity.TileEntityInfoReader;
 import sonar.logistics.info.types.CategoryInfo;
 import sonar.logistics.integration.multipart.InfoReaderPart;
@@ -30,15 +31,17 @@ import sonar.logistics.network.packets.PacketInfoBlock;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-public abstract class GuiInfoNode extends GuiSonar {
+public class GuiInfoReader extends GuiSonar {
 
 	public int xCoord, yCoord, zCoord;
+	public InfoReaderHandler handler;
 
-	public GuiInfoNode(Container container, TileEntity entity) {
-		super(container, entity);
-		this.xCoord = entity.xCoord;
-		this.yCoord = entity.yCoord;
-		this.zCoord = entity.zCoord;
+	public GuiInfoReader(InfoReaderHandler handler, TileEntity tile) {
+		super(new ContainerInfoNode(handler, tile), tile);
+		this.xCoord = tile.xCoord;
+		this.yCoord = tile.yCoord;
+		this.zCoord = tile.zCoord;
+		this.handler = handler;
 	}
 
 	public static final ResourceLocation bground = new ResourceLocation("PracticalLogistics:textures/gui/infoselect.png");
@@ -68,7 +71,7 @@ public abstract class GuiInfoNode extends GuiSonar {
 	}
 
 	public int getDataPosition() {
-		if (getCurrentInfo() == null) {
+		if (getPrimaryInfo() == null) {
 			return -1;
 		}
 		if (getInfo() == null) {
@@ -80,7 +83,7 @@ public abstract class GuiInfoNode extends GuiSonar {
 			if (getInfo().get(i) != null) {
 				Info info = getInfo().get(i);
 				if (info != null) {
-					if (info.isEqualType(getCurrentInfo())) {
+					if (info.isEqualType(getPrimaryInfo())) {
 						return i - start;
 					}
 				}
@@ -141,7 +144,7 @@ public abstract class GuiInfoNode extends GuiSonar {
 			for (int i = start; i < finish; i++) {
 				Info info = getInfo().get(i);
 				if (info != null) {
-					boolean isSelected = info.isEqualType(getCurrentInfo());
+					boolean isSelected = info.isEqualType(getPrimaryInfo());
 					if (!(info instanceof CategoryInfo)) {
 						int colour = isSelected ? Color.green.getRGB() : Color.lightGray.getRGB();
 						FontHelper.text(info.getSubCategory().substring(0, Math.min(16, info.getSubCategory().length())), 10, 31 + (12 * i) - (12 * start), colour);
@@ -256,18 +259,30 @@ public abstract class GuiInfoNode extends GuiSonar {
 							return;
 						}
 						if (buttonID == 0) {
-							if (getCurrentInfo() != null && info.isEqualType(getCurrentInfo())) {
+							if (getPrimaryInfo() != null && info.isEqualType(getPrimaryInfo())) {
 								Logistics.network.sendToServer(new PacketInfoBlock(xCoord, yCoord, zCoord, true));
+								if (handler.isMultipart.getBoolean()) {
+									handler.primaryInfo = null;
+								}
 							} else {
 								Logistics.network.sendToServer(new PacketInfoBlock(xCoord, yCoord, zCoord, info, true));
+								if (handler.isMultipart.getBoolean()) {
+									handler.primaryInfo = info;
+								}
 							}
 
 						} else if (buttonID == 1) {
-							if (getCurrentInfo() != null && !info.isEqualType(getCurrentInfo())) {
+							if (getPrimaryInfo() != null && !info.isEqualType(getPrimaryInfo())) {
 								if (getSecondInfo() != null && info.isEqualType(getSecondInfo())) {
 									Logistics.network.sendToServer(new PacketInfoBlock(xCoord, yCoord, zCoord, false));
+									if (handler.isMultipart.getBoolean()) {
+										handler.secondaryInfo = null;
+									}
 								} else {
 									Logistics.network.sendToServer(new PacketInfoBlock(xCoord, yCoord, zCoord, info, false));
+									if (handler.isMultipart.getBoolean()) {
+										handler.secondaryInfo = info;
+									}
 								}
 							}
 						}
@@ -276,6 +291,7 @@ public abstract class GuiInfoNode extends GuiSonar {
 			}
 		}
 	}
+
 	protected void actionPerformed(GuiButton button) {
 		this.buttonPressed(button, 0);
 	}
@@ -323,62 +339,16 @@ public abstract class GuiInfoNode extends GuiSonar {
 		return getInfo() == null ? 0 : getInfo().size();
 	}
 
-	public abstract List<Info> getInfo();
-
-	public abstract Info getCurrentInfo();
-
-	public abstract Info getSecondInfo();
-
-	public static class Normal extends GuiInfoNode {
-
-		public TileEntityInfoReader tile;
-
-		public Normal(TileEntityInfoReader entity) {
-			super(new ContainerInfoNode(entity), entity);
-			tile = entity;
-		}
-
-		@Override
-		public List<Info> getInfo() {
-			return tile.clientInfo;
-		}
-
-		@Override
-		public Info getCurrentInfo() {
-			return tile.primaryInfo;
-		}
-
-		@Override
-		public Info getSecondInfo() {
-			return tile.secondaryInfo;
-		}
-
+	public List<Info> getInfo() {
+		return handler.clientInfo;
 	}
 
-	public static class Multipart extends GuiInfoNode {
+	public Info getPrimaryInfo(){
+		return handler.primaryInfo;
+	}
 
-		public InfoReaderPart tile;
-
-		public Multipart(InfoReaderPart entity) {
-			super(new ContainerInfoNode.Multipart(entity), entity.tile());
-			tile = entity;
-		}
-
-		@Override
-		public List<Info> getInfo() {
-			return tile.info;
-		}
-
-		@Override
-		public Info getCurrentInfo() {
-			return tile.primaryInfo;
-		}
-
-		@Override
-		public Info getSecondInfo() {
-			return tile.secondaryInfo;
-		}
-
+	public Info getSecondInfo(){
+		return handler.secondaryInfo;
 	}
 
 }

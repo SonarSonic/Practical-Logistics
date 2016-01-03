@@ -1,15 +1,17 @@
 [
 {"modid": "PracticalLogistics",
   "name": "Practical Logistics",
-  "description": "All things data",
+  "description": "All things data - Requires SonarCore",
   "version": "0.0.1a",
   "mcversion": "1.7.10",
 
   "updateUrl": "",
-  "authors": "Ollie Lansdell",
+  "authors": ["Ollie Lansdell"],
   "credits": "Ollie Lansdell - Ideas, Coding, Textures, Models, SkullyGamingMC - Testing, Ideas, Additional Textures and Models",
-  "logoFile": "",
+  "logoFile": "/banner.png",
   "screenshots": [],
-  "dependencies": ["CoFHLib","CoFHCore","CoFHAPI","WailaAPI","ForgeMultipart", "Calculator"]
-,"useDependencyInformation": "true"}
+  "requiredMods": [ "Forge", "SonarCore" ],
+  "dependencies": [],
+  "useDependencyInformation": "true"
+}
 ]

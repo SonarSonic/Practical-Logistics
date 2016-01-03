@@ -3,6 +3,7 @@ package sonar.logistics.integration.multipart;
 import java.util.Arrays;
 
 import net.minecraft.block.Block;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.MovingObjectPosition;
@@ -12,30 +13,36 @@ import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.SonarHandlerPart;
 import sonar.core.integration.fmp.SonarTilePart;
 import sonar.core.integration.fmp.handlers.TileHandler;
+import sonar.core.network.utils.ITextField;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
+import sonar.logistics.Logistics;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.StandardInfo;
 import sonar.logistics.api.connecting.IDataConnection;
 import sonar.logistics.api.connecting.IInfoReader;
+import sonar.logistics.api.render.ICableRenderer;
 import sonar.logistics.client.renderers.RenderDisplayScreen;
+import sonar.logistics.client.renderers.RenderHandlers;
 import sonar.logistics.common.handlers.DisplayScreenHandler;
+import sonar.logistics.common.handlers.InfoCreatorHandler;
 import sonar.logistics.common.handlers.InfoReaderHandler;
 import sonar.logistics.common.tileentity.TileEntityInventoryReader;
 import sonar.logistics.helpers.CableHelper;
 import sonar.logistics.helpers.InfoHelper;
+import sonar.logistics.network.LogisticsGui;
 import sonar.logistics.registries.BlockRegistry;
 import sonar.logistics.registries.ItemRegistry;
 import codechicken.lib.vec.Cuboid6;
 
-public class DisplayScreenPart extends SonarHandlerPart implements IDataConnection {
+public class InfoCreatorPart extends SonarHandlerPart implements IDataConnection, ICableRenderer, ITextField {
 
-	public DisplayScreenHandler handler = new DisplayScreenHandler(true);
+	public InfoCreatorHandler handler = new InfoCreatorHandler(true);
 
-	public DisplayScreenPart() {
+	public InfoCreatorPart() {
 		super();
 	}
 
-	public DisplayScreenPart(int meta) {
+	public InfoCreatorPart(int meta) {
 		super(meta);
 	}
 
@@ -51,7 +58,6 @@ public class DisplayScreenPart extends SonarHandlerPart implements IDataConnecti
 
 	@Override
 	public void updateData(ForgeDirection dir) {
-		handler.updateData(tile(), dir);
 	}
 
 	@Override
@@ -60,53 +66,44 @@ public class DisplayScreenPart extends SonarHandlerPart implements IDataConnecti
 	}
 
 	@Override
+	public void textTyped(String string, int id) {
+		handler.textTyped(string, id);
+		
+	}
+
+	@Override
+	public boolean canRenderConnection(ForgeDirection dir) {
+		return handler.canRenderConnection(tile(), dir);
+	}
+	
+	public boolean activate(EntityPlayer player, MovingObjectPosition pos, ItemStack stack) {
+		if (player != null) {
+			player.openGui(Logistics.instance, LogisticsGui.infoCreator, tile().getWorldObj(), x(), y(), z());
+			return true;
+
+		}
+		return false;
+	}
+	
+	@Override
 	public Cuboid6 getBounds() {
-		float f = 0.28125F;
-		float f1 = 0.78125F;
-		float f2 = 0.0F;
-		float f3 = 1.0F;
-		float f4 = 0.125F;
-		if (meta == 2) {
-			return new Cuboid6(f2, f, 1.0F - f4, f3, f1, 1.0F);
-		}
-
-		if (meta == 3) {
-			return new Cuboid6(f2, f, 0.0F, f3, f1, f4);
-		}
-
-		if (meta == 4) {
-			return new Cuboid6(1.0F - f4, f, f2, 1.0F, f1, f3);
-		}
-
-		if (meta == 5) {
-			return new Cuboid6(0.0F, f, f2, f4, f1, f3);
-		}
-		return new Cuboid6(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
-	}
-
-	@Override
-	public ItemStack pickItem(MovingObjectPosition hit) {
-		return new ItemStack(ItemRegistry.displayScreen);
-	}
-
-	@Override
-	public Iterable<ItemStack> getDrops() {
-		return Arrays.asList(new ItemStack(ItemRegistry.displayScreen));
+		return new Cuboid6(4 * 0.0625, 4 * 0.0625, 4 * 0.0625, 1 - 4 * 0.0625, 1 - 4 * 0.0625, 1 - 4 * 0.0625);
 	}
 
 	@Override
 	public Block getBlock() {
-		return BlockRegistry.displayScreen;
+		return BlockRegistry.infoCreator;
 	}
 
 	@Override
 	public String getType() {
-		return "Screen Part";
+		return "Info Creator";
 	}
 
 	@Override
 	public Object getSpecialRenderer() {
-		return new RenderDisplayScreen();
+		return new RenderHandlers.InfoCreator();
 	}
+
 
 }

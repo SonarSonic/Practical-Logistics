@@ -3,8 +3,8 @@ package sonar.logistics.common.tileentity;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import sonar.core.SonarCore;
 import sonar.core.common.tileentity.TileEntityInventory;
-import sonar.core.network.SonarPackets;
 import sonar.core.network.sync.SyncInt;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.utils.HammerRecipes;
@@ -28,7 +28,7 @@ public class TileEntityHammer extends TileEntityInventory implements ISidedInven
 		}
 		if (coolDown.getInt() != 0) {
 			coolDown.increaseBy(-1);
-			SonarPackets.sendFullSyncAround(this, 64);
+			SonarCore.sendFullSyncAround(this, 64);
 		} else if (canProcess()) {
 			if (progress.getInt() < speed) {
 				progress.increaseBy(1);
@@ -38,7 +38,7 @@ public class TileEntityHammer extends TileEntityInventory implements ISidedInven
 				progress.setInt(0);
 				this.worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
 			}
-			SonarPackets.sendFullSyncAround(this, 64);
+			SonarCore.sendFullSyncAround(this, 64);
 		} else {
 			this.coolDown.setInt(this.progress.getInt()*2);
 			this.progress.setInt(0);

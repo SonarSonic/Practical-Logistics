@@ -14,6 +14,7 @@ import sonar.logistics.helpers.CableHelper;
 import sonar.logistics.registries.BlockRegistry;
 import codechicken.lib.vec.Cuboid6;
 import codechicken.multipart.NormallyOccludedPart;
+import codechicken.multipart.TMultiPart;
 
 public class DataCablePart extends SonarTilePart implements IDataCable {
 	public BlockCoords coords;
@@ -143,14 +144,14 @@ public class DataCablePart extends SonarTilePart implements IDataCable {
 	public void setCoords(BlockCoords coords) {
 		if (!BlockCoords.equalCoords(this.coords, coords)) {
 			this.coords = coords;
-			//CableHelper.updateAdjacentCoords(tile(), coords, true);
+			CableHelper.updateAdjacentCoords(tile(), coords, true);
 		}
 	}
 
 	@Override
 	public void onWorldJoin() {
 		super.onWorldJoin();
-		//CableHelper.updateAdjacentCoords(tile(), coords, true);
+		CableHelper.updateAdjacentCoords(tile(), coords, true);
 	}
 
 	@Override
@@ -165,4 +166,8 @@ public class DataCablePart extends SonarTilePart implements IDataCable {
 		CableHelper.updateAdjacentCoords(tile().getWorldObj(), x(), y(), z(), null, true);
 	}
 
+	public void onPartChanged(TMultiPart part) {
+		this.coords = null;
+		CableHelper.removeAllBlockedAdjacentCoords(tile());
+	}
 }

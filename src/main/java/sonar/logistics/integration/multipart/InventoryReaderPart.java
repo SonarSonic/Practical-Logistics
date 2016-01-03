@@ -25,6 +25,7 @@ import sonar.logistics.api.connecting.IDataConnection;
 import sonar.logistics.api.connecting.IInfoReader;
 import sonar.logistics.client.renderers.RenderHandlers;
 import sonar.logistics.common.handlers.InfoReaderHandler;
+import sonar.logistics.common.handlers.InventoryReaderHandler;
 import sonar.logistics.common.tileentity.TileEntityBlockNode;
 import sonar.logistics.helpers.CableHelper;
 import sonar.logistics.helpers.InfoHelper;
@@ -35,15 +36,15 @@ import codechicken.lib.vec.Cuboid6;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-public class InfoReaderPart extends SonarHandlerPart implements IDataConnection, IInfoReader {
+public class InventoryReaderPart extends SonarHandlerPart implements IDataConnection{
 
-	public InfoReaderHandler handler = new InfoReaderHandler(true);
+	public InventoryReaderHandler handler = new InventoryReaderHandler(true);
 
-	public InfoReaderPart() {
+	public InventoryReaderPart() {
 		super();
 	}
 
-	public InfoReaderPart(int meta) {
+	public InventoryReaderPart(int meta) {
 		super(meta);
 	}
 
@@ -57,10 +58,6 @@ public class InfoReaderPart extends SonarHandlerPart implements IDataConnection,
 		return handler.canConnect(tile(), dir);
 	}
 
-	@Override
-	public Info getSecondaryInfo() {
-		return handler.getSecondaryInfo(tile());
-	}
 
 	@Override
 	public void updateData(ForgeDirection dir) {
@@ -79,7 +76,7 @@ public class InfoReaderPart extends SonarHandlerPart implements IDataConnection,
 	public boolean activate(EntityPlayer player, MovingObjectPosition pos, ItemStack stack) {
 		if (player != null) {
 			sendAvailableData(player);
-			player.openGui(Logistics.instance, LogisticsGui.infoNode, tile().getWorldObj(), x(), y(), z());
+			player.openGui(Logistics.instance, LogisticsGui.inventoryReader, tile().getWorldObj(), x(), y(), z());
 			return true;
 
 		}
@@ -99,16 +96,16 @@ public class InfoReaderPart extends SonarHandlerPart implements IDataConnection,
 
 	@Override
 	public Object getSpecialRenderer() {
-		return new RenderHandlers.InfoNode();
+		return new RenderHandlers.InventoryReader();
 	}
 
 	@Override
 	public Block getBlock() {
-		return BlockRegistry.infoReader;
+		return BlockRegistry.inventoryReader;
 	}
 
 	@Override
 	public String getType() {
-		return "Info Reader";
+		return "Inventory Reader";
 	}
 }

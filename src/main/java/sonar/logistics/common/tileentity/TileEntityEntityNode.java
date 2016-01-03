@@ -1,26 +1,21 @@
 package sonar.logistics.common.tileentity;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityCreature;
-import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.common.tileentity.TileEntitySonar;
 import sonar.core.network.sync.SyncInt;
 import sonar.core.utils.BlockCoords;
 import sonar.core.utils.IMachineButtons;
-import sonar.core.utils.helpers.SonarHelper;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
+import sonar.core.utils.helpers.SonarHelper;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.connecting.IDataConnection;
 import sonar.logistics.api.render.ICableRenderer;
 import sonar.logistics.helpers.CableHelper;
-import sonar.logistics.helpers.InfoHelper;
 import sonar.logistics.info.types.BlockCoordsInfo;
 
 public class TileEntityEntityNode extends TileEntitySonar implements ICableRenderer, IDataConnection, IMachineButtons {

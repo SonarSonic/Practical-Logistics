@@ -9,7 +9,7 @@ import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StatCollector;
 
@@ -17,30 +17,33 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
+import sonar.core.SonarCore;
 import sonar.core.inventory.GuiSonar;
 import sonar.core.inventory.SonarButtons;
 import sonar.core.inventory.StoredItemStack;
 import sonar.core.network.PacketByteBuf;
-import sonar.core.network.SonarPackets;
 import sonar.core.utils.helpers.FontHelper;
 import sonar.core.utils.helpers.RenderHelper;
 import sonar.logistics.common.containers.ContainerInventoryReader;
+import sonar.logistics.common.handlers.InventoryReaderHandler;
 import sonar.logistics.common.tileentity.TileEntityInventoryReader;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-public abstract class GuiInventoryReader extends GuiSonar {
+public class GuiInventoryReader extends GuiSonar {
 
 	public int xCoord, yCoord, zCoord;
 
-	public TileEntityInventoryReader entity;
+	public InventoryReaderHandler handler;
+	public TileEntity tile;
 	
-	public GuiInventoryReader(Container container, TileEntityInventoryReader entity) {
-		super(container, entity);
+	public GuiInventoryReader(InventoryReaderHandler handler, TileEntity entity, InventoryPlayer inventoryPlayer) {
+		super(new ContainerInventoryReader(handler, entity, inventoryPlayer), entity);
 		this.xCoord = entity.xCoord;
 		this.yCoord = entity.yCoord;
 		this.zCoord = entity.zCoord;
-		this.entity=entity;
+		this.handler=handler;
+		this.tile=entity;
 	}
 
 	public static final ResourceLocation bground = new ResourceLocation("PracticalLogistics:textures/gui/inventoryReader.png");
@@ -64,32 +67,8 @@ public abstract class GuiInventoryReader extends GuiSonar {
 		scrollerStart = this.guiTop + 31;
 		scrollerEnd = scrollerStart + 128;
 		scrollerWidth = 10;
-		// for (int i = 0; i < 11; i++) {
-		// this.buttonList.add(new NetworkButton(10 + i, guiLeft + 7, guiTop + 29 + (i * 12)));
-		// }
 	}
-
-	public int getStackPosition() {
-		if (getCurrentStack() == null) {
-			return -1;
-		}
-		if (getStacks() == null) {
-			return -1;
-		}
-		int start = (int) (stackListSize() * this.currentScroll);
-		int finish = Math.min(start + (12 * 7), stackListSize());
-		for (int i = start; i < finish; i++) {
-			if (getStacks().get(i) != null) {
-				StoredItemStack info = getStacks().get(i);
-				// if (getCurrentStack().category.equals(info.category) && getCurrentStack().subCategory.equals(info.getSubCategory())) {
-				// return i - start;
-
-				// }
-			}
-		}
-		return -1;
-	}
-
+	
 	public List<Integer> getCategoryPositions() {
 		if (getStacks() == null) {
 			return null;
@@ -119,8 +98,8 @@ public abstract class GuiInventoryReader extends GuiSonar {
 				if (i < getStacks().size()) {
 					StoredItemStack storedStack = getStacks().get(i);
 					if (storedStack != null) {
-						entity.current=storedStack.item;
-						SonarPackets.network.sendToServer(new PacketByteBuf(entity, 1));
+						handler.current=storedStack.item;
+						SonarCore.network.sendToServer(new PacketByteBuf(handler, tile.xCoord, tile.yCoord,tile.zCoord, 1));
 					}
 				}
 			}
@@ -272,32 +251,8 @@ public abstract class GuiInventoryReader extends GuiSonar {
 		return getStacks() == null ? 0 : getStacks().size();
 	}
 
-	public abstract List<StoredItemStack> getStacks();
-
-	public abstract StoredItemStack getCurrentStack();
-
-	public static class Normal extends GuiInventoryReader {
-
-		public TileEntityInventoryReader tile;
-
-		public Normal(TileEntityInventoryReader entity, InventoryPlayer inventoryPlayer) {
-			super(new ContainerInventoryReader(entity, inventoryPlayer), entity);
-			tile = entity;
-		}
-
-		@Override
-		public List<StoredItemStack> getStacks() {
-			return tile.stacks;
-		}
-
-		@Override
-		public StoredItemStack getCurrentStack() {
-			return null;
-		}
-
+	public List<StoredItemStack> getStacks(){
+		return handler.stacks;
 	}
-	/* public static class Multipart extends GuiInventoryReader { public InfoReaderPart tile; public Multipart(InfoReaderPart entity) { super(new ContainerInfoNode.Multipart(entity), entity.tile()); tile = entity; }
-	 * @Override public List<BlockInfo> getStacks() { return tile.info; }
-	 * @Override public BlockInfo getCurrentStack() { return tile.currentInfo; } } */
 
 }

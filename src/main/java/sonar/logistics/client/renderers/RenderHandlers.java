@@ -13,15 +13,22 @@ import net.minecraft.util.ResourceLocation;
 
 import org.lwjgl.opengl.GL11;
 
-import sonar.calculator.mod.common.tileentity.machines.TileEntityAnalysingChamber;
+import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.renderers.SonarTERender;
 import sonar.core.utils.helpers.RenderHelper;
 import sonar.logistics.Logistics;
-import sonar.logistics.client.models.*;
+import sonar.logistics.client.models.ModelBlockNode;
+import sonar.logistics.client.models.ModelDataCable;
+import sonar.logistics.client.models.ModelDataModifier;
+import sonar.logistics.client.models.ModelDataReceiver;
+import sonar.logistics.client.models.ModelDirectionalConnector;
+import sonar.logistics.client.models.ModelEntityNode;
+import sonar.logistics.client.models.ModelHammer;
+import sonar.logistics.client.models.ModelInfoCreator;
+import sonar.logistics.client.models.ModelRedstoneSignaller;
 import sonar.logistics.common.tileentity.TileEntityEntityNode;
 import sonar.logistics.common.tileentity.TileEntityHammer;
 import sonar.logistics.registries.BlockRegistry;
-import sonar.logistics.utils.HammerRecipes;
 
 public class RenderHandlers {
 
@@ -137,7 +144,7 @@ public class RenderHandlers {
 		public void renderTileEntityAt(TileEntity entity, double x, double y, double z, float f) {
 			RenderHelper.beginRender(x + 0.5F, y + 1.5F, z + 0.5F, RenderHelper.setMetaData(entity), texture);
 			if (entity != null && entity.getWorldObj() != null) {
-				int meta = entity.getBlockMetadata();
+				int meta = FMPHelper.getMeta(entity);
 				if (meta == 0) {
 					GL11.glTranslated(0, 1, -1.0625);
 					GL11.glRotated(90, 1, 0, 0);
@@ -163,7 +170,7 @@ public class RenderHandlers {
 		public void renderTileEntityAt(TileEntity entity, double x, double y, double z, float f) {
 			RenderHelper.beginRender(x + 0.5F, y + 1.5F, z + 0.5F, RenderHelper.setMetaData(entity), texture);
 			if (entity != null && entity.getWorldObj() != null) {
-				int meta = entity.getBlockMetadata();
+				int meta = FMPHelper.getMeta(entity);
 				if (meta == 0) {
 					GL11.glTranslated(0, 1, -1.0625);
 					GL11.glRotated(90, 1, 0, 0);
