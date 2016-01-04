@@ -2,15 +2,13 @@ package sonar.logistics.integration.nei;
 
 import java.awt.Rectangle;
 
-import codechicken.nei.recipe.TemplateRecipeHandler;
 import net.minecraft.client.gui.inventory.GuiContainer;
-import sonar.calculator.mod.client.gui.machines.GuiSmeltingBlock;
-import sonar.calculator.mod.common.recipes.machines.ProcessingChamberRecipes;
 import sonar.core.integration.nei.AbstractProcessorHandler;
 import sonar.core.utils.helpers.FontHelper;
 import sonar.core.utils.helpers.RecipeHelper;
 import sonar.logistics.client.gui.GuiHammer;
 import sonar.logistics.utils.HammerRecipes;
+import codechicken.nei.recipe.TemplateRecipeHandler;
 
 public class HammerHandler extends AbstractProcessorHandler {
 

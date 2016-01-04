@@ -8,13 +8,11 @@ import net.minecraft.util.ResourceLocation;
 
 import org.lwjgl.input.Keyboard;
 
+import sonar.core.SonarCore;
 import sonar.core.inventory.GuiSonar;
 import sonar.core.network.PacketMachineButton;
-import sonar.core.network.PacketTextField;
-import sonar.core.network.SonarPackets;
 import sonar.core.utils.helpers.FontHelper;
 import sonar.logistics.common.containers.ContainerEmptySync;
-import sonar.logistics.common.tileentity.TileEntityDataEmitter;
 import sonar.logistics.common.tileentity.TileEntityEntityNode;
 
 public abstract class GuiEntityNode extends GuiSonar {
@@ -96,7 +94,7 @@ public abstract class GuiEntityNode extends GuiSonar {
 			} else {
 				entity.entityTarget.setInt(0);
 			}
-			SonarPackets.network.sendToServer(new PacketMachineButton(0, entity.entityTarget.getInt(), entity.xCoord, entity.yCoord, entity.zCoord));
+			SonarCore.network.sendToServer(new PacketMachineButton(0, entity.entityTarget.getInt(), entity.xCoord, entity.yCoord, entity.zCoord));
 		
 		}
 

@@ -59,7 +59,6 @@ public class EmitterRegistry {
 		if (emitter != null || playerName != null) {
 			if (emitters.get(playerName) == null) {
 				return;
-
 			}
 			int i = 0;
 			List<BlockCoords> removeList = new ArrayList();

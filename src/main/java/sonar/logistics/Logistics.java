@@ -7,8 +7,8 @@ import net.minecraftforge.common.MinecraftForge;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import sonar.core.SonarCore;
 import sonar.core.integration.SonarAPI;
-import sonar.core.network.SonarPackets;
 import sonar.logistics.info.providers.entity.EntityProviderRegistry;
 import sonar.logistics.info.providers.tile.TileProviderRegistry;
 import sonar.logistics.info.types.InfoTypeRegistry;
@@ -16,12 +16,15 @@ import sonar.logistics.integration.LogisticsWailaModule;
 import sonar.logistics.integration.multipart.ForgeMultipartHandler;
 import sonar.logistics.network.LogisticsCommon;
 import sonar.logistics.registries.BlockRegistry;
+import sonar.logistics.registries.ChannelRegistry;
 import sonar.logistics.registries.CraftingRegistry;
+import sonar.logistics.registries.EmitterRegistry;
 import sonar.logistics.registries.EventRegistry;
 import sonar.logistics.registries.ItemRegistry;
 import sonar.logistics.registries.OreDictRegistry;
 import sonar.logistics.utils.SapphireOreGen;
 import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
@@ -29,11 +32,12 @@ import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.event.FMLServerStoppingEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import cpw.mods.fml.common.registry.GameRegistry;
 
-@Mod(modid = Logistics.modid, version = Logistics.version)
+@Mod(modid = Logistics.modid, name = "Practical Logistics", version = Logistics.version)
 public class Logistics {
 
 	@SidedProxy(clientSide = "sonar.logistics.network.LogisticsClient", serverSide = "sonar.logistics.network.LogisticsCommon")
@@ -41,6 +45,7 @@ public class Logistics {
 
 	public static final String modid = "PracticalLogistics";
 	public static final String version = "0.0.1a";
+	public static final String coreVersion = "1.0.0";
 
 	public static SimpleNetworkWrapper network;
 	public static Logger logger = (Logger) LogManager.getLogger(modid);
@@ -57,10 +62,15 @@ public class Logistics {
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
+		if (!Loader.isModLoaded("SonarCore")) {
+			logger.fatal("Sonar Core is not loaded");
+		} else {
+			logger.info("Successfully loaded with Sonar Core");
+		}
 		network = NetworkRegistry.INSTANCE.newSimpleChannel(modid);
 		logger.info("Registered Network");
 
-		SonarPackets.registerPackets();
+		SonarCore.registerPackets();
 		LogisticsCommon.registerPackets();
 		logger.info("Registered Packets");
 
@@ -88,7 +98,7 @@ public class Logistics {
 		if (LogisticsConfig.sapphireOre) {
 			GameRegistry.registerWorldGenerator(new SapphireOreGen(), 1);
 			logger.info("Registered Sapphire World Generator");
-		}else
+		} else
 			logger.info("Sapphire Ore Generation is disabled in the config");
 	}
 
@@ -96,7 +106,7 @@ public class Logistics {
 	public void load(FMLInitializationEvent event) {
 		InfoTypeRegistry.registerProviders();
 		logger.info("Registered " + InfoTypeRegistry.getInfoTypes().size() + " Format Types");
-		
+
 		CraftingRegistry.addRecipes();
 		logger.info("Registered Crafting Recipes");
 
@@ -120,7 +130,11 @@ public class Logistics {
 		logger.info("Registered " + TileProviderRegistry.getProviders().size() + " Info Providers");
 		EntityProviderRegistry.registerProviders();
 		logger.info("Registered " + EntityProviderRegistry.getProviders().size() + " Entity Providers");
-
 	}
 
+	@EventHandler
+	public void onClose(FMLServerStoppingEvent event) {
+		EmitterRegistry.removeAll();
+		ChannelRegistry.removeAll();
+	}
 }

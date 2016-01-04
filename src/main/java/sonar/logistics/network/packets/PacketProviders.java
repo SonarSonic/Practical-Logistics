@@ -6,9 +6,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.tileentity.TileEntity;
 import sonar.core.integration.SonarAPI;
 import sonar.core.integration.fmp.FMPHelper;
+import sonar.core.integration.fmp.ITileHandler;
+import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.logistics.api.Info;
+import sonar.logistics.common.handlers.InfoReaderHandler;
 import sonar.logistics.common.tileentity.TileEntityInfoReader;
 import sonar.logistics.helpers.InfoHelper;
 import sonar.logistics.info.types.CategoryInfo;
@@ -44,11 +48,12 @@ public class PacketProviders implements IMessage {
 				info.add(InfoHelper.readInfo(buf));
 			}
 		}
-		Object tile = Minecraft.getMinecraft().thePlayer.worldObj.getTileEntity(xCoord, yCoord, zCoord);
-		tile = FMPHelper.checkObject(tile);
-		if (tile != null) {
-			if (tile instanceof TileEntityInfoReader) {
-				TileEntityInfoReader node = (TileEntityInfoReader) tile;
+		TileEntity tile = Minecraft.getMinecraft().thePlayer.worldObj.getTileEntity(xCoord, yCoord, zCoord);
+		Object target = FMPHelper.checkObject(tile);
+		if (target != null && target instanceof ITileHandler) {
+			TileHandler handler = ((ITileHandler) target).getTileHandler();
+			if (handler != null && handler instanceof InfoReaderHandler) {
+				InfoReaderHandler reader = (InfoReaderHandler) handler;
 				if (info != null) {
 					List<Info> newInfo = new ArrayList();
 					Info lastInfo = null;
@@ -59,26 +64,9 @@ public class PacketProviders implements IMessage {
 						newInfo.add(blockInfo);
 						lastInfo = blockInfo;
 					}
-					node.clientInfo = newInfo;
+					reader.clientInfo = newInfo;
 				} else {
-					node.clientInfo = null;
-				}
-			}
-			if (SonarAPI.forgeMultipartLoaded() && tile instanceof InfoReaderPart) {
-				InfoReaderPart node = (InfoReaderPart) tile;
-				if (info != null) {
-					List<Info> newInfo = new ArrayList();
-					Info lastInfo = null;
-					for (Info blockInfo : info) {
-						if (lastInfo == null || !lastInfo.getCategory().equals(blockInfo.getCategory())) {
-							newInfo.add(CategoryInfo.createInfo(blockInfo.getCategory()));
-						}
-						newInfo.add(blockInfo);
-						lastInfo = blockInfo;
-					}
-					node.info = newInfo;
-				} else {
-					node.info = null;
+					reader.clientInfo = null;
 				}
 			}
 
