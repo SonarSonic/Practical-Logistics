@@ -107,7 +107,9 @@ public class CableHelper {
 								TileEntity emitter = receiver.getEmitter().coords.getTileEntity();
 								if (emitter instanceof TileEntityDataEmitter) {
 									TileEntityDataEmitter dataemitter = (TileEntityDataEmitter) emitter;
-									return dataemitter.getConnectedTile();
+									if (tile.xCoord != dataemitter.xCoord || tile.yCoord != dataemitter.yCoord || tile.zCoord != dataemitter.zCoord) {
+										return dataemitter.getConnectedTile();
+									}
 								}
 								if (emitter != null) {
 									return emitter;
@@ -126,7 +128,9 @@ public class CableHelper {
 				TileEntity emitter = receiver.getEmitter().coords.getTileEntity();
 				if (emitter instanceof TileEntityDataEmitter) {
 					TileEntityDataEmitter dataemitter = (TileEntityDataEmitter) emitter;
-					return dataemitter.getConnectedTile();
+					if (tile.xCoord != dataemitter.xCoord || tile.yCoord != dataemitter.yCoord || tile.zCoord != dataemitter.zCoord) {
+						return dataemitter.getConnectedTile();
+					}
 				}
 				if (emitter != null) {
 					return emitter;

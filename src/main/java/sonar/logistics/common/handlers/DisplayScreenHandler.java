@@ -71,10 +71,12 @@ public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 				}
 
 			}
+
 			if (info != null) {
 				if (!info.isEqualType(lastInfo)||!info.isDataEqualType(lastInfo)) {
 					if (info instanceof StandardInfo && info.isEqualType(lastInfo)) {
-						SonarCore.sendPacketAround(te, 64, 1);
+						//if((StandardInfo)info.e)
+						SonarCore.sendPacketAround(te, 64, 0);
 					} else {
 						SonarCore.sendPacketAround(te, 64, 0);
 					}
