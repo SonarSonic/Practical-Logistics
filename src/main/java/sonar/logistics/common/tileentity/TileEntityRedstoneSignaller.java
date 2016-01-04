@@ -9,6 +9,7 @@ import sonar.core.network.utils.ITextField;
 import sonar.core.utils.IMachineButtons;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.api.Info;
+import sonar.logistics.api.StandardInfo;
 import sonar.logistics.api.connecting.IDataConnection;
 import sonar.logistics.api.connecting.IDataTile;
 import sonar.logistics.common.blocks.BlockRedstoneSignaller;

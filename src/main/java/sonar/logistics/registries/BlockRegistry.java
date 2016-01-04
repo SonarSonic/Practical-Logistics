@@ -3,34 +3,8 @@ package sonar.logistics.registries;
 import net.minecraft.block.Block;
 import sonar.core.common.block.SonarBlockTip;
 import sonar.logistics.Logistics;
-import sonar.logistics.common.blocks.BlockDataCable;
-import sonar.logistics.common.blocks.BlockDataEmitter;
-import sonar.logistics.common.blocks.BlockDataModifier;
-import sonar.logistics.common.blocks.BlockDataReceiver;
-import sonar.logistics.common.blocks.BlockEntityNode;
-import sonar.logistics.common.blocks.BlockHammer;
-import sonar.logistics.common.blocks.BlockHammerAir;
-import sonar.logistics.common.blocks.BlockHolographicDisplay;
-import sonar.logistics.common.blocks.BlockInfoCreator;
-import sonar.logistics.common.blocks.BlockInfoReader;
-import sonar.logistics.common.blocks.BlockInventoryReader;
-import sonar.logistics.common.blocks.BlockNode;
-import sonar.logistics.common.blocks.BlockRedstoneSignaller;
-import sonar.logistics.common.blocks.BlockSapphireOre;
-import sonar.logistics.common.blocks.DisplayScreen;
-import sonar.logistics.common.tileentity.TileEntityBlockNode;
-import sonar.logistics.common.tileentity.TileEntityDataCable;
-import sonar.logistics.common.tileentity.TileEntityDataEmitter;
-import sonar.logistics.common.tileentity.TileEntityDataModifier;
-import sonar.logistics.common.tileentity.TileEntityDataReceiver;
-import sonar.logistics.common.tileentity.TileEntityDisplayScreen;
-import sonar.logistics.common.tileentity.TileEntityEntityNode;
-import sonar.logistics.common.tileentity.TileEntityHammer;
-import sonar.logistics.common.tileentity.TileEntityHolographicDisplay;
-import sonar.logistics.common.tileentity.TileEntityInfoCreator;
-import sonar.logistics.common.tileentity.TileEntityInfoReader;
-import sonar.logistics.common.tileentity.TileEntityInventoryReader;
-import sonar.logistics.common.tileentity.TileEntityRedstoneSignaller;
+import sonar.logistics.common.blocks.*;
+import sonar.logistics.common.tileentity.*;
 import cpw.mods.fml.common.registry.GameRegistry;
 
 public class BlockRegistry extends Logistics {
@@ -50,7 +24,7 @@ public class BlockRegistry extends Logistics {
 		GameRegistry.registerBlock(sapphire_ore, "SapphireOre");
 
 
-		displayScreen = new DisplayScreen().setBlockName("DisplayScreen").setHardness(0.2F).setResistance(20.0F).setBlockTextureName(modid + ":" + "data_cable");
+		displayScreen = new DisplayScreen().setBlockName("DisplayScreen").setHardness(0.2F).setResistance(20.0F).setBlockTextureName(modid + ":" + "infoBlock_normal");
 		GameRegistry.registerBlock(displayScreen, SonarBlockTip.class, "DisplayScreen");
 		GameRegistry.registerTileEntity(TileEntityDisplayScreen.class, "DisplayScreen");		
 

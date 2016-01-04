@@ -126,7 +126,7 @@ public class RenderDisplayScreen extends TileEntitySpecialRenderer {
 				break;
 			}
 			GL11.glTranslated(0, 0, -(0.98));
-			FontRenderer rend = Minecraft.getMinecraft().fontRenderer;
+			FontRenderer rend = this.func_147498_b();
 			GL11.glDisable(GL11.GL_LIGHTING);
 			if(info.hasSpecialRender()){
 			info.renderInfo(tess, tile);

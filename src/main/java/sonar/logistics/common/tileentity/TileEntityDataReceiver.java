@@ -7,8 +7,8 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
-import sonar.logistics.api.DataEmitter;
 import sonar.logistics.api.Info;
+import sonar.logistics.api.DataEmitter;
 import sonar.logistics.api.StandardInfo;
 import sonar.logistics.api.connecting.IDataReceiver;
 import sonar.logistics.helpers.CableHelper;
@@ -65,7 +65,7 @@ public class TileEntityDataReceiver extends TileEntityNode implements IDataRecei
 
 	public void readData(NBTTagCompound nbt, SyncType type) {
 		super.readData(nbt, type);
-		if (type == SyncType.SAVE || type == SyncType.SYNC) {
+		if (type == SyncType.SAVE) {
 			if (nbt.hasKey("coords")) {
 				if (nbt.getCompoundTag("coords").getBoolean("hasCoords")) {
 					emitter = DataEmitter.readFromNBT(nbt.getCompoundTag("coords"));
@@ -78,7 +78,7 @@ public class TileEntityDataReceiver extends TileEntityNode implements IDataRecei
 
 	public void writeData(NBTTagCompound nbt, SyncType type) {
 		super.writeData(nbt, type);
-		if (type == SyncType.SAVE || type == SyncType.SYNC) {
+		if (type == SyncType.SAVE) {
 			NBTTagCompound infoTag = new NBTTagCompound();
 			if (emitter != null) {
 				DataEmitter.writeToNBT(infoTag, emitter);

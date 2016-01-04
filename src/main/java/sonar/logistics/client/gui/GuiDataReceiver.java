@@ -92,11 +92,10 @@ public class GuiDataReceiver extends GuiSonar {
 		if (tile.emitters != null) {
 			int start = (int) (emitterSize() * this.currentScroll);
 			int finish = Math.min(start + 11, emitterSize());
-			int pos = this.getDataPosition();
 			for (int i = start; i < finish; i++) {
 				DataEmitter emitter = tile.emitters.get(i);
 				if (emitter != null) {
-					boolean isSelected = pos==i;
+					boolean isSelected = tile.emitter == null ? false : BlockCoords.equalCoords(emitter.coords, tile.emitter.coords);
 					FontHelper.text(emitter.name, 10, 31 + (12 * i) - (12 * start), isSelected ? Color.GREEN.getRGB() : Color.WHITE.getRGB());
 
 					GL11.glPushMatrix();

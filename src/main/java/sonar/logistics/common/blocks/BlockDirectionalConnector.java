@@ -1,7 +1,19 @@
 package sonar.logistics.common.blocks;
 
+import static net.minecraftforge.common.util.ForgeDirection.DOWN;
+import static net.minecraftforge.common.util.ForgeDirection.EAST;
+import static net.minecraftforge.common.util.ForgeDirection.NORTH;
+import static net.minecraftforge.common.util.ForgeDirection.SOUTH;
+import static net.minecraftforge.common.util.ForgeDirection.UP;
+import static net.minecraftforge.common.util.ForgeDirection.WEST;
+
 import java.util.List;
 
+import sonar.core.integration.fmp.FMPHelper;
+import sonar.core.network.utils.ISyncTile;
+import sonar.core.utils.helpers.SonarHelper;
+import sonar.core.utils.helpers.NBTHelper.SyncType;
+import sonar.logistics.api.connecting.IDataCable;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.EntityLivingBase;
@@ -12,9 +24,6 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
-import sonar.core.integration.fmp.FMPHelper;
-import sonar.core.integration.fmp.ITileHandler;
-import sonar.logistics.api.connecting.IDataCable;
 
 public class BlockDirectionalConnector extends BaseNode {
 
@@ -38,12 +47,18 @@ public class BlockDirectionalConnector extends BaseNode {
 
 	@Override
 	public void breakBlock(World world, int x, int y, int z, Block oldblock, int oldMetadata) {
-		Object target =FMPHelper.getTile(world, x, y, z);		
-		if(target instanceof ITileHandler){
-			((ITileHandler)target).getTileHandler().removed(world, x, y, z, oldMetadata);
-		}		
 		super.breakBlock(world, x, y, z, oldblock, oldMetadata);
-	
+		ForgeDirection dir = ForgeDirection.getOrientation(oldMetadata);
+		Object tile = world.getTileEntity(x + dir.offsetX, y + dir.offsetY, z + dir.offsetZ);
+		tile = FMPHelper.checkObject(tile);
+		if (tile != null) {
+			if (tile instanceof IDataCable) {
+				IDataCable cable = (IDataCable) tile;
+				if (cable.getCoords() != null) {
+					cable.setCoords(null);
+				}
+			}
+		}
 	}
 
 	@Override

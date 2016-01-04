@@ -4,11 +4,7 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import sonar.core.integration.SonarAPI;
-import sonar.core.integration.fmp.FMPHelper;
-import sonar.core.integration.fmp.ITileHandler;
-import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.logistics.api.Info;
-import sonar.logistics.common.handlers.InfoReaderHandler;
 import sonar.logistics.common.tileentity.TileEntityInfoReader;
 import sonar.logistics.helpers.InfoHelper;
 import sonar.logistics.integration.multipart.InfoReaderPart;
@@ -78,16 +74,22 @@ public class PacketInfoBlock implements IMessage {
 			if (te == null) {
 				return null;
 			}
-			Object target = FMPHelper.checkObject(te);
-			if(target!=null && target instanceof ITileHandler){
-				TileHandler handler = ((ITileHandler) target).getTileHandler();;
-				if(handler!=null && handler instanceof InfoReaderHandler){
-					InfoReaderHandler reader = (InfoReaderHandler) handler;					
+			if (te != null && te instanceof TileEntityInfoReader) {
+				TileEntityInfoReader node = (TileEntityInfoReader) te;
+				if (message.primary) {
+					node.primaryInfo = message.info;
+				} else {
+					node.secondaryInfo = message.info;
+				}
+			}
+			if (SonarAPI.forgeMultipartLoaded() && te != null && te instanceof TileMultipart) {
+				TMultiPart part = ((TileMultipart) te).jPartList().get(0);
+				if (part != null && part instanceof InfoReaderPart) {
+					InfoReaderPart node = (InfoReaderPart) part;
 					if (message.primary) {
-						reader.primaryInfo = message.info;
-					} else {
-						reader.secondaryInfo = message.info;
-					}
+						node.primaryInfo = message.info;
+					} else
+						node.secondaryInfo = message.info;
 				}
 			}
 			return null;

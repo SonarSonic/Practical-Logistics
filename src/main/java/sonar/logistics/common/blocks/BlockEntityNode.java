@@ -1,13 +1,14 @@
 package sonar.logistics.common.blocks;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
 import sonar.core.common.block.SonarMaterials;
 import sonar.logistics.Logistics;
 import sonar.logistics.common.tileentity.TileEntityEntityNode;
 import sonar.logistics.network.LogisticsGui;
+import net.minecraft.block.material.Material;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.World;
 
 public class BlockEntityNode extends BaseNode {
 

@@ -22,24 +22,18 @@ public class ForgeMultipartHandler implements IPartFactory, IPartConverter {
 			return new DataCablePart();
 		if (name.equals("Info Reader"))
 			return new InfoReaderPart();
-		if (name.equals("Inventory Reader"))
-			return new InventoryReaderPart();
-		if (name.equals("Info Creator"))
-			return new InfoCreatorPart();
-		if (name.equals("Data Modifier"))
-			return new DataModifierPart();
 		return null;
 	}
 
 	public static void init() {
 		instance = new ForgeMultipartHandler();
 		MultiPartRegistry.registerConverter(instance);
-		MultiPartRegistry.registerParts(instance, new String[] { "Screen Part","Cable Part","Info Reader","Inventory Reader","Info Creator","Data Modifier" });
+		MultiPartRegistry.registerParts(instance, new String[] { "Screen Part","Cable Part","Info Reader" });
 	}
 
 	@Override
 	public Iterable<Block> blockTypes() {
-		return Arrays.asList(BlockRegistry.displayScreen,BlockRegistry.dataCable, BlockRegistry.infoReader, BlockRegistry.inventoryReader,BlockRegistry.infoCreator,BlockRegistry.dataModifier);
+		return Arrays.asList(BlockRegistry.displayScreen,BlockRegistry.dataCable, BlockRegistry.infoReader);
 	}
 
 	@Override
@@ -54,15 +48,6 @@ public class ForgeMultipartHandler implements IPartFactory, IPartConverter {
 		}
 		if (b == BlockRegistry.infoReader) {
 			return new InfoReaderPart(meta);
-		}
-		if (b == BlockRegistry.inventoryReader) {
-			return new InventoryReaderPart(meta);
-		}
-		if (b == BlockRegistry.infoCreator) {
-			return new InfoCreatorPart(meta);
-		}
-		if (b == BlockRegistry.dataModifier) {
-			return new DataModifierPart(meta);
 		}
 		return null;
 	}

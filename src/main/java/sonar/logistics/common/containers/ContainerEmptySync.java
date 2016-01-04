@@ -5,13 +5,9 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import sonar.core.inventory.ContainerSync;
-import sonar.core.network.utils.ISyncTile;
 
 public class ContainerEmptySync extends ContainerSync {
 
-	public ContainerEmptySync(ISyncTile sync, TileEntity entity) {
-		super(sync, entity);
-	}
 	public ContainerEmptySync(TileEntity entity) {
 		super(entity);
 	}

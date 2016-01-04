@@ -2,14 +2,17 @@ package sonar.logistics.info.providers.entity;
 
 import java.util.List;
 
+import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityAgeable;
+import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityList;
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.player.EntityPlayer;
 import sonar.logistics.api.EntityInfo;
 import sonar.logistics.api.Info;
+import sonar.logistics.api.StandardInfo;
 import sonar.logistics.api.data.EntityProvider;
 
 public class NormalEntityProvider extends EntityProvider {
@@ -43,7 +46,7 @@ public class NormalEntityProvider extends EntityProvider {
 
 			infoList.add(new EntityInfo(id, 0, 2, (int)living.getHealth(), "HP"));
 			infoList.add(new EntityInfo(id, 0, 3, (int)living.getMaxHealth(), "HP"));
-			if (entity instanceof EntityMob) {
+			if (entity instanceof EntityCreature) {
 				infoList.add(new EntityInfo(id, 0, 4, true));
 			} else {
 				infoList.add(new EntityInfo(id, 0, 4, false));

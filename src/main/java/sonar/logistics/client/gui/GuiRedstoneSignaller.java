@@ -8,10 +8,10 @@ import net.minecraft.util.ResourceLocation;
 
 import org.lwjgl.input.Keyboard;
 
-import sonar.core.SonarCore;
 import sonar.core.inventory.GuiSonar;
 import sonar.core.network.PacketMachineButton;
 import sonar.core.network.PacketTextField;
+import sonar.core.network.SonarPackets;
 import sonar.core.utils.helpers.FontHelper;
 import sonar.logistics.common.containers.ContainerEmptySync;
 import sonar.logistics.common.tileentity.TileEntityRedstoneSignaller;
@@ -198,7 +198,7 @@ public abstract class GuiRedstoneSignaller extends GuiSonar {
 
 		@Override
 		public void setString(String string) {
-			SonarCore.network.sendToServer(new PacketTextField(string, entity.xCoord, entity.yCoord, entity.zCoord, 1));
+			SonarPackets.network.sendToServer(new PacketTextField(string, entity.xCoord, entity.yCoord, entity.zCoord, 1));
 			entity.stringName.setString(string);
 		}
 
@@ -209,7 +209,7 @@ public abstract class GuiRedstoneSignaller extends GuiSonar {
 			} else {
 				entity.dataType.setInt(0);
 			}
-			SonarCore.network.sendToServer(new PacketMachineButton(0, entity.dataType.getInt(), entity.xCoord, entity.yCoord, entity.zCoord));
+			SonarPackets.network.sendToServer(new PacketMachineButton(0, entity.dataType.getInt(), entity.xCoord, entity.yCoord, entity.zCoord));
 		}
 
 		@Override
@@ -219,7 +219,7 @@ public abstract class GuiRedstoneSignaller extends GuiSonar {
 			} else {
 				entity.integerEmitType.setInt(0);
 			}
-			SonarCore.network.sendToServer(new PacketMachineButton(1, entity.integerEmitType.getInt(), entity.xCoord, entity.yCoord, entity.zCoord));
+			SonarPackets.network.sendToServer(new PacketMachineButton(1, entity.integerEmitType.getInt(), entity.xCoord, entity.yCoord, entity.zCoord));
 
 		}
 
@@ -236,7 +236,7 @@ public abstract class GuiRedstoneSignaller extends GuiSonar {
 
 		@Override
 		public void setInteger(String string) {
-			SonarCore.network.sendToServer(new PacketTextField(string, entity.xCoord, entity.yCoord, entity.zCoord, 0));
+			SonarPackets.network.sendToServer(new PacketTextField(string, entity.xCoord, entity.yCoord, entity.zCoord, 0));
 			entity.integerTarget.setInt(Integer.parseInt(string));
 		}
 

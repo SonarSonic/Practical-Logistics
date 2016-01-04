@@ -5,23 +5,19 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import sonar.core.integration.fmp.FMPHelper;
-import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.inventory.ContainerSync;
 import sonar.core.inventory.slots.SlotList;
-import sonar.logistics.common.handlers.InventoryReaderHandler;
 import sonar.logistics.common.tileentity.TileEntityInventoryReader;
 
 public class ContainerInventoryReader extends ContainerSync {
 
 	private static final int INV_START = 1, INV_END = INV_START + 26, HOTBAR_START = INV_END + 1, HOTBAR_END = HOTBAR_START + 8;
 
-	public ContainerInventoryReader(InventoryReaderHandler handler, TileEntity entity, InventoryPlayer inventoryPlayer) {
-		super(handler, entity);
-
-		addSlotToContainer(new SlotList(handler, 0, 13, 9));
-
+	public ContainerInventoryReader(TileEntityInventoryReader entity, InventoryPlayer inventoryPlayer) {
+		super(entity);
+		
+		addSlotToContainer(new SlotList(entity, 0, 13, 9));
+		
 		for (int i = 0; i < 3; ++i) {
 			for (int j = 0; j < 9; ++j) {
 				this.addSlotToContainer(new Slot(inventoryPlayer, j + i * 9 + 9, 41 + j * 18, 174 + i * 18));
@@ -41,9 +37,8 @@ public class ContainerInventoryReader extends ContainerSync {
 			if (crafters != null) {
 				for (Object o : crafters) {
 					if (o != null && o instanceof EntityPlayerMP) {
-						TileHandler handler = FMPHelper.getHandler(tile);
-						if (handler != null && handler instanceof InventoryReaderHandler) {
-							((InventoryReaderHandler) handler).sendAvailableData(tile, (EntityPlayerMP) o);
+						if (tile instanceof TileEntityInventoryReader) {
+							((TileEntityInventoryReader) tile).sendAvailableData((EntityPlayerMP) o);
 						}
 					}
 				}

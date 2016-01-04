@@ -2,9 +2,11 @@ package sonar.logistics.common.tileentity;
 
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
+import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.SonarHelper;
 import sonar.logistics.api.Info;
+import sonar.logistics.api.connecting.IDataCable;
 import sonar.logistics.api.connecting.IDataConnection;
 import sonar.logistics.api.render.ICableRenderer;
 import sonar.logistics.helpers.CableHelper;

@@ -1,12 +1,16 @@
 package sonar.logistics.common.containers;
 
+import ic2.api.item.IElectricItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
+import sonar.core.energy.DischargeValues;
+import sonar.core.integration.SonarAPI;
 import sonar.core.inventory.ContainerSync;
 import sonar.core.inventory.slots.SlotBlockedInventory;
 import sonar.logistics.common.tileentity.TileEntityHammer;
+import cofh.api.energy.IEnergyContainerItem;
 
 public class ContainerHammer extends ContainerSync {
 

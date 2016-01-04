@@ -7,25 +7,20 @@ import net.minecraft.util.ResourceLocation;
 
 import org.lwjgl.input.Keyboard;
 
-import sonar.core.SonarCore;
 import sonar.core.inventory.GuiSonar;
 import sonar.core.network.PacketTextField;
+import sonar.core.network.SonarPackets;
 import sonar.core.utils.helpers.FontHelper;
 import sonar.logistics.common.containers.ContainerEmptySync;
-import sonar.logistics.common.handlers.InfoCreatorHandler;
 import sonar.logistics.common.tileentity.TileEntityInfoCreator;
 
-public class GuiInfoCreator extends GuiSonar {
+public abstract class GuiInfoCreator extends GuiSonar {
 
 	public static final ResourceLocation bground = new ResourceLocation("PracticalLogistics:textures/gui/signaller.png");
 	private GuiTextField subCategory, data;
-	public InfoCreatorHandler handler;
-	public TileEntity entity;
-	
-	public GuiInfoCreator(InfoCreatorHandler handler, TileEntity entity) {
-		super(new ContainerEmptySync(handler, entity), entity);
-		this.handler = handler;
-		this.entity= entity;
+
+	public GuiInfoCreator(Container container, TileEntity entity) {
+		super(container, entity);
 	}
 
 	@Override
@@ -101,26 +96,39 @@ public class GuiInfoCreator extends GuiSonar {
 		return bground;
 	}
 
-	public String getText(int id){
-		switch (id) {
-		case 1:
-			return handler.data.getString();
-		case 0:
-			return handler.subCategory.getString();
-		}
-		return " ";
-	}
+	public abstract String getText(int id);
 
-	public void setString(String string, int id){
-		SonarCore.network.sendToServer(new PacketTextField(string, entity.xCoord,  entity.yCoord,  entity.zCoord, id));
-		switch (id) {
-		case 0:
-			handler.subCategory.setString(string);
-			break;
-		case 1:
-			handler.data.setString(string);
-			break;
-		}
-	}
+	public abstract void setString(String string, int id);
 
+	public static class Normal extends GuiInfoCreator {
+
+		public TileEntityInfoCreator entity;
+
+		public Normal(TileEntityInfoCreator entity) {
+			super(new ContainerEmptySync(entity), entity);
+			this.entity = entity;
+		}
+
+		@Override
+		public String getText(int id) {
+			switch (id) {
+			case 1:
+				return entity.data.getString();
+			default:
+				return entity.subCategory.getString();
+			}
+		}
+
+		@Override
+		public void setString(String string, int id) {
+			SonarPackets.network.sendToServer(new PacketTextField(string, entity.xCoord, entity.yCoord, entity.zCoord, id));
+			switch (id) {
+			case 1:
+				entity.data.setString(string);
+			default:
+				entity.subCategory.setString(string);
+			}
+		}
+
+	}
 }

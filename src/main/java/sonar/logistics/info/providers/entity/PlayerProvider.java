@@ -2,10 +2,12 @@ package sonar.logistics.info.providers.entity;
 
 import java.util.List;
 
+import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import sonar.logistics.api.EntityInfo;
 import sonar.logistics.api.Info;
+import sonar.logistics.api.StandardInfo;
 import sonar.logistics.api.data.EntityProvider;
 
 public class PlayerProvider extends EntityProvider {

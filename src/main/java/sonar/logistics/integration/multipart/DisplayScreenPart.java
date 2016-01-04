@@ -7,19 +7,13 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraftforge.common.util.ForgeDirection;
-import sonar.core.SonarCore;
 import sonar.core.integration.fmp.FMPHelper;
-import sonar.core.integration.fmp.SonarHandlerPart;
 import sonar.core.integration.fmp.SonarTilePart;
-import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.api.Info;
-import sonar.logistics.api.StandardInfo;
 import sonar.logistics.api.connecting.IDataConnection;
 import sonar.logistics.api.connecting.IInfoReader;
 import sonar.logistics.client.renderers.RenderDisplayScreen;
-import sonar.logistics.common.handlers.DisplayScreenHandler;
-import sonar.logistics.common.handlers.InfoReaderHandler;
 import sonar.logistics.common.tileentity.TileEntityInventoryReader;
 import sonar.logistics.helpers.CableHelper;
 import sonar.logistics.helpers.InfoHelper;
@@ -27,36 +21,16 @@ import sonar.logistics.registries.BlockRegistry;
 import sonar.logistics.registries.ItemRegistry;
 import codechicken.lib.vec.Cuboid6;
 
-public class DisplayScreenPart extends SonarHandlerPart implements IDataConnection {
+public class DisplayScreenPart extends SonarTilePart implements IDataConnection {
 
-	public DisplayScreenHandler handler = new DisplayScreenHandler(true);
-
+	public Info info;
+	
 	public DisplayScreenPart() {
 		super();
 	}
 
 	public DisplayScreenPart(int meta) {
 		super(meta);
-	}
-
-	@Override
-	public TileHandler getTileHandler() {
-		return handler;
-	}
-
-	@Override
-	public boolean canConnect(ForgeDirection dir) {
-		return handler.canConnect(tile(), dir);
-	}
-
-	@Override
-	public void updateData(ForgeDirection dir) {
-		handler.updateData(tile(), dir);
-	}
-
-	@Override
-	public Info currentInfo() {
-		return handler.currentInfo();
 	}
 
 	@Override
@@ -104,6 +78,79 @@ public class DisplayScreenPart extends SonarHandlerPart implements IDataConnecti
 		return "Screen Part";
 	}
 
+	public void readData(NBTTagCompound nbt, SyncType type) {
+		if (type == SyncType.SAVE || type == SyncType.SYNC) {
+			if (nbt.hasKey("currentInfo")) {
+				info = InfoHelper.readInfo(nbt.getCompoundTag("currentInfo"));
+			}
+		}
+	}
+
+	public void writeData(NBTTagCompound nbt, SyncType type) {
+		if (type == SyncType.SAVE || type == SyncType.SYNC) {
+			if (info != null) {
+				NBTTagCompound infoTag = new NBTTagCompound();
+				InfoHelper.writeInfo(infoTag, info);
+				nbt.setTag("currentInfo", infoTag);
+			}
+		}
+	}
+
+	public void update() {
+		if (!world().isRemote) {
+			this.updateData(ForgeDirection.getOrientation(meta));
+		}
+	}
+
+	// IDATACONNECTION
+
+	@Override
+	public boolean canConnect(ForgeDirection dir) {
+		return dir.equals(ForgeDirection.getOrientation(meta).getOpposite());
+	}
+
+	@Override
+	public void updateData(ForgeDirection dir) {
+		Object target = CableHelper.getConnectedTile(tile(), dir.getOpposite());
+		target = FMPHelper.checkObject(target);
+		if (target == null) {
+			return;
+		} else {
+			if (target instanceof IInfoReader) {
+				IInfoReader infoReader= (IInfoReader) target;
+				if(infoReader.currentInfo() != null && infoReader.getSecondaryInfo()!=null){
+					this.info = InfoHelper.combineData(infoReader.currentInfo(), infoReader.getSecondaryInfo());
+				}
+				else if (infoReader.currentInfo() != null) {
+					this.info = infoReader.currentInfo();
+				} else if (this.info != null) {
+					this.info.emptyData();
+				}
+			} else if(target instanceof TileEntityInventoryReader){
+				TileEntityInventoryReader infoNode = (TileEntityInventoryReader) target;
+				if (infoNode.currentInfo() != null) {
+					this.info = infoNode.currentInfo();
+				} else if (this.info != null) {
+					this.info.emptyData();
+				}
+			}
+			else if (target instanceof IDataConnection) {
+				IDataConnection infoNode = (IDataConnection) target;
+				if (infoNode.currentInfo() != null) {
+					this.info = infoNode.currentInfo();
+				} else if (this.info != null) {
+					this.info.emptyData();
+				}
+			}
+		}
+	}
+
+	@Override
+	public Info currentInfo() {
+		return info;
+	}
+
+	
 	@Override
 	public Object getSpecialRenderer() {
 		return new RenderDisplayScreen();

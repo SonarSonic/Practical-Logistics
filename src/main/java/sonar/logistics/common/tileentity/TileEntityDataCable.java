@@ -65,13 +65,5 @@ public class TileEntityDataCable extends TileEntitySonar implements IDataCable {
 
 		}
 	}
-	public void validate(){
-		this.coords=null;
-		super.validate();
-	}
-	public void invalidate(){
-		this.coords=null;
-		super.invalidate();
-		CableHelper.updateAdjacentCoords(worldObj, xCoord, yCoord, zCoord, null, true);
-	}
+
 }

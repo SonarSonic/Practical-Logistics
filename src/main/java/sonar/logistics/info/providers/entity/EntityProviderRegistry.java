@@ -8,6 +8,7 @@ import java.util.Map;
 
 import sonar.logistics.Logistics;
 import sonar.logistics.api.data.EntityProvider;
+import sonar.logistics.api.data.TileProvider;
 
 public class EntityProviderRegistry {
 

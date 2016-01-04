@@ -6,9 +6,9 @@ import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import sonar.core.SonarCore;
 import sonar.core.inventory.ContainerSync;
 import sonar.core.network.PacketTileSync;
+import sonar.core.network.SonarPackets;
 import sonar.core.utils.helpers.NBTHelper;
 import sonar.logistics.Logistics;
 import sonar.logistics.common.tileentity.TileEntityDataReceiver;
@@ -31,7 +31,7 @@ public class ContainerDataReceiver extends ContainerSync {
 				sync.writeData(syncData, NBTHelper.SyncType.SYNC);
 				for (Object o : crafters) {
 					if (o != null && o instanceof EntityPlayerMP) {						
-						SonarCore.network.sendTo(new PacketTileSync(tile.xCoord, tile.yCoord, tile.zCoord, syncData), (EntityPlayerMP) o);
+						SonarPackets.network.sendTo(new PacketTileSync(tile.xCoord, tile.yCoord, tile.zCoord, syncData), (EntityPlayerMP) o);
 						Logistics.network.sendTo(new PacketDataEmitters(tile.xCoord, tile.yCoord, tile.zCoord,EmitterRegistry.getEmitters(((EntityPlayerMP) o).getGameProfile().getName())), (EntityPlayerMP) o);
 					}
 				}
