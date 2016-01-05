@@ -86,6 +86,7 @@ public class InfoHelper {
 				return res;
 			}
 		});
+		
 		return providerInfo;
 	}
 
@@ -145,6 +146,13 @@ public class InfoHelper {
 		} else if (tile instanceof IInventory) {
 			addInventoryToList(storedStacks, (IInventory) tile);
 		}
+		Collections.sort(storedStacks, new Comparator<StoredItemStack>() {
+			 public int compare(StoredItemStack str1, StoredItemStack str2){
+			       if(str1.stored <  str2.stored) return 1;
+			       if(str1.stored == str2.stored) return 0;
+			       return -1;
+			    }
+		});
 		return storedStacks;
 	}
 

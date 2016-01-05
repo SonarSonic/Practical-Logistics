@@ -69,13 +69,9 @@ public class InventoryReaderPart extends SonarHandlerPart implements IDataConnec
 		return handler.currentInfo(tile());
 	}
 
-	public void sendAvailableData(EntityPlayer player) {
-		handler.sendAvailableData(tile(), player);
-	}
-
 	public boolean activate(EntityPlayer player, MovingObjectPosition pos, ItemStack stack) {
 		if (player != null) {
-			sendAvailableData(player);
+			this.sendSyncPacket(player);			
 			player.openGui(Logistics.instance, LogisticsGui.inventoryReader, tile().getWorldObj(), x(), y(), z());
 			return true;
 

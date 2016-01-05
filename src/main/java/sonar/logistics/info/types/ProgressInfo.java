@@ -157,6 +157,9 @@ public class ProgressInfo extends Info {
 
 	@Override
 	public boolean isEqualType(Info info) {
+		if (info != null && info.getType().equals(this.getType())) {
+			return info.getCategory().equals(this.getCategory()) && info.getSubCategory().equals(getSubCategory());
+		}
 		return false;
 	}
 

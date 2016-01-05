@@ -63,8 +63,8 @@ public class TileProviderRegistry {
 		return null;
 	}
 	public static void addProvider(TileProvider provider) {
-		Logistics.logger.warn("Loading Info Provider: " + provider.helperName());
 		if(!provider.isLoadable()){
+			Logistics.logger.warn("Info Provider wasn't loadable: " + provider.helperName());
 			return;
 		}
 		if (provider != null) {

@@ -58,24 +58,18 @@ public class TileEntityInventoryReader extends TileEntityHandlerInventory implem
 		return handler.currentInfo(this);
 	}
 
-	public void sendAvailableData(EntityPlayer player) {
-		handler.sendAvailableData(this, player);
-	}
-
 	public boolean maxRender() {
 		return true;
 	}
 
 	@Override
 	public void writePacket(ByteBuf buf, int id) {
-		handler.writePacket(buf, id);
-		
+		handler.writePacket(buf, id);		
 	}
 
 	@Override
 	public void readPacket(ByteBuf buf, int id) {
-		handler.readPacket(buf, id);
-		
+		handler.readPacket(buf, id);		
 	}
 
 }

@@ -267,12 +267,12 @@ public class GuiInfoReader extends GuiSonar {
 							} else {
 								Logistics.network.sendToServer(new PacketInfoBlock(xCoord, yCoord, zCoord, info, true));
 								if (handler.isMultipart.getBoolean()) {
-									handler.primaryInfo = info;
+									handler.primaryInfo.setInfo(info);
 								}
 							}
 
 						} else if (buttonID == 1) {
-							if (getPrimaryInfo() != null && !info.isEqualType(getPrimaryInfo())) {
+							if (!info.isEqualType(getPrimaryInfo())) {
 								if (getSecondInfo() != null && info.isEqualType(getSecondInfo())) {
 									Logistics.network.sendToServer(new PacketInfoBlock(xCoord, yCoord, zCoord, false));
 									if (handler.isMultipart.getBoolean()) {
@@ -281,7 +281,7 @@ public class GuiInfoReader extends GuiSonar {
 								} else {
 									Logistics.network.sendToServer(new PacketInfoBlock(xCoord, yCoord, zCoord, info, false));
 									if (handler.isMultipart.getBoolean()) {
-										handler.secondaryInfo = info;
+										handler.secondaryInfo.setInfo(info);
 									}
 								}
 							}
@@ -344,11 +344,11 @@ public class GuiInfoReader extends GuiSonar {
 	}
 
 	public Info getPrimaryInfo(){
-		return handler.primaryInfo;
+		return handler.primaryInfo.getInfo();
 	}
 
 	public Info getSecondInfo(){
-		return handler.secondaryInfo;
+		return handler.secondaryInfo.getInfo();
 	}
 
 }

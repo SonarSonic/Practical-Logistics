@@ -24,7 +24,6 @@ public class ContainerDataReceiver extends ContainerSync {
 	}
 	@Override
 	public void detectAndSendChanges() {
-		super.detectAndSendChanges();
 		if (sync != null) {
 			if (crafters != null) {
 				NBTTagCompound syncData = new NBTTagCompound();

@@ -137,12 +137,6 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 
 	}
 
-	public void sendAvailableData(TileEntity te, EntityPlayer player) {
-		if (player != null && player instanceof EntityPlayerMP) {
-			SonarCore.network.sendTo(new PacketByteBuf(this, te.xCoord, te.yCoord,te.zCoord, 0), (EntityPlayerMP) player);
-		}
-	}
-
 	public void readData(NBTTagCompound nbt, SyncType type) {
 		super.readData(nbt, type);
 		if (type == SyncType.SAVE) {
@@ -152,6 +146,53 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 				} else {
 					coords = null;
 				}
+			}
+		}
+		if (type == SyncType.SPECIAL) {
+			if (nbt.hasKey("null")) {
+				this.stacks = new ArrayList();
+				return;
+			}
+			NBTTagList list = nbt.getTagList("Stacks", 10);
+			if (this.stacks == null) {
+				this.stacks = new ArrayList();
+			}
+			for (int i = 0; i < list.tagCount(); i++) {
+				NBTTagCompound compound = list.getCompoundTagAt(i);
+				byte slot = compound.getByte("Slot");
+				boolean set = slot < stacks.size();
+				switch (compound.getByte("f")) {
+				case 0:
+					if (set)
+						stacks.set(slot, StoredItemStack.readFromNBT(compound));
+					else
+						stacks.add(slot, StoredItemStack.readFromNBT(compound));
+					break;
+				case 1:
+					long stored = compound.getLong("Stored");
+					if (stored != 0) {
+						stacks.set(slot, new StoredItemStack(stacks.get(slot).item, stored));
+					} else {
+						stacks.set(slot, null);
+					}
+					break;
+				case 2:
+					if (set)
+						stacks.set(slot, null);
+					else
+						stacks.add(slot, null);
+					break;
+				}
+
+			}
+		}
+		if (type == SyncType.SYNC) {
+			NBTTagList list = nbt.getTagList("StoredStacks", 10);
+			this.stacks = new ArrayList();
+			for (int i = 0; i < list.tagCount(); i++) {
+				NBTTagCompound compound = list.getCompoundTagAt(i);
+				this.stacks.add(StoredItemStack.readFromNBT(compound));
+
 			}
 		}
 	}
@@ -168,7 +209,79 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 			}
 			nbt.setTag("coords", coordTag);
 		}
+		if (type == SyncType.SPECIAL) {
 
+			if (stacks == null) {
+				stacks = new ArrayList();
+			}
+			if (lastStacks == null) {
+				lastStacks = new ArrayList();
+			}
+			if (this.stacks.size() <= 0 && (!(this.lastStacks.size() <= 0))) {
+				nbt.setBoolean("null", true);
+				this.lastStacks = new ArrayList();
+				return;
+			}
+			NBTTagList list = new NBTTagList();
+			int size = Math.max(this.stacks.size(), this.lastStacks.size());
+			for (int i = 0; i < size; ++i) {
+				StoredItemStack current = null;
+				StoredItemStack last = null;
+				if (i < this.stacks.size()) {
+					current = this.stacks.get(i);
+				}
+				if (i < this.lastStacks.size()) {
+					last = this.lastStacks.get(i);
+				}
+				NBTTagCompound compound = new NBTTagCompound();
+				if (current != null) {
+					if (last != null) {
+						if (!ItemStack.areItemStacksEqual(last.item, current.item)) {
+							compound.setByte("f", (byte) 0);
+							this.lastStacks.set(i, current);
+							StoredItemStack.writeToNBT(compound, this.stacks.get(i));
+
+						} else if (last.stored != current.stored) {
+							compound.setByte("f", (byte) 1);
+							this.lastStacks.set(i, current);
+							StoredItemStack.writeToNBT(compound, this.stacks.get(i));
+							compound.setLong("Stored", current.stored);
+						}
+					} else {
+						compound.setByte("f", (byte) 0);
+						this.lastStacks.add(i, current);
+						StoredItemStack.writeToNBT(compound, this.stacks.get(i));
+					}
+				} else if (last != null) {
+					this.lastStacks.set(i, null);
+					compound.setByte("f", (byte) 2);
+				}
+				if (!compound.hasNoTags()) {
+					compound.setByte("Slot", (byte) i);
+					list.appendTag(compound);
+				}
+
+			}
+			if (list.tagCount() != 0) {
+				nbt.setTag("Stacks", list);
+			}
+		}
+		if (type == SyncType.SYNC) {
+			NBTTagList list = new NBTTagList();
+			if (stacks == null) {
+				stacks = new ArrayList();
+			}
+			for (int i = 0; i < this.stacks.size(); i++) {
+				if (this.stacks.get(i) != null) {
+					NBTTagCompound compound = new NBTTagCompound();
+					compound.setByte("Slot", (byte) i);
+					StoredItemStack.writeToNBT(compound, this.stacks.get(i));
+					list.appendTag(compound);
+				}
+			}
+
+			nbt.setTag("StoredStacks", list);
+		}
 	}
 
 	@Override

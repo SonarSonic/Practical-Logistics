@@ -3,13 +3,18 @@ package sonar.logistics.common.containers;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.inventory.ICrafting;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import sonar.core.SonarCore;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.inventory.ContainerSync;
 import sonar.core.inventory.slots.SlotList;
+import sonar.core.network.PacketTileSync;
+import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.common.handlers.InventoryReaderHandler;
 import sonar.logistics.common.tileentity.TileEntityInventoryReader;
 
@@ -36,15 +41,31 @@ public class ContainerInventoryReader extends ContainerSync {
 
 	@Override
 	public void detectAndSendChanges() {
-		super.detectAndSendChanges();
+		for (int i = 0; i < this.inventorySlots.size(); ++i) {
+			ItemStack itemstack = ((Slot) this.inventorySlots.get(i)).getStack();
+			ItemStack itemstack1 = (ItemStack) this.inventoryItemStacks.get(i);
+
+			if (!ItemStack.areItemStacksEqual(itemstack1, itemstack)) {
+				itemstack1 = itemstack == null ? null : itemstack.copy();
+				this.inventoryItemStacks.set(i, itemstack1);
+
+				for (int j = 0; j < this.crafters.size(); ++j) {
+					((ICrafting) this.crafters.get(j)).sendSlotContents(this, i, itemstack1);
+				}
+			}
+		}
 		if (sync != null) {
 			if (crafters != null) {
+				NBTTagCompound tag = new NBTTagCompound();
+				TileHandler handler = FMPHelper.getHandler(tile);
+				handler.writeData(tag, SyncType.SPECIAL);
+				if (tag.hasNoTags()) {
+					return;
+				}
 				for (Object o : crafters) {
 					if (o != null && o instanceof EntityPlayerMP) {
-						TileHandler handler = FMPHelper.getHandler(tile);
-						if (handler != null && handler instanceof InventoryReaderHandler) {
-							((InventoryReaderHandler) handler).sendAvailableData(tile, (EntityPlayerMP) o);
-						}
+						SonarCore.network.sendTo(new PacketTileSync(tile.xCoord, tile.yCoord, tile.zCoord, tag, SyncType.SPECIAL), (EntityPlayerMP) o);
+
 					}
 				}
 

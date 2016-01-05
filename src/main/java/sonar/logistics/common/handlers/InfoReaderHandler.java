@@ -1,5 +1,6 @@
 package sonar.logistics.common.handlers;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import codechicken.multipart.TMultiPart;
@@ -7,14 +8,19 @@ import codechicken.multipart.TileMultipart;
 import codechicken.multipart.minecraft.McMetaPart;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
+import sonar.core.SonarCore;
 import sonar.core.integration.SonarAPI;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.SonarTilePart;
 import sonar.core.integration.fmp.handlers.TileHandler;
+import sonar.core.inventory.StoredItemStack;
+import sonar.core.network.PacketTileSync;
 import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.Logistics;
@@ -27,6 +33,8 @@ import sonar.logistics.common.tileentity.TileEntityBlockNode;
 import sonar.logistics.common.tileentity.TileEntityEntityNode;
 import sonar.logistics.helpers.CableHelper;
 import sonar.logistics.helpers.InfoHelper;
+import sonar.logistics.info.types.CategoryInfo;
+import sonar.logistics.network.SyncInfo;
 import sonar.logistics.network.packets.PacketProviders;
 
 public class InfoReaderHandler extends TileHandler {
@@ -38,8 +46,8 @@ public class InfoReaderHandler extends TileHandler {
 	public List<Info> clientInfo;
 	public List<Info> lastInfo;
 
-	public Info primaryInfo;
-	public Info secondaryInfo;
+	public SyncInfo primaryInfo = new SyncInfo(0);
+	public SyncInfo secondaryInfo = new SyncInfo(1);
 	public BlockCoords coords;
 
 	@Override
@@ -64,15 +72,15 @@ public class InfoReaderHandler extends TileHandler {
 			}
 		}
 
-		if (this.primaryInfo != null) {
+		if (this.primaryInfo.getInfo() != null) {
 			if (this.coords != null) {
 				TileEntity tile = this.coords.getTileEntity();
 				if (tile != null && tile instanceof TileEntityBlockNode) {
-					this.setData(te, InfoHelper.getLatestTileInfo(primaryInfo, (TileEntityBlockNode) tile), true);
-					this.setData(te, InfoHelper.getLatestTileInfo(secondaryInfo, (TileEntityBlockNode) tile), false);
+					this.setData(te, InfoHelper.getLatestTileInfo(primaryInfo.getInfo(), (TileEntityBlockNode) tile), true);
+					this.setData(te, InfoHelper.getLatestTileInfo(secondaryInfo.getInfo(), (TileEntityBlockNode) tile), false);
 				} else if (tile != null && tile instanceof TileEntityEntityNode) {
-					this.setData(te, InfoHelper.getLatestEntityInfo(primaryInfo, (TileEntityEntityNode) tile), true);
-					this.setData(te, InfoHelper.getLatestEntityInfo(secondaryInfo, (TileEntityEntityNode) tile), false);
+					this.setData(te, InfoHelper.getLatestEntityInfo(primaryInfo.getInfo(), (TileEntityEntityNode) tile), true);
+					this.setData(te, InfoHelper.getLatestEntityInfo(secondaryInfo.getInfo(), (TileEntityEntityNode) tile), false);
 				} else {
 					this.setData(te, null, true);
 					this.setData(te, null, false);
@@ -97,47 +105,47 @@ public class InfoReaderHandler extends TileHandler {
 
 	public Info currentInfo(TileEntity te) {
 
-		if (secondaryInfo == null || !te.getWorldObj().isBlockIndirectlyGettingPowered(te.xCoord, te.yCoord, te.zCoord)) {
+		if (secondaryInfo.getInfo() == null || !te.getWorldObj().isBlockIndirectlyGettingPowered(te.xCoord, te.yCoord, te.zCoord)) {
 
-			if (primaryInfo == null) {
+			if (primaryInfo.getInfo() == null) {
 				return new StandardInfo((byte) -1, "", "", "NO DATA");
 			}
-			return primaryInfo;
+			return primaryInfo.getInfo();
 		} else {
-			if (secondaryInfo == null) {
+			if (secondaryInfo.getInfo() == null) {
 				return new StandardInfo((byte) -1, "", "", "NO DATA");
 			}
-			return secondaryInfo;
+			return secondaryInfo.getInfo();
 		}
 	}
 
 	public Info getSecondaryInfo(TileEntity te) {
-		if (primaryInfo == null || !te.getWorldObj().isBlockIndirectlyGettingPowered(te.xCoord, te.yCoord, te.zCoord)) {
+		if (primaryInfo.getInfo() == null || !te.getWorldObj().isBlockIndirectlyGettingPowered(te.xCoord, te.yCoord, te.zCoord)) {
 
-			if (secondaryInfo == null) {
+			if (secondaryInfo.getInfo() == null) {
 				return new StandardInfo((byte) -1, "", "", "NO DATA");
 			}
-			return secondaryInfo;
+			return secondaryInfo.getInfo();
 		} else {
-			if (primaryInfo == null) {
+			if (primaryInfo.getInfo() == null) {
 				return new StandardInfo((byte) -1, "", "", "NO DATA");
 			}
-			return primaryInfo;
+			return primaryInfo.getInfo();
 		}
 	}
 
 	public void setData(TileEntity te, Info info, boolean primary) {
 		if (info != null) {
 			if (primary) {
-				this.primaryInfo = info;
+				this.primaryInfo.setInfo(info);
 			} else {
-				this.secondaryInfo = info;
+				this.secondaryInfo.setInfo(info);
 			}
-		} else if (primary && this.primaryInfo != null) {
-			this.primaryInfo.emptyData();
+		} else if (primary && this.primaryInfo.getInfo() != null) {
+			this.primaryInfo.getInfo().emptyData();
 
-		} else if (!primary && this.secondaryInfo != null) {
-			this.secondaryInfo.emptyData();
+		} else if (!primary && this.secondaryInfo.getInfo() != null) {
+			this.secondaryInfo.getInfo().emptyData();
 		}
 
 		CableHelper.updateAdjacentCoord(te, new BlockCoords(te.xCoord, te.yCoord, te.zCoord), false, ForgeDirection.getOrientation(FMPHelper.getMeta(te)));
@@ -162,44 +170,89 @@ public class InfoReaderHandler extends TileHandler {
 
 	public void sendAvailableData(TileEntity te, EntityPlayer player) {
 		if (player != null && player instanceof EntityPlayerMP) {
-			if (this.coords != null) {
-				TileEntity tile = this.coords.getTileEntity();
-				if (tile instanceof TileEntityBlockNode) {
-					Logistics.network.sendTo(new PacketProviders(te.xCoord, te.yCoord, te.zCoord, InfoHelper.getTileInfo((TileEntityBlockNode) tile)), (EntityPlayerMP) player);
-				} else if (tile instanceof TileEntityEntityNode) {
-					Logistics.network.sendTo(new PacketProviders(te.xCoord, te.yCoord, te.zCoord, InfoHelper.getEntityInfo((TileEntityEntityNode) tile)), (EntityPlayerMP) player);
 
+			if (this.coords != null) {
+				this.lastInfo = clientInfo;
+				TileEntity tile = this.coords.getTileEntity();
+				List<Info> info = new ArrayList();
+				if (tile != null && tile instanceof TileEntityBlockNode) {
+					info = InfoHelper.getTileInfo((TileEntityBlockNode) tile);
+				} else if (tile != null && tile instanceof TileEntityEntityNode) {
+					info = InfoHelper.getEntityInfo((TileEntityEntityNode) tile);
+				} else {
+					info = new ArrayList();
 				}
-			} else {
-				Logistics.network.sendTo(new PacketProviders(te.xCoord, te.yCoord, te.zCoord, null), (EntityPlayerMP) player);
+				List<Info> newInfo = new ArrayList();
+				Info lastInfo = null;
+				for (Info blockInfo : info) {
+					if (lastInfo == null || !lastInfo.getCategory().equals(blockInfo.getCategory())) {
+						newInfo.add(CategoryInfo.createInfo(blockInfo.getCategory()));
+					}
+					newInfo.add(blockInfo);
+					lastInfo = blockInfo;
+				}
+				clientInfo = newInfo;
+				NBTTagCompound tag = new NBTTagCompound();
+				this.writeData(tag, SyncType.SPECIAL);
+
+				SonarCore.network.sendTo(new PacketTileSync(te.xCoord, te.yCoord, te.zCoord, tag, SyncType.SPECIAL), (EntityPlayerMP) player);
+
 			}
+
 		}
+
 	}
 
 	public void readData(NBTTagCompound nbt, SyncType type) {
 		super.readData(nbt, type);
 		if (type == SyncType.SAVE || type == SyncType.SYNC) {
-			if (nbt.getBoolean("hasPrimary")) {
-				if (nbt.hasKey("primary")) {
-					primaryInfo = InfoHelper.readInfo(nbt.getCompoundTag("primary"));
+			primaryInfo.readFromNBT(nbt, type);
+			secondaryInfo.readFromNBT(nbt, type);
+			if (type == SyncType.SAVE) {
+				if (nbt.hasKey("coords")) {
+					if (nbt.getCompoundTag("coords").getBoolean("hasCoords")) {
+						coords = BlockCoords.readFromNBT(nbt.getCompoundTag("coords"));
+					} else {
+						coords = null;
+					}
 				}
-			} else {
-				primaryInfo = null;
 			}
+		}
+		if (type == SyncType.SPECIAL) {
+			if (nbt.hasKey("null")) {
+				this.clientInfo = new ArrayList();
+				return;
+			}
+			NBTTagList list = nbt.getTagList("Info", 10);
+			if (this.clientInfo == null) {
+				this.clientInfo = new ArrayList();
+			}
+			for (int i = 0; i < list.tagCount(); i++) {
+				NBTTagCompound compound = list.getCompoundTagAt(i);
+				byte slot = compound.getByte("Slot");
+				boolean set = slot < clientInfo.size();
+				switch (compound.getByte("f")) {
+				case 0:
+					if (set)
+						clientInfo.set(slot, InfoHelper.readInfo(compound));
+					else
+						clientInfo.add(slot, InfoHelper.readInfo(compound));
+					break;
+				case 1:
+					long stored = compound.getLong("Stored");
+					if (stored != 0) {
+						clientInfo.set(slot, InfoHelper.readInfo(compound));
+						// clientInfo.set(slot, new StoredItemStack(clientInfo.get(slot).item, stored));
+					} else {
+						clientInfo.set(slot, null);
 
-			if (nbt.getBoolean("hasSecondary")) {
-				if (nbt.hasKey("secondaryInfo")) {
-					secondaryInfo = InfoHelper.readInfo(nbt.getCompoundTag("secondaryInfo"));
+					}
+					break;
+				case 2:
+					clientInfo.set(slot, null);
+					break;
 				}
-			} else {
-				secondaryInfo = null;
-			}
-			if (nbt.hasKey("coords")) {
-				if (nbt.getCompoundTag("coords").getBoolean("hasCoords")) {
-					coords = BlockCoords.readFromNBT(nbt.getCompoundTag("coords"));
-				} else {
-					coords = null;
-				}
+
 			}
 		}
 	}
@@ -207,22 +260,9 @@ public class InfoReaderHandler extends TileHandler {
 	public void writeData(NBTTagCompound nbt, SyncType type) {
 		super.writeData(nbt, type);
 		if (type == SyncType.SAVE || type == SyncType.SYNC) {
-			if (primaryInfo != null) {
-				nbt.setBoolean("hasPrimary", true);
-				NBTTagCompound infoTag = new NBTTagCompound();
-				InfoHelper.writeInfo(infoTag, primaryInfo);
-				nbt.setTag("primary", infoTag);
-			} else {
-				nbt.setBoolean("hasPrimary", false);
-			}
-			if (secondaryInfo != null) {
-				nbt.setBoolean("hasSecondary", true);
-				NBTTagCompound infoTag = new NBTTagCompound();
-				InfoHelper.writeInfo(infoTag, secondaryInfo);
-				nbt.setTag("secondaryInfo", infoTag);
-			} else {
-				nbt.setBoolean("hasSecondary", false);
-			}
+			this.primaryInfo.writeToNBT(nbt, type);
+			this.secondaryInfo.writeToNBT(nbt, type);
+
 			if (type == SyncType.SAVE) {
 				NBTTagCompound coordTag = new NBTTagCompound();
 				if (coords != null) {
@@ -232,6 +272,59 @@ public class InfoReaderHandler extends TileHandler {
 					coordTag.setBoolean("hasCoords", false);
 				}
 				nbt.setTag("coords", coordTag);
+			}
+		}
+
+		if (type == SyncType.SPECIAL) {
+			if (clientInfo == null) {
+				clientInfo = new ArrayList();
+			}
+			if (lastInfo == null) {
+				lastInfo = new ArrayList();
+			}
+			if (this.clientInfo.size() <= 0 && (!(this.lastInfo.size() <= 0))) {
+				nbt.setBoolean("null", true);
+				this.lastInfo = new ArrayList();
+				return;
+			}
+			NBTTagList list = new NBTTagList();
+			int size = Math.max(this.clientInfo.size(), this.lastInfo.size());
+			for (int i = 0; i < size; ++i) {
+				Info current = null;
+				Info last = null;
+				if (i < this.clientInfo.size()) {
+					current = this.clientInfo.get(i);
+				}
+				if (i < this.lastInfo.size()) {
+					last = this.lastInfo.get(i);
+				}
+				NBTTagCompound compound = new NBTTagCompound();
+				if (current != null) {
+					if (last != null) {
+						if (!current.isEqualType(last) || !current.isDataEqualType(last)) {
+							compound.setByte("f", (byte) 0);
+							this.lastInfo.set(i, current);
+							InfoHelper.writeInfo(compound, this.clientInfo.get(i));
+						} else if (!current.isDataEqualType(last)) {
+							/* compound.setByte("f", (byte) 1); this.lastInfo.set(i, current); InfoHelper.writeInfo(compound, this.clientInfo.get(i)); */
+						}
+					} else {
+						compound.setByte("f", (byte) 0);
+						this.lastInfo.add(i, current);
+						InfoHelper.writeInfo(compound, this.clientInfo.get(i));
+					}
+				} else if (last != null) {
+					this.lastInfo.set(i, null);
+					compound.setByte("f", (byte) 2);
+				}
+				if (!compound.hasNoTags()) {
+					compound.setByte("Slot", (byte) i);
+					list.appendTag(compound);
+				}
+
+			}
+			if (list.tagCount() != 0) {
+				nbt.setTag("Info", list);
 			}
 		}
 	}

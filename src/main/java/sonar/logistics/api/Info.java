@@ -41,7 +41,10 @@ public abstract class Info {
 		}
 		return this.getData().equals(info.getData()) && this.getDisplayableData().equals(info.getDisplayableData());
 	}
-
+	//public Object setData(){
+		
+	//}
+	
 	public abstract void emptyData();
 
 	public abstract Info newInfo();
