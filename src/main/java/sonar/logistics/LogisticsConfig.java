@@ -27,9 +27,7 @@ public class LogisticsConfig extends Logistics {
 	public static void loadMainConfig() {
 		Configuration config = new Configuration(new File("config/Practical-Logistics/Main-Config.cfg"));
 		config.load();
-
 		sapphireOre = config.getBoolean("Generate Ore", "settings", true, "Sapphire Ore");
-
 		config.save();
 
 	}
@@ -40,7 +38,6 @@ public class LogisticsConfig extends Logistics {
 		String[] blockExamples = new String[2];
 		blockExamples[0] = "ExampleBlock";
 		blockExamples[1] = "ExampleBlock2";
-
 		blocksblackList = blocks.get("Block Config", "Disabled", blockExamples);
 		blocks.save();
 	}
@@ -51,7 +48,6 @@ public class LogisticsConfig extends Logistics {
 		String[] itemExamples = new String[2];
 		itemExamples[0] = "ExampleItem";
 		itemExamples[1] = "ExampleItem2";
-
 		itemsblackList = items.get("Item Config", "Disabled", itemExamples);
 		items.save();
 	}

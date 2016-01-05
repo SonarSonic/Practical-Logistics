@@ -136,5 +136,7 @@ public class Logistics {
 	public void onClose(FMLServerStoppingEvent event) {
 		EmitterRegistry.removeAll();
 		ChannelRegistry.removeAll();
+		TileProviderRegistry.removeAll();
+		EntityProviderRegistry.removeAll();
 	}
 }

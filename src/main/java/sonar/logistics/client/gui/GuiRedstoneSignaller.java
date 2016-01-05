@@ -103,7 +103,7 @@ public abstract class GuiRedstoneSignaller extends GuiSonar {
 			FontHelper.textCentre("Emits if data equals", xSize, 32, 0);
 			stringField.drawTextBox();
 		}
-		FontHelper.textCentre(this.getErrorFlagString(), xSize, 68, 1);
+		FontHelper.textCentre(this.getErrorFlagString(), xSize, 66, 1);
 	}
 
 	@Override

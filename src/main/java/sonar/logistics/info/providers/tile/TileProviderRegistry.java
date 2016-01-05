@@ -28,6 +28,9 @@ public class TileProviderRegistry {
 		addProvider(new EUEnergyProvider());
 		addProvider(new IC2ReactorProvider());
 		addProvider(new HammerProvider());
+		addProvider(new AE2CraftingProvider());
+		addProvider(new AE2EnergyProvider());
+		addProvider(new AE2GridProvider());
 	}
 
 	public static void removeAll() {

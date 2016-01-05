@@ -28,16 +28,16 @@ public class StandardInfo extends Info {
 		this.suffix = suffix;
 	}
 
-	public StandardInfo(byte providerID, int category, int subCategory, Object data) {
-		this.providerID = providerID;
+	public StandardInfo(int providerID, int category, int subCategory, Object data) {
+		this.providerID = (byte) providerID;
 		this.catID = (byte) category;
 		this.subCatID = (byte) subCategory;
 		this.data = data.toString();
 		this.dataType = data instanceof Integer ? 0 : 1;
 	}
 
-	public StandardInfo(byte providerID, String category, String subCategory, Object data) {
-		this.providerID = providerID;
+	public StandardInfo(int providerID, String category, String subCategory, Object data) {
+		this.providerID = (byte) providerID;
 		this.category = category;
 		this.subCategory = subCategory;
 		this.data = data.toString();

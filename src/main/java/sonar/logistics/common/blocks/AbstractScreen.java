@@ -14,6 +14,8 @@ import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import sonar.core.common.block.SonarMaterials;
+import sonar.logistics.api.Info;
+import sonar.logistics.api.StandardInfo;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -27,6 +29,7 @@ public abstract class AbstractScreen extends BlockContainer {
 		this.setBlockBounds(0.5F - height, 0.0F, 0.5F - height, 0.5F + height, width, 0.5F + height);
 	}
 
+	
 	public abstract float height();
 
 	public abstract float width();
@@ -44,11 +47,11 @@ public abstract class AbstractScreen extends BlockContainer {
 	public void setBlockBoundsBasedOnState(IBlockAccess world, int x, int y, int z) {
 
 		int l = world.getBlockMetadata(x, y, z);
-		float f = 0.28125F;
-		float f1 = 0.78125F;
+		float f = 0.27125F;
+		float f1 = 0.77125F;
 		float f2 = 0.0F;
 		float f3 = 1.0F;
-		float f4 = 0.125F;
+		float f4 = 0.080F;
 		this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
 
 		if (l == 2) {
