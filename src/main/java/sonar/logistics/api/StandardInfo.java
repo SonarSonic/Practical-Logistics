@@ -56,6 +56,7 @@ public class StandardInfo extends Info {
 
 	@Override
 	public String getCategory() {
+		
 		return (catID==-1 ||providerID==-1)  ? category : TileProviderRegistry.getProvider(providerID).getCategory(catID);
 	}
 

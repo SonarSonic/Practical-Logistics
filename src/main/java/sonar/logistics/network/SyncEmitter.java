@@ -3,20 +3,22 @@ package sonar.logistics.network;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.nbt.NBTTagCompound;
 import sonar.core.network.sync.ISyncPart;
+import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
+import sonar.logistics.api.DataEmitter;
 import sonar.logistics.api.Info;
 import sonar.logistics.helpers.InfoHelper;
 
-public class SyncInfo implements ISyncPart {
-	private Info c;
-	private Info last;
+public class SyncEmitter implements ISyncPart {
+	private DataEmitter c;
+	private DataEmitter last;
 	private byte id;
 
-	public SyncInfo(int id) {
+	public SyncEmitter(int id) {
 		this.id = (byte) id;
 	}
 
-	public SyncInfo(int id, Info def) {
+	public SyncEmitter(int id, DataEmitter def) {
 		this.id = (byte) id;
 		this.c = def;
 		this.last = def;
@@ -30,13 +32,13 @@ public class SyncInfo implements ISyncPart {
 		if (last == null) {
 			return false;
 		}
-		return c.isEqualType(last) && c.isDataEqualType(last);
+		return BlockCoords.equalCoords(c.coords, last.coords) && c.name.equals(last.name);
 	}
 
 	public void writeToBuf(ByteBuf buf) {
 		if (!equal()) {
 			buf.writeBoolean(true);
-			InfoHelper.writeInfo(buf, c);
+			DataEmitter.writeInfo(buf, c);
 			last = c;
 		} else
 			buf.writeBoolean(false);
@@ -45,7 +47,7 @@ public class SyncInfo implements ISyncPart {
 	@Override
 	public void readFromBuf(ByteBuf buf) {
 		if (buf.readBoolean()) {
-			this.c = InfoHelper.readInfo(buf);
+			this.c = DataEmitter.readInfo(buf);
 		}
 	}
 
@@ -53,14 +55,14 @@ public class SyncInfo implements ISyncPart {
 		if (type == SyncType.SYNC) {
 			if (!equal()) {
 				NBTTagCompound infoTag = new NBTTagCompound();
-				InfoHelper.writeInfo(infoTag, c);
+				DataEmitter.writeToNBT(infoTag, c);
 				nbt.setTag(String.valueOf(id), infoTag);
 				last = c;
 			}
 		}
 		if (type == SyncType.SAVE) {
 			NBTTagCompound infoTag = new NBTTagCompound();
-			InfoHelper.writeInfo(infoTag, c);
+			DataEmitter.writeToNBT(infoTag, c);
 			nbt.setTag(String.valueOf(id), infoTag);
 
 		}
@@ -69,21 +71,21 @@ public class SyncInfo implements ISyncPart {
 	public void readFromNBT(NBTTagCompound nbt, SyncType type) {
 		if (type == SyncType.SYNC) {
 			if (nbt.hasKey(String.valueOf(id))) {
-				this.c = InfoHelper.readInfo(nbt.getCompoundTag(String.valueOf(id)));
+				this.c = DataEmitter.readFromNBT(nbt.getCompoundTag(String.valueOf(id)));
 			}
 		}
 		if (type == SyncType.SAVE) {
 			if (nbt.hasKey(String.valueOf(id))) {
-				this.c = InfoHelper.readInfo(nbt.getCompoundTag(String.valueOf(id)));
+				this.c = DataEmitter.readFromNBT(nbt.getCompoundTag(String.valueOf(id)));
 			}
 		}
 	}
 
-	public void setInfo(Info value) {
+	public void setEmitter(DataEmitter value) {
 		c = value;
 	}
 
-	public Info getInfo() {
+	public DataEmitter getEmitter() {
 		return c;
 	}
 

@@ -29,7 +29,7 @@ public abstract class BaseNode extends SonarMachineBlock {
 	public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase entity, ItemStack itemstack) {
 		super.onBlockPlacedBy(world, x, y, z, entity, itemstack);
 		TileEntity target = world.getTileEntity(x, y, z);
-		if (entity instanceof EntityPlayer && target instanceof TileEntityNode) {
+		if (entity instanceof EntityPlayer && target instanceof TileEntityNode) {			
 			EntityPlayer player = (EntityPlayer) entity;
 			TileEntityNode node = (TileEntityNode) target;
 			node.playerName = player.getGameProfile().getName();

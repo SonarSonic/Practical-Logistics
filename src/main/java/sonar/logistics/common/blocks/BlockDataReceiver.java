@@ -9,10 +9,16 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
+import sonar.core.SonarCore;
 import sonar.core.common.block.SonarMaterials;
+import sonar.core.common.tileentity.TileEntitySonar;
+import sonar.core.network.PacketTileSync;
+import sonar.core.utils.helpers.FontHelper;
+import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.connecting.IDataCable;
 import sonar.logistics.common.tileentity.TileEntityDataReceiver;
+import sonar.logistics.common.tileentity.TileEntityNode;
 import sonar.logistics.network.LogisticsGui;
 import sonar.logistics.network.packets.PacketDataEmitters;
 import sonar.logistics.registries.EmitterRegistry;
@@ -37,15 +43,38 @@ public class BlockDataReceiver extends BaseNode {
 
 	@Override
 	public void openGui(World world, int x, int y, int z, EntityPlayer player) {
-		if (player != null && player instanceof EntityPlayerMP) {
-			Logistics.network.sendTo(new PacketDataEmitters(x, y, z, EmitterRegistry.getEmitters(((EntityPlayerMP) player).getGameProfile().getName())), (EntityPlayerMP) player);
-
+		TileEntity target = world.getTileEntity(x, y, z);
+		if (target != null && target instanceof TileEntityDataReceiver) {
+			TileEntityDataReceiver sonar = (TileEntityDataReceiver) target;
+			sonar.sendAvailableData(target, player);
 		}
 		player.openGui(Logistics.instance, LogisticsGui.dataReceiver, world, x, y, z);
 	}
 
 	public boolean hasSpecialRenderer() {
 		return true;
+	}
+
+	@Override
+	public boolean operateBlock(World world, int x, int y, int z, EntityPlayer player, int side, float hitx, float hity, float hitz) {
+		if (!hasGui()) {
+			return false;
+		}
+		if (player != null) {
+			TileEntity target = world.getTileEntity(x, y, z);
+			if (target instanceof TileEntityNode) {
+				TileEntityNode node = (TileEntityNode) target;
+				if (node.playerName.equals(player.getGameProfile().getName())) {
+					node.sendSyncPacket(player);
+					openGui(world, x, y, z, player);
+					return true;
+				}else{
+					FontHelper.sendMessage("ACCESS DENIED", world, player);
+				}
+			}
+
+		}
+		return false;
 	}
 
 	@Override

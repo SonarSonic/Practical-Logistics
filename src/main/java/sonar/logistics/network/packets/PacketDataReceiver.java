@@ -56,7 +56,7 @@ public class PacketDataReceiver implements IMessage {
 			}
 			if (te != null && te instanceof TileEntityDataReceiver) {
 				TileEntityDataReceiver receiver = (TileEntityDataReceiver) te;
-				receiver.emitter = message.coords;
+				receiver.emitter.setEmitter(message.coords);
 			}
 
 			return null;

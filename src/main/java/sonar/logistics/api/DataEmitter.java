@@ -1,7 +1,11 @@
 package sonar.logistics.api;
 
+import io.netty.buffer.ByteBuf;
+import cpw.mods.fml.common.network.ByteBufUtils;
 import net.minecraft.nbt.NBTTagCompound;
 import sonar.core.utils.BlockCoords;
+import sonar.logistics.Logistics;
+import sonar.logistics.info.types.InfoTypeRegistry;
 
 public class DataEmitter {
 	public String name;
@@ -11,15 +15,45 @@ public class DataEmitter {
 		this.name = name;
 		this.coords = coords;
 	}	
+	
+	
 	public static DataEmitter readFromNBT(NBTTagCompound tag) {
-		
-		return new DataEmitter(tag.getString("clientName"), BlockCoords.readFromNBT(tag));
+		if (tag.getBoolean("b")) {
+			return new DataEmitter(tag.getString("clientName"), BlockCoords.readFromNBT(tag));
+		} else {
+			return null;
+		}
+				
 	}
 
 	public static void writeToNBT(NBTTagCompound tag, DataEmitter info) {
-		
-		tag.setString("clientName", info.name);
-		BlockCoords.writeToNBT(tag, info.coords);
-		
+		if (info != null) {
+			tag.setBoolean("b", true);	
+			tag.setString("clientName", info.name);
+			BlockCoords.writeToNBT(tag, info.coords);
+		} else {
+			tag.setBoolean("b", false);				
+		}
+	}
+	
+	public static DataEmitter readInfo(ByteBuf buf) {
+		if (buf.readBoolean()) {			
+			String name = ByteBufUtils.readUTF8String(buf);
+			BlockCoords coords = BlockCoords.readFromBuf(buf);
+			return new DataEmitter(name,coords);
+
+		} else {
+			return null;
+		}
+	}
+
+	public static void writeInfo(ByteBuf buf, DataEmitter info) {
+		if (info != null) {
+			buf.writeBoolean(true);			
+			ByteBufUtils.writeUTF8String(buf, info.name);
+			BlockCoords.writeToBuf(buf, info.coords);
+		} else {
+			buf.writeBoolean(false);
+		}
 	}
 }

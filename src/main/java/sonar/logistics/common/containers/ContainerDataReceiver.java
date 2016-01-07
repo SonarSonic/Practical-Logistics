@@ -10,6 +10,7 @@ import sonar.core.SonarCore;
 import sonar.core.inventory.ContainerSync;
 import sonar.core.network.PacketTileSync;
 import sonar.core.utils.helpers.NBTHelper;
+import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.Logistics;
 import sonar.logistics.common.tileentity.TileEntityDataReceiver;
 import sonar.logistics.network.packets.PacketDataEmitters;
@@ -22,23 +23,26 @@ public class ContainerDataReceiver extends ContainerSync {
 	public ContainerDataReceiver(TileEntityDataReceiver entity, InventoryPlayer inventoryPlayer) {
 		super(entity);
 	}
+
 	@Override
 	public void detectAndSendChanges() {
-		if (sync != null) {
-			if (crafters != null) {
-				NBTTagCompound syncData = new NBTTagCompound();
-				sync.writeData(syncData, NBTHelper.SyncType.SYNC);
-				for (Object o : crafters) {
-					if (o != null && o instanceof EntityPlayerMP) {						
-						SonarCore.network.sendTo(new PacketTileSync(tile.xCoord, tile.yCoord, tile.zCoord, syncData), (EntityPlayerMP) o);
-						Logistics.network.sendTo(new PacketDataEmitters(tile.xCoord, tile.yCoord, tile.zCoord,EmitterRegistry.getEmitters(((EntityPlayerMP) o).getGameProfile().getName())), (EntityPlayerMP) o);
+
+		if (tile instanceof TileEntityDataReceiver) {
+			if (sync != null) {
+				if (crafters != null) {
+					NBTTagCompound syncData = new NBTTagCompound();
+					sync.writeData(syncData, NBTHelper.SyncType.SYNC);
+					for (Object o : crafters) {
+						if (o != null && o instanceof EntityPlayerMP) {
+							((TileEntityDataReceiver) tile).sendAvailableData(tile, (EntityPlayerMP) o);
+						}
 					}
+
 				}
-
 			}
-
 		}
 	}
+
 	@Override
 	public boolean canInteractWith(EntityPlayer player) {
 		return true;

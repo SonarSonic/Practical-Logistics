@@ -169,6 +169,13 @@ public class InfoHelper {
 			EntityPlayer player = (EntityPlayer) entity;
 			addInventoryToList(storedStacks, player.inventory);
 		}
+		Collections.sort(storedStacks, new Comparator<StoredItemStack>() {
+			 public int compare(StoredItemStack str1, StoredItemStack str2){
+			       if(str1.stored <  str2.stored) return 1;
+			       if(str1.stored == str2.stored) return 0;
+			       return -1;
+			    }
+		});
 		return storedStacks;
 
 	}
@@ -202,6 +209,8 @@ public class InfoHelper {
 			if (primary.getDataType() == 0 && secondary.getDataType() == 0) {
 				int stored = Integer.parseInt(secondary.getData());
 				int max = Integer.parseInt(primary.getData());
+				
+							
 				if (stored < 0 || max < 0) {
 					return primary;
 				}
@@ -232,7 +241,7 @@ public class InfoHelper {
 		if (buf.readBoolean()) {
 			String type = ByteBufUtils.readUTF8String(buf);
 			if (InfoTypeRegistry.getInfoType(type) == null) {
-				Logistics.logger.warn("Unregisted Info Type: " + type);
+				Logistics.logger.warn("Unregistered Info Type: " + type);
 				return null;
 			}
 			Info info = InfoTypeRegistry.getInfoType(type).newInfo();
@@ -256,15 +265,15 @@ public class InfoHelper {
 
 	public static Info readInfo(NBTTagCompound tag) {
 		if (tag.hasKey("type")) {
-			String string = tag.getString("type");
-			if (string.equals("NULLED")) {
+			String type = tag.getString("type");
+			if (type.equals("NULLED")) {
 				return null;
 			}
-			if (InfoTypeRegistry.getInfoType(string) == null) {
-				Logistics.logger.warn("Unregisted Info Type: " + string);
+			if (InfoTypeRegistry.getInfoType(type) == null) {
+				Logistics.logger.warn("Unregistered Info Type: " + type);
 				return null;
 			}
-			Info info = InfoTypeRegistry.getInfoType(string).newInfo();
+			Info info = InfoTypeRegistry.getInfoType(type).newInfo();
 			info.readFromNBT(tag);
 
 			return info;

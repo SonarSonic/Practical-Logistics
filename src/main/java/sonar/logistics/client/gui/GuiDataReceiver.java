@@ -59,7 +59,7 @@ public class GuiDataReceiver extends GuiSonar {
 	}
 
 	public int getDataPosition() {
-		if (tile.emitter == null) {
+		if (tile.emitter.getEmitter() == null) {
 			return -1;
 		}
 		if (tile.emitters == null) {
@@ -70,7 +70,7 @@ public class GuiDataReceiver extends GuiSonar {
 		for (int i = start; i < finish; i++) {
 			if (tile.emitters.get(i) != null) {
 				DataEmitter info = tile.emitters.get(i);
-				if (BlockCoords.equalCoords(info.coords, tile.emitter.coords)) {
+				if (BlockCoords.equalCoords(info.coords, tile.emitter.getEmitter().coords)) {
 					return i - start;
 
 				}
