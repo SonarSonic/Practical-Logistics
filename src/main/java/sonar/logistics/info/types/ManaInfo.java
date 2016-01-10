@@ -15,94 +15,86 @@ import org.lwjgl.opengl.GL11;
 
 import sonar.logistics.api.Info;
 import sonar.logistics.client.renderers.RenderHandlers;
+import sonar.logistics.info.providers.tile.ManaProvider;
 import cpw.mods.fml.common.network.ByteBufUtils;
 
-public class ProgressInfo extends Info {
+public class ManaInfo extends ProgressInfo {
 
 	private static final ResourceLocation progress = new ResourceLocation(RenderHandlers.modelFolder + "progressBar.png");
-	public String data;
 	public long stored, max;
-	public int fluidID = -1;
-	public String rend = "Progress";
-	
-	public ProgressInfo() {
-	}
-	public ProgressInfo(long stored, long max, String data) {
-		this.stored = stored;
-		this.max = max;
-		this.data = data;
+	public int providerID = -1;
+
+	public ManaInfo() {
 	}
 
-	public ProgressInfo(long stored, long max, String data, int fluidID) {
+	public ManaInfo(int providerID, long stored, long max) {
 		this.stored = stored;
 		this.max = max;
-		this.data = data;
-		this.fluidID = fluidID;
+		this.providerID = providerID;
+		this.data = " ";
 	}
+
 	@Override
 	public String getType() {
-		return "ProgressBar";
+		return "ManaBar";
 	}
 
 	@Override
 	public byte getProviderID() {
-		return -1;
+		return (byte) providerID;
 	}
 
 	@Override
 	public String getCategory() {
-		return rend;
+		return new ManaProvider().getCategory((byte) 0);
 	}
 
 	@Override
 	public String getSubCategory() {
-		return rend;
+		return "Mana";
 	}
 
 	@Override
 	public String getData() {
-		return data;
+		return String.valueOf(stored);
 	}
 
 	@Override
 	public String getDisplayableData() {
-		return getData();
+		return "-";
 	}
 
 	@Override
 	public int getDataType() {
 		return 1;
 	}
+
 	@Override
 	public void readFromBuf(ByteBuf buf) {
 		this.stored = buf.readLong();
 		this.max = buf.readLong();
-		this.fluidID = buf.readInt();
-		this.data = ByteBufUtils.readUTF8String(buf);
+		this.providerID = buf.readByte();
 	}
 
 	@Override
 	public void writeToBuf(ByteBuf buf) {
 		buf.writeLong(stored);
 		buf.writeLong(max);
-		buf.writeInt(fluidID);
-		ByteBufUtils.writeUTF8String(buf, data);
+		buf.writeByte(providerID);
 		
 	}
 	public void readFromNBT(NBTTagCompound tag) {
 		this.stored = tag.getLong("stored");
 		this.max = tag.getLong("max");
-		this.fluidID = tag.getInteger("fluidID");
-		this.data = tag.getString("data");
+		this.providerID = tag.getByte("ID");
 	}
 
 	public void writeToNBT(NBTTagCompound tag) {
 		tag.setLong("stored", stored);
 		tag.setLong("max", max);
-		tag.setInteger("fluidID", fluidID);
-		tag.setString("data", data);
+		tag.setByte("ID", (byte) providerID);
 	}
-
+	
 	@Override
 	public boolean hasSpecialRender() {
 		return true;
@@ -116,41 +108,19 @@ public class ProgressInfo extends Info {
 		float start = 0.0625f;
 		float top = 0;
 		float height = (float) (0.0625 * 6);
-		
-		boolean renderNormal = true;
-		if (fluidID != -1) {
-			if (FluidRegistry.getFluid(fluidID) != null) {
-				IIcon icon = FluidRegistry.getFluid(fluidID).getIcon();
-				if (icon != null) {
-					renderNormal=false;
-					Minecraft.getMinecraft().renderEngine.bindTexture(TextureMap.locationBlocksTexture);
-					tess.startDrawingQuads();
 
-					double widthnew = (icon.getMinU() + (width * (icon.getMaxU() - icon.getMinU())));
-					double heightnew = (icon.getMinV() + (height * (icon.getMaxV() - icon.getMinV())));
+		Minecraft.getMinecraft().renderEngine.bindTexture(progress);
+		tess.startDrawingQuads();
+		tess.addVertexWithUV(start, 0, 0, 0, 0);
+		tess.addVertexWithUV(start, height, 0, 0, height);
+		tess.addVertexWithUV(start + width, height, 0, width, height);
+		tess.addVertexWithUV(start + width, 0, 0, width, 0);
+		tess.draw();
 
-					tess.addVertexWithUV((start + 0), (top + height), 0, (double) icon.getMinU(), heightnew);
-					tess.addVertexWithUV((start + width), (top + height), 0, widthnew, heightnew);
-					tess.addVertexWithUV((start + width), (top + 0), 0, widthnew, (double) icon.getMinV());
-					tess.addVertexWithUV((start + 0), (top + 0), 0, (double) icon.getMinU(), (double) icon.getMinV());
-
-					tess.draw();
-				}
-			}
-		}
-		if (renderNormal) {
-			Minecraft.getMinecraft().renderEngine.bindTexture(progress);
-			tess.startDrawingQuads();
-			tess.addVertexWithUV(start, 0, 0, 0, 0);
-			tess.addVertexWithUV(start, height, 0, 0, height);
-			tess.addVertexWithUV(start + width, height, 0, width, height);
-			tess.addVertexWithUV(start + width, 0, 0, width, 0);
-			tess.draw();
-		}		
 		GL11.glTranslated(+0.5, +0.2085, +0.205);
 		GL11.glTranslatef(0.0f, -0.04f, -0.20f);
 		GL11.glScalef(1.0f / 120.0f, 1.0f / 120.0f, 1.0f / 120.0f);
-		String data = getDisplayableData();
+		String data = getSubCategory();
 		rend.drawString(data, -rend.getStringWidth(data) / 2, 0, -1);
 	}
 
@@ -167,11 +137,9 @@ public class ProgressInfo extends Info {
 
 	}
 
-
-
 	@Override
 	public Info newInfo() {
-		return new ProgressInfo();
+		return new ManaInfo();
 	}
 
 }

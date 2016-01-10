@@ -30,6 +30,16 @@ import sonar.logistics.info.types.CategoryInfo;
 import sonar.logistics.info.types.FluidInfo;
 import sonar.logistics.info.types.InfoTypeRegistry;
 import sonar.logistics.info.types.ProgressInfo;
+import appeng.api.AEApi;
+import appeng.api.implementations.tiles.ITileStorageMonitorable;
+import appeng.api.networking.security.BaseActionSource;
+import appeng.api.networking.security.IActionHost;
+import appeng.api.networking.security.MachineSource;
+import appeng.api.storage.IMEMonitor;
+import appeng.api.storage.IStorageMonitorable;
+import appeng.api.storage.data.IAEItemStack;
+import appeng.api.storage.data.IItemList;
+import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.network.ByteBufUtils;
 
 public class InfoHelper {
@@ -86,7 +96,7 @@ public class InfoHelper {
 				return res;
 			}
 		});
-		
+
 		return providerInfo;
 	}
 
@@ -143,17 +153,39 @@ public class InfoHelper {
 			if (inv.getStoredItemType() != null) {
 				storedStacks.add(new StoredItemStack(inv.getStoredItemType()));
 			}
+		} else if (Loader.isModLoaded("appliedenergistics2")) {
+			if (tile instanceof ITileStorageMonitorable && tile instanceof IActionHost) {
+				IStorageMonitorable monitor = ((ITileStorageMonitorable) tile).getMonitorable(dir, new MachineSource(((IActionHost) tile)));
+				if (monitor != null) {
+					IMEMonitor<IAEItemStack> stacks = monitor.getItemInventory();
+					IItemList<IAEItemStack> items = stacks.getAvailableItems(AEApi.instance().storage().createItemList());
+					for (IAEItemStack item : items) {
+						storedStacks.add(new StoredItemStack(item.getItemStack(), item.getStackSize()));
+					}
+				}
+			}
 		} else if (tile instanceof IInventory) {
 			addInventoryToList(storedStacks, (IInventory) tile);
 		}
+
 		Collections.sort(storedStacks, new Comparator<StoredItemStack>() {
-			 public int compare(StoredItemStack str1, StoredItemStack str2){
-			       if(str1.stored <  str2.stored) return 1;
-			       if(str1.stored == str2.stored) return 0;
-			       return -1;
-			    }
+			public int compare(StoredItemStack str1, StoredItemStack str2) {
+				if (str1.stored < str2.stored)
+					return 1;
+				if (str1.stored == str2.stored)
+					return 0;
+				return -1;
+			}
 		});
 		return storedStacks;
+	}
+
+	public static class ReaderSource extends BaseActionSource {
+
+		@Override
+		public boolean isMachine() {
+			return true;
+		}
 	}
 
 	public static List<StoredItemStack> getEntityInventory(TileEntityEntityNode tileNode) {
@@ -165,16 +197,18 @@ public class InfoHelper {
 		if (entity instanceof EntityPlayer) {
 			EntityPlayer player = (EntityPlayer) entity;
 			addInventoryToList(storedStacks, player.inventory);
-		}else if (entity instanceof EntityPlayer) {
+		} else if (entity instanceof EntityPlayer) {
 			EntityPlayer player = (EntityPlayer) entity;
 			addInventoryToList(storedStacks, player.inventory);
 		}
 		Collections.sort(storedStacks, new Comparator<StoredItemStack>() {
-			 public int compare(StoredItemStack str1, StoredItemStack str2){
-			       if(str1.stored <  str2.stored) return 1;
-			       if(str1.stored == str2.stored) return 0;
-			       return -1;
-			    }
+			public int compare(StoredItemStack str1, StoredItemStack str2) {
+				if (str1.stored < str2.stored)
+					return 1;
+				if (str1.stored == str2.stored)
+					return 0;
+				return -1;
+			}
 		});
 		return storedStacks;
 
@@ -209,8 +243,7 @@ public class InfoHelper {
 			if (primary.getDataType() == 0 && secondary.getDataType() == 0) {
 				int stored = Integer.parseInt(secondary.getData());
 				int max = Integer.parseInt(primary.getData());
-				
-							
+
 				if (stored < 0 || max < 0) {
 					return primary;
 				}

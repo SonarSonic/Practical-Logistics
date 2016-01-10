@@ -21,6 +21,7 @@ public class InfoTypeRegistry {
 		addInfoType(new ProgressInfo());	
 		addInfoType(new FluidInfo());	
 		addInfoType(new ThaumcraftAspectInfo());	
+		addInfoType(new ManaInfo());	
 	}
 
 	public static void removeAll() {

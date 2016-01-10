@@ -54,6 +54,9 @@ public abstract class BaseNode extends SonarMachineBlock {
 		if (player != null) {
 			TileEntity target = world.getTileEntity(x, y, z);
 			if (target instanceof TileEntitySonar) {
+				if(world.isRemote){
+					return true;
+				}
 				TileEntitySonar node = (TileEntitySonar) target;
 				node.sendSyncPacket(player);
 				openGui(world, x, y, z, player);

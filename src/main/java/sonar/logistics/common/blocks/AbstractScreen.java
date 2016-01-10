@@ -36,8 +36,6 @@ public abstract class AbstractScreen extends BlockContainer {
 
 	public abstract TileEntity createNewTileEntity(World world, int i);
 
-	public abstract Item getItemDropped(int meta, Random rand, int par);
-
 	@SideOnly(Side.CLIENT)
 	public IIcon getIcon(int side, int meta) {
 
@@ -48,9 +46,9 @@ public abstract class AbstractScreen extends BlockContainer {
 
 		int l = world.getBlockMetadata(x, y, z);
 		float f = 0.27125F;
-		float f1 = 0.77125F;
+		float f1 = 1-height();
 		float f2 = 0.0F;
-		float f3 = 1.0F;
+		float f3 = width();
 		float f4 = 0.080F;
 		this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
 

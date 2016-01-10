@@ -5,41 +5,27 @@ import io.netty.buffer.ByteBuf;
 import java.util.ArrayList;
 import java.util.List;
 
-import codechicken.multipart.TMultiPart;
-import codechicken.multipart.TileMultipart;
-import codechicken.multipart.minecraft.McMetaPart;
-import cpw.mods.fml.common.network.ByteBufUtils;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
-import sonar.core.SonarCore;
-import sonar.core.integration.SonarAPI;
 import sonar.core.integration.fmp.FMPHelper;
-import sonar.core.integration.fmp.SonarTilePart;
 import sonar.core.integration.fmp.handlers.InventoryTileHandler;
-import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.inventory.StoredItemStack;
-import sonar.core.network.PacketByteBuf;
 import sonar.core.network.utils.IByteBufTile;
 import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
-import sonar.logistics.Logistics;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.StandardInfo;
 import sonar.logistics.api.connecting.IDataCable;
-import sonar.logistics.api.connecting.IDataConnection;
-import sonar.logistics.api.connecting.IInfoReader;
 import sonar.logistics.common.tileentity.TileEntityBlockNode;
 import sonar.logistics.common.tileentity.TileEntityEntityNode;
 import sonar.logistics.helpers.CableHelper;
 import sonar.logistics.helpers.InfoHelper;
 import sonar.logistics.info.types.StoredStackInfo;
-import sonar.logistics.network.packets.PacketProviders;
+import cpw.mods.fml.common.network.ByteBufUtils;
 
 public class InventoryReaderHandler extends InventoryTileHandler implements IByteBufTile {
 
@@ -149,6 +135,7 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 			}
 		}
 		if (type == SyncType.SPECIAL) {
+			
 			if (nbt.hasKey("null")) {
 				this.stacks = new ArrayList();
 				return;
@@ -185,6 +172,7 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 				}
 
 			}
+			
 		}
 		if (type == SyncType.SYNC) {
 			NBTTagList list = nbt.getTagList("StoredStacks", 10);
@@ -265,6 +253,7 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 			if (list.tagCount() != 0) {
 				nbt.setTag("Stacks", list);
 			}
+			
 		}
 		if (type == SyncType.SYNC) {
 			NBTTagList list = new NBTTagList();

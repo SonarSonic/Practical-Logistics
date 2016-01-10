@@ -7,6 +7,7 @@ import java.util.List;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -34,7 +35,7 @@ import cpw.mods.fml.common.network.ByteBufUtils;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-public class TileEntityInventoryReader extends TileEntityHandlerInventory implements IDataConnection, IByteBufTile {
+public class TileEntityInventoryReader extends TileEntityHandlerInventory implements IDataConnection, IByteBufTile, ISidedInventory {
 
 	public InventoryReaderHandler handler = new InventoryReaderHandler(false);
 
@@ -70,6 +71,21 @@ public class TileEntityInventoryReader extends TileEntityHandlerInventory implem
 	@Override
 	public void readPacket(ByteBuf buf, int id) {
 		handler.readPacket(buf, id);		
+	}
+
+	@Override
+	public int[] getAccessibleSlotsFromSide(int slot) {
+		return null;
+	}
+
+	@Override
+	public boolean canInsertItem(int slot, ItemStack p_102007_2_, int p_102007_3_) {
+		return false;
+	}
+
+	@Override
+	public boolean canExtractItem(int slot, ItemStack p_102008_2_, int p_102008_3_) {
+		return false;
 	}
 
 }

@@ -12,7 +12,7 @@ public class DisplayScreen extends AbstractScreen {
 
 	@Override
 	public float height(){
-		return 0.25F;
+		return 1.0F/16 * 3.7F;
 	}
 
 	@Override

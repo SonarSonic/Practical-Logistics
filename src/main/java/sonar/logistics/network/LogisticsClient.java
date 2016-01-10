@@ -7,6 +7,7 @@ import sonar.logistics.client.renderers.RenderDisplayScreen;
 import sonar.logistics.client.renderers.RenderHandlers;
 import sonar.logistics.client.renderers.RenderHolographicDisplay;
 import sonar.logistics.client.renderers.RenderItemHandlers;
+import sonar.logistics.client.renderers.RenderLargeDisplay;
 import sonar.logistics.common.tileentity.TileEntityBlockNode;
 import sonar.logistics.common.tileentity.TileEntityDataCable;
 import sonar.logistics.common.tileentity.TileEntityDataEmitter;
@@ -19,6 +20,7 @@ import sonar.logistics.common.tileentity.TileEntityHolographicDisplay;
 import sonar.logistics.common.tileentity.TileEntityInfoCreator;
 import sonar.logistics.common.tileentity.TileEntityInfoReader;
 import sonar.logistics.common.tileentity.TileEntityInventoryReader;
+import sonar.logistics.common.tileentity.TileEntityLargeScreen;
 import sonar.logistics.common.tileentity.TileEntityRedstoneSignaller;
 import sonar.logistics.registries.BlockRegistry;
 import cpw.mods.fml.client.registry.ClientRegistry;
@@ -31,6 +33,10 @@ public class LogisticsClient extends LogisticsCommon {
 		TileEntitySpecialRenderer blockNode = new RenderHandlers.BlockNode();
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityBlockNode.class, blockNode);
 		MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(BlockRegistry.node), new RenderItemHandlers.Node(blockNode, new TileEntityBlockNode()));
+		
+		TileEntitySpecialRenderer largeDisplay = new RenderLargeDisplay();
+		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityLargeScreen.class, largeDisplay);
+		//MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(BlockRegistry.largeDisplayScreen), new RenderItemHandlers.Node(largeDisplay, new TileEntityLargeScreen()));
 		
 		TileEntitySpecialRenderer entityNode = new RenderHandlers.EntityNode();
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityEntityNode.class, entityNode);

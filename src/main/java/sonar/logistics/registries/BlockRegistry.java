@@ -18,6 +18,7 @@ import sonar.logistics.common.blocks.BlockNode;
 import sonar.logistics.common.blocks.BlockRedstoneSignaller;
 import sonar.logistics.common.blocks.BlockSapphireOre;
 import sonar.logistics.common.blocks.DisplayScreen;
+import sonar.logistics.common.blocks.LargeDisplayScreen;
 import sonar.logistics.common.tileentity.TileEntityBlockNode;
 import sonar.logistics.common.tileentity.TileEntityDataCable;
 import sonar.logistics.common.tileentity.TileEntityDataEmitter;
@@ -30,12 +31,13 @@ import sonar.logistics.common.tileentity.TileEntityHolographicDisplay;
 import sonar.logistics.common.tileentity.TileEntityInfoCreator;
 import sonar.logistics.common.tileentity.TileEntityInfoReader;
 import sonar.logistics.common.tileentity.TileEntityInventoryReader;
+import sonar.logistics.common.tileentity.TileEntityLargeScreen;
 import sonar.logistics.common.tileentity.TileEntityRedstoneSignaller;
 import cpw.mods.fml.common.registry.GameRegistry;
 
 public class BlockRegistry extends Logistics {
 
-	public static Block displayScreen, node, entityNode, infoReader, dataCable, dataReceiver, dataEmitter, inventoryReader, redstoneSignaller_on, redstoneSignaller_off, holographicDisplay, dataModifier, infoCreator,sapphire_ore, hammer, hammer_air;
+	public static Block displayScreen, largeDisplayScreen, node, entityNode, infoReader, dataCable, dataReceiver, dataEmitter, inventoryReader, redstoneSignaller_on, redstoneSignaller_off, holographicDisplay, dataModifier, infoCreator,sapphire_ore, hammer, hammer_air;
 
 	public static void registerBlocks() {
 
@@ -100,7 +102,9 @@ public class BlockRegistry extends Logistics {
 		GameRegistry.registerBlock(holographicDisplay, SonarBlockTip.class, "HolographicDisplay");
 		GameRegistry.registerTileEntity(TileEntityHolographicDisplay.class, "HolographicDisplay");	
 
-
+		//largeDisplayScreen = new LargeDisplayScreen().setBlockName("LargeDisplayScreen").setHardness(0.2F).setCreativeTab(Logistics.creativeTab).setResistance(20.0F).setBlockTextureName(modid + ":" + "data_cable");
+		//GameRegistry.registerBlock(largeDisplayScreen, SonarBlockTip.class, "LargeDisplayScreen");
+		//GameRegistry.registerTileEntity(TileEntityLargeScreen.class, "LargeDisplayScreen");	
 	}
 
 }

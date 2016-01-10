@@ -79,7 +79,6 @@ public class GuiInventoryReader extends GuiSonar {
 		for (int i = start; i < finish; i++) {
 			if (getStacks().get(i) != null) {
 				StoredItemStack info = getStacks().get(i);
-
 			}
 		}
 		return positions;
@@ -196,20 +195,6 @@ public class GuiInventoryReader extends GuiSonar {
 
 	}
 
-	protected void actionPerformed(GuiButton button) {
-		if (button != null) {
-			if (button.id >= 10) {
-				if (getStacks() != null) {
-					int start = (int) (stackListSize() * this.currentScroll);
-					int network = start + button.id - 10;
-					if (network < stackListSize()) {
-					}
-
-				}
-			}
-		}
-	}
-
 	@Override
 	protected void drawGuiContainerBackgroundLayer(float var1, int var2, int var3) {
 		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
@@ -217,7 +202,6 @@ public class GuiInventoryReader extends GuiSonar {
 		Minecraft.getMinecraft().getTextureManager().bindTexture(this.getBackground());
 
 		drawTexturedModalRect(this.guiLeft, this.guiTop, 0, 0, this.xSize, this.ySize);
-		List<Integer> positions = this.getCategoryPositions();
 		// int pos = getDataPosition();
 		// for (int i = 0; i < 11; i++) {
 		// drawTexturedModalRect(this.guiLeft + 7, this.guiTop + 29 + (12 * i), 0, positions != null && positions.contains(i) ? 190 : i == pos ? 178 : 166, 154 + 72, 12);

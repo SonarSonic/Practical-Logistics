@@ -17,6 +17,7 @@ tile.InfoCreator.name=Info Creator
 tile.Hammer.name=Forging Hammer
 tile.Hammer_Air.name=Forging Hammer
 tile.EntityNode.name=Entity Node
+tile.LargeDisplayScreen.name=Large Display Screen
 
 //items
 item.EnergyScreenItem.name=Energy Screen

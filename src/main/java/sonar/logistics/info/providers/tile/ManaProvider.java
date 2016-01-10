@@ -8,17 +8,20 @@ import net.minecraftforge.common.util.ForgeDirection;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.StandardInfo;
 import sonar.logistics.api.data.TileProvider;
+import sonar.logistics.info.types.ManaInfo;
+import sonar.logistics.info.types.ProgressInfo;
 import vazkii.botania.api.mana.IManaBlock;
 import vazkii.botania.api.mana.IManaCollector;
 import vazkii.botania.api.mana.IManaPool;
 import vazkii.botania.api.mana.IManaReceiver;
+import vazkii.botania.common.block.tile.mana.TilePool;
 import cpw.mods.fml.common.Loader;
 
 public class ManaProvider extends TileProvider {
 
 	public static String name = "Mana-Provider";
-	public String[] categories = new String[] { "Mana" };
-	public String[] subcategories = new String[] { "Current Mana", "Is Full", "Max Mana", "Is Outputting" };
+	public static String[] categories = new String[] { "Mana" };
+	public static String[] subcategories = new String[] { "Current Mana", "Is Full", "Max Mana", "Is Outputting" };
 
 	@Override
 	public String helperName() {
@@ -38,21 +41,19 @@ public class ManaProvider extends TileProvider {
 		if (te == null) {
 			return;
 		}
-		if (te instanceof IManaBlock) {
-			IManaBlock manaBlock = (IManaBlock) te;
-			infoList.add(new StandardInfo(id, 0, 0, manaBlock.getCurrentMana()));
+		if(te instanceof TilePool){
+			TilePool pool = (TilePool) te;
+			infoList.add(new ManaInfo(id, pool.getCurrentMana(), pool.manaCap));
 		}
+		
 		if (te instanceof IManaReceiver) {
 			IManaReceiver manaReceiver = (IManaReceiver) te;
 			infoList.add(new StandardInfo(id, 0, 1, manaReceiver.isFull()));
 		}
-		if (te instanceof IManaCollector) {
-			IManaCollector manaCollector = (IManaCollector) te;
-			infoList.add(new StandardInfo(id, 0, 2, manaCollector.getMaxMana()));
-		}
 		if (te instanceof IManaPool) {
 			IManaPool manaPool = (IManaPool) te;
 			infoList.add(new StandardInfo(id, 0, 3, manaPool.isOutputtingPower()));
+			
 		}
 	}
 
