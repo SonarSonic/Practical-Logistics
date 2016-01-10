@@ -53,8 +53,8 @@ public class EntityProviderRegistry {
 		return null;
 	}
 	public static void addProvider(EntityProvider provider) {
-		Logistics.logger.warn("Loading Entity Provider: " + provider.helperName());
 		if(!provider.isLoadable()){
+			Logistics.logger.warn("Entity Provider wasn't loadable: " + provider.helperName());
 			return;
 		}
 		if (provider != null) {

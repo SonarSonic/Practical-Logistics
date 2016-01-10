@@ -30,15 +30,8 @@ import sonar.logistics.info.types.CategoryInfo;
 import sonar.logistics.info.types.FluidInfo;
 import sonar.logistics.info.types.InfoTypeRegistry;
 import sonar.logistics.info.types.ProgressInfo;
-import appeng.api.AEApi;
-import appeng.api.implementations.tiles.ITileStorageMonitorable;
+import sonar.logistics.integration.AE2Helper;
 import appeng.api.networking.security.BaseActionSource;
-import appeng.api.networking.security.IActionHost;
-import appeng.api.networking.security.MachineSource;
-import appeng.api.storage.IMEMonitor;
-import appeng.api.storage.IStorageMonitorable;
-import appeng.api.storage.data.IAEItemStack;
-import appeng.api.storage.data.IItemList;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.network.ByteBufUtils;
 
@@ -158,36 +151,19 @@ public class InfoHelper {
 			addInventoryToList(storedStacks, (IInventory) tile);
 		}
 		if (Loader.isModLoaded("appliedenergistics2")) {
-			if (tile instanceof ITileStorageMonitorable && tile instanceof IActionHost) {
-				IStorageMonitorable monitor = ((ITileStorageMonitorable) tile).getMonitorable(dir, new MachineSource(((IActionHost) tile)));
-				if (monitor != null) {
-					IMEMonitor<IAEItemStack> stacks = monitor.getItemInventory();
-					IItemList<IAEItemStack> items = stacks.getAvailableItems(AEApi.instance().storage().createItemList());
-					for (IAEItemStack item : items) {
-						storedStacks.add(new StoredItemStack(item.getItemStack(), item.getStackSize()));
-					}
-				}
+			AE2Helper.addNetworkItems(tile, dir, storedStacks);
+		}
+
+		Collections.sort(storedStacks, new Comparator<StoredItemStack>() {
+			public int compare(StoredItemStack str1, StoredItemStack str2) {
+				if (str1.stored < str2.stored)
+					return 1;
+				if (str1.stored == str2.stored)
+					return 0;
+				return -1;
 			}
-		}
-
-			Collections.sort(storedStacks, new Comparator<StoredItemStack>() {
-				public int compare(StoredItemStack str1, StoredItemStack str2) {
-					if (str1.stored < str2.stored)
-						return 1;
-					if (str1.stored == str2.stored)
-						return 0;
-					return -1;
-				}
-			});
+		});
 		return storedStacks;
-	}
-
-	public static class ReaderSource extends BaseActionSource {
-
-		@Override
-		public boolean isMachine() {
-			return true;
-		}
 	}
 
 	public static List<StoredItemStack> getEntityInventory(TileEntityEntityNode tileNode) {
