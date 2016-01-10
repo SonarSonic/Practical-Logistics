@@ -153,7 +153,11 @@ public class InfoHelper {
 			if (inv.getStoredItemType() != null) {
 				storedStacks.add(new StoredItemStack(inv.getStoredItemType()));
 			}
-		} else if (Loader.isModLoaded("appliedenergistics2")) {
+		}
+		if (tile instanceof IInventory) {
+			addInventoryToList(storedStacks, (IInventory) tile);
+		}
+		if (Loader.isModLoaded("appliedenergistics2")) {
 			if (tile instanceof ITileStorageMonitorable && tile instanceof IActionHost) {
 				IStorageMonitorable monitor = ((ITileStorageMonitorable) tile).getMonitorable(dir, new MachineSource(((IActionHost) tile)));
 				if (monitor != null) {
@@ -164,19 +168,17 @@ public class InfoHelper {
 					}
 				}
 			}
-		} else if (tile instanceof IInventory) {
-			addInventoryToList(storedStacks, (IInventory) tile);
 		}
 
-		Collections.sort(storedStacks, new Comparator<StoredItemStack>() {
-			public int compare(StoredItemStack str1, StoredItemStack str2) {
-				if (str1.stored < str2.stored)
-					return 1;
-				if (str1.stored == str2.stored)
-					return 0;
-				return -1;
-			}
-		});
+			Collections.sort(storedStacks, new Comparator<StoredItemStack>() {
+				public int compare(StoredItemStack str1, StoredItemStack str2) {
+					if (str1.stored < str2.stored)
+						return 1;
+					if (str1.stored == str2.stored)
+						return 0;
+					return -1;
+				}
+			});
 		return storedStacks;
 	}
 
