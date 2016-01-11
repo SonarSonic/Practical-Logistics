@@ -29,7 +29,7 @@ public abstract class BaseNode extends SonarMachineBlock {
 	public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase entity, ItemStack itemstack) {
 		super.onBlockPlacedBy(world, x, y, z, entity, itemstack);
 		TileEntity target = world.getTileEntity(x, y, z);
-		if (entity instanceof EntityPlayer && target instanceof TileEntityNode) {			
+		if (entity instanceof EntityPlayer && target instanceof TileEntityNode) {
 			EntityPlayer player = (EntityPlayer) entity;
 			TileEntityNode node = (TileEntityNode) target;
 			node.playerName = player.getGameProfile().getName();
@@ -54,13 +54,13 @@ public abstract class BaseNode extends SonarMachineBlock {
 		if (player != null) {
 			TileEntity target = world.getTileEntity(x, y, z);
 			if (target instanceof TileEntitySonar) {
-				if(world.isRemote){
-					return true;
+				if (!world.isRemote) {
+					TileEntitySonar node = (TileEntitySonar) target;
+					node.sendSyncPacket(player);
+					openGui(world, x, y, z, player);
 				}
-				TileEntitySonar node = (TileEntitySonar) target;
-				node.sendSyncPacket(player);
-				openGui(world, x, y, z, player);
 				return true;
+
 			}
 
 		}

@@ -19,7 +19,7 @@ import sonar.core.common.tileentity.TileEntityInventory;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.inventory.StoredItemStack;
-import sonar.core.network.PacketByteBuf;
+import sonar.core.network.PacketByteBufServer;
 import sonar.core.network.utils.IByteBufTile;
 import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.NBTHelper.SyncType;

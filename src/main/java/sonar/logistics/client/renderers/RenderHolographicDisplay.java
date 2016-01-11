@@ -1,5 +1,7 @@
 package sonar.logistics.client.renderers;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.Entity;
@@ -11,6 +13,8 @@ import net.minecraftforge.common.util.ForgeDirection;
 import org.lwjgl.opengl.GL11;
 
 import sonar.core.utils.helpers.RenderHelper;
+import sonar.logistics.api.Info;
+import sonar.logistics.api.render.InfoRenderer;
 import sonar.logistics.client.models.ModelHolographicDisplay;
 
 public class RenderHolographicDisplay extends RenderDisplayScreen {
@@ -87,20 +91,27 @@ public class RenderHolographicDisplay extends RenderDisplayScreen {
 			GL11.glPushMatrix();
 			ForgeDirection dir = ForgeDirection.getOrientation(RenderHelper.setMetaData(entity));
 
-			
-			
-			GL11.glTranslated(x + (dir.offsetX == 0 ? 0.5 : dir.offsetX == -1 ? 0.3 : 0.7), y + 1.0, z + (dir.offsetZ == 0 ? 0.5 : dir.offsetZ == -1 ? 0.3 : 0.7));
-
-			// GL11.glTranslated(x + (dir.offsetX==1? 0.5 : 0.3), y + 1.0, z + (dir.offsetZ==1? 0.3 : 0.5));
+			GL11.glTranslated(x + 0.5, y + 1.0, z + 0.5);
+			GL11.glTranslated(-0.0625 * 2 * dir.offsetX, 0, -0.0625 * 2 * dir.offsetZ);
 			GL11.glScaled(1.5, 1.5, 1.5);
 			int br = 16 << 20 | 16 << 4;
 			int var11 = br % 65536;
 			int var12 = br / 65536;
 			OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, var11 * 0.8F, var12 * 0.8F);
-			this.tesrRenderScreen(tess, entity, dir, false);
+			this.tesrRenderScreen(tess, entity, dir);
 
 			GL11.glPopMatrix();
 		}
 
+	}
+
+	public void renderInfo(Tessellator tess, TileEntity tile, ForgeDirection side, Info info) {
+		float pixel = 1.0F / 16F;
+		if (info.hasSpecialRender()) {
+			info.renderInfo(tess, tile, -pixel*4.5F, -0.1850F, (1.0f - (pixel) * 11.5F), (pixel * 6), -0.207F, 140F);
+		} else {
+			FontRenderer rend = Minecraft.getMinecraft().fontRenderer;
+			InfoRenderer.renderStandardInfo(info, rend, -pixel*4.5F, -0.1850F, (1.0f - (pixel) * 11.5F), (pixel * 6), -0.207F, 140F);
+		}
 	}
 }

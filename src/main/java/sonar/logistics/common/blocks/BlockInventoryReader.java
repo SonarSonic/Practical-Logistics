@@ -30,9 +30,9 @@ public class BlockInventoryReader extends BlockDirectionalConnector {
 		TileEntity target = world.getTileEntity(x, y, z);
 		if (!world.isRemote && target != null && target instanceof TileEntityInventoryReader) {
 			TileEntityInventoryReader node = (TileEntityInventoryReader) target;
-			node.sendSyncPacket(player);
+			//node.sendSyncPacket(player);
+			player.openGui(Logistics.instance, LogisticsGui.inventoryReader, world, x, y, z);
 		}
-		player.openGui(Logistics.instance, LogisticsGui.inventoryReader, world, x, y, z);
 	}
 
 	@Override

@@ -192,11 +192,6 @@ public class StandardInfo extends Info {
 	}
 
 	@Override
-	public void renderInfo(Tessellator tess, TileEntity tile) {
-
-	}
-
-	@Override
 	public boolean isEqualType(Info info) {
 		if (info != null && ((info.getType().equals("Fluid-Info") || info.getType().equals(this.getType())))) {
 			return info.getProviderID() == this.providerID && info.getCategory().equals(this.getCategory()) && info.getSubCategory().equals(getSubCategory());

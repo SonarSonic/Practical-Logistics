@@ -175,6 +175,7 @@ public class InfoReaderHandler extends TileHandler {
 				this.lastInfo = clientInfo;
 				TileEntity tile = this.coords.getTileEntity();
 				List<Info> info = new ArrayList();
+
 				if (tile != null && tile instanceof TileEntityBlockNode) {
 					info = InfoHelper.getTileInfo((TileEntityBlockNode) tile);
 				} else if (tile != null && tile instanceof TileEntityEntityNode) {
@@ -194,13 +195,11 @@ public class InfoReaderHandler extends TileHandler {
 				clientInfo = newInfo;
 				NBTTagCompound tag = new NBTTagCompound();
 				this.writeData(tag, SyncType.SPECIAL);
-
-				SonarCore.network.sendTo(new PacketTileSync(te.xCoord, te.yCoord, te.zCoord, tag, SyncType.SPECIAL), (EntityPlayerMP) player);
+				if (!tag.hasNoTags())
+					SonarCore.network.sendTo(new PacketTileSync(te.xCoord, te.yCoord, te.zCoord, tag, SyncType.SPECIAL), (EntityPlayerMP) player);
 
 			}
-
 		}
-
 	}
 
 	public void readData(NBTTagCompound nbt, SyncType type) {

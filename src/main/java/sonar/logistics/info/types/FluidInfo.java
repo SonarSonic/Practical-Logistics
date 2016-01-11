@@ -69,39 +69,33 @@ public class FluidInfo extends StandardInfo {
 	}
 
 	@Override
-	public void renderInfo(Tessellator tess, TileEntity tile) {
+	public void renderInfo(Tessellator tess, TileEntity tile, float minX, float minY, float maxX, float maxY, float zOffset, float scale) {
 		FontRenderer rend = Minecraft.getMinecraft().fontRenderer;
-		GL11.glTranslated(-0.5, -0.2085, -0.205);
-		float width = (1.0f - (0.0625f) * 2);
-		float start = 0.0625f;
-		float top = 0;
-		float height = (float) (0.0625 * 6);
-		Tessellator t = Tessellator.instance;
+		GL11.glTranslated(0, 0, zOffset);
+		float width = (maxX - minX);
+		boolean renderNormal = true;
 		if (fluidID != -1) {
 			if (FluidRegistry.getFluid(fluidID) != null) {
 				IIcon icon = FluidRegistry.getFluid(fluidID).getIcon();
 				if (icon != null) {
+					renderNormal = false;
 					Minecraft.getMinecraft().renderEngine.bindTexture(TextureMap.locationBlocksTexture);
-					t.startDrawingQuads();
+					tess.startDrawingQuads();
 
 					double widthnew = (icon.getMinU() + (width * (icon.getMaxU() - icon.getMinU())));
-					double heightnew = (icon.getMinV() + (height * (icon.getMaxV() - icon.getMinV())));
+					double heightnew = (icon.getMinV() + (maxY * (icon.getMaxV() - icon.getMinV())));
 
-					t.addVertexWithUV((start + 0), (top + height), 0, (double) icon.getMinU(), heightnew);
-					t.addVertexWithUV((start + width), (top + height), 0, widthnew, heightnew);
-					t.addVertexWithUV((start + width), (top + 0), 0, widthnew, (double) icon.getMinV());
-					t.addVertexWithUV((start + 0), (top + 0), 0, (double) icon.getMinU(), (double) icon.getMinV());
+					tess.addVertexWithUV((minX + 0), (minY + maxY), 0, icon.getMinU(), heightnew);
+					tess.addVertexWithUV((minX + width), (minY + maxY), 0, widthnew, heightnew);
+					tess.addVertexWithUV((minX + width), (minY + 0), 0, widthnew, icon.getMinV());
+					tess.addVertexWithUV((minX + 0), (minY + 0), 0, icon.getMinU(), icon.getMinV());
 
-					t.draw();
+					tess.draw();
 				}
 			}
 		}
-		GL11.glTranslated(+0.5, +0.2085, +0.205);
-		// GL11.glTranslatef(0.0f, -0.04f, -0.20f);
-		// GL11.glScalef(1.0f / 120.0f, 1.0f / 120.0f, 1.0f / 120.0f);
-		// String data = getDisplayableData();
-		// rend.drawString(data, -rend.getStringWidth(data) / 2, 0, -1);
-		InfoRenderer.renderStandardInfo(this, rend);
+		GL11.glTranslated(0, 0, -zOffset);
+		InfoRenderer.renderStandardInfo(this, rend, minX, minY, maxX, maxY, zOffset, scale);
 	}
 
 	@Override

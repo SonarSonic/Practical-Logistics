@@ -68,19 +68,20 @@ public class RenderDisplayScreen extends TileEntitySpecialRenderer {
 
 		RenderHelper.finishRender();
 
-		// start of AE2 Rendering Code: all credit goes to them, I don't understand it
-
 		final Tessellator tess = Tessellator.instance;
 
 		if (entity.getWorldObj() != null) {
 			GL11.glPushMatrix();
 			GL11.glTranslated(x + 0.5, y + 0.5, z + 0.5);
-			this.tesrRenderScreen(tess, entity, ForgeDirection.getOrientation(RenderHelper.setMetaData(entity)), false);
+			ForgeDirection d = ForgeDirection.getOrientation(RenderHelper.setMetaData(entity));
+			float move = -0.21F;
+			GL11.glTranslated(d.offsetX * move, d.offsetY * move, d.offsetZ * move);
+			this.tesrRenderScreen(tess, entity, d);
 			GL11.glPopMatrix();
 		}
 	}
 
-	protected void tesrRenderScreen(Tessellator tess, TileEntity tile, ForgeDirection side, boolean normalSize) {
+	protected void tesrRenderScreen(Tessellator tess, TileEntity tile, ForgeDirection side) {
 		if (tile == null || tile.getWorldObj() == null) {
 			return;
 		}
@@ -93,7 +94,6 @@ public class RenderDisplayScreen extends TileEntitySpecialRenderer {
 				return;
 			}
 			final ForgeDirection d = side;
-			GL11.glTranslated(d.offsetX * 0.77, d.offsetY * 0.77, d.offsetZ * 0.77);
 
 			switch (d) {
 			case UP:
@@ -125,103 +125,23 @@ public class RenderDisplayScreen extends TileEntitySpecialRenderer {
 			default:
 				break;
 			}
-			GL11.glTranslated(0, 0, -(0.98));
-			FontRenderer rend = Minecraft.getMinecraft().fontRenderer;
 			GL11.glDisable(GL11.GL_LIGHTING);
-			if(info.hasSpecialRender()){
-			info.renderInfo(tess, tile);
-			}else{
-				InfoRenderer.renderStandardInfo(info, rend);
-			}
-			/*
-			if (info.getSubCategory().equals("ITEMREND") && info.getCategory().equals("ITEMREND") && screen instanceof IItemRenderer) {
-				ItemStack stack = ((IItemRenderer) screen).getRenderStack();
-				if (stack != null) {
-					stack.stackSize = 1;
-
-					final int br = 16 << 20 | 16 << 4;
-					final int var11 = br % 65536;
-					final int var12 = br / 65536;
-
-					GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-
-					GL11.glDisable(GL12.GL_RESCALE_NORMAL);
-					tess.setColorOpaque_F(1.0f, 1.0f, 1.0f);
-					GL11.glScaled(0.8, 0.8, 0.8);
-					GL11.glTranslatef(0.0f, 0.06f, 0f);
-					RenderHelper.doRenderItem(stack, tile.getWorldObj(), normalSize);
-					GL11.glEnable(GL12.GL_RESCALE_NORMAL);
-
-					GL11.glTranslatef(0.0f, 0.0f, -0.24f);
-					GL11.glScalef(1.0f / 40.0f, 1.0f / 40.0f, 1.0f / 40.0f);
-
-					String s1 = FontHelper.formatStackSize(Long.parseLong(info.getDisplayableData()));
-
-					final float scaleFactor = 0.5F;
-					final float inverseScaleFactor = 1.0f / scaleFactor;
-					GL11.glScaled(scaleFactor, scaleFactor, scaleFactor);
-					final int X = (int) (((float) -8 + 15.0f - rend.getStringWidth(s1) * scaleFactor) * inverseScaleFactor);
-					final int Y = (int) (((float) -12 + 15.0f - 7.0f * scaleFactor) * inverseScaleFactor);
-
-					GL11.glDisable(GL11.GL_LIGHTING);
-					rend.drawString(s1, X, Y, 16777215);
-				}
-			} else if (info.getProvider().equals("PERCENT") && info.getCategory().equals("PERCENT")) {
-
-				GL11.glTranslated(-0.5, -0.2085, -0.205);
-				float width = Integer.parseInt(info.getSubCategory()) * (1.0f - (0.0625f) * 2) / Integer.parseInt(info.getDisplayableData());
-				float start = 0.0625f;
-				float top = 0;
-				float height = (float) (0.0625 * 6);
-				Tessellator t = Tessellator.instance;
-				if (info.getDataType() == 3) {
-					IIcon icon = FluidRegistry.getFluid(2).getIcon();
-
-					this.bindTexture(TextureMap.locationBlocksTexture);
-					t.startDrawingQuads();
-
-					double widthnew = (icon.getMinU() + (width * (icon.getMaxU() - icon.getMinU())));
-					double heightnew = (icon.getMinV() + (height * (icon.getMaxV() - icon.getMinV())));
-
-					t.addVertexWithUV((start + 0), (top + height), 0, (double) icon.getMinU(), heightnew);
-					t.addVertexWithUV((start + width), (top + height), 0, widthnew, heightnew);
-					t.addVertexWithUV((start + width), (top + 0), 0, widthnew, (double) icon.getMinV());
-					t.addVertexWithUV((start + 0), (top + 0), 0, (double) icon.getMinU(), (double) icon.getMinV());
-
-					t.draw();
-				} else {
-					this.bindTexture(progress);
-					t.startDrawingQuads();
-					t.addVertexWithUV(start, 0, 0, 0, 0); // Bottom left texture
-					t.addVertexWithUV(start, height, 0, 0, height); // Top left
-					t.addVertexWithUV(start + width, height, 0, width, height); // Top right
-					t.addVertexWithUV(start + width, 0, 0, width, 0); // Bottom right
-					t.draw();
-				}
-
-				GL11.glTranslated(+0.5, +0.2085, +0.205);
-				GL11.glTranslatef(0.0f, -0.04f, -0.20f);
-				GL11.glScalef(1.0f / 120.0f, 1.0f / 120.0f, 1.0f / 120.0f);
-				String data = info.getSubCategory();
-				rend.drawString(data, -rend.getStringWidth(data) / 2, 0, -1);
-
-			} else {
-				GL11.glTranslatef(0.0f, -0.02f, -0.20f);
-				GL11.glScalef(1.0f / 120.0f, 1.0f / 120.0f, 1.0f / 120.0f);
-				String category = info.getSubCategory();
-				String data = info.getDisplayableData();
-				if (category.isEmpty() || category.equals(" ")) {
-					rend.drawString(data, -rend.getStringWidth(data) / 2, -4, -1);
-				} else {
-					rend.drawString(category, -rend.getStringWidth(category) / 2, -8, -1);
-					rend.drawString(data, -rend.getStringWidth(data) / 2, 4, -1);
-				}
-			}
-			*/
+			renderInfo(tess, tile, d, info);
 			GL11.glEnable(GL11.GL_LIGHTING);
-			
+
 		}
 
+	}
+
+	public void renderInfo(Tessellator tess, TileEntity tile, ForgeDirection side, Info info) {
+		float pixel = 1.0F / 16F;
+		if (info.hasSpecialRender()) {
+			info.renderInfo(tess, tile, -0.5F + pixel, -0.2085F, (1.0f - (pixel) * 9), (pixel * 6), -0.207F, 120F);
+			//info.renderInfo(tess, tile, -0.5F + pixel, -0.2085F, (1.0f - (pixel) * 9), (pixel * 1), -0.207F, 120F);
+		} else {
+			FontRenderer rend = Minecraft.getMinecraft().fontRenderer;
+			InfoRenderer.renderStandardInfo(info, rend, -0.5F + pixel, -0.2085F, (1.0f - (pixel) * 9), (pixel * 6), -0.207F, 120F);
+		}
 	}
 
 }

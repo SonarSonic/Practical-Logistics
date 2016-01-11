@@ -31,9 +31,11 @@ public abstract class Info {
 
 	public abstract boolean hasSpecialRender();
 
-	public abstract void renderInfo(Tessellator tess, TileEntity tile);
-
 	public abstract boolean isEqualType(Info info);
+	
+	public void renderInfo(Tessellator tess, TileEntity tile, float minX, float minY, float maxX, float maxY, float zOffset, float scale) {
+		
+	}
 
 	public boolean isDataEqualType(Info info) {
 		if(info==null){

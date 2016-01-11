@@ -21,7 +21,7 @@ import sonar.core.SonarCore;
 import sonar.core.inventory.GuiSonar;
 import sonar.core.inventory.SonarButtons;
 import sonar.core.inventory.StoredItemStack;
-import sonar.core.network.PacketByteBuf;
+import sonar.core.network.PacketByteBufServer;
 import sonar.core.utils.helpers.FontHelper;
 import sonar.core.utils.helpers.RenderHelper;
 import sonar.logistics.common.containers.ContainerInventoryReader;
@@ -98,7 +98,7 @@ public class GuiInventoryReader extends GuiSonar {
 					StoredItemStack storedStack = getStacks().get(i);
 					if (storedStack != null) {
 						handler.current=storedStack.item;
-						SonarCore.network.sendToServer(new PacketByteBuf(handler, tile.xCoord, tile.yCoord,tile.zCoord, 1));
+						SonarCore.network.sendToServer(new PacketByteBufServer(handler, tile.xCoord, tile.yCoord,tile.zCoord, 1));
 					}
 				}
 			}

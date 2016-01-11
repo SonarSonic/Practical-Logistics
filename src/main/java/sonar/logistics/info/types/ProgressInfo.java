@@ -24,9 +24,10 @@ public class ProgressInfo extends Info {
 	public long stored, max;
 	public int fluidID = -1;
 	public String rend = "Progress";
-	
+
 	public ProgressInfo() {
 	}
+
 	public ProgressInfo(long stored, long max, String data) {
 		this.stored = stored;
 		this.max = max;
@@ -39,6 +40,7 @@ public class ProgressInfo extends Info {
 		this.data = data;
 		this.fluidID = fluidID;
 	}
+
 	@Override
 	public String getType() {
 		return "ProgressBar";
@@ -73,6 +75,7 @@ public class ProgressInfo extends Info {
 	public int getDataType() {
 		return 1;
 	}
+
 	@Override
 	public void readFromBuf(ByteBuf buf) {
 		this.stored = buf.readLong();
@@ -87,8 +90,9 @@ public class ProgressInfo extends Info {
 		buf.writeLong(max);
 		buf.writeInt(fluidID);
 		ByteBufUtils.writeUTF8String(buf, data);
-		
+
 	}
+
 	public void readFromNBT(NBTTagCompound tag) {
 		this.stored = tag.getLong("stored");
 		this.max = tag.getLong("max");
@@ -109,30 +113,26 @@ public class ProgressInfo extends Info {
 	}
 
 	@Override
-	public void renderInfo(Tessellator tess, TileEntity tile) {
+	public void renderInfo(Tessellator tess, TileEntity tile, float minX, float minY, float maxX, float maxY, float zOffset, float scale) {
 		FontRenderer rend = Minecraft.getMinecraft().fontRenderer;
-		GL11.glTranslated(-0.5, -0.2085, -0.205);
-		float width = stored * (1.0f - (0.0625f) * 2) / max;
-		float start = 0.0625f;
-		float top = 0;
-		float height = (float) (0.0625 * 6);
-		
+		GL11.glTranslated(0, 0, zOffset);
+		float width = stored * (maxX - minX) / max;
 		boolean renderNormal = true;
 		if (fluidID != -1) {
 			if (FluidRegistry.getFluid(fluidID) != null) {
 				IIcon icon = FluidRegistry.getFluid(fluidID).getIcon();
 				if (icon != null) {
-					renderNormal=false;
+					renderNormal = false;
 					Minecraft.getMinecraft().renderEngine.bindTexture(TextureMap.locationBlocksTexture);
 					tess.startDrawingQuads();
 
 					double widthnew = (icon.getMinU() + (width * (icon.getMaxU() - icon.getMinU())));
-					double heightnew = (icon.getMinV() + (height * (icon.getMaxV() - icon.getMinV())));
+					double heightnew = (icon.getMinV() + (maxY * (icon.getMaxV() - icon.getMinV())));
 
-					tess.addVertexWithUV((start + 0), (top + height), 0, (double) icon.getMinU(), heightnew);
-					tess.addVertexWithUV((start + width), (top + height), 0, widthnew, heightnew);
-					tess.addVertexWithUV((start + width), (top + 0), 0, widthnew, (double) icon.getMinV());
-					tess.addVertexWithUV((start + 0), (top + 0), 0, (double) icon.getMinU(), (double) icon.getMinV());
+					tess.addVertexWithUV((minX + 0), (minY + maxY), 0, icon.getMinU(), heightnew);
+					tess.addVertexWithUV((minX + width), (minY + maxY), 0, widthnew, heightnew);
+					tess.addVertexWithUV((minX + width), (minY + 0), 0, widthnew, icon.getMinV());
+					tess.addVertexWithUV((minX + 0), (minY + 0), 0, icon.getMinU(), icon.getMinV());
 
 					tess.draw();
 				}
@@ -141,17 +141,26 @@ public class ProgressInfo extends Info {
 		if (renderNormal) {
 			Minecraft.getMinecraft().renderEngine.bindTexture(progress);
 			tess.startDrawingQuads();
-			tess.addVertexWithUV(start, 0, 0, 0, 0);
-			tess.addVertexWithUV(start, height, 0, 0, height);
-			tess.addVertexWithUV(start + width, height, 0, width, height);
-			tess.addVertexWithUV(start + width, 0, 0, width, 0);
+
+			double widthnew = (0 + (width * (2)));
+			double heightnew = (0 + (maxY * (2)));
+
+			tess.addVertexWithUV((minX + 0), (minY + maxY), 0, 0, heightnew);
+			tess.addVertexWithUV((minX + width), (minY + maxY), 0, widthnew, heightnew);
+			tess.addVertexWithUV((minX + width), (minY + 0), 0, widthnew, 0);
+			tess.addVertexWithUV((minX + 0), (minY + 0), 0, 0, 0);
+
 			tess.draw();
-		}		
-		GL11.glTranslated(+0.5, +0.2085, +0.205);
-		GL11.glTranslatef(0.0f, -0.04f, -0.20f);
-		GL11.glScalef(1.0f / 120.0f, 1.0f / 120.0f, 1.0f / 120.0f);
-		String data = getDisplayableData();
-		rend.drawString(data, -rend.getStringWidth(data) / 2, 0, -1);
+		}
+
+		//float scaleFactor = 120.0f;
+		GL11.glTranslatef(0, -0.2F, 0f);
+		GL11.glTranslatef(minX + (maxX - minX) / 2, minY + maxY/2, 0.01f);
+		GL11.glScalef(1.0f / scale, 1.0f / scale, 1.0f / scale);
+		GL11.glTranslated(0, ((scale - 40) / 5) + 4, 0);
+		String data = this.getDisplayableData();
+		rend.drawString(data, -(rend.getStringWidth(data) / 2), 0, -1);
+
 	}
 
 	@Override
@@ -166,8 +175,6 @@ public class ProgressInfo extends Info {
 	public void emptyData() {
 
 	}
-
-
 
 	@Override
 	public Info newInfo() {

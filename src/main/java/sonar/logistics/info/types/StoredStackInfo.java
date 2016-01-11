@@ -86,25 +86,26 @@ public class StoredStackInfo extends Info {
 	}
 
 	@Override
-	public void renderInfo(Tessellator tess, TileEntity tile) {
+	public void renderInfo(Tessellator tess, TileEntity tile, float minX, float minY, float maxX, float maxY, float zOffset, float scale) {
 		if (stack != null && stack.item != null) {
 
+			GL11.glTranslatef(minX + (maxX - minX) / 2, minY + maxY/2, 0.01f);
 			FontRenderer rend = Minecraft.getMinecraft().fontRenderer;
 			stack.item.stackSize = 1;
 
 			final int br = 16 << 20 | 16 << 4;
 			final int var11 = br % 65536;
 			final int var12 = br / 65536;
-			OpenGlHelper.setLightmapTextureCoords( OpenGlHelper.lightmapTexUnit, var11 * 0.8F, var12 * 0.8F );
+			OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, var11 * 0.8F, var12 * 0.8F);
 
 			GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 
 			GL11.glDisable(GL12.GL_RESCALE_NORMAL);
 			tess.setColorOpaque_F(1.0f, 1.0f, 1.0f);
-			GL11.glScaled(0.8, 0.8, 0.8);
-			GL11.glTranslatef(0.0f, 0.06f, 0f);
+			float itemScale = scale/150;
+			GL11.glTranslatef(0.0f, 0.07f, zOffset-0.01F);
+			GL11.glScaled(itemScale, itemScale, 0.001);
 
-			
 			RenderHelper.doRenderItem(stack.item, tile.getWorldObj(), false);
 			GL11.glEnable(GL12.GL_RESCALE_NORMAL);
 
@@ -115,7 +116,9 @@ public class StoredStackInfo extends Info {
 
 			final float scaleFactor = 0.5F;
 			final float inverseScaleFactor = 1.0f / scaleFactor;
+			
 			GL11.glScaled(scaleFactor, scaleFactor, scaleFactor);
+			
 			final int X = (int) (((float) -8 + 15.0f - rend.getStringWidth(s1) * scaleFactor) * inverseScaleFactor);
 			final int Y = (int) (((float) -12 + 15.0f - 7.0f * scaleFactor) * inverseScaleFactor);
 

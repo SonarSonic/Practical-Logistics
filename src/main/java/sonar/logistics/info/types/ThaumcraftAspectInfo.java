@@ -65,36 +65,34 @@ public class ThaumcraftAspectInfo extends StandardInfo {
 	}
 
 	@Override
-	public void renderInfo(Tessellator tess, TileEntity tile) {
+	public void renderInfo(Tessellator tess, TileEntity tile, float minX, float minY, float maxX, float maxY, float zOffset, float scale) {
 		FontRenderer rend = Minecraft.getMinecraft().fontRenderer;
-		GL11.glTranslated(-0.5, -0.2085, -0.205);
-		float width = 1.0F;
-		float start = 0f;
-		float top = 0f;
-		float height = 1.0F;
-		Tessellator t = Tessellator.instance;
-		double scale = 0.3;
 
-		GL11.glScaled(scale, scale, scale);
+		GL11.glTranslated(0, 0, zOffset);
+		float width = 1;
+		float height = 1;
+		double scaled = scale/400;
+		GL11.glScaled(scaled, scaled, scaled);
 		if (tex != null) {
-			GL11.glTranslated(0.5, 0.1, 0.0);
+			GL11.glTranslated(-0.7, -0.55, 0.0);
 			Aspect aspect = Aspect.getAspect(tex);
 			if (aspect != null) {
 				Minecraft.getMinecraft().renderEngine.bindTexture(aspect.getImage());
 				GL11.glBlendFunc(770, aspect.getBlend());
-				t.startDrawingQuads();
-				t.setColorRGBA_I(aspect.getColor(), 128);
-				t.addVertexWithUV(start, 0, 0, 0, 0);
-				t.addVertexWithUV(start, height, 0, 0, height);
-				t.addVertexWithUV(start + width, height, 0, width, height);
-				t.addVertexWithUV(start + width, 0, 0, width, 0);
-				t.draw();
+				tess.startDrawingQuads();
+				tess.setColorRGBA_I(aspect.getColor(), 128);
+				tess.addVertexWithUV(minX, 0, 0, 0, 0);
+				tess.addVertexWithUV(minX, height, 0, 0, height);
+				tess.addVertexWithUV(minX + width, height, 0, width, height);
+				tess.addVertexWithUV(minX + width, 0, 0, width, 0);
+				tess.draw();
 			}
-			GL11.glTranslated(0.0, -0.1, 0.0);
+			GL11.glTranslated(0.7, 0.55, 0.0);
 		}
-		GL11.glScaled(1.0 / scale, 1.0 / scale, 1.0 / scale);
-		GL11.glTranslated(+0.5, +0.2085, +0.205);
-		InfoRenderer.renderStandardInfo(this, rend);
+		GL11.glTranslated(0.5, 0.00, 0.0);
+		GL11.glScaled(1.0 / scaled, 1.0 / scaled, 1.0 / scaled);
+		GL11.glTranslated(0, 0, -zOffset);
+		InfoRenderer.renderStandardInfo(this, rend, minX, minY, maxX, maxY, zOffset, scale);
 	}
 	@Override
 	public Info newInfo() {

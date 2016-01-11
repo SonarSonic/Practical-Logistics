@@ -76,10 +76,6 @@ public class CategoryInfo extends Info {
 	}
 
 	@Override
-	public void renderInfo(Tessellator tess, TileEntity tile) {
-	}
-
-	@Override
 	public boolean isEqualType(Info info) {
 		if (info != null && info.getType() == this.getType()) {
 			return info.getCategory().equals(category);
