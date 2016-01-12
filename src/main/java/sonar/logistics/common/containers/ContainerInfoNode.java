@@ -7,13 +7,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import sonar.core.SonarCore;
-import sonar.core.integration.fmp.ContainerSyncFMP;
 import sonar.core.inventory.ContainerSync;
 import sonar.core.network.PacketTileSync;
 import sonar.core.utils.helpers.NBTHelper;
 import sonar.logistics.common.handlers.InfoReaderHandler;
 import sonar.logistics.common.tileentity.TileEntityInfoReader;
-import sonar.logistics.integration.multipart.InfoReaderPart;
 
 public class ContainerInfoNode extends ContainerSync {
 

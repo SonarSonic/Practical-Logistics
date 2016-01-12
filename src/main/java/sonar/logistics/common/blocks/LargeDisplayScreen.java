@@ -1,21 +1,14 @@
 package sonar.logistics.common.blocks;
 
-import java.util.Random;
-
 import net.minecraft.block.Block;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import sonar.core.network.utils.ISyncTile;
-import sonar.core.utils.helpers.NBTHelper.SyncType;
-import sonar.logistics.common.tileentity.TileEntityDisplayScreen;
 import sonar.logistics.common.tileentity.TileEntityLargeScreen;
-import sonar.logistics.registries.ItemRegistry;
 
 public class LargeDisplayScreen extends AbstractScreen {
 

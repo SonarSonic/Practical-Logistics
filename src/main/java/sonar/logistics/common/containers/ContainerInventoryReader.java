@@ -16,7 +16,6 @@ import sonar.core.inventory.slots.SlotList;
 import sonar.core.network.PacketTileSync;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.common.handlers.InventoryReaderHandler;
-import sonar.logistics.common.tileentity.TileEntityInventoryReader;
 
 public class ContainerInventoryReader extends ContainerSync {
 

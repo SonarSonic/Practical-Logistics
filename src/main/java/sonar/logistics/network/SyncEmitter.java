@@ -6,8 +6,6 @@ import sonar.core.network.sync.ISyncPart;
 import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.api.DataEmitter;
-import sonar.logistics.api.Info;
-import sonar.logistics.helpers.InfoHelper;
 
 public class SyncEmitter implements ISyncPart {
 	private DataEmitter c;

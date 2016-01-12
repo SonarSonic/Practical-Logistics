@@ -5,13 +5,11 @@ import java.util.List;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.SonarCore;
-import sonar.core.inventory.StoredItemStack;
 import sonar.core.network.PacketTileSync;
 import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
@@ -20,8 +18,6 @@ import sonar.logistics.api.Info;
 import sonar.logistics.api.StandardInfo;
 import sonar.logistics.api.connecting.IDataReceiver;
 import sonar.logistics.helpers.CableHelper;
-import sonar.logistics.helpers.InfoHelper;
-import sonar.logistics.info.types.CategoryInfo;
 import sonar.logistics.network.SyncEmitter;
 import sonar.logistics.registries.EmitterRegistry;
 

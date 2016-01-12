@@ -4,9 +4,6 @@ import io.netty.buffer.ByteBuf;
 
 import java.util.List;
 
-import cpw.mods.fml.common.network.ByteBufUtils;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
@@ -23,6 +20,9 @@ import sonar.logistics.api.connecting.IInfoReader;
 import sonar.logistics.common.tileentity.TileEntityInventoryReader;
 import sonar.logistics.helpers.CableHelper;
 import sonar.logistics.helpers.InfoHelper;
+import cpw.mods.fml.common.network.ByteBufUtils;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 

@@ -1,7 +1,6 @@
 package sonar.logistics.client.gui;
 
 import net.minecraft.client.gui.GuiTextField;
-import net.minecraft.inventory.Container;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 
@@ -13,7 +12,6 @@ import sonar.core.network.PacketTextField;
 import sonar.core.utils.helpers.FontHelper;
 import sonar.logistics.common.containers.ContainerEmptySync;
 import sonar.logistics.common.handlers.InfoCreatorHandler;
-import sonar.logistics.common.tileentity.TileEntityInfoCreator;
 
 public class GuiInfoCreator extends GuiSonar {
 

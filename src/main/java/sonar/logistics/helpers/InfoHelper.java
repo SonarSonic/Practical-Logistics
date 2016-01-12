@@ -31,7 +31,6 @@ import sonar.logistics.info.types.FluidInfo;
 import sonar.logistics.info.types.InfoTypeRegistry;
 import sonar.logistics.info.types.ProgressInfo;
 import sonar.logistics.integration.AE2Helper;
-import appeng.api.networking.security.BaseActionSource;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.network.ByteBufUtils;
 

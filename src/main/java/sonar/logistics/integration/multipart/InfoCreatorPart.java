@@ -1,37 +1,21 @@
 package sonar.logistics.integration.multipart;
 
-import java.util.Arrays;
-
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraftforge.common.util.ForgeDirection;
-import sonar.core.SonarCore;
-import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.SonarHandlerPart;
-import sonar.core.integration.fmp.SonarTilePart;
 import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.network.utils.ITextField;
-import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.Info;
-import sonar.logistics.api.StandardInfo;
 import sonar.logistics.api.connecting.IDataConnection;
-import sonar.logistics.api.connecting.IInfoReader;
 import sonar.logistics.api.render.ICableRenderer;
-import sonar.logistics.client.renderers.RenderDisplayScreen;
 import sonar.logistics.client.renderers.RenderHandlers;
-import sonar.logistics.common.handlers.DisplayScreenHandler;
 import sonar.logistics.common.handlers.InfoCreatorHandler;
-import sonar.logistics.common.handlers.InfoReaderHandler;
-import sonar.logistics.common.tileentity.TileEntityInventoryReader;
-import sonar.logistics.helpers.CableHelper;
-import sonar.logistics.helpers.InfoHelper;
 import sonar.logistics.network.LogisticsGui;
 import sonar.logistics.registries.BlockRegistry;
-import sonar.logistics.registries.ItemRegistry;
 import codechicken.lib.vec.Cuboid6;
 
 public class InfoCreatorPart extends SonarHandlerPart implements IDataConnection, ICableRenderer, ITextField {

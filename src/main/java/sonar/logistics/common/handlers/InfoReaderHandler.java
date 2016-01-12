@@ -3,39 +3,28 @@ package sonar.logistics.common.handlers;
 import java.util.ArrayList;
 import java.util.List;
 
-import codechicken.multipart.TMultiPart;
-import codechicken.multipart.TileMultipart;
-import codechicken.multipart.minecraft.McMetaPart;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.SonarCore;
-import sonar.core.integration.SonarAPI;
 import sonar.core.integration.fmp.FMPHelper;
-import sonar.core.integration.fmp.SonarTilePart;
 import sonar.core.integration.fmp.handlers.TileHandler;
-import sonar.core.inventory.StoredItemStack;
 import sonar.core.network.PacketTileSync;
 import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
-import sonar.logistics.Logistics;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.StandardInfo;
 import sonar.logistics.api.connecting.IDataCable;
-import sonar.logistics.api.connecting.IDataConnection;
-import sonar.logistics.api.connecting.IInfoReader;
 import sonar.logistics.common.tileentity.TileEntityBlockNode;
 import sonar.logistics.common.tileentity.TileEntityEntityNode;
 import sonar.logistics.helpers.CableHelper;
 import sonar.logistics.helpers.InfoHelper;
 import sonar.logistics.info.types.CategoryInfo;
 import sonar.logistics.network.SyncInfo;
-import sonar.logistics.network.packets.PacketProviders;
 
 public class InfoReaderHandler extends TileHandler {
 

@@ -4,24 +4,17 @@ import java.util.List;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
-import sonar.core.SonarCore;
 import sonar.core.common.block.SonarMaterials;
-import sonar.core.common.tileentity.TileEntitySonar;
-import sonar.core.network.PacketTileSync;
 import sonar.core.utils.helpers.FontHelper;
-import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.connecting.IDataCable;
 import sonar.logistics.common.tileentity.TileEntityDataReceiver;
 import sonar.logistics.common.tileentity.TileEntityNode;
 import sonar.logistics.network.LogisticsGui;
-import sonar.logistics.network.packets.PacketDataEmitters;
-import sonar.logistics.registries.EmitterRegistry;
 
 public class BlockDataReceiver extends BaseNode {
 

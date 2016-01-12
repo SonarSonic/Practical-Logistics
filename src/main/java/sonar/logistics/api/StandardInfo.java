@@ -1,9 +1,7 @@
 package sonar.logistics.api;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
 import sonar.logistics.info.providers.tile.TileProviderRegistry;
 import cpw.mods.fml.common.network.ByteBufUtils;
 

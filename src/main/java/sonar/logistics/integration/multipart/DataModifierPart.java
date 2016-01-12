@@ -14,7 +14,6 @@ import sonar.logistics.api.connecting.IDataConnection;
 import sonar.logistics.api.render.ICableRenderer;
 import sonar.logistics.client.renderers.RenderHandlers;
 import sonar.logistics.common.handlers.DataModifierHandler;
-import sonar.logistics.common.handlers.InfoCreatorHandler;
 import sonar.logistics.network.LogisticsGui;
 import sonar.logistics.registries.BlockRegistry;
 import codechicken.lib.vec.Cuboid6;

@@ -6,7 +6,6 @@ import java.util.List;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
-import net.minecraft.inventory.Container;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StatCollector;
@@ -24,9 +23,7 @@ import sonar.logistics.Logistics;
 import sonar.logistics.api.Info;
 import sonar.logistics.common.containers.ContainerInfoNode;
 import sonar.logistics.common.handlers.InfoReaderHandler;
-import sonar.logistics.common.tileentity.TileEntityInfoReader;
 import sonar.logistics.info.types.CategoryInfo;
-import sonar.logistics.integration.multipart.InfoReaderPart;
 import sonar.logistics.network.packets.PacketInfoBlock;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;

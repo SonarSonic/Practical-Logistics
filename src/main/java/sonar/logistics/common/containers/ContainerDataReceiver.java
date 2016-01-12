@@ -6,15 +6,9 @@ import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import sonar.core.SonarCore;
 import sonar.core.inventory.ContainerSync;
-import sonar.core.network.PacketTileSync;
 import sonar.core.utils.helpers.NBTHelper;
-import sonar.core.utils.helpers.NBTHelper.SyncType;
-import sonar.logistics.Logistics;
 import sonar.logistics.common.tileentity.TileEntityDataReceiver;
-import sonar.logistics.network.packets.PacketDataEmitters;
-import sonar.logistics.registries.EmitterRegistry;
 
 public class ContainerDataReceiver extends ContainerSync {
 

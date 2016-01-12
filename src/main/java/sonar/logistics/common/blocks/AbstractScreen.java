@@ -2,7 +2,6 @@ package sonar.logistics.common.blocks;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
@@ -14,8 +13,6 @@ import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import sonar.core.common.block.SonarMaterials;
-import sonar.logistics.api.Info;
-import sonar.logistics.api.StandardInfo;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 

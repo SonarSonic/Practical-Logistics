@@ -1,6 +1,5 @@
 package sonar.logistics.api.signals;
 
-import sonar.core.network.sync.SyncInt;
 import sonar.core.network.sync.SyncString;
 import sonar.logistics.api.Info;
 

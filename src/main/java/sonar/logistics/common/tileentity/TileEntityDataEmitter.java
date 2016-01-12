@@ -1,7 +1,6 @@
 package sonar.logistics.common.tileentity;
 
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.network.sync.SyncString;
 import sonar.core.network.utils.ITextField;

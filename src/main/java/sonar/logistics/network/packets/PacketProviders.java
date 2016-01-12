@@ -7,16 +7,13 @@ import java.util.List;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.tileentity.TileEntity;
-import sonar.core.integration.SonarAPI;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.ITileHandler;
 import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.logistics.api.Info;
 import sonar.logistics.common.handlers.InfoReaderHandler;
-import sonar.logistics.common.tileentity.TileEntityInfoReader;
 import sonar.logistics.helpers.InfoHelper;
 import sonar.logistics.info.types.CategoryInfo;
-import sonar.logistics.integration.multipart.InfoReaderPart;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;

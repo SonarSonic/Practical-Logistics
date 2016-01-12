@@ -2,16 +2,16 @@ package sonar.logistics.info.providers.tile;
 
 import java.util.List;
 
-import appeng.api.implementations.IPowerChannelState;
-import appeng.api.networking.IGridBlock;
-import appeng.api.networking.IGridConnection;
-import cpw.mods.fml.common.Loader;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.StandardInfo;
 import sonar.logistics.api.data.TileProvider;
+import appeng.api.implementations.IPowerChannelState;
+import appeng.api.networking.IGridBlock;
+import appeng.api.networking.IGridConnection;
+import cpw.mods.fml.common.Loader;
 
 public class AE2GridProvider extends TileProvider {
 

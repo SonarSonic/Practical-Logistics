@@ -1,11 +1,9 @@
 package sonar.logistics.api;
 
 import io.netty.buffer.ByteBuf;
-import cpw.mods.fml.common.network.ByteBufUtils;
 import net.minecraft.nbt.NBTTagCompound;
 import sonar.core.utils.BlockCoords;
-import sonar.logistics.Logistics;
-import sonar.logistics.info.types.InfoTypeRegistry;
+import cpw.mods.fml.common.network.ByteBufUtils;
 
 public class DataEmitter {
 	public String name;

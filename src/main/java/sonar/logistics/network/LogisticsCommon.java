@@ -8,7 +8,6 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import sonar.core.integration.fmp.FMPHelper;
-import sonar.core.integration.fmp.ITileHandler;
 import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.logistics.Logistics;
 import sonar.logistics.client.gui.GuiDataModifier;

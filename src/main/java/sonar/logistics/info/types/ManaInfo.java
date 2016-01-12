@@ -4,19 +4,15 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fluids.FluidRegistry;
 
 import org.lwjgl.opengl.GL11;
 
 import sonar.logistics.api.Info;
 import sonar.logistics.client.renderers.RenderHandlers;
 import sonar.logistics.info.providers.tile.ManaProvider;
-import cpw.mods.fml.common.network.ByteBufUtils;
 
 public class ManaInfo extends ProgressInfo {
 
