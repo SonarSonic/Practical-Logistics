@@ -9,7 +9,7 @@ import sonar.logistics.api.Info;
 import sonar.logistics.api.connecting.IDataConnection;
 import sonar.logistics.common.handlers.InventoryReaderHandler;
 
-public class TileEntityInventoryReader extends TileEntityHandlerInventory implements IDataConnection, IByteBufTile {
+public class TileEntityInventoryReader extends TileEntityHandlerInventory implements IDataConnection {
 
 	public InventoryReaderHandler handler = new InventoryReaderHandler(false);
 
@@ -35,16 +35,6 @@ public class TileEntityInventoryReader extends TileEntityHandlerInventory implem
 
 	public boolean maxRender() {
 		return true;
-	}
-
-	@Override
-	public void writePacket(ByteBuf buf, int id) {
-		handler.writePacket(buf, id);
-	}
-
-	@Override
-	public void readPacket(ByteBuf buf, int id) {
-		handler.readPacket(buf, id);
 	}
 
 }

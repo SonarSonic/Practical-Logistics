@@ -22,8 +22,10 @@ import sonar.core.inventory.StoredItemStack;
 import sonar.core.network.PacketByteBufServer;
 import sonar.core.utils.helpers.FontHelper;
 import sonar.core.utils.helpers.RenderHelper;
+import sonar.logistics.Logistics;
 import sonar.logistics.common.containers.ContainerInventoryReader;
 import sonar.logistics.common.handlers.InventoryReaderHandler;
+import sonar.logistics.network.packets.PacketInventoryReader;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -33,14 +35,14 @@ public class GuiInventoryReader extends GuiSonar {
 
 	public InventoryReaderHandler handler;
 	public TileEntity tile;
-	
+
 	public GuiInventoryReader(InventoryReaderHandler handler, TileEntity entity, InventoryPlayer inventoryPlayer) {
 		super(new ContainerInventoryReader(handler, entity, inventoryPlayer), entity);
 		this.xCoord = entity.xCoord;
 		this.yCoord = entity.yCoord;
 		this.zCoord = entity.zCoord;
-		this.handler=handler;
-		this.tile=entity;
+		this.handler = handler;
+		this.tile = entity;
 	}
 
 	public static final ResourceLocation bground = new ResourceLocation("PracticalLogistics:textures/gui/inventoryReader.png");
@@ -65,7 +67,7 @@ public class GuiInventoryReader extends GuiSonar {
 		scrollerEnd = scrollerStart + 128;
 		scrollerWidth = 10;
 	}
-	
+
 	public List<Integer> getCategoryPositions() {
 		if (getStacks() == null) {
 			return null;
@@ -94,8 +96,9 @@ public class GuiInventoryReader extends GuiSonar {
 				if (i < getStacks().size()) {
 					StoredItemStack storedStack = getStacks().get(i);
 					if (storedStack != null) {
-						handler.current=storedStack.item;
-						SonarCore.network.sendToServer(new PacketByteBufServer(handler, tile.xCoord, tile.yCoord,tile.zCoord, 1));
+						handler.current = storedStack.item;
+						handler.current.stackSize = 1;
+						Logistics.network.sendToServer(new PacketInventoryReader(tile.xCoord, tile.yCoord, tile.zCoord, handler.current));
 					}
 				}
 			}
@@ -232,7 +235,7 @@ public class GuiInventoryReader extends GuiSonar {
 		return getStacks() == null ? 0 : getStacks().size();
 	}
 
-	public List<StoredItemStack> getStacks(){
+	public List<StoredItemStack> getStacks() {
 		return handler.stacks;
 	}
 

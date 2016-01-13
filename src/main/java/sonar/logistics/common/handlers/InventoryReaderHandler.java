@@ -27,7 +27,7 @@ import sonar.logistics.helpers.InfoHelper;
 import sonar.logistics.info.types.StoredStackInfo;
 import cpw.mods.fml.common.network.ByteBufUtils;
 
-public class InventoryReaderHandler extends InventoryTileHandler implements IByteBufTile {
+public class InventoryReaderHandler extends InventoryTileHandler {
 
 	public BlockCoords coords;
 	public List<StoredItemStack> stacks;
@@ -272,61 +272,4 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 			nbt.setTag("StoredStacks", list);
 		}
 	}
-
-	@Override
-	public void writePacket(ByteBuf buf, int id) {
-		if (id == 0) {
-			NBTTagList list = new NBTTagList();
-			NBTTagCompound nbt = new NBTTagCompound();
-			if (stacks == null) {
-				stacks = new ArrayList();
-			}
-			for (int i = 0; i < this.stacks.size(); i++) {
-				if (this.stacks.get(i) != null) {
-					NBTTagCompound compound = new NBTTagCompound();
-					compound.setByte("Slot", (byte) i);
-					StoredItemStack.writeToNBT(compound, this.stacks.get(i));
-					list.appendTag(compound);
-				}
-			}
-
-			nbt.setTag("StoredStacks", list);
-
-			ByteBufUtils.writeTag(buf, nbt);
-
-			this.lastStacks = stacks;
-
-		}
-		if (id == 1) {
-			if (current != null) {
-				buf.writeBoolean(true);
-				current.stackSize = 1;
-				ByteBufUtils.writeItemStack(buf, current);
-			} else {
-				buf.writeBoolean(false);
-			}
-		}
-	}
-
-	@Override
-	public void readPacket(ByteBuf buf, int id) {
-		if (id == 0) {
-			NBTTagCompound nbt = ByteBufUtils.readTag(buf);
-			NBTTagList list = nbt.getTagList("StoredStacks", 10);
-			this.stacks = new ArrayList();
-			for (int i = 0; i < list.tagCount(); i++) {
-				NBTTagCompound compound = list.getCompoundTagAt(i);
-				this.stacks.add(StoredItemStack.readFromNBT(compound));
-
-			}
-		}
-		if (id == 1) {
-			if (buf.readBoolean()) {
-				slots[0] = ByteBufUtils.readItemStack(buf);
-			} else {
-				this.slots[0] = null;
-			}
-		}
-	}
-
 }
