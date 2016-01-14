@@ -1,0 +1,27 @@
+itemGroup.Practical Logistics=Practical Logistics
+
+//blocks
+tile.SapphireOre.name=Zaffiro grezzo
+tile.InfoReader.name=Lettore di informazioni
+tile.Node.name=Nodo
+tile.EnergyScreenItem.name=Schermo energia
+tile.DisplayScreenItem.name=Schermo
+tile.DataEmitter.name=Emettitore di dati
+tile.DataReceiver.name=Ricevitore di dati
+tile.DataCable.name=Cavo dati
+tile.InventoryReader.name=Lettore di inventario
+tile.RedstoneSignaller.name=Segnalatore di pietrarossa
+tile.HolographicDisplay.name=Display olografico
+tile.DataModifier.name=Modificatore di dati
+tile.InfoCreator.name=Creatore di informazioni
+tile.Hammer.name=Maglio
+tile.Hammer_Air.name=Maglio
+tile.EntityNode.name=Nodo entita'
+tile.LargeDisplayScreen.name=Schermo grande
+
+//items
+item.EnergyScreenItem.name=Schermo energia
+item.DisplayScreenItem.name=Schermo
+item.Sapphire.name=Zaffiro
+item.SapphireDust.name=Polvere di Zaffiro
+item.StonePlate.name=Lastra di roccia
