@@ -139,7 +139,9 @@ public class InfoHelper {
 		List<StoredItemStack> storedStacks = new ArrayList();
 		ForgeDirection dir = ForgeDirection.getOrientation(SonarHelper.invertMetadata(tileNode.getBlockMetadata())).getOpposite();
 		TileEntity tile = tileNode.getWorldObj().getTileEntity(tileNode.xCoord + dir.offsetX, tileNode.yCoord + dir.offsetY, tileNode.zCoord + dir.offsetZ);
-
+		if(tile==null){
+			return storedStacks;
+		}
 		if (tile instanceof IDeepStorageUnit) {
 			IDeepStorageUnit inv = (IDeepStorageUnit) tile;
 			if (inv.getStoredItemType() != null) {

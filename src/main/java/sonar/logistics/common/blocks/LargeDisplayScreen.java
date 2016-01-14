@@ -8,7 +8,9 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import sonar.logistics.common.tileentity.TileEntityDataEmitter;
 import sonar.logistics.common.tileentity.TileEntityLargeScreen;
+import sonar.logistics.helpers.DisplayHelper;
 
 public class LargeDisplayScreen extends AbstractScreen {
 
@@ -66,6 +68,7 @@ public class LargeDisplayScreen extends AbstractScreen {
 	public void onBlockAdded(World world, int x, int y, int z) {
 		super.onBlockAdded(world, x, y, z);
 		setDefaultDirection(world, x, y, z);
+		DisplayHelper.onDisplayAdded(world.getTileEntity(x, y, z));
 	}
 
 	public void setDefaultDirection(World world, int x, int y, int z) {
@@ -117,4 +120,11 @@ public class LargeDisplayScreen extends AbstractScreen {
 			world.setBlockMetadataWithNotify(x, y, z, 4, 2);
 		}
 	}
+
+	@Override
+	public void breakBlock(World world, int x, int y, int z, Block oldblock, int oldMetadata) {
+		DisplayHelper.onDisplayRemoved(world.getTileEntity(x, y, z));
+		super.breakBlock(world, x, y, z, oldblock, oldMetadata);
+	}
+
 }

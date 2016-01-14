@@ -217,7 +217,7 @@ public class InfoReaderHandler extends TileHandler {
 			}
 			for (int i = 0; i < list.tagCount(); i++) {
 				NBTTagCompound compound = list.getCompoundTagAt(i);
-				byte slot = compound.getByte("Slot");
+				int slot = compound.getInteger("Slot");
 				boolean set = slot < clientInfo.size();
 				switch (compound.getByte("f")) {
 				case 0:
@@ -306,7 +306,7 @@ public class InfoReaderHandler extends TileHandler {
 					compound.setByte("f", (byte) 2);
 				}
 				if (!compound.hasNoTags()) {
-					compound.setByte("Slot", (byte) i);
+					compound.setInteger("Slot", i);
 					list.appendTag(compound);
 				}
 

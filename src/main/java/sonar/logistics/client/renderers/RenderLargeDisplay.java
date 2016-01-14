@@ -14,10 +14,14 @@ import net.minecraftforge.common.util.ForgeDirection;
 
 import org.lwjgl.opengl.GL11;
 
+import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.utils.helpers.RenderHelper;
 import sonar.logistics.api.Info;
+import sonar.logistics.api.connecting.ILargeDisplay;
 import sonar.logistics.api.render.InfoRenderer;
+import sonar.logistics.api.render.LargeScreenSizing;
 import sonar.logistics.client.models.ModelLargeDisplay;
+import sonar.logistics.common.handlers.LargeDisplayScreenHandler;
 import sonar.logistics.registries.BlockRegistry;
 
 public class RenderLargeDisplay extends RenderDisplayScreen {
@@ -55,22 +59,24 @@ public class RenderLargeDisplay extends RenderDisplayScreen {
 		final Tessellator tess = Tessellator.instance;
 
 		if (entity.getWorldObj() != null) {
+			Object target = FMPHelper.checkObject(entity);
+			if (!(target instanceof ILargeDisplay)) {
+				target = FMPHelper.getHandler(target);
+			}
 
-			GL11.glPushMatrix();
-			ForgeDirection dir = ForgeDirection.getOrientation(RenderHelper.setMetaData(entity));
-			float f1 = -2.65F + 0.0625F;
-			float f2 = 5.8F;
-			float f3 = -2.25F;
-			GL11.glTranslated(x + (dir.offsetX == 0 ? f1 : dir.offsetX == -1 ? f3 : f2), y + 1.3425, z + (dir.offsetZ == 0 ? f1 : dir.offsetZ == -1 ? f3 : f2));
-			// GL11.glTranslated(x, y, z);
-			GL11.glScaled(7.625, 7.625, 7.625);
-			int br = 16 << 20 | 16 << 4;
-			int var11 = br % 65536;
-			int var12 = br / 65536;
-			OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, var11 * 0.8F, var12 * 0.8F);
-			this.tesrRenderScreen(tess, entity, dir);
+			if (target instanceof ILargeDisplay) {
+				ILargeDisplay display = (ILargeDisplay) target;
+				if (display.isHandler()) {
+					GL11.glPushMatrix();
+					GL11.glTranslated(x + 0.5, y + 0.5, z + 0.5);
+					ForgeDirection d = ForgeDirection.getOrientation(RenderHelper.setMetaData(entity));
+					float move = -0.23F;
+					GL11.glTranslated(d.offsetX * move, d.offsetY * move, d.offsetZ * move);
+					this.tesrRenderScreen(tess, entity, d);
+					GL11.glPopMatrix();
+				}
+			}
 
-			GL11.glPopMatrix();
 		}
 
 	}
@@ -189,9 +195,20 @@ public class RenderLargeDisplay extends RenderDisplayScreen {
 	}
 
 	public void renderInfo(Tessellator tess, TileEntity tile, ForgeDirection side, Info info) {
+		LargeScreenSizing sizing = null;
+		Object target = FMPHelper.checkObject(tile);
+		if (!(target instanceof ILargeDisplay)) {
+			target = FMPHelper.getHandler(target);
+		}
+
+		if (target instanceof LargeDisplayScreenHandler) {
+			LargeDisplayScreenHandler display = (LargeDisplayScreenHandler) target;
+			sizing = display.sizing;
+		}
+		//System.out.print(sizing);
 		float pixel = 1.0F / 16F;
 		if (info.hasSpecialRender()) {
-			info.renderInfo(tess, tile, -0.5F + pixel, -0.2085F, (1.0f - (pixel) * 9), (pixel * 6), -0.207F, 120F);
+			info.renderInfo(tess, tile, -0.5F + pixel, -0.4400F, (1.0f - (pixel) * 9), (pixel * 14), -0.207F, 100F);
 		} else {
 			FontRenderer rend = Minecraft.getMinecraft().fontRenderer;
 			InfoRenderer.renderStandardInfo(info, rend, -0.5F + pixel, -0.2085F, (1.0f - (pixel) * 9), (pixel * 6), -0.207F, 120F);

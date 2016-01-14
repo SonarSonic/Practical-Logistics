@@ -146,7 +146,7 @@ public class InventoryReaderHandler extends InventoryTileHandler {
 			}
 			for (int i = 0; i < list.tagCount(); i++) {
 				NBTTagCompound compound = list.getCompoundTagAt(i);
-				byte slot = compound.getByte("Slot");
+				int slot = compound.getInteger("Slot");
 				boolean set = slot < stacks.size();
 				switch (compound.getByte("f")) {
 				case 0:
@@ -245,7 +245,7 @@ public class InventoryReaderHandler extends InventoryTileHandler {
 					compound.setByte("f", (byte) 2);
 				}
 				if (!compound.hasNoTags()) {
-					compound.setByte("Slot", (byte) i);
+					compound.setInteger("Slot", i);
 					list.appendTag(compound);
 				}
 
@@ -263,7 +263,6 @@ public class InventoryReaderHandler extends InventoryTileHandler {
 			for (int i = 0; i < this.stacks.size(); i++) {
 				if (this.stacks.get(i) != null) {
 					NBTTagCompound compound = new NBTTagCompound();
-					compound.setByte("Slot", (byte) i);
 					StoredItemStack.writeToNBT(compound, this.stacks.get(i));
 					list.appendTag(compound);
 				}
