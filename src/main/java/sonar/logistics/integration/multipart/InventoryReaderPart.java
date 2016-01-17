@@ -38,12 +38,6 @@ public class InventoryReaderPart extends SonarHandlerPart implements IDataConnec
 		return handler.canConnect(tile(), dir);
 	}
 
-
-	@Override
-	public void updateData(ForgeDirection dir) {
-		handler.updateData(tile(), dir);
-	}
-
 	@Override
 	public Info currentInfo() {
 		return handler.currentInfo(tile());

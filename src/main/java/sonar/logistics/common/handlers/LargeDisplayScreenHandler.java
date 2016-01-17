@@ -15,6 +15,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.SonarCore;
 import sonar.core.integration.fmp.FMPHelper;
+import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.network.sync.SyncBoolean;
 import sonar.core.network.utils.IByteBufTile;
 import sonar.core.utils.BlockCoords;
@@ -23,6 +24,7 @@ import sonar.logistics.api.StandardInfo;
 import sonar.logistics.api.connecting.IDataCable;
 import sonar.logistics.api.connecting.ILargeDisplay;
 import sonar.logistics.api.render.LargeScreenSizing;
+import sonar.logistics.helpers.CableHelper;
 import sonar.logistics.helpers.DisplayHelper;
 import sonar.logistics.helpers.InfoHelper;
 
@@ -32,7 +34,8 @@ public class LargeDisplayScreenHandler extends DisplayScreenHandler implements I
 	public List<BlockCoords> displays = new ArrayList();
 	public BlockCoords handler = null;
 	public LargeScreenSizing sizing;
-	public boolean resetSizing = false;
+	public boolean resetSizing = true;
+	public BlockCoords connectedTile = null;
 
 	public LargeDisplayScreenHandler(boolean isMultipart) {
 		super(isMultipart);
@@ -40,17 +43,39 @@ public class LargeDisplayScreenHandler extends DisplayScreenHandler implements I
 
 	@Override
 	public void update(TileEntity te) {
-		if (!isHandler.getBoolean()) {
-			return;
-		}
-		if (sizing == null || resetSizing) {
-			sizing = DisplayHelper.getScreenSizing(te);
-			SonarCore.sendPacketAround(te, 64, 2);
-			resetSizing = false;
-		}
 		if (!te.getWorldObj().isRemote) {
-			this.updateData(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)));
+			if (!isHandler.getBoolean()) {
+				return;
+			}
+			if (resetSizing) {
+				sizing = DisplayHelper.getScreenSizing(te);
+				SonarCore.sendPacketAround(te, 64, 2);
+				resetSizing = false;
+			}
+			connectedTile = getConnectedTile(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)));
+			if (connectedTile == null || connectedTile.getTileEntity(te.getWorldObj()) == null) {
+				this.updateData(te, te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)));
+			} else {				
+				this.updateData(connectedTile.getTileEntity(te.getWorldObj()), te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)));
+			}
 		}
+
+	}
+
+	public BlockCoords getConnectedTile(TileEntity te, ForgeDirection dir) {
+		if (displays != null) {
+			for (BlockCoords coords : displays) {
+				TileEntity target = coords.getTileEntity(te.getWorldObj());
+
+				Object connectedTile = CableHelper.getConnectedTile(target, dir.getOpposite());
+				connectedTile = FMPHelper.checkObject(connectedTile);
+
+				if (connectedTile != null) {
+					return coords;
+				}
+			}
+		}
+		return null;
 
 	}
 
@@ -61,8 +86,9 @@ public class LargeDisplayScreenHandler extends DisplayScreenHandler implements I
 			if (sizing != null) {
 				buf.writeBoolean(true);
 				sizing.writeToBuf(buf);
-			} else
+			} else {
 				buf.writeBoolean(false);
+			}
 		}
 	}
 
@@ -72,6 +98,8 @@ public class LargeDisplayScreenHandler extends DisplayScreenHandler implements I
 		if (id == 2) {
 			if (buf.readBoolean()) {
 				sizing = LargeScreenSizing.readFromBuf(buf);
+			} else {
+				sizing = null;
 			}
 		}
 	}
@@ -118,10 +146,10 @@ public class LargeDisplayScreenHandler extends DisplayScreenHandler implements I
 		for (BlockCoords display : displays) {
 			if (BlockCoords.equalCoords(display, coords)) {
 				displays.remove(display);
+				resetSizing();
 				return;
 			}
 		}
-		resetSizing();
 	}
 
 	@Override
@@ -136,7 +164,6 @@ public class LargeDisplayScreenHandler extends DisplayScreenHandler implements I
 	@Override
 	public void resetSizing() {
 		resetSizing = true;
-		System.out.print("write siz");
 	}
 
 	public void readData(NBTTagCompound nbt, SyncType type) {
@@ -146,7 +173,12 @@ public class LargeDisplayScreenHandler extends DisplayScreenHandler implements I
 			if (nbt.hasKey("hCoords")) {
 				handler = BlockCoords.readFromNBT(nbt.getCompoundTag("hCoords"));
 			}
-			sizing.readFromNBT(nbt);
+			if (nbt.hasKey("cCoords")) {
+				connectedTile = BlockCoords.readFromNBT(nbt.getCompoundTag("cCoords"));
+			}
+			if (nbt.hasKey("mxY")) {
+				sizing = LargeScreenSizing.readFromNBT(nbt);
+			}
 
 			if (displays == null) {
 				displays = new ArrayList();
@@ -170,7 +202,14 @@ public class LargeDisplayScreenHandler extends DisplayScreenHandler implements I
 				BlockCoords.writeToNBT(infoTag, handler);
 				nbt.setTag("hCoords", infoTag);
 			}
-			LargeScreenSizing.readFromNBT(nbt);
+			if (connectedTile != null) {
+				NBTTagCompound infoTag = new NBTTagCompound();
+				BlockCoords.writeToNBT(infoTag, connectedTile);
+				nbt.setTag("cCoords", infoTag);
+			}
+			if (sizing != null) {
+				sizing.writeToNBT(nbt);
+			}
 
 			NBTTagList list = new NBTTagList();
 			if (displays != null) {

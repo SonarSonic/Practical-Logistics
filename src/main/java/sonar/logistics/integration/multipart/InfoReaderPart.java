@@ -5,6 +5,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraftforge.common.util.ForgeDirection;
+import sonar.core.integration.IWailaInfo;
 import sonar.core.integration.fmp.SonarHandlerPart;
 import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.logistics.Logistics;
@@ -42,11 +43,6 @@ public class InfoReaderPart extends SonarHandlerPart implements IDataConnection,
 	@Override
 	public Info getSecondaryInfo() {
 		return handler.getSecondaryInfo(tile());
-	}
-
-	@Override
-	public void updateData(ForgeDirection dir) {
-		handler.updateData(tile(), dir);
 	}
 
 	@Override

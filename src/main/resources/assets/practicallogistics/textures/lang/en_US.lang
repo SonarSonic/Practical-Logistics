@@ -25,3 +25,6 @@ item.DisplayScreenItem.name=Display Screen
 item.Sapphire.name=Sapphire
 item.SapphireDust.name=Sapphire Dust
 item.StonePlate.name=Stone Plate
+
+//messages
+dataBlock.denied=Access Denied

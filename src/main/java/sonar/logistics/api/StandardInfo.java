@@ -184,10 +184,6 @@ public class StandardInfo extends Info {
 		}
 	}
 
-	@Override
-	public boolean hasSpecialRender() {
-		return false;
-	}
 
 	@Override
 	public boolean isEqualType(Info info) {
@@ -205,7 +201,7 @@ public class StandardInfo extends Info {
 	}
 
 	@Override
-	public Info newInfo() {
+	public StandardInfo newInfo() {
 		return new StandardInfo();
 	}
 

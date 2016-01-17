@@ -60,11 +60,6 @@ public class ThaumcraftAspectInfo extends StandardInfo {
 	}
 
 	@Override
-	public boolean hasSpecialRender() {
-		return true;
-	}
-
-	@Override
 	public void renderInfo(Tessellator tess, TileEntity tile, float minX, float minY, float maxX, float maxY, float zOffset, float scale) {
 		FontRenderer rend = Minecraft.getMinecraft().fontRenderer;
 
@@ -95,7 +90,7 @@ public class ThaumcraftAspectInfo extends StandardInfo {
 		InfoRenderer.renderStandardInfo(this, rend, minX, minY, maxX, maxY, zOffset, scale);
 	}
 	@Override
-	public Info newInfo() {
+	public ThaumcraftAspectInfo newInfo() {
 		return new ThaumcraftAspectInfo();
 	}
 }

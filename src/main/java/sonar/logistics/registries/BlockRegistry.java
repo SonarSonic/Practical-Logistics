@@ -102,7 +102,7 @@ public class BlockRegistry extends Logistics {
 		GameRegistry.registerBlock(holographicDisplay, SonarBlockTip.class, "HolographicDisplay");
 		GameRegistry.registerTileEntity(TileEntityHolographicDisplay.class, "HolographicDisplay");	
 
-		largeDisplayScreen = new LargeDisplayScreen().setBlockName("LargeDisplayScreen").setHardness(0.2F).setCreativeTab(Logistics.creativeTab).setResistance(20.0F).setBlockTextureName(modid + ":" + "data_cable");
+		largeDisplayScreen = new LargeDisplayScreen().setBlockName("LargeDisplayScreen").setHardness(0.2F).setCreativeTab(Logistics.creativeTab).setResistance(20.0F).setBlockTextureName(modid + ":" + "large_screen");
 		GameRegistry.registerBlock(largeDisplayScreen, SonarBlockTip.class, "LargeDisplayScreen");
 		GameRegistry.registerTileEntity(TileEntityLargeScreen.class, "LargeDisplayScreen");	
 	}

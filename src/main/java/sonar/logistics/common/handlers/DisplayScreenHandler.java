@@ -35,11 +35,11 @@ public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 	@Override
 	public void update(TileEntity te) {
 		if (!te.getWorldObj().isRemote) {
-			this.updateData(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)));
+			this.updateData(te, te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)));
 		}
 	}
 
-	public void updateData(TileEntity te, ForgeDirection dir) {
+	public void updateData(TileEntity te, TileEntity packetTile, ForgeDirection dir) {
 		Object target = CableHelper.getConnectedTile(te, dir.getOpposite());
 		target = FMPHelper.checkObject(target);
 		if (target == null) {
@@ -75,13 +75,13 @@ public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 			if (info != null) {
 				if (!info.isEqualType(lastInfo)||!info.isDataEqualType(lastInfo)) {
 					if (info instanceof StandardInfo && info.isEqualType(lastInfo)) {
-						SonarCore.sendPacketAround(te, 64, 0);
+						SonarCore.sendPacketAround(packetTile, 64, 0);
 					} else {
-						SonarCore.sendPacketAround(te, 64, 0);
+						SonarCore.sendPacketAround(packetTile, 64, 0);
 					}
 				}
 			}else{
-				SonarCore.sendPacketAround(te, 64, 0);
+				SonarCore.sendPacketAround(packetTile, 64, 0);
 			}
 		}
 	}

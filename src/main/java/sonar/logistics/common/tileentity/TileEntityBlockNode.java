@@ -2,6 +2,7 @@ package sonar.logistics.common.tileentity;
 
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
+import sonar.core.common.tileentity.TileEntitySonar;
 import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.SonarHelper;
 import sonar.logistics.api.Info;
@@ -10,7 +11,7 @@ import sonar.logistics.api.render.ICableRenderer;
 import sonar.logistics.helpers.CableHelper;
 import sonar.logistics.info.types.BlockCoordsInfo;
 
-public class TileEntityBlockNode extends TileEntityNode implements IDataConnection, ICableRenderer {
+public class TileEntityBlockNode extends TileEntitySonar implements IDataConnection, ICableRenderer {
 
 	@Override
 	public Info currentInfo() {
@@ -25,15 +26,11 @@ public class TileEntityBlockNode extends TileEntityNode implements IDataConnecti
 	public boolean canRenderConnection(ForgeDirection dir) {
 		int meta = this.getBlockMetadata();
 		TileEntity tile = SonarHelper.getAdjacentTileEntity(this, dir);
-		if(tile!=null && tile instanceof TileEntityBlockNode){
+		if (tile != null && tile instanceof TileEntityBlockNode) {
 			return false;
 		}
 		return CableHelper.canRenderConnection(this, dir);
 
-	}
-
-	@Override
-	public void updateData(ForgeDirection dir) {
 	}
 
 	public void updateEntity() {

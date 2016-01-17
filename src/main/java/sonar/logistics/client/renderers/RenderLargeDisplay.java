@@ -51,8 +51,10 @@ public class RenderLargeDisplay extends RenderDisplayScreen {
 		}
 		GL11.glRotated(rotate, 0, 0, 1);
 
+		// GL11.glEnable(GL11.GL_CULL_FACE);
 		model.render((Entity) null, 0.0F, 0.0F, -0.1F, 0.0F, 0.0F, 0.0625F);
 		// RenderHelper.finishRender();
+		// GL11.glDisable(GL11.GL_CULL_FACE);
 
 		GL11.glPopMatrix();
 		GL11.glPopMatrix();
@@ -205,13 +207,19 @@ public class RenderLargeDisplay extends RenderDisplayScreen {
 			LargeDisplayScreenHandler display = (LargeDisplayScreenHandler) target;
 			sizing = display.sizing;
 		}
-		//System.out.print(sizing);
-		float pixel = 1.0F / 16F;
-		if (info.hasSpecialRender()) {
-			info.renderInfo(tess, tile, -0.5F + pixel, -0.4400F, (1.0f - (pixel) * 9), (pixel * 14), -0.207F, 100F);
+		ForgeDirection dir = ForgeDirection.getOrientation(tile.getBlockMetadata()).getRotation(ForgeDirection.UP);
+		boolean north = false;
+		if (dir.offsetZ == 1 || dir.offsetX == 1) {
+			north = true;
+		}
+		if (sizing == null || sizing.maxH == 0 && sizing.minH == 0 && sizing.maxY == 0 && sizing.minY == 0) {
+			float pixel = 1.0F / 16F;
+			info.renderInfo(tess, tile, -0.5F + pixel, -0.4400F, (1.0f - (pixel) * 9), (pixel * 14), -0.200F, 120F);
+
 		} else {
-			FontRenderer rend = Minecraft.getMinecraft().fontRenderer;
-			InfoRenderer.renderStandardInfo(info, rend, -0.5F + pixel, -0.2085F, (1.0f - (pixel) * 9), (pixel * 6), -0.207F, 120F);
+			float pixel = 1.0F / 16F;
+			info.renderInfo(tess, tile, -0.5F + pixel + (north ? -sizing.maxH : sizing.minH), -0.4400F - sizing.maxY, (1.0f - (pixel) * 9) + (north ? -sizing.minH : sizing.maxH), (pixel * 14) + sizing.minY + sizing.maxY, -0.200F, 40F);
+
 		}
 	}
 }

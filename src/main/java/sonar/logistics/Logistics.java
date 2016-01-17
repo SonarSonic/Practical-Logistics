@@ -9,10 +9,11 @@ import org.apache.logging.log4j.Logger;
 
 import sonar.core.SonarCore;
 import sonar.core.integration.SonarAPI;
+import sonar.core.integration.SonarWailaModule;
 import sonar.logistics.info.providers.entity.EntityProviderRegistry;
 import sonar.logistics.info.providers.tile.TileProviderRegistry;
 import sonar.logistics.info.types.InfoTypeRegistry;
-import sonar.logistics.integration.LogisticsWailaModule;
+import sonar.logistics.integration.MineTweakerIntegration;
 import sonar.logistics.integration.multipart.ForgeMultipartHandler;
 import sonar.logistics.network.LogisticsCommon;
 import sonar.logistics.registries.BlockRegistry;
@@ -82,12 +83,6 @@ public class Logistics {
 		ItemRegistry.registerItems();
 		logger.info("Loaded Items");
 
-		if (SonarAPI.wailaLoaded()) {
-			LogisticsWailaModule.register();
-			logger.info("'WAILA' integration was loaded");
-		} else {
-			logger.warn("'WAILA' integration wasn't loaded");
-		}
 		if (SonarAPI.forgeMultipartLoaded()) {
 			ForgeMultipartHandler.init();
 			logger.info("'Forge Multipart' integration was loaded");
@@ -99,6 +94,10 @@ public class Logistics {
 			logger.info("Registered Sapphire World Generator");
 		} else
 			logger.info("Sapphire Ore Generation is disabled in the config");
+
+		if (SonarAPI.wailaLoaded()) {
+			SonarWailaModule.addFMPProvider("Info Reader");
+		}
 	}
 
 	@EventHandler
@@ -129,13 +128,18 @@ public class Logistics {
 		logger.info("Registered " + TileProviderRegistry.getProviders().size() + " Info Providers");
 		EntityProviderRegistry.registerProviders();
 		logger.info("Registered " + EntityProviderRegistry.getProviders().size() + " Entity Providers");
+
+		if (Loader.isModLoaded("MineTweaker3")) {
+			MineTweakerIntegration.integrate();
+			logger.info("'Mine Tweaker' integration was loaded");
+		}
 	}
 
 	@EventHandler
 	public void onClose(FMLServerStoppingEvent event) {
 		EmitterRegistry.removeAll();
 		ChannelRegistry.removeAll();
-		//TileProviderRegistry.removeAll();
-		//EntityProviderRegistry.removeAll();
+		// TileProviderRegistry.removeAll();
+		// EntityProviderRegistry.removeAll();
 	}
 }

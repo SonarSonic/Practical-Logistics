@@ -24,11 +24,6 @@ public class TileEntityDataModifier extends TileEntityHandler implements IDataCo
 	}
 
 	@Override
-	public void updateData(ForgeDirection dir) {
-		handler.updateData(this, dir);
-	}
-
-	@Override
 	public Info currentInfo() {
 		return handler.currentInfo();
 	}

@@ -50,24 +50,8 @@ public class BlockDataReceiver extends BaseNode {
 
 	@Override
 	public boolean operateBlock(World world, int x, int y, int z, EntityPlayer player, int side, float hitx, float hity, float hitz) {
-		if (!hasGui()) {
-			return false;
-		}
-		if (player != null) {
-			TileEntity target = world.getTileEntity(x, y, z);
-			if (target instanceof TileEntityNode) {
-				TileEntityNode node = (TileEntityNode) target;
-				if (node.playerName.equals(player.getGameProfile().getName())) {
-					node.sendSyncPacket(player);
-					openGui(world, x, y, z, player);
-					return true;
-				}else{
-					FontHelper.sendMessage("ACCESS DENIED", world, player);
-				}
-			}
-
-		}
-		return false;
+		
+		return super.operateBlock(world, x, y, z, player, side, hitx, hity, hitz);
 	}
 
 	@Override

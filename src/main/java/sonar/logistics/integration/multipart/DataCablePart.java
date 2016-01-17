@@ -57,9 +57,6 @@ public class DataCablePart extends SonarTilePart implements IDataCable {
 	@Override
 	public Cuboid6 getBounds() {
 		return new Cuboid6((float) 0.0625 * 6, (float) 0.0625 * 6, (float) 0.0625 * 6, (float) (1 - (0.0625 * 6)), (float) (1 - (0.0625 * 6)), (float) (1 - (0.0625 * 6)));
-
-		// return new Cuboid6((float) (this.canRenderConnection(ForgeDirection.WEST) ? 0 : 0.0625 * 6), (float) (this.canRenderConnection(ForgeDirection.DOWN) ? 0 : 0.0625 * 6), (float) (this.canRenderConnection(ForgeDirection.NORTH) ? 0 : 0.0625 * 6), (float) (this.canRenderConnection(ForgeDirection.EAST) ? 1 : (1 - (0.0625 * 6))), (float) (this.canRenderConnection(ForgeDirection.UP) ? 1
-		// : (1 - (0.0625 * 6))), (float) (this.canRenderConnection(ForgeDirection.SOUTH) ? 1 : (1 - (0.0625 * 6))));
 	}
 
 	@Override

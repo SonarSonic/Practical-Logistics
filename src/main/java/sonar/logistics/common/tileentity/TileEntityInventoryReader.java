@@ -24,11 +24,6 @@ public class TileEntityInventoryReader extends TileEntityHandlerInventory implem
 	}
 
 	@Override
-	public void updateData(ForgeDirection dir) {
-		handler.updateData(this, dir);
-	}
-
-	@Override
 	public Info currentInfo() {
 		return handler.currentInfo(this);
 	}

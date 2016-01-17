@@ -107,11 +107,7 @@ public class RenderHolographicDisplay extends RenderDisplayScreen {
 
 	public void renderInfo(Tessellator tess, TileEntity tile, ForgeDirection side, Info info) {
 		float pixel = 1.0F / 16F;
-		if (info.hasSpecialRender()) {
-			info.renderInfo(tess, tile, -pixel*4.5F, -0.1850F, (1.0f - (pixel) * 11.5F), (pixel * 6), -0.207F, 140F);
-		} else {
-			FontRenderer rend = Minecraft.getMinecraft().fontRenderer;
-			InfoRenderer.renderStandardInfo(info, rend, -pixel*4.5F, -0.1850F, (1.0f - (pixel) * 11.5F), (pixel * 6), -0.207F, 140F);
-		}
+		info.renderInfo(tess, tile, -pixel * 4.5F, -0.1850F, (1.0f - (pixel) * 11.5F), (pixel * 6), -0.207F, 140F);
+
 	}
 }

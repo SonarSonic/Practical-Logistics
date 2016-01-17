@@ -8,6 +8,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import sonar.core.common.block.SonarMachineBlock;
 import sonar.core.common.tileentity.TileEntitySonar;
+import sonar.core.utils.helpers.FontHelper;
 import sonar.logistics.common.tileentity.TileEntityBlockNode;
 import sonar.logistics.common.tileentity.TileEntityNode;
 
@@ -55,8 +56,15 @@ public abstract class BaseNode extends SonarMachineBlock {
 			TileEntity target = world.getTileEntity(x, y, z);
 			if (target instanceof TileEntitySonar) {
 				if (!world.isRemote) {
-					TileEntitySonar node = (TileEntitySonar) target;
-					node.sendSyncPacket(player);
+					TileEntitySonar sonar = (TileEntitySonar) target;
+					if (sonar instanceof TileEntityNode) {
+						TileEntityNode node = (TileEntityNode) target;
+						if (!node.playerName.equals(player.getGameProfile().getName())) {
+							FontHelper.sendMessage(FontHelper.translate("dataBlock.denied")+ ": " + node.playerName, world, player);
+							return false;
+						}
+					}
+					sonar.sendSyncPacket(player);
 					openGui(world, x, y, z, player);
 				}
 				return true;

@@ -108,34 +108,35 @@ public class ProgressInfo extends Info {
 	}
 
 	@Override
-	public boolean hasSpecialRender() {
-		return true;
-	}
-
-	@Override
 	public void renderInfo(Tessellator tess, TileEntity tile, float minX, float minY, float maxX, float maxY, float zOffset, float scale) {
 		FontRenderer rend = Minecraft.getMinecraft().fontRenderer;
 		GL11.glTranslated(0, 0, zOffset);
 		float width = stored * (maxX - minX) / max;
+		float height = stored * (maxY - minY) / max;
 		boolean renderNormal = true;
 		if (fluidID != -1) {
 			if (FluidRegistry.getFluid(fluidID) != null) {
 				IIcon icon = FluidRegistry.getFluid(fluidID).getIcon();
+				renderNormal = false;
+				
 				if (icon != null) {
 					renderNormal = false;
 					Minecraft.getMinecraft().renderEngine.bindTexture(TextureMap.locationBlocksTexture);
 					tess.startDrawingQuads();
-
-					double widthnew = (icon.getMinU() + (width * (icon.getMaxU() - icon.getMinU())));
-					double heightnew = (icon.getMinV() + (maxY * (icon.getMaxV() - icon.getMinV())));
-
+					
+					
+					double divide = Math.max((0.5+minX +(maxX - minX)), (0.5+(maxY - minY)));
+					double widthnew = (icon.getMinU() + (width * (icon.getMaxU() - icon.getMinU())/divide));
+					double heightnew = (icon.getMinV() + (maxY * (icon.getMaxV() - icon.getMinV())/divide));
+					
 					tess.addVertexWithUV((minX + 0), (minY + maxY), 0, icon.getMinU(), heightnew);
 					tess.addVertexWithUV((minX + width), (minY + maxY), 0, widthnew, heightnew);
 					tess.addVertexWithUV((minX + width), (minY + 0), 0, widthnew, icon.getMinV());
 					tess.addVertexWithUV((minX + 0), (minY + 0), 0, icon.getMinU(), icon.getMinV());
-
 					tess.draw();
+
 				}
+				
 			}
 		}
 		if (renderNormal) {
@@ -153,9 +154,9 @@ public class ProgressInfo extends Info {
 			tess.draw();
 		}
 
-		//float scaleFactor = 120.0f;
+		// float scaleFactor = 120.0f;
 		GL11.glTranslatef(0, -0.2F, 0f);
-		GL11.glTranslatef(minX + (maxX - minX) / 2, minY + maxY/2, 0.01f);
+		GL11.glTranslatef(minX + (maxX - minX) / 2, minY + maxY / 2, 0.01f);
 		GL11.glScalef(1.0f / scale, 1.0f / scale, 1.0f / scale);
 		GL11.glTranslated(0, ((scale - 40) / 5) + 4, 0);
 		String data = this.getDisplayableData();
@@ -177,7 +178,7 @@ public class ProgressInfo extends Info {
 	}
 
 	@Override
-	public Info newInfo() {
+	public ProgressInfo newInfo() {
 		return new ProgressInfo();
 	}
 

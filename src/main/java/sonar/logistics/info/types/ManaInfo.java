@@ -93,10 +93,6 @@ public class ManaInfo extends ProgressInfo {
 	}
 
 	@Override
-	public boolean hasSpecialRender() {
-		return true;
-	}
-	@Override
 	public void renderInfo(Tessellator tess, TileEntity tile, float minX, float minY, float maxX, float maxY, float zOffset, float scale) {
 		FontRenderer rend = Minecraft.getMinecraft().fontRenderer;
 		GL11.glTranslated(0, 0, zOffset);
@@ -136,7 +132,7 @@ public class ManaInfo extends ProgressInfo {
 	}
 
 	@Override
-	public Info newInfo() {
+	public ManaInfo newInfo() {
 		return new ManaInfo();
 	}
 

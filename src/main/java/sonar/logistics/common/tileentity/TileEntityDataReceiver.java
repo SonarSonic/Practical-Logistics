@@ -55,10 +55,6 @@ public class TileEntityDataReceiver extends TileEntityNode implements IDataRecei
 		return ForgeDirection.getOrientation(this.getBlockMetadata()) == dir;
 	}
 
-	@Override
-	public void updateData(ForgeDirection dir) {
-	}
-
 	public void updateEntity() {
 		super.updateEntity();
 		if (isClient()) {

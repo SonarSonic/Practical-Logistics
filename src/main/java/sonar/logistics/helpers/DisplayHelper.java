@@ -1,9 +1,14 @@
 package sonar.logistics.helpers;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
+import sonar.core.SonarCore;
 import sonar.core.integration.fmp.FMPHelper;
+import sonar.core.integration.fmp.ITileHandler;
 import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.utils.BlockCoords;
 import sonar.logistics.api.connecting.IDataCable;
@@ -13,38 +18,71 @@ import sonar.logistics.api.render.LargeScreenSizing;
 public class DisplayHelper {
 
 	public static void onDisplayAdded(TileEntity tile) {
-		System.out.print("add");
-		Object tileObj = FMPHelper.checkObject(tile);
-		if (!(tileObj instanceof ILargeDisplay)) {
-			tileObj = FMPHelper.getHandler(tileObj);
-		}
+		TileHandler tileObj = FMPHelper.getHandler(tile);
 		if (tileObj == null || !(tileObj instanceof ILargeDisplay)) {
 			return;
 		}
 		ILargeDisplay added = (ILargeDisplay) tileObj;
+		ForgeDirection forward = ForgeDirection.getOrientation(tile.blockMetadata);
+
+		BlockCoords handlerCoords = null;
+		int connectedSize = -1;
+		int listPos = -1;
+		ILargeDisplay[] handlers = new ILargeDisplay[6];
+		BlockCoords[] coordsList = new BlockCoords[6];
 		for (int i = 0; i < 6; i++) {
 			ForgeDirection dir = ForgeDirection.getOrientation(i);
-			BlockCoords coords = new BlockCoords(tile.xCoord + dir.offsetX, tile.yCoord + dir.offsetY, tile.zCoord + dir.offsetZ);
-			Object target = FMPHelper.checkObject(coords.getTileEntity(tile.getWorldObj()));
-			if (!(target instanceof ILargeDisplay)) {
-				target = FMPHelper.getHandler(target);
-			}
-			if (target instanceof ILargeDisplay) {
-				ILargeDisplay display = (ILargeDisplay) target;
-				if (display.isHandler()) {
-					added.setHandlerCoords(coords);
-					added.setHandler(false);
-					display.addDisplay(new BlockCoords(tile));
-					return;
+			if (dir != forward || dir != forward.getOpposite()) {
+				BlockCoords coords = new BlockCoords(tile.xCoord + dir.offsetX, tile.yCoord + dir.offsetY, tile.zCoord + dir.offsetZ);
+				TileHandler target = FMPHelper.getHandler(coords.getTileEntity(tile.getWorldObj()));
+				if (target instanceof ILargeDisplay) {
+					ILargeDisplay display = (ILargeDisplay) target;
+					if (display.isHandler()) {
+						if (display.getConnectedScreens().size() > connectedSize) {
+							handlerCoords = coords;
+							connectedSize = display.getConnectedScreens().size();
+							listPos = i;
+						}
+						handlers[i] = display;
+						coordsList[i] = coords;
+					} else {
+						BlockCoords handler = display.getHandlerCoords();
+						if (handler != null) {
+							TileHandler handTarg = FMPHelper.getHandler(handler.getTileEntity(tile.getWorldObj()));
+							if (handTarg != null && handTarg instanceof ILargeDisplay) {
+								ILargeDisplay handlerDis = (ILargeDisplay) handTarg;
+								if (handlerDis.getConnectedScreens().size() > connectedSize) {
+									handlerCoords = handler;
+									connectedSize = handlerDis.getConnectedScreens().size();
+									listPos = i;
+								}
+								handlers[i] = handlerDis;
+								coordsList[i] = handler;
+							}
+						}
+					}
 				}
 			}
 		}
-		added.setHandler(true);
-		added.addDisplay(new BlockCoords(tile));
+		if (handlerCoords != null) {
+			added.setHandlerCoords(handlerCoords);
+			added.setHandler(false);
+			TileHandler handTarg = FMPHelper.getHandler(handlerCoords.getTileEntity(tile.getWorldObj()));
+			if (handTarg != null && handTarg instanceof ILargeDisplay) {
+				ILargeDisplay handlerDis = (ILargeDisplay) handTarg;
+				handlerDis.addDisplay(new BlockCoords(tile));
+			}
+			/*if (listPos != -1) { for (int i = 0; i < 6; i++) { if (i != listPos && handlers[i] != null) { ILargeDisplay handler = handlers[i]; List<BlockCoords> list = new ArrayList(); for (BlockCoords coords : handler.getConnectedScreens()) { TileHandler target = FMPHelper.getHandler(coords.getTileEntity(tile.getWorldObj())); if (target instanceof ILargeDisplay) { ILargeDisplay display =
+			 * (ILargeDisplay) target; display.setHandler(false); display.setHandlerCoords(handlerCoords); display.setConnectedScreens(new ArrayList()); list.add(coords); } } for (BlockCoords coords : list) { handlers[i].addDisplay(coords); } } } handlers[listPos].resetSizing(); */
+
+		} else {
+			added.setHandler(true);
+			added.addDisplay(new BlockCoords(tile));
+		}
+
 	}
 
 	public static void onDisplayRemoved(TileEntity tile) {
-		System.out.print("remove");
 		Object tileObj = FMPHelper.checkObject(tile);
 		if (!(tileObj instanceof ILargeDisplay)) {
 			tileObj = FMPHelper.getHandler(tileObj);
@@ -96,44 +134,49 @@ public class DisplayHelper {
 		if (!remove.isHandler()) {
 			return null;
 		} else {
-			int maxY = 0, minY = 0, maxH = 0, minH = 0;
+			int maxX = tile.xCoord, maxY = tile.yCoord, maxZ = tile.zCoord, minX = tile.xCoord, minY = tile.yCoord, minZ = tile.zCoord;
 			int meta = tile.getBlockMetadata();
+			ForgeDirection dir = ForgeDirection.getOrientation(meta).getRotation(ForgeDirection.UP);
 			boolean north = false;
-			if (meta == 2 || meta == 3) {
+			if (dir.offsetX == -1 || dir.offsetX == 1) {
 				north = true;
 			}
+			int screens = 0;
 			for (BlockCoords coords : remove.getConnectedScreens()) {
-				System.out.print("screen");
-				if (tile.xCoord - coords.getX() > maxH) {
-					maxH = tile.xCoord - coords.getX();
-				} else if (coords.getX() - tile.xCoord < minH) {
-					minH = coords.getX() - tile.xCoord;
+				screens++;
+				if (coords.getX() > maxX) {
+					maxX = coords.getX();
+				} else if (coords.getX() < minX) {
+					minX = coords.getX();
 				}
-				if (tile.zCoord - coords.getZ() > maxH) {
-					maxH = tile.zCoord - coords.getZ();
-				} else if (coords.getZ() - tile.zCoord < minH) {
-					minH = coords.getZ() - tile.zCoord;
+				if (coords.getY() > maxY) {
+					maxY = coords.getY();
+				} else if (coords.getY() < minY) {
+					minY = coords.getY();
 				}
-				if (tile.yCoord - coords.getY() > maxY) {
-					maxY = tile.yCoord - coords.getY();
-				} else if (coords.getY() - tile.yCoord < minY) {
-					minY = coords.getY() - tile.yCoord;
+				if (coords.getZ() > maxZ) {
+					maxZ = coords.getZ();
+				} else if (coords.getZ() < minZ) {
+					minZ = coords.getZ();
 				}
 			}
+			int maxH = north ? maxX : maxZ;
+			int minH = north ? minX : minZ;
+
 			for (int h = minH; h <= maxH; h++) {
 				for (int y = minY; y <= maxY; y++) {
-					BlockCoords coords = new BlockCoords(north ? tile.xCoord + h : tile.xCoord, tile.yCoord, !north ? tile.zCoord + h : tile.zCoord);
+					BlockCoords coords = new BlockCoords(north ? h : tile.xCoord, y, !north ? h : tile.zCoord);
 					TileEntity target = coords.getTileEntity(tile.getWorldObj());
-
-					Object targetObj = FMPHelper.checkObject(target);
-					if (!(targetObj instanceof ILargeDisplay)) {
-						targetObj = FMPHelper.getHandler(tileObj);
-					}
-					if (target == null || !(targetObj instanceof ILargeDisplay) || !(target.getBlockMetadata() == meta)) {
+					TileHandler targetObj = FMPHelper.getHandler(target);
+					if (targetObj == null || !(targetObj instanceof ILargeDisplay) || !(target.getBlockMetadata() == meta)) {
 						return null;
 					}
 				}
 			}
+			maxY = maxY - tile.yCoord;
+			minY = tile.yCoord - minY;
+			maxH = maxH - (north ? tile.xCoord : tile.zCoord);
+			minH = minH - (north ? tile.xCoord : tile.zCoord);
 			return new LargeScreenSizing(maxY, minY, maxH, minH);
 		}
 	}

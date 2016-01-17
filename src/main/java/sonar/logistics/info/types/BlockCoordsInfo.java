@@ -75,11 +75,6 @@ public class BlockCoordsInfo extends Info {
 	}
 
 	@Override
-	public boolean hasSpecialRender() {
-		return false;
-	}
-
-	@Override
 	public boolean isEqualType(Info info) {
 		if (info != null && info instanceof BlockCoordsInfo) {
 			BlockCoordsInfo coordInfo = (BlockCoordsInfo) info;
@@ -94,7 +89,7 @@ public class BlockCoordsInfo extends Info {
 	}
 
 	@Override
-	public Info newInfo() {
+	public BlockCoordsInfo newInfo() {
 		return new BlockCoordsInfo();
 	}
 

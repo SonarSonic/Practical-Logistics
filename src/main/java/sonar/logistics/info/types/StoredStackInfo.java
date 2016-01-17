@@ -81,15 +81,10 @@ public class StoredStackInfo extends Info {
 	}
 
 	@Override
-	public boolean hasSpecialRender() {
-		return true;
-	}
-
-	@Override
 	public void renderInfo(Tessellator tess, TileEntity tile, float minX, float minY, float maxX, float maxY, float zOffset, float scale) {
 		if (stack != null && stack.item != null) {
 
-			GL11.glTranslatef(minX + (maxX - minX) / 2, minY + maxY/2, 0.01f);
+			GL11.glTranslatef(minX + (maxX - minX) / 2, minY + maxY / 2, 0.01f);
 			FontRenderer rend = Minecraft.getMinecraft().fontRenderer;
 			stack.item.stackSize = 1;
 
@@ -101,24 +96,27 @@ public class StoredStackInfo extends Info {
 			GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 
 			GL11.glDisable(GL12.GL_RESCALE_NORMAL);
+			GL11.glEnable(GL11.GL_CULL_FACE);
 			tess.setColorOpaque_F(1.0f, 1.0f, 1.0f);
-			float itemScale = scale/150;
-			GL11.glTranslatef(0.0f, 0.07f, zOffset-0.01F);
-			GL11.glScaled(itemScale, itemScale, 0.001);
+			double sizing = Math.round(Math.min((maxX - minX), (maxY - minY)));
+			double itemScale = sizing >= 2 ? (2.5F + sizing*1.0F) : scale >= 120 ? 0.8F : 1.4F;
+			GL11.glTranslatef(0.0f, (float) (scale >= 120 ? 0.07F : 0.13F + ((sizing-1)*0.15)), zOffset - 0.01F);
+			GL11.glScaled(itemScale, itemScale, itemScale);
+			GL11.glTranslatef(0.0f, 0.0f, +0.25f);
 
 			RenderHelper.doRenderItem(stack.item, tile.getWorldObj(), false);
+			GL11.glDisable(GL11.GL_CULL_FACE);
 			GL11.glEnable(GL12.GL_RESCALE_NORMAL);
-
-			GL11.glTranslatef(0.0f, 0.0f, -0.24f);
+			GL11.glTranslatef(0.0f, 0.0f, -0.242f);
 			GL11.glScalef(1.0f / 40.0f, 1.0f / 40.0f, 1.0f / 40.0f);
 
 			String s1 = FontHelper.formatStackSize(stack.stored);
 
 			final float scaleFactor = 0.5F;
 			final float inverseScaleFactor = 1.0f / scaleFactor;
-			
+
 			GL11.glScaled(scaleFactor, scaleFactor, scaleFactor);
-			
+
 			final int X = (int) (((float) -8 + 15.0f - rend.getStringWidth(s1) * scaleFactor) * inverseScaleFactor);
 			final int Y = (int) (((float) -12 + 15.0f - 7.0f * scaleFactor) * inverseScaleFactor);
 
@@ -148,7 +146,7 @@ public class StoredStackInfo extends Info {
 	}
 
 	@Override
-	public Info newInfo() {
+	public StoredStackInfo newInfo() {
 		return new StoredStackInfo();
 	}
 

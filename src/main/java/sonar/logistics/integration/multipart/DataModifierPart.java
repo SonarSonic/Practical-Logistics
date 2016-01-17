@@ -41,10 +41,6 @@ public class DataModifierPart extends SonarHandlerPart implements IDataConnectio
 	}
 
 	@Override
-	public void updateData(ForgeDirection dir) {
-	}
-
-	@Override
 	public Info currentInfo() {
 		return handler.currentInfo();
 	}

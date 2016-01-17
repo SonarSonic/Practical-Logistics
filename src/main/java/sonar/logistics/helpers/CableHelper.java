@@ -93,7 +93,6 @@ public class CableHelper {
 		if (target == null) {
 			return null;
 		}
-
 		if (target instanceof IDataCable) {
 			IDataCable cable = (IDataCable) target;
 			if (!cable.isBlocked(dir.getOpposite())) {
@@ -102,18 +101,9 @@ public class CableHelper {
 					dataProvider = FMPHelper.checkObject(dataProvider);
 					if (dataProvider != null) {
 						if (dataProvider instanceof IDataReceiver) {
-							IDataReceiver receiver = (IDataReceiver) dataProvider;
-							if (receiver.getEmitter() != null) {
-								TileEntity emitter = receiver.getEmitter().coords.getTileEntity();
-								if (emitter instanceof TileEntityDataEmitter) {
-									TileEntityDataEmitter dataemitter = (TileEntityDataEmitter) emitter;
-									if (tile.xCoord != dataemitter.xCoord || tile.yCoord != dataemitter.yCoord || tile.zCoord != dataemitter.zCoord) {
-										return dataemitter.getConnectedTile();
-									}
-								}
-								if (emitter != null) {
-									return emitter;
-								}
+							Object emitterBlock = getConnectedEmitter((IDataReceiver) target, tile);
+							if (emitterBlock != null) {
+								return emitterBlock;
 							}
 						} else if (dataProvider instanceof IDataConnection) {
 							return dataProvider;
@@ -123,18 +113,9 @@ public class CableHelper {
 			}
 		}
 		if (target instanceof IDataReceiver) {
-			IDataReceiver receiver = (IDataReceiver) target;
-			if (receiver.getEmitter() != null) {
-				TileEntity emitter = receiver.getEmitter().coords.getTileEntity();
-				if (emitter instanceof TileEntityDataEmitter) {
-					TileEntityDataEmitter dataemitter = (TileEntityDataEmitter) emitter;
-					if (tile.xCoord != dataemitter.xCoord || tile.yCoord != dataemitter.yCoord || tile.zCoord != dataemitter.zCoord) {
-						return dataemitter.getConnectedTile();
-					}
-				}
-				if (emitter != null) {
-					return emitter;
-				}
+			Object emitterBlock = getConnectedEmitter((IDataReceiver) target, tile);
+			if (emitterBlock != null) {
+				return emitterBlock;
 			}
 		}
 		if (target instanceof IDataConnection) {
@@ -147,6 +128,22 @@ public class CableHelper {
 
 		return null;
 
+	}
+
+	public static Object getConnectedEmitter(IDataReceiver receiver, TileEntity tile) {
+		if (receiver.getEmitter() != null) {
+			TileEntity emitter = receiver.getEmitter().coords.getTileEntity();
+			if (emitter instanceof TileEntityDataEmitter) {
+				TileEntityDataEmitter dataemitter = (TileEntityDataEmitter) emitter;
+				if (tile.xCoord != dataemitter.xCoord || tile.yCoord != dataemitter.yCoord || tile.zCoord != dataemitter.zCoord) {
+					return dataemitter.getConnectedTile();
+				}
+			}
+			if (emitter != null) {
+				return emitter;
+			}
+		}
+		return null;
 	}
 
 	/** checks connection on direction */

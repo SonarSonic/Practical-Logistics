@@ -77,11 +77,6 @@ public class TileEntityDataEmitter extends TileEntityNode implements IDataConnec
 	}
 
 	@Override
-	public void updateData(ForgeDirection dir) {
-
-	}
-
-	@Override
 	public Info currentInfo() {
 		return BlockCoordsInfo.createInfo("Data Emitter", new BlockCoords(this));
 	}

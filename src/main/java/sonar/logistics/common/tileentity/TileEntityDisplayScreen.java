@@ -22,11 +22,6 @@ public class TileEntityDisplayScreen extends TileEntityHandler implements IDataC
 	}
 
 	@Override
-	public void updateData(ForgeDirection dir) {
-		handler.updateData(this, dir);
-	}
-
-	@Override
 	public Info currentInfo() {
 		return handler.currentInfo();
 	}

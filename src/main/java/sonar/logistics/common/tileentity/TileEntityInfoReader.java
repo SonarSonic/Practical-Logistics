@@ -30,11 +30,6 @@ public class TileEntityInfoReader extends TileEntityHandler implements IDataConn
 	}
 
 	@Override
-	public void updateData(ForgeDirection dir) {
-		handler.updateData(this, dir);
-	}
-
-	@Override
 	public Info currentInfo() {
 		return handler.currentInfo(this);
 	}

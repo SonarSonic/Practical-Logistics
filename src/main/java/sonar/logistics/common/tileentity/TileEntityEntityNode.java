@@ -41,11 +41,6 @@ public class TileEntityEntityNode extends TileEntitySonar implements ICableRende
 		return CableHelper.canRenderConnection(this, dir);
 	}
 
-	@Override
-	public void updateData(ForgeDirection dir) {
-
-	}
-
 	public void updateEntity() {
 		super.updateEntity();
 		if (this.worldObj.isRemote) {

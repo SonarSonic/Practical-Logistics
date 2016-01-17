@@ -69,11 +69,6 @@ public class CategoryInfo extends Info {
 	}
 
 	@Override
-	public boolean hasSpecialRender() {
-		return false;
-	}
-
-	@Override
 	public boolean isEqualType(Info info) {
 		if (info != null && info.getType() == this.getType()) {
 			return info.getCategory().equals(category);
@@ -87,7 +82,7 @@ public class CategoryInfo extends Info {
 	}
 
 	@Override
-	public Info newInfo() {
+	public CategoryInfo newInfo() {
 		return new CategoryInfo();
 	}
 

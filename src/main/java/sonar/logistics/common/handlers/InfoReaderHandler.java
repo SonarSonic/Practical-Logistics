@@ -11,6 +11,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.SonarCore;
+import sonar.core.integration.IWailaInfo;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.network.PacketTileSync;
@@ -26,7 +27,7 @@ import sonar.logistics.helpers.InfoHelper;
 import sonar.logistics.info.types.CategoryInfo;
 import sonar.logistics.network.SyncInfo;
 
-public class InfoReaderHandler extends TileHandler {
+public class InfoReaderHandler extends TileHandler implements IWailaInfo  {
 
 	public InfoReaderHandler(boolean isMultipart) {
 		super(isMultipart);
@@ -315,6 +316,12 @@ public class InfoReaderHandler extends TileHandler {
 				nbt.setTag("Info", list);
 			}
 		}
+	}
+
+	@Override
+	public List<String> getWailaInfo(List<String> currenttip) {
+		currenttip.add("TESTING WAILA!");
+		return currenttip;
 	}
 
 }

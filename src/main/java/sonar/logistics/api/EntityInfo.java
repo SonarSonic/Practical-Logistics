@@ -40,7 +40,7 @@ public class EntityInfo extends StandardInfo {
 	}
 
 	@Override
-	public Info newInfo() {
+	public EntityInfo newInfo() {
 		return new EntityInfo();
 	}
 }

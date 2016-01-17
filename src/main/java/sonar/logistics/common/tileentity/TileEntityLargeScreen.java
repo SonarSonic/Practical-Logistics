@@ -22,11 +22,6 @@ public class TileEntityLargeScreen extends TileEntityHandler implements IDataCon
 	}
 
 	@Override
-	public void updateData(ForgeDirection dir) {
-		handler.updateData(this, dir);
-	}
-
-	@Override
 	public Info currentInfo() {
 		return handler.currentInfo();
 	}

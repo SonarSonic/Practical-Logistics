@@ -39,11 +39,6 @@ public class DisplayScreenPart extends SonarHandlerPart implements IDataConnecti
 	}
 
 	@Override
-	public void updateData(ForgeDirection dir) {
-		handler.updateData(tile(), dir);
-	}
-
-	@Override
 	public Info currentInfo() {
 		return handler.currentInfo();
 	}
