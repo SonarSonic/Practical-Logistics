@@ -11,8 +11,8 @@ public class NEILogisticsConfig implements IConfigureNEI {
 	
 	@Override
 	public void loadConfig() {
-		API.registerUsageHandler(new HammerHandler());
-		API.registerRecipeHandler(new HammerHandler());
+		API.registerUsageHandler(new HammerNEIHandler());
+		API.registerRecipeHandler(new HammerNEIHandler());
 		API.registerGuiOverlay(GuiHammer.class, "hammer");
 
 		API.hideItem(new ItemStack(BlockRegistry.displayScreen));

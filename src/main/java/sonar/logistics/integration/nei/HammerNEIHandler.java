@@ -10,7 +10,7 @@ import sonar.logistics.client.gui.GuiHammer;
 import sonar.logistics.utils.HammerRecipes;
 import codechicken.nei.recipe.TemplateRecipeHandler;
 
-public class HammerHandler extends AbstractProcessorHandler {
+public class HammerNEIHandler extends AbstractProcessorHandler {
 
 	@Override
 	public RecipeHelper recipeHelper() {
