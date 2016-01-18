@@ -7,7 +7,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.StandardInfo;
-import sonar.logistics.api.data.TileProvider;
+import sonar.logistics.api.providers.TileProvider;
 import cofh.api.energy.IEnergyConnection;
 import cofh.api.energy.IEnergyHandler;
 import cofh.api.energy.IEnergyStorage;
@@ -19,7 +19,7 @@ public class RFEnergyProvider extends TileProvider {
 	public String[] subcategories = new String[] { "Connects: ","Current","Max Energy","Stored","Max Stored" };
 
 	@Override
-	public String helperName() {
+	public String getName() {
 		return "Redstone-Flux";
 	}
 

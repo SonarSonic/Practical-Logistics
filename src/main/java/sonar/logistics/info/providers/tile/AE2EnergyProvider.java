@@ -7,7 +7,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.StandardInfo;
-import sonar.logistics.api.data.TileProvider;
+import sonar.logistics.api.providers.TileProvider;
 import appeng.api.networking.energy.IAEPowerStorage;
 import appeng.api.networking.energy.IEnergyGrid;
 import cpw.mods.fml.common.Loader;
@@ -19,7 +19,7 @@ public class AE2EnergyProvider extends TileProvider {
 	public String[] subcategories = new String[] { "Stored Power", "Max Power", "Avg Power Injection", "Avg Power Usage", "Idle Power Usage"};
 
 	@Override
-	public String helperName() {
+	public String getName() {
 		return name;
 	}
 

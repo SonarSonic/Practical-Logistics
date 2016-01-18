@@ -1,6 +1,5 @@
 package sonar.logistics.api.connecting;
 
-import net.minecraftforge.common.util.ForgeDirection;
 import sonar.logistics.api.Info;
 
 /**implemented by Tiles which can provide info to other tiles, normally connected via cables*/

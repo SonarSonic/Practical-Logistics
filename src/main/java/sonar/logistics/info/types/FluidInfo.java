@@ -3,7 +3,6 @@ package sonar.logistics.info.types;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.nbt.NBTTagCompound;
@@ -13,16 +12,14 @@ import net.minecraftforge.fluids.FluidRegistry;
 
 import org.lwjgl.opengl.GL11;
 
-import sonar.logistics.api.Info;
 import sonar.logistics.api.StandardInfo;
-import sonar.logistics.api.render.InfoRenderer;
 
 public class FluidInfo extends StandardInfo {
 
 	public int fluidID = -1;
 
 	@Override
-	public String getType() {
+	public String getName() {
 		return "Fluid-Info";
 	}
 

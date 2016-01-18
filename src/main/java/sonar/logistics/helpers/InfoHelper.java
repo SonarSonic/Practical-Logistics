@@ -14,30 +14,25 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
-import powercrystals.minefactoryreloaded.api.IDeepStorageUnit;
 import sonar.core.inventory.StoredItemStack;
 import sonar.core.utils.helpers.SonarHelper;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.StandardInfo;
-import sonar.logistics.api.data.EntityProvider;
-import sonar.logistics.api.data.TileProvider;
+import sonar.logistics.api.providers.EntityProvider;
+import sonar.logistics.api.providers.InventoryProvider;
+import sonar.logistics.api.providers.TileProvider;
 import sonar.logistics.common.tileentity.TileEntityBlockNode;
 import sonar.logistics.common.tileentity.TileEntityEntityNode;
-import sonar.logistics.info.providers.entity.EntityProviderRegistry;
-import sonar.logistics.info.providers.tile.TileProviderRegistry;
 import sonar.logistics.info.types.CategoryInfo;
 import sonar.logistics.info.types.FluidInfo;
-import sonar.logistics.info.types.InfoTypeRegistry;
 import sonar.logistics.info.types.ProgressInfo;
-import sonar.logistics.integration.AE2Helper;
-import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.network.ByteBufUtils;
 
 public class InfoHelper {
 
 	public static List<Info> getTileInfo(TileEntityBlockNode tileNode) {
-		List<TileProvider> providers = TileProviderRegistry.getProviders();
+		List<TileProvider> providers = Logistics.tileProviders.getObjects();
 		List<Info> providerInfo = new ArrayList();
 		for (TileProvider provider : providers) {
 			ForgeDirection dir = ForgeDirection.getOrientation(SonarHelper.invertMetadata(tileNode.getBlockMetadata())).getOpposite();
@@ -63,7 +58,7 @@ public class InfoHelper {
 	}
 
 	public static List<Info> getEntityInfo(TileEntityEntityNode tileNode) {
-		List<EntityProvider> providers = EntityProviderRegistry.getProviders();
+		List<EntityProvider> providers = Logistics.entityProviders.getObjects();
 		List<Info> providerInfo = new ArrayList();
 		Entity entity = tileNode.getNearestEntity();
 		if (entity == null) {
@@ -96,7 +91,7 @@ public class InfoHelper {
 		if (blockInfo == null) {
 			return null;
 		}
-		TileProvider provider = TileProviderRegistry.getProvider(blockInfo.getProviderID());
+		TileProvider provider = Logistics.tileProviders.getRegisteredObject(blockInfo.getProviderID());
 		if (provider != null) {
 			ForgeDirection dir = ForgeDirection.getOrientation(SonarHelper.invertMetadata(tileNode.getBlockMetadata())).getOpposite();
 			List<Info> info = new ArrayList();
@@ -119,7 +114,7 @@ public class InfoHelper {
 		if (entity == null) {
 			return null;
 		}
-		EntityProvider provider = EntityProviderRegistry.getProvider(blockInfo.getProviderID());
+		EntityProvider provider = Logistics.entityProviders.getRegisteredObject(blockInfo.getProviderID());
 		if (provider != null) {
 			ForgeDirection dir = ForgeDirection.getOrientation(SonarHelper.invertMetadata(tileNode.getBlockMetadata())).getOpposite();
 			List<Info> info = new ArrayList();
@@ -139,20 +134,17 @@ public class InfoHelper {
 		List<StoredItemStack> storedStacks = new ArrayList();
 		ForgeDirection dir = ForgeDirection.getOrientation(SonarHelper.invertMetadata(tileNode.getBlockMetadata())).getOpposite();
 		TileEntity tile = tileNode.getWorldObj().getTileEntity(tileNode.xCoord + dir.offsetX, tileNode.yCoord + dir.offsetY, tileNode.zCoord + dir.offsetZ);
-		if(tile==null){
+		if (tile == null) {
 			return storedStacks;
 		}
-		if (tile instanceof IDeepStorageUnit) {
-			IDeepStorageUnit inv = (IDeepStorageUnit) tile;
-			if (inv.getStoredItemType() != null) {
-				storedStacks.add(new StoredItemStack(inv.getStoredItemType()));
+		boolean specialProvider = false;
+		for (InventoryProvider provider : Logistics.inventoryProviders.getObjects()) {
+			if (provider.canProvideItems(tileNode.getWorldObj(), tileNode.xCoord + dir.offsetX, tileNode.yCoord + dir.offsetY, tileNode.zCoord + dir.offsetZ, dir)) {
+				specialProvider = provider.getItems(storedStacks, tileNode.getWorldObj(), tileNode.xCoord + dir.offsetX, tileNode.yCoord + dir.offsetY, tileNode.zCoord + dir.offsetZ, dir);
 			}
 		}
-		if (tile instanceof IInventory) {
+		if (!specialProvider && tile instanceof IInventory) {
 			addInventoryToList(storedStacks, (IInventory) tile);
-		}
-		if (Loader.isModLoaded("appliedenergistics2")) {
-			AE2Helper.addNetworkItems(tile, dir, storedStacks);
 		}
 
 		Collections.sort(storedStacks, new Comparator<StoredItemStack>() {
@@ -252,11 +244,11 @@ public class InfoHelper {
 	public static Info readInfo(ByteBuf buf) {
 		if (buf.readBoolean()) {
 			String type = ByteBufUtils.readUTF8String(buf);
-			if (InfoTypeRegistry.getInfoType(type) == null) {
+			if (Logistics.infoTypes.getRegisteredObject(type) == null) {
 				Logistics.logger.warn("Unregistered Info Type: " + type);
 				return null;
 			}
-			Info info = InfoTypeRegistry.getInfoType(type).newInfo();
+			Info info = Logistics.infoTypes.getRegisteredObject(type).newInfo();
 			info.readFromBuf(buf);
 			return info;
 
@@ -268,7 +260,7 @@ public class InfoHelper {
 	public static void writeInfo(ByteBuf buf, Info info) {
 		if (info != null) {
 			buf.writeBoolean(true);
-			ByteBufUtils.writeUTF8String(buf, info.getType());
+			ByteBufUtils.writeUTF8String(buf, info.getName());
 			info.writeToBuf(buf);
 		} else {
 			buf.writeBoolean(false);
@@ -281,11 +273,11 @@ public class InfoHelper {
 			if (type.equals("NULLED")) {
 				return null;
 			}
-			if (InfoTypeRegistry.getInfoType(type) == null) {
+			if (Logistics.infoTypes.getRegisteredObject(type) == null) {
 				Logistics.logger.warn("Unregistered Info Type: " + type);
 				return null;
 			}
-			Info info = InfoTypeRegistry.getInfoType(type).newInfo();
+			Info info = Logistics.infoTypes.getRegisteredObject(type).newInfo();
 			info.readFromNBT(tag);
 
 			return info;
@@ -296,7 +288,7 @@ public class InfoHelper {
 
 	public static void writeInfo(NBTTagCompound tag, Info info) {
 		if (info != null) {
-			tag.setString("type", info.getType());
+			tag.setString("type", info.getName());
 			info.writeToNBT(tag);
 		} else {
 			tag.setString("type", "NULLED");

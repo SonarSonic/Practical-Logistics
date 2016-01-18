@@ -11,7 +11,7 @@ import net.minecraftforge.fluids.IFluidHandler;
 import net.minecraftforge.fluids.IFluidTank;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.StandardInfo;
-import sonar.logistics.api.data.TileProvider;
+import sonar.logistics.api.providers.TileProvider;
 import sonar.logistics.info.types.FluidInfo;
 
 public class TankProvider extends TileProvider {
@@ -21,7 +21,7 @@ public class TankProvider extends TileProvider {
 	public String[] subcategories = new String[] {"Capacity","Stored","Fluid Type"};
 
 	@Override
-	public String helperName() {
+	public String getName() {
 		return name;
 	}
 

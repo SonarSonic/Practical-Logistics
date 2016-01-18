@@ -1,11 +1,11 @@
 package sonar.logistics.api;
 
-import sonar.logistics.info.providers.entity.EntityProviderRegistry;
+import sonar.logistics.Logistics;
 
 public class EntityInfo extends StandardInfo {
 
 	@Override
-	public String getType() {
+	public String getName() {
 		return "Entity";
 	}
 
@@ -31,12 +31,12 @@ public class EntityInfo extends StandardInfo {
 
 	@Override
 	public String getCategory() {
-		return (catID == -1 || providerID == -1) ? category : EntityProviderRegistry.getProvider(providerID).getCategory(catID);
+		return (catID == -1 || providerID == -1) ? category : Logistics.entityProviders.getRegisteredObject(providerID).getCategory(catID);
 	}
 
 	@Override
 	public String getSubCategory() {
-		return (subCatID == -1 || providerID == -1) ? subCategory : EntityProviderRegistry.getProvider(providerID).getSubCategory(subCatID);
+		return (subCatID == -1 || providerID == -1) ? subCategory : Logistics.entityProviders.getRegisteredObject(providerID).getSubCategory(subCatID);
 	}
 
 	@Override

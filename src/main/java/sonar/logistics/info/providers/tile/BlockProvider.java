@@ -8,7 +8,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.BlockFluidBase;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.StandardInfo;
-import sonar.logistics.api.data.TileProvider;
+import sonar.logistics.api.providers.TileProvider;
 
 public class BlockProvider extends TileProvider {
 
@@ -17,7 +17,7 @@ public class BlockProvider extends TileProvider {
 	public String[] subcategories = new String[] { "Metadata", "X Coord", "Y Coord", "Z Coord", "Direction", "Is Raining", "Is Thundering", "Save Name", "Dimension", "Dimension Name", "Light", "Is Side Solid", "Hardness", "Signal", "Weak Power", "Strong Power", "Temperature", "Density", "Viscosity" };
 
 	@Override
-	public String helperName() {
+	public String getName() {
 		return name;
 	}
 

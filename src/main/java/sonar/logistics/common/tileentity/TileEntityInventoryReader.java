@@ -1,10 +1,8 @@
 package sonar.logistics.common.tileentity;
 
-import io.netty.buffer.ByteBuf;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.common.tileentity.TileEntityHandlerInventory;
 import sonar.core.integration.fmp.handlers.TileHandler;
-import sonar.core.network.utils.IByteBufTile;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.connecting.IDataConnection;
 import sonar.logistics.common.handlers.InventoryReaderHandler;

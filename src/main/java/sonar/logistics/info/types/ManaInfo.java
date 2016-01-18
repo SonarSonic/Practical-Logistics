@@ -31,7 +31,7 @@ public class ManaInfo extends ProgressInfo {
 	}
 
 	@Override
-	public String getType() {
+	public String getName() {
 		return "ManaBar";
 	}
 
@@ -120,7 +120,7 @@ public class ManaInfo extends ProgressInfo {
 
 	@Override
 	public boolean isEqualType(Info info) {
-		if (info != null && info.getType().equals(this.getType())) {
+		if (info != null && info.getName().equals(this.getName())) {
 			return info.getCategory().equals(this.getCategory()) && info.getSubCategory().equals(getSubCategory());
 		}
 		return false;

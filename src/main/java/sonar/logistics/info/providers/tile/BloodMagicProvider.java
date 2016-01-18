@@ -7,7 +7,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.StandardInfo;
-import sonar.logistics.api.data.TileProvider;
+import sonar.logistics.api.providers.TileProvider;
 import WayofTime.alchemicalWizardry.api.alchemy.energy.IReagentHandler;
 import WayofTime.alchemicalWizardry.api.alchemy.energy.ISegmentedReagentHandler;
 import WayofTime.alchemicalWizardry.api.alchemy.energy.ReagentContainerInfo;
@@ -22,7 +22,7 @@ public class BloodMagicProvider extends TileProvider {
 	public String[] subcategories = new String[] {"Tier","Blood Stored","Capacity","Buffer Capacity","Progress","Has Demon Blood","Connected Tanks","Owner","Cool Down","Are Tanks Empty"};
 
 	@Override
-	public String helperName() {
+	public String getName() {
 		return name;
 	}
 

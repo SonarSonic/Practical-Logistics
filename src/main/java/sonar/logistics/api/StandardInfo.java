@@ -2,7 +2,7 @@ package sonar.logistics.api;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.nbt.NBTTagCompound;
-import sonar.logistics.info.providers.tile.TileProviderRegistry;
+import sonar.logistics.Logistics;
 import cpw.mods.fml.common.network.ByteBufUtils;
 
 public class StandardInfo extends Info {
@@ -43,7 +43,7 @@ public class StandardInfo extends Info {
 	}
 
 	@Override
-	public String getType() {
+	public String getName() {
 		return "Standard";
 	}
 
@@ -55,12 +55,12 @@ public class StandardInfo extends Info {
 	@Override
 	public String getCategory() {
 		
-		return (catID==-1 ||providerID==-1)  ? category : TileProviderRegistry.getProvider(providerID).getCategory(catID);
+		return (catID==-1 ||providerID==-1)  ? category : Logistics.tileProviders.getRegisteredObject(providerID).getCategory(catID);
 	}
 
 	@Override
 	public String getSubCategory() {
-		return (subCatID==-1||providerID==-1)  ? subCategory : TileProviderRegistry.getProvider(providerID).getSubCategory(subCatID);
+		return (subCatID==-1||providerID==-1)  ? subCategory : Logistics.tileProviders.getRegisteredObject(providerID).getSubCategory(subCatID);
 	}
 
 	@Override
@@ -187,7 +187,7 @@ public class StandardInfo extends Info {
 
 	@Override
 	public boolean isEqualType(Info info) {
-		if (info != null && ((info.getType().equals("Fluid-Info") || info.getType().equals(this.getType())))) {
+		if (info != null && ((info.getName().equals("Fluid-Info") || info.getName().equals(this.getName())))) {
 			return info.getProviderID() == this.providerID && info.getCategory().equals(this.getCategory()) && info.getSubCategory().equals(getSubCategory());
 		}
 		return false;

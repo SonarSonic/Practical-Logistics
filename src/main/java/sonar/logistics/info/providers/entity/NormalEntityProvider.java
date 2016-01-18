@@ -10,7 +10,7 @@ import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.player.EntityPlayer;
 import sonar.logistics.api.EntityInfo;
 import sonar.logistics.api.Info;
-import sonar.logistics.api.data.EntityProvider;
+import sonar.logistics.api.providers.EntityProvider;
 
 public class NormalEntityProvider extends EntityProvider {
 
@@ -19,7 +19,7 @@ public class NormalEntityProvider extends EntityProvider {
 	public String[] subcategories = new String[] { "Type", "Age", "Health", "Max Health", "Hostile Mob", "Growing Age" };
 
 	@Override
-	public String helperName() {
+	public String getName() {
 		return name;
 	}
 

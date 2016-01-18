@@ -16,7 +16,7 @@ public class CategoryInfo extends Info {
 	}
 
 	@Override
-	public String getType() {
+	public String getName() {
 		return "Header";
 	}
 
@@ -70,7 +70,7 @@ public class CategoryInfo extends Info {
 
 	@Override
 	public boolean isEqualType(Info info) {
-		if (info != null && info.getType() == this.getType()) {
+		if (info != null && info.getName() == this.getName()) {
 			return info.getCategory().equals(category);
 		}
 		return false;

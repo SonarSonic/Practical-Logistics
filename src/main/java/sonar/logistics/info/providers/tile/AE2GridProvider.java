@@ -7,7 +7,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.StandardInfo;
-import sonar.logistics.api.data.TileProvider;
+import sonar.logistics.api.providers.TileProvider;
 import appeng.api.implementations.IPowerChannelState;
 import appeng.api.networking.IGridBlock;
 import appeng.api.networking.IGridConnection;
@@ -20,7 +20,7 @@ public class AE2GridProvider extends TileProvider {
 	public String[] subcategories = new String[] { "Idle Power Usage", "Used Channels", "Is Active", "Is Powered" };
 
 	@Override
-	public String helperName() {
+	public String getName() {
 		return name;
 	}
 

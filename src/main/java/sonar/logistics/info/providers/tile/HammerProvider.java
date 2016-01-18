@@ -7,7 +7,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.StandardInfo;
-import sonar.logistics.api.data.TileProvider;
+import sonar.logistics.api.providers.TileProvider;
 import sonar.logistics.common.tileentity.TileEntityHammer;
 import sonar.logistics.registries.BlockRegistry;
 
@@ -17,7 +17,7 @@ public class HammerProvider extends TileProvider {
 	public String[] subcategories = new String[] { "Progress", "Process Time", "Cool Down", "Cool Down Time"};
 
 	@Override
-	public String helperName() {
+	public String getName() {
 		return name;
 	}
 

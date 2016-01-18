@@ -14,6 +14,7 @@ public class CraftingRegistry extends Logistics {
 	public static void addRecipes() {
 		addShapedOre(new ItemStack(BlockRegistry.dataCable, 16), new Object[] { "PPP", "DDD", "PPP", 'P', ItemRegistry.stone_plate, 'D', "dustSapphire" });
 		addShapelessOre(new ItemStack(ItemRegistry.displayScreen, 1), new Object[] { ItemRegistry.stone_plate, "dustSapphire", BlockRegistry.dataCable });
+		addShapelessOre(new ItemStack(BlockRegistry.largeDisplayScreen, 1), new Object[] { ItemRegistry.stone_plate, "dustSapphire", ItemRegistry.displayScreen });
 		addShapedOre(new ItemStack(BlockRegistry.holographicDisplay, 1), new Object[] { "   ", "PDP", " C ", 'P', ItemRegistry.stone_plate, 'D', ItemRegistry.displayScreen, 'C', BlockRegistry.dataCable });
 		addShapedOre(new ItemStack(BlockRegistry.dataModifier, 1), new Object[] { "DCD", "PDC", "DCD", 'P', ItemRegistry.stone_plate, 'D', "dustSapphire", 'C', BlockRegistry.dataCable });
 		addShapedOre(new ItemStack(BlockRegistry.infoCreator, 1), new Object[] { "DPD", "PCD", "DPD", 'P', ItemRegistry.stone_plate, 'D', "dustSapphire", 'C', BlockRegistry.dataCable });
@@ -22,8 +23,9 @@ public class CraftingRegistry extends Logistics {
 		addShapedOre(new ItemStack(BlockRegistry.dataReceiver, 1), new Object[] { "DPD", "PCP", "DDD", 'P', Items.redstone, 'D', ItemRegistry.stone_plate, 'C', BlockRegistry.infoReader });
 		addShapedOre(new ItemStack(BlockRegistry.infoReader, 1), new Object[] { "PIP", "RDS", "PIP", 'R', Items.redstone, 'I', Items.iron_ingot, 'P', ItemRegistry.stone_plate, 'D', BlockRegistry.dataCable, 'S', "dustSapphire" });
 		addShapelessOre(new ItemStack(BlockRegistry.inventoryReader, 1), new Object[] { BlockRegistry.infoReader, Blocks.chest });
+		addShapelessOre(new ItemStack(BlockRegistry.fluidReader, 1), new Object[] { BlockRegistry.infoReader, Items.bucket });
 		addShapedOre(new ItemStack(BlockRegistry.node, 1), new Object[] { "   ", " C ", "PDP", 'P', ItemRegistry.stone_plate, 'D', "dustSapphire", 'C', BlockRegistry.dataCable });
-		addShapedOre(new ItemStack(BlockRegistry.hammer, 1), new Object[] { "ADA", "B B", "ACA", 'A', "logWood", 'B', "stickWood", 'C', "stone",'D', "slabWood"  });
+		addShapedOre(new ItemStack(BlockRegistry.hammer, 1), new Object[] { "ADA", "B B", "ACA", 'A', "logWood", 'B', "stickWood", 'C', "stone", 'D', "slabWood" });
 		addShapelessOre(new ItemStack(BlockRegistry.entityNode, 1), new Object[] { ItemRegistry.stone_plate, "gemSapphire", BlockRegistry.dataCable });
 
 	}

@@ -1,8 +1,9 @@
 package sonar.logistics.api.render;
 
-import net.minecraft.nbt.NBTTagCompound;
 import io.netty.buffer.ByteBuf;
+import net.minecraft.nbt.NBTTagCompound;
 
+/**used to work out the Scaling of Large Display screens, still kind of w.i.p*/
 public class LargeScreenSizing {
 
 	public int maxY = 0, minY = 0, maxH = 0, minH = 0;

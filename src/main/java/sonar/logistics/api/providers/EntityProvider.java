@@ -1,20 +1,21 @@
-package sonar.logistics.api.data;
+package sonar.logistics.api.providers;
 
 import java.util.List;
 
 import net.minecraft.entity.Entity;
+import sonar.core.utils.IRegistryObject;
+import sonar.logistics.Logistics;
 import sonar.logistics.api.Info;
-import sonar.logistics.info.providers.entity.EntityProviderRegistry;
 
-/** used for providing information on Block/TileEntity for the Info Reader to read, the Provider must be registered in the PractialLogisticsAPI to be used */
-public abstract class EntityProvider {
+/** used for providing information on Entities for the Info Reader to read, the Provider must be registered in the PractialLogisticsAPI to be used */
+public abstract class EntityProvider implements IRegistryObject {
 
 	public byte getID() {
-		return EntityProviderRegistry.getProviderID(helperName());
+		return Logistics.entityProviders.getObjectID(getName());
 	}
 
 	/** the name the info helper will be registered too */
-	public abstract String helperName();
+	public abstract String getName();
 
 	/**
 	 * can provide info on the given entity

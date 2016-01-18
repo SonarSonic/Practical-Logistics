@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StatCollector;
 
@@ -15,11 +17,9 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
-import sonar.core.SonarCore;
 import sonar.core.inventory.GuiSonar;
 import sonar.core.inventory.SonarButtons;
 import sonar.core.inventory.StoredItemStack;
-import sonar.core.network.PacketByteBufServer;
 import sonar.core.utils.helpers.FontHelper;
 import sonar.core.utils.helpers.RenderHelper;
 import sonar.logistics.Logistics;
@@ -124,6 +124,7 @@ public class GuiInventoryReader extends GuiSonar {
 					if (i < finish) {
 						StoredItemStack storedStack = getStacks().get(i);
 						if (storedStack != null) {
+
 							ItemStack stack = storedStack.item;
 							stack.stackSize = (int) storedStack.stored;
 							RenderItem.getInstance().renderItemAndEffectIntoGUI(fontRendererObj, this.mc.getTextureManager(), stack, 13 + (X * 18), 32 + (Y * 18));
@@ -134,6 +135,41 @@ public class GuiInventoryReader extends GuiSonar {
 				}
 			}
 		}
+		if (x - guiLeft >= 13 && x - guiLeft <= 13 + (12 * 18) && y - guiTop >= 32 && y - guiTop <= 32 + (7 * 18)) {
+			int start = (int) (stackListSize() / 12 * this.currentScroll);
+			int X = (x - guiLeft - 13) / 18;
+			int Y = (y - guiTop - 32) / 18;
+			int i = (start * 12) + X + ((Y) * 12);
+
+			if (i < getStacks().size()) {
+				StoredItemStack storedStack = getStacks().get(i);
+				if (storedStack != null) {
+
+					GL11.glDisable(GL11.GL_DEPTH_TEST);
+					GL11.glDisable(GL11.GL_LIGHTING);
+					this.renderToolTip(storedStack, x - guiLeft, y - guiTop);
+					GL11.glEnable(GL11.GL_LIGHTING);
+					GL11.glEnable(GL11.GL_DEPTH_TEST);
+					net.minecraft.client.renderer.RenderHelper.enableGUIStandardItemLighting();
+
+				}
+			}
+		}
+	}
+
+	protected void renderToolTip(StoredItemStack stored, int x, int y) {
+		List list = stored.item.getTooltip(this.mc.thePlayer, this.mc.gameSettings.advancedItemTooltips);
+		list.add(1, "Stored: " + stored.stored);
+		for (int k = 0; k < list.size(); ++k) {
+			if (k == 0) {
+				list.set(k, stored.item.getRarity().rarityColor + (String) list.get(k));
+			} else {
+				list.set(k, EnumChatFormatting.GRAY + (String) list.get(k));
+			}
+		}
+
+		FontRenderer font = stored.item.getItem().getFontRenderer(stored.item);
+		drawHoveringText(list, x, y, (font == null ? fontRendererObj : font));
 	}
 
 	public void handleMouseInput() {
@@ -204,7 +240,9 @@ public class GuiInventoryReader extends GuiSonar {
 		drawTexturedModalRect(this.guiLeft, this.guiTop, 0, 0, this.xSize, this.ySize);
 		// int pos = getDataPosition();
 		// for (int i = 0; i < 11; i++) {
-		// drawTexturedModalRect(this.guiLeft + 7, this.guiTop + 29 + (12 * i), 0, positions != null && positions.contains(i) ? 190 : i == pos ? 178 : 166, 154 + 72, 12);
+		// drawTexturedModalRect(this.guiLeft + 7, this.guiTop + 29 + (12 * i),
+		// 0, positions != null && positions.contains(i) ? 190 : i == pos ? 178
+		// : 166, 154 + 72, 12);
 		// }
 		this.drawTexturedModalRect(scrollerLeft, scrollerStart + (int) ((float) (scrollerEnd - scrollerStart - 17) * this.currentScroll), 176 + 72, 0, 8, 15);
 

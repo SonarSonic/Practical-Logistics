@@ -8,6 +8,7 @@ import sonar.logistics.common.blocks.BlockDataEmitter;
 import sonar.logistics.common.blocks.BlockDataModifier;
 import sonar.logistics.common.blocks.BlockDataReceiver;
 import sonar.logistics.common.blocks.BlockEntityNode;
+import sonar.logistics.common.blocks.BlockFluidReader;
 import sonar.logistics.common.blocks.BlockHammer;
 import sonar.logistics.common.blocks.BlockHammerAir;
 import sonar.logistics.common.blocks.BlockHolographicDisplay;
@@ -26,6 +27,7 @@ import sonar.logistics.common.tileentity.TileEntityDataModifier;
 import sonar.logistics.common.tileentity.TileEntityDataReceiver;
 import sonar.logistics.common.tileentity.TileEntityDisplayScreen;
 import sonar.logistics.common.tileentity.TileEntityEntityNode;
+import sonar.logistics.common.tileentity.TileEntityFluidReader;
 import sonar.logistics.common.tileentity.TileEntityHammer;
 import sonar.logistics.common.tileentity.TileEntityHolographicDisplay;
 import sonar.logistics.common.tileentity.TileEntityInfoCreator;
@@ -37,7 +39,7 @@ import cpw.mods.fml.common.registry.GameRegistry;
 
 public class BlockRegistry extends Logistics {
 
-	public static Block displayScreen, largeDisplayScreen, node, entityNode, infoReader, dataCable, dataReceiver, dataEmitter, inventoryReader, redstoneSignaller_on, redstoneSignaller_off, holographicDisplay, dataModifier, infoCreator,sapphire_ore, hammer, hammer_air;
+	public static Block displayScreen, largeDisplayScreen, node, entityNode, infoReader, dataCable, dataReceiver, dataEmitter, inventoryReader, redstoneSignaller_on, redstoneSignaller_off, holographicDisplay, dataModifier, infoCreator,sapphire_ore, hammer, hammer_air, fluidReader;
 
 	public static void registerBlocks() {
 
@@ -74,7 +76,11 @@ public class BlockRegistry extends Logistics {
 
 		inventoryReader = new BlockInventoryReader().setBlockName("InventoryReader").setHardness(1.0F).setCreativeTab(Logistics.creativeTab).setResistance(20.0F).setBlockTextureName(modid + ":" + "data_cable");
 		GameRegistry.registerBlock(inventoryReader, SonarBlockTip.class, "InventoryReader");
-		GameRegistry.registerTileEntity(TileEntityInventoryReader.class, "InventoryReader");
+		GameRegistry.registerTileEntity(TileEntityInventoryReader.class, "InventoryReader");		
+
+		fluidReader = new BlockFluidReader().setBlockName("FluidReader").setHardness(1.0F).setCreativeTab(Logistics.creativeTab).setResistance(20.0F).setBlockTextureName(modid + ":" + "data_cable");
+		GameRegistry.registerBlock(fluidReader, SonarBlockTip.class, "FluidReader");
+		GameRegistry.registerTileEntity(TileEntityFluidReader.class, "FluidReader");
 				
 		dataReceiver = new BlockDataReceiver().setBlockName("DataReceiver").setHardness(1.0F).setCreativeTab(Logistics.creativeTab).setResistance(20.0F).setBlockTextureName(modid + ":" + "data_cable");
 		GameRegistry.registerBlock(dataReceiver, SonarBlockTip.class, "DataReceiver");

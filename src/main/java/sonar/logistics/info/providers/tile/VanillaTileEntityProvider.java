@@ -9,7 +9,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.StandardInfo;
-import sonar.logistics.api.data.TileProvider;
+import sonar.logistics.api.providers.TileProvider;
 
 public class VanillaTileEntityProvider extends TileProvider {
 
@@ -18,7 +18,7 @@ public class VanillaTileEntityProvider extends TileProvider {
 	public String[] subcategories = new String[] {"Burn Time","Current Time","Cook Time","Current Fuel","Current Note"};
 
 	@Override
-	public String helperName() {
+	public String getName() {
 		return name;
 	}
 

@@ -6,7 +6,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import sonar.logistics.api.EntityInfo;
 import sonar.logistics.api.Info;
-import sonar.logistics.api.data.EntityProvider;
+import sonar.logistics.api.providers.EntityProvider;
 
 public class PlayerProvider extends EntityProvider {
 
@@ -15,7 +15,7 @@ public class PlayerProvider extends EntityProvider {
 	public String[] subcategories = new String[] {"Name", "Team","Fly Speed","Walk Speed","Is Creative Mode", "Needs Food", "Food Level", "Saturation Level", "Absorption Amount", "Experience Bar", "Experience Level", "Total Experience"};
 
 	@Override
-	public String helperName() {
+	public String getName() {
 		return name;
 	}
 

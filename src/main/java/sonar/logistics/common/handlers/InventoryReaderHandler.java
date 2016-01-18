@@ -1,7 +1,5 @@
 package sonar.logistics.common.handlers;
 
-import io.netty.buffer.ByteBuf;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +12,6 @@ import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.handlers.InventoryTileHandler;
 import sonar.core.inventory.StoredItemStack;
-import sonar.core.network.utils.IByteBufTile;
 import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.api.Info;
@@ -25,7 +22,6 @@ import sonar.logistics.common.tileentity.TileEntityEntityNode;
 import sonar.logistics.helpers.CableHelper;
 import sonar.logistics.helpers.InfoHelper;
 import sonar.logistics.info.types.StoredStackInfo;
-import cpw.mods.fml.common.network.ByteBufUtils;
 
 public class InventoryReaderHandler extends InventoryTileHandler {
 
@@ -39,7 +35,7 @@ public class InventoryReaderHandler extends InventoryTileHandler {
 		super(isMultipart);
 		super.slots = new ItemStack[1];
 	}
-
+	
 	@Override
 	public void update(TileEntity te) {
 		if (te.getWorldObj().isRemote) {

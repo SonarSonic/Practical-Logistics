@@ -28,18 +28,20 @@ public class ForgeMultipartHandler implements IPartFactory, IPartConverter {
 			return new InfoCreatorPart();
 		if (name.equals("Data Modifier"))
 			return new DataModifierPart();
+		if (name.equals("Fluid Reader"))
+			return new FluidReaderPart();
 		return null;
 	}
 
 	public static void init() {
 		instance = new ForgeMultipartHandler();
 		MultiPartRegistry.registerConverter(instance);
-		MultiPartRegistry.registerParts(instance, new String[] { "Screen Part","Cable Part","Info Reader","Inventory Reader","Info Creator","Data Modifier" });
+		MultiPartRegistry.registerParts(instance, new String[] { "Screen Part","Cable Part","Info Reader","Inventory Reader","Info Creator","Data Modifier","Fluid Reader" });
 	}
 
 	@Override
 	public Iterable<Block> blockTypes() {
-		return Arrays.asList(BlockRegistry.displayScreen,BlockRegistry.dataCable, BlockRegistry.infoReader, BlockRegistry.inventoryReader,BlockRegistry.infoCreator,BlockRegistry.dataModifier);
+		return Arrays.asList(BlockRegistry.displayScreen,BlockRegistry.dataCable, BlockRegistry.infoReader, BlockRegistry.inventoryReader,BlockRegistry.infoCreator,BlockRegistry.dataModifier,BlockRegistry.fluidReader);
 	}
 
 	@Override
@@ -63,6 +65,9 @@ public class ForgeMultipartHandler implements IPartFactory, IPartConverter {
 		}
 		if (b == BlockRegistry.dataModifier) {
 			return new DataModifierPart(meta);
+		}
+		if (b == BlockRegistry.fluidReader) {
+			return new FluidReaderPart(meta);
 		}
 		return null;
 	}

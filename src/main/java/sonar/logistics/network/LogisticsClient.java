@@ -15,6 +15,7 @@ import sonar.logistics.common.tileentity.TileEntityDataModifier;
 import sonar.logistics.common.tileentity.TileEntityDataReceiver;
 import sonar.logistics.common.tileentity.TileEntityDisplayScreen;
 import sonar.logistics.common.tileentity.TileEntityEntityNode;
+import sonar.logistics.common.tileentity.TileEntityFluidReader;
 import sonar.logistics.common.tileentity.TileEntityHammer;
 import sonar.logistics.common.tileentity.TileEntityHolographicDisplay;
 import sonar.logistics.common.tileentity.TileEntityInfoCreator;
@@ -55,14 +56,17 @@ public class LogisticsClient extends LogisticsCommon {
 		MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(BlockRegistry.infoCreator), new RenderItemHandlers.DataModifier(infoCreator, new TileEntityInfoCreator()));
 		
 		
-		TileEntitySpecialRenderer infoNode = new RenderHandlers.InfoNode();
-		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityInfoReader.class, infoNode);
-		MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(BlockRegistry.infoReader), new RenderItemHandlers.Reader(infoNode, new TileEntityInfoReader()));
+		TileEntitySpecialRenderer infoReader = new RenderHandlers.InfoReader();
+		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityInfoReader.class, infoReader);
+		MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(BlockRegistry.infoReader), new RenderItemHandlers.Reader(infoReader, new TileEntityInfoReader()));
 		
-
 		TileEntitySpecialRenderer inventoryReader = new RenderHandlers.InventoryReader();
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityInventoryReader.class, inventoryReader);
 		MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(BlockRegistry.inventoryReader), new RenderItemHandlers.Reader(inventoryReader, new TileEntityInventoryReader()));
+		
+		TileEntitySpecialRenderer fluidReader = new RenderHandlers.FluidReader();
+		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityFluidReader.class, fluidReader);
+		MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(BlockRegistry.fluidReader), new RenderItemHandlers.Reader(fluidReader, new TileEntityFluidReader()));
 		
 		TileEntitySpecialRenderer dataReceiver = new RenderHandlers.DataReceiver();
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityDataReceiver.class, dataReceiver);

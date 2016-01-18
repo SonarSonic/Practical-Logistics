@@ -18,6 +18,7 @@ tile.Hammer.name=Forging Hammer
 tile.Hammer_Air.name=Forging Hammer
 tile.EntityNode.name=Entity Node
 tile.LargeDisplayScreen.name=Large Display Screen
+tile.FluidReader.name=Fluid Reader
 
 //items
 item.EnergyScreenItem.name=Energy Screen

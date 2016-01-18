@@ -1,15 +1,16 @@
 package sonar.logistics.api;
 
-import sonar.logistics.api.render.InfoRenderer;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import sonar.core.utils.IRegistryObject;
+import sonar.logistics.api.render.InfoRenderer;
 
-public abstract class Info<T extends Info> {
-	
-	public abstract String getType();
+public abstract class Info<T extends Info> implements IRegistryObject {
+
+	public abstract String getName();
 
 	public abstract byte getProviderID();
 
@@ -36,15 +37,19 @@ public abstract class Info<T extends Info> {
 	public abstract void emptyData();
 
 	public abstract T newInfo();
-	
+
 	public boolean isDataEqualType(Info info) {
 		if (info == null) {
 			return false;
 		}
 		return this.getData().equals(info.getData()) && this.getDisplayableData().equals(info.getDisplayableData());
 	}
-	
+
 	public void renderInfo(Tessellator tess, TileEntity tile, float minX, float minY, float maxX, float maxY, float zOffset, float scale) {
 		InfoRenderer.renderStandardInfo(this, Minecraft.getMinecraft().fontRenderer, minX, minY, maxX, maxY, zOffset, scale);
+	}
+
+	public boolean isLoadable() {
+		return true;
 	}
 }

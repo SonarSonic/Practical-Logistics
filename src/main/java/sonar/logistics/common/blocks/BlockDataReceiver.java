@@ -9,11 +9,9 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.common.block.SonarMaterials;
-import sonar.core.utils.helpers.FontHelper;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.connecting.IDataCable;
 import sonar.logistics.common.tileentity.TileEntityDataReceiver;
-import sonar.logistics.common.tileentity.TileEntityNode;
 import sonar.logistics.network.LogisticsGui;
 
 public class BlockDataReceiver extends BaseNode {

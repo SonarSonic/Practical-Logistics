@@ -1,7 +1,6 @@
 package sonar.logistics.client.renderers;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.model.ModelSign;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
@@ -16,7 +15,6 @@ import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.utils.helpers.RenderHelper;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.connecting.IDataConnection;
-import sonar.logistics.api.render.InfoRenderer;
 import sonar.logistics.integration.multipart.DisplayScreenPart;
 import codechicken.multipart.TileMultipart;
 import cpw.mods.fml.relauncher.Side;

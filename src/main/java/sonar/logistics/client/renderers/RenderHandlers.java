@@ -126,7 +126,7 @@ public class RenderHandlers {
 			RenderHelper.beginRender(x + 0.5F, y + 1.5F, z + 0.5F, 0, cableTex);
 			modelCable.renderTile(entity, (Entity) null, 0.0F, 0.0F, -0.1F, 0.0F, 0.0F, 0.0625F);
 			RenderHelper.finishRender();
-			
+
 			RenderHelper.beginRender(x + 0.5F, y + 1.5F, z + 0.5F, RenderHelper.setMetaData(entity), modelTex);
 			GL11.glTranslated(0, 0.0625, 0);
 			model.render((Entity) null, 0.0F, 0.0F, -0.1F, 0.0F, 0.0F, 0.0625F);
@@ -134,9 +134,7 @@ public class RenderHandlers {
 		}
 	}
 
-	/* public static class DataModifier extends TileEntitySpecialRenderer { public ModelDataCable model = new ModelDataCable(); public String texture = modelFolder + "dataRenamer.png";
-	 * @Override public void renderTileEntityAt(TileEntity entity, double x, double y, double z, float f) { RenderHelper.beginRender(x + 0.5F, y + 1.5F, z + 0.5F, RenderHelper.setMetaData(entity), texture); model.renderTile(entity, (Entity) null, 0.0F, 0.0F, -0.1F, 0.0F, 0.0F, 0.0625F); RenderHelper.finishRender(); } } */
-	public static class InfoNode extends TileEntitySpecialRenderer {
+	public static class InfoReader extends TileEntitySpecialRenderer {
 		public ModelDirectionalConnector model = new ModelDirectionalConnector();
 		public String texture = modelFolder + "infoNode.png";
 
@@ -148,11 +146,11 @@ public class RenderHandlers {
 				if (meta == 0) {
 					GL11.glTranslated(0, 1, -1.0625);
 					GL11.glRotated(90, 1, 0, 0);
-					
+
 				} else if (meta == 1) {
 					GL11.glRotated(90, -1, 0, 0);
 					GL11.glTranslated(0, -1.0625, 1);
-				}else{
+				} else {
 					GL11.glTranslated(0, -0.0625, 0);
 				}
 
@@ -162,29 +160,16 @@ public class RenderHandlers {
 		}
 	}
 
-	public static class InventoryReader extends TileEntitySpecialRenderer {
-		public ModelDirectionalConnector model = new ModelDirectionalConnector();
-		public String texture = modelFolder + "inventoryReader.png";
+	public static class InventoryReader extends InfoReader {
+		public InventoryReader() {
+			super.texture = modelFolder + "inventoryReader.png";
 
-		@Override
-		public void renderTileEntityAt(TileEntity entity, double x, double y, double z, float f) {
-			RenderHelper.beginRender(x + 0.5F, y + 1.5F, z + 0.5F, RenderHelper.setMetaData(entity), texture);
-			if (entity != null && entity.getWorldObj() != null) {
-				int meta = FMPHelper.getMeta(entity);
-				if (meta == 0) {
-					GL11.glTranslated(0, 1, -1.0625);
-					GL11.glRotated(90, 1, 0, 0);
-					
-				} else if (meta == 1) {
-					GL11.glRotated(90, -1, 0, 0);
-					GL11.glTranslated(0, -1.0625, 1);
-				}else{
-					GL11.glTranslated(0, -0.0625, 0);
-				}
+		}
+	}
+	public static class FluidReader extends InfoReader {
+		public FluidReader() {
+			super.texture = modelFolder + "fluidReader.png";
 
-			}
-			model.render((Entity) null, 0.0F, 0.0F, -0.1F, 0.0F, 0.0F, 0.0625F);
-			RenderHelper.finishRender();
 		}
 	}
 
@@ -250,12 +235,12 @@ public class RenderHandlers {
 			boolean cooling = false;
 			if (entity != null && entity.getWorldObj() != null) {
 				TileEntityHammer hammer = (TileEntityHammer) entity;
-				if(hammer.coolDown.getInt()!=0){
-					progress = hammer.coolDown.getInt();					
-					cooling=true;
-				}else
+				if (hammer.coolDown.getInt() != 0) {
+					progress = hammer.coolDown.getInt();
+					cooling = true;
+				} else
 					progress = hammer.progress.getInt();
-				double move = !cooling? progress * 1.625 / hammer.speed : progress * 1.625 / 200;
+				double move = !cooling ? progress * 1.625 / hammer.speed : progress * 1.625 / 200;
 				model.render((Entity) null, 0.0F, 0.0F, -0.1F, 0.0F, 0.0F, 0.0625F, true, move);
 			} else {
 				model.render((Entity) null, 0.0F, 0.0F, -0.1F, 0.0F, 0.0F, 0.0625F, false, 0);
@@ -263,7 +248,7 @@ public class RenderHandlers {
 			RenderHelper.finishRender();
 			if (entity.getWorldObj() != null) {
 				GL11.glTranslated(0, 2.75, 0);
-				double height = -(!cooling? progress * 1.625 / 100 : progress * 1.625 / 200);
+				double height = -(!cooling ? progress * 1.625 / 100 : progress * 1.625 / 200);
 				float width = 0.53F;
 				Tessellator tessellator = Tessellator.instance;
 				this.bindTexture(rope);
@@ -317,12 +302,12 @@ public class RenderHandlers {
 				ItemStack target = null;
 				if ((progress == 0 || cooling) && hammer.getStackInSlot(1) != null) {
 					target = hammer.getStackInSlot(1);
-				} else if(!cooling){
+				} else if (!cooling) {
 					target = hammer.getStackInSlot(0);
 				}
 
 				if (target != null) {
-					if (!(target.getItem() instanceof ItemBlock)) {		
+					if (!(target.getItem() instanceof ItemBlock)) {
 
 						GL11.glRotated(90, 1, 0, 0);
 
@@ -330,7 +315,7 @@ public class RenderHandlers {
 
 					} else {
 						GL11.glRotated(90, -1, 0, 0);
-						//GL11.glTranslated(0.0625 * 8, 0.0625 * 13, 0.4);
+						// GL11.glTranslated(0.0625 * 8, 0.0625 * 13, 0.4);
 						GL11.glTranslated(0.5, -0.7, 0.92);
 						if (!cooling && progress > 81) {
 							GL11.glTranslated(0, 0, -((progress - 81) * 0.085 / (hammer.speed - 81)));
@@ -343,6 +328,7 @@ public class RenderHandlers {
 			GL11.glPopMatrix();
 		}
 	}
+
 	public static class EntityNode extends TileEntitySpecialRenderer {
 		public ModelEntityNode model = new ModelEntityNode();
 		public String texture = modelFolder + "entity_node.png";
@@ -356,9 +342,9 @@ public class RenderHandlers {
 			RenderHelper.finishRender();
 
 			RenderHelper.beginRender(x + 0.5F, y + 1.5F, z + 0.5F, RenderHelper.setMetaData(entity), texture);
-			model.renderTile((TileEntityEntityNode) entity,(Entity) null, 0.0F, 0.0F, -0.1F, 0.0F, 0.0F, 0.0625F);
+			model.renderTile((TileEntityEntityNode) entity, (Entity) null, 0.0F, 0.0F, -0.1F, 0.0F, 0.0F, 0.0625F);
 			RenderHelper.finishRender();
 		}
 	}
-	
+
 }

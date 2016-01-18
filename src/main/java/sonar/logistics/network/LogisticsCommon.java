@@ -13,6 +13,7 @@ import sonar.logistics.Logistics;
 import sonar.logistics.client.gui.GuiDataModifier;
 import sonar.logistics.client.gui.GuiDataReceiver;
 import sonar.logistics.client.gui.GuiEntityNode;
+import sonar.logistics.client.gui.GuiFluidReader;
 import sonar.logistics.client.gui.GuiHammer;
 import sonar.logistics.client.gui.GuiInfoCreator;
 import sonar.logistics.client.gui.GuiInfoReader;
@@ -21,10 +22,12 @@ import sonar.logistics.client.gui.GuiRedstoneSignaller;
 import sonar.logistics.client.gui.GuiRenameEmitter;
 import sonar.logistics.common.containers.ContainerDataReceiver;
 import sonar.logistics.common.containers.ContainerEmptySync;
+import sonar.logistics.common.containers.ContainerFluidReader;
 import sonar.logistics.common.containers.ContainerHammer;
 import sonar.logistics.common.containers.ContainerInfoNode;
 import sonar.logistics.common.containers.ContainerInventoryReader;
 import sonar.logistics.common.handlers.DataModifierHandler;
+import sonar.logistics.common.handlers.FluidReaderHandler;
 import sonar.logistics.common.handlers.InfoCreatorHandler;
 import sonar.logistics.common.handlers.InfoReaderHandler;
 import sonar.logistics.common.handlers.InventoryReaderHandler;
@@ -32,17 +35,20 @@ import sonar.logistics.common.tileentity.TileEntityDataEmitter;
 import sonar.logistics.common.tileentity.TileEntityDataModifier;
 import sonar.logistics.common.tileentity.TileEntityDataReceiver;
 import sonar.logistics.common.tileentity.TileEntityEntityNode;
+import sonar.logistics.common.tileentity.TileEntityFluidReader;
 import sonar.logistics.common.tileentity.TileEntityHammer;
 import sonar.logistics.common.tileentity.TileEntityInfoCreator;
 import sonar.logistics.common.tileentity.TileEntityInfoReader;
 import sonar.logistics.common.tileentity.TileEntityInventoryReader;
 import sonar.logistics.common.tileentity.TileEntityRedstoneSignaller;
 import sonar.logistics.integration.multipart.DataModifierPart;
+import sonar.logistics.integration.multipart.FluidReaderPart;
 import sonar.logistics.integration.multipart.InfoCreatorPart;
 import sonar.logistics.integration.multipart.InfoReaderPart;
 import sonar.logistics.integration.multipart.InventoryReaderPart;
 import sonar.logistics.network.packets.PacketDataEmitters;
 import sonar.logistics.network.packets.PacketDataReceiver;
+import sonar.logistics.network.packets.PacketFluidReader;
 import sonar.logistics.network.packets.PacketInfoBlock;
 import sonar.logistics.network.packets.PacketInventoryReader;
 import sonar.logistics.network.packets.PacketProviders;
@@ -59,6 +65,7 @@ public class LogisticsCommon implements IGuiHandler {
 		Logistics.network.registerMessage(PacketDataEmitters.Handler.class, PacketDataEmitters.class, 2, Side.CLIENT);
 		Logistics.network.registerMessage(PacketDataReceiver.Handler.class, PacketDataReceiver.class, 3, Side.SERVER);
 		Logistics.network.registerMessage(PacketInventoryReader.Handler.class, PacketInventoryReader.class, 4, Side.SERVER);
+		Logistics.network.registerMessage(PacketFluidReader.Handler.class, PacketFluidReader.class, 5, Side.SERVER);
 	}
 
 	@Override
@@ -113,6 +120,12 @@ public class LogisticsCommon implements IGuiHandler {
 			case LogisticsGui.entityNode:
 				if (entity instanceof TileEntityEntityNode) {
 					return new ContainerEmptySync((TileEntityEntityNode) entity);
+				}
+			case LogisticsGui.fluidReader:
+				if (entity instanceof TileEntityFluidReader || entity instanceof FluidReaderPart) {
+					TileHandler handler = FMPHelper.getHandler(tile);
+					if (handler != null && handler instanceof FluidReaderHandler)
+						return new ContainerFluidReader((FluidReaderHandler) handler, tile, player.inventory);
 				}
 			}
 
@@ -171,6 +184,12 @@ public class LogisticsCommon implements IGuiHandler {
 			case LogisticsGui.entityNode:
 				if (entity instanceof TileEntityEntityNode) {
 					return new GuiEntityNode.EntityNode((TileEntityEntityNode) entity);
+				}
+			case LogisticsGui.fluidReader:
+				if (entity instanceof TileEntityFluidReader || entity instanceof FluidReaderPart) {
+					TileHandler handler = FMPHelper.getHandler(tile);
+					if (handler != null && handler instanceof FluidReaderHandler)
+						return new GuiFluidReader((FluidReaderHandler) handler, tile, player.inventory);
 				}
 			}
 

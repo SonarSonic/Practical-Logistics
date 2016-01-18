@@ -42,7 +42,7 @@ public class ProgressInfo extends Info {
 	}
 
 	@Override
-	public String getType() {
+	public String getName() {
 		return "ProgressBar";
 	}
 
@@ -124,8 +124,8 @@ public class ProgressInfo extends Info {
 					Minecraft.getMinecraft().renderEngine.bindTexture(TextureMap.locationBlocksTexture);
 					tess.startDrawingQuads();
 					
-					
-					double divide = Math.max((0.5+minX +(maxX - minX)), (0.5+(maxY - minY)));
+
+					double divide = Math.max((0.5 +(maxX - minX)), (0.5+(maxY - minY)));
 					double widthnew = (icon.getMinU() + (width * (icon.getMaxU() - icon.getMinU())/divide));
 					double heightnew = (icon.getMinV() + (maxY * (icon.getMaxV() - icon.getMinV())/divide));
 					
@@ -166,7 +166,7 @@ public class ProgressInfo extends Info {
 
 	@Override
 	public boolean isEqualType(Info info) {
-		if (info != null && info.getType().equals(this.getType())) {
+		if (info != null && info.getName().equals(this.getName())) {
 			return info.getCategory().equals(this.getCategory()) && info.getSubCategory().equals(getSubCategory());
 		}
 		return false;

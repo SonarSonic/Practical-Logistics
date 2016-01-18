@@ -9,7 +9,6 @@ import net.minecraft.tileentity.TileEntity;
 
 import org.lwjgl.opengl.GL11;
 
-import sonar.logistics.api.Info;
 import sonar.logistics.api.StandardInfo;
 import sonar.logistics.api.render.InfoRenderer;
 import thaumcraft.api.aspects.Aspect;
@@ -20,7 +19,7 @@ public class ThaumcraftAspectInfo extends StandardInfo {
 	public String tex;
 
 	@Override
-	public String getType() {
+	public String getName() {
 		return "Aspect-Info";
 	}
 

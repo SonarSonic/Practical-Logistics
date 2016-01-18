@@ -11,7 +11,7 @@ import sonar.calculator.mod.api.ITeleport;
 import sonar.calculator.mod.utils.FluxRegistry;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.StandardInfo;
-import sonar.logistics.api.data.TileProvider;
+import sonar.logistics.api.providers.TileProvider;
 import cpw.mods.fml.common.Loader;
 
 public class CalculatorProvider extends TileProvider {
@@ -21,7 +21,7 @@ public class CalculatorProvider extends TileProvider {
 	public String[] subcategories = new String[] { "Flux Network ID", "Flux Network Name", "Flux Network Owner", "Max Transfer", "Priority", "Teleporter ID", "Teleporter Name" };
 
 	@Override
-	public String helperName() {
+	public String getName() {
 		return name;
 	}
 

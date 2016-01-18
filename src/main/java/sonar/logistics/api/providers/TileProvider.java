@@ -1,21 +1,22 @@
-package sonar.logistics.api.data;
+package sonar.logistics.api.providers;
 
 import java.util.List;
 
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
+import sonar.core.utils.IRegistryObject;
+import sonar.logistics.Logistics;
 import sonar.logistics.api.Info;
-import sonar.logistics.info.providers.tile.TileProviderRegistry;
 
 /** used for providing information on Block/TileEntity for the Info Reader to read, the Provider must be registered in the PractialLogisticsAPI to be used */
-public abstract class TileProvider {
+public abstract class TileProvider implements IRegistryObject {
 
 	public byte getID(){
-		return TileProviderRegistry.getProviderID(helperName());		
+		return Logistics.tileProviders.getObjectID(getName());		
 	}
 	
 	/** the name the info helper will be registered too */
-	public abstract String helperName();
+	public abstract String getName();
 
 	/**
 	 * @param world The World

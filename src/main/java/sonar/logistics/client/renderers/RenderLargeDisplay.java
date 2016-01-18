@@ -4,9 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.block.Block;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.Entity;
 import net.minecraft.tileentity.TileEntity;
@@ -18,7 +15,6 @@ import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.utils.helpers.RenderHelper;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.connecting.ILargeDisplay;
-import sonar.logistics.api.render.InfoRenderer;
 import sonar.logistics.api.render.LargeScreenSizing;
 import sonar.logistics.client.models.ModelLargeDisplay;
 import sonar.logistics.common.handlers.LargeDisplayScreenHandler;
@@ -214,7 +210,7 @@ public class RenderLargeDisplay extends RenderDisplayScreen {
 		}
 		if (sizing == null || sizing.maxH == 0 && sizing.minH == 0 && sizing.maxY == 0 && sizing.minY == 0) {
 			float pixel = 1.0F / 16F;
-			info.renderInfo(tess, tile, -0.5F + pixel, -0.4400F, (1.0f - (pixel) * 9), (pixel * 14), -0.200F, 120F);
+			info.renderInfo(tess, tile, -0.5F + pixel, -0.4400F, (1.0f - (pixel) * 9), (pixel * 14), -0.200F, 110F);
 
 		} else {
 			float pixel = 1.0F / 16F;

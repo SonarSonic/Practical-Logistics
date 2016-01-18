@@ -20,7 +20,7 @@ public class BlockCoordsInfo extends Info {
 	}
 
 	@Override
-	public String getType() {
+	public String getName() {
 		return "Coords";
 	}
 

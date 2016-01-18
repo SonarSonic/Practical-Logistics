@@ -28,7 +28,7 @@ public class StoredStackInfo extends Info {
 	}
 
 	@Override
-	public String getType() {
+	public String getName() {
 		return "StoredStack";
 	}
 
@@ -99,11 +99,13 @@ public class StoredStackInfo extends Info {
 			GL11.glEnable(GL11.GL_CULL_FACE);
 			tess.setColorOpaque_F(1.0f, 1.0f, 1.0f);
 			double sizing = Math.round(Math.min((maxX - minX), (maxY - minY)));
-			double itemScale = sizing >= 2 ? (2.5F + sizing*1.0F) : scale >= 120 ? 0.8F : 1.4F;
+			double itemScale = sizing >= 2 ? (2.5F + sizing-1*1.0F) : scale >= 120 ? 0.8F : 1.4F;
 			GL11.glTranslatef(0.0f, (float) (scale >= 120 ? 0.07F : 0.13F + ((sizing-1)*0.15)), zOffset - 0.01F);
 			GL11.glScaled(itemScale, itemScale, itemScale);
 			GL11.glTranslatef(0.0f, 0.0f, +0.25f);
 
+	        net.minecraft.client.renderer.RenderHelper.enableGUIStandardItemLighting();
+	        //net.minecraft.client.renderer.RenderHelper.enableStandardItemLighting();
 			RenderHelper.doRenderItem(stack.item, tile.getWorldObj(), false);
 			GL11.glDisable(GL11.GL_CULL_FACE);
 			GL11.glEnable(GL12.GL_RESCALE_NORMAL);

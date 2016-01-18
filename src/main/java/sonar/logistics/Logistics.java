@@ -9,10 +9,11 @@ import org.apache.logging.log4j.Logger;
 
 import sonar.core.SonarCore;
 import sonar.core.integration.SonarAPI;
-import sonar.core.integration.SonarWailaModule;
-import sonar.logistics.info.providers.entity.EntityProviderRegistry;
-import sonar.logistics.info.providers.tile.TileProviderRegistry;
-import sonar.logistics.info.types.InfoTypeRegistry;
+import sonar.logistics.api.LogisticsAPI;
+import sonar.logistics.info.providers.EntityProviderRegistry;
+import sonar.logistics.info.providers.FluidProviderRegistry;
+import sonar.logistics.info.providers.InventoryProviderRegistry;
+import sonar.logistics.info.providers.TileProviderRegistry;
 import sonar.logistics.integration.MineTweakerIntegration;
 import sonar.logistics.integration.multipart.ForgeMultipartHandler;
 import sonar.logistics.network.LogisticsCommon;
@@ -21,6 +22,7 @@ import sonar.logistics.registries.ChannelRegistry;
 import sonar.logistics.registries.CraftingRegistry;
 import sonar.logistics.registries.EmitterRegistry;
 import sonar.logistics.registries.EventRegistry;
+import sonar.logistics.registries.InfoTypeRegistry;
 import sonar.logistics.registries.ItemRegistry;
 import sonar.logistics.registries.OreDictRegistry;
 import sonar.logistics.utils.SapphireOreGen;
@@ -45,11 +47,17 @@ public class Logistics {
 	public static LogisticsCommon proxy;
 
 	public static final String modid = "PracticalLogistics";
-	public static final String version = "0.0.4";
+	public static final String version = "0.0.6";
 
 	public static SimpleNetworkWrapper network;
 	public static Logger logger = (Logger) LogManager.getLogger(modid);
 
+	public static InfoTypeRegistry infoTypes = new InfoTypeRegistry();
+	public static TileProviderRegistry tileProviders = new TileProviderRegistry();
+	public static EntityProviderRegistry entityProviders = new EntityProviderRegistry();
+	public static InventoryProviderRegistry inventoryProviders = new InventoryProviderRegistry();
+	public static FluidProviderRegistry fluidProviders = new FluidProviderRegistry();
+	
 	@Instance(modid)
 	public static Logistics instance;
 
@@ -67,6 +75,10 @@ public class Logistics {
 		} else {
 			logger.info("Successfully loaded with Sonar Core");
 		}
+		
+		LogisticsAPI.init();
+		logger.info("Initilised API");
+		
 		network = NetworkRegistry.INSTANCE.newSimpleChannel(modid);
 		logger.info("Registered Network");
 
@@ -95,16 +107,11 @@ public class Logistics {
 		} else
 			logger.info("Sapphire Ore Generation is disabled in the config");
 
-		if (SonarAPI.wailaLoaded()) {
-			SonarWailaModule.addFMPProvider("Info Reader");
-		}
+		/*if (SonarAPI.wailaLoaded()) { SonarWailaModule.addFMPProvider("Info Reader"); } */
 	}
 
 	@EventHandler
 	public void load(FMLInitializationEvent event) {
-		InfoTypeRegistry.registerProviders();
-		logger.info("Registered " + InfoTypeRegistry.getInfoTypes().size() + " Format Types");
-
 		CraftingRegistry.addRecipes();
 		logger.info("Registered Crafting Recipes");
 
@@ -124,10 +131,16 @@ public class Logistics {
 
 	@EventHandler
 	public void postLoad(FMLPostInitializationEvent evt) {
-		TileProviderRegistry.registerProviders();
-		logger.info("Registered " + TileProviderRegistry.getProviders().size() + " Info Providers");
-		EntityProviderRegistry.registerProviders();
-		logger.info("Registered " + EntityProviderRegistry.getProviders().size() + " Entity Providers");
+		infoTypes.register();
+		tileProviders.register();
+		entityProviders.register();
+		inventoryProviders.register();
+		fluidProviders.register();
+		logger.info("Registered " + infoTypes.getObjects().size() + " Info Types");
+		logger.info("Registered " + tileProviders.getObjects().size() + " Tile Providers");
+		logger.info("Registered " + entityProviders.getObjects().size() + " Entity Providers");
+		logger.info("Registered " + inventoryProviders.getObjects().size() + " Inventory Providers");
+		logger.info("Registered " + fluidProviders.getObjects().size() + " Fluid Providers");
 
 		if (Loader.isModLoaded("MineTweaker3")) {
 			MineTweakerIntegration.integrate();
@@ -139,7 +152,5 @@ public class Logistics {
 	public void onClose(FMLServerStoppingEvent event) {
 		EmitterRegistry.removeAll();
 		ChannelRegistry.removeAll();
-		// TileProviderRegistry.removeAll();
-		// EntityProviderRegistry.removeAll();
 	}
 }

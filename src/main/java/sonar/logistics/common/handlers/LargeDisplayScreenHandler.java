@@ -6,27 +6,20 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.google.common.collect.Lists;
-
-import cpw.mods.fml.common.network.ByteBufUtils;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.SonarCore;
 import sonar.core.integration.fmp.FMPHelper;
-import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.network.sync.SyncBoolean;
 import sonar.core.network.utils.IByteBufTile;
 import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
-import sonar.logistics.api.StandardInfo;
-import sonar.logistics.api.connecting.IDataCable;
 import sonar.logistics.api.connecting.ILargeDisplay;
 import sonar.logistics.api.render.LargeScreenSizing;
 import sonar.logistics.helpers.CableHelper;
 import sonar.logistics.helpers.DisplayHelper;
-import sonar.logistics.helpers.InfoHelper;
 
 public class LargeDisplayScreenHandler extends DisplayScreenHandler implements ILargeDisplay, IByteBufTile {
 

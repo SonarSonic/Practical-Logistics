@@ -1,17 +1,10 @@
 package sonar.logistics.helpers;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
-import sonar.core.SonarCore;
 import sonar.core.integration.fmp.FMPHelper;
-import sonar.core.integration.fmp.ITileHandler;
 import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.utils.BlockCoords;
-import sonar.logistics.api.connecting.IDataCable;
 import sonar.logistics.api.connecting.ILargeDisplay;
 import sonar.logistics.api.render.LargeScreenSizing;
 

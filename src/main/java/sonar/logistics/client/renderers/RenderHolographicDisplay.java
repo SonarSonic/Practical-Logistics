@@ -1,7 +1,5 @@
 package sonar.logistics.client.renderers;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.Entity;
@@ -14,7 +12,6 @@ import org.lwjgl.opengl.GL11;
 
 import sonar.core.utils.helpers.RenderHelper;
 import sonar.logistics.api.Info;
-import sonar.logistics.api.render.InfoRenderer;
 import sonar.logistics.client.models.ModelHolographicDisplay;
 
 public class RenderHolographicDisplay extends RenderDisplayScreen {
