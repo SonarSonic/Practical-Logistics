@@ -35,6 +35,7 @@ public class AE2FluidProvider extends FluidProvider {
 	public void getFluids(List<StoredFluidStack> fluids, World world, int x, int y, int z, ForgeDirection dir) {
 		TileEntity tile = world.getTileEntity(x, y, z);
 		if (tile instanceof ITileStorageMonitorable && tile instanceof IActionHost) {
+
 			IStorageMonitorable monitor = ((ITileStorageMonitorable) tile).getMonitorable(dir, new MachineSource(((IActionHost) tile)));
 			if (monitor != null) {
 				IMEMonitor<IAEFluidStack> stacks = monitor.getFluidInventory();
@@ -45,9 +46,11 @@ public class AE2FluidProvider extends FluidProvider {
 					}
 				}
 			}
+
 		}
 	}
 
+	@Override
 	public boolean isLoadable() {
 		return Loader.isModLoaded("appliedenergistics2");
 	}
