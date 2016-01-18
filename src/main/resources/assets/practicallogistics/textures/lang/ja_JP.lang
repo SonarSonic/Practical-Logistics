@@ -1,3 +1,4 @@
+//Current Code must be UTF-8
 itemGroup.Practical Logistics=プラクティカル・ロジスティクス
 
 //blocks
@@ -18,6 +19,7 @@ tile.Hammer.name=鍛造加工用ハンマー
 tile.Hammer_Air.name=鍛造加工用ハンマー
 tile.EntityNode.name=エンティティ・ノード
 tile.LargeDisplayScreen.name=大きなスクリーン
+tile.FluidReader.name=流体読込器
 
 //items
 item.EnergyScreenItem.name=エネルギー用スクリーン
