@@ -1,6 +1,7 @@
 package sonar.logistics.client.renderers;
 
 import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
@@ -14,6 +15,7 @@ import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 
 import sonar.core.integration.fmp.FMPHelper;
+import sonar.core.network.sync.SyncInt;
 import sonar.core.renderers.SonarTERender;
 import sonar.core.utils.helpers.RenderHelper;
 import sonar.logistics.Logistics;
@@ -25,9 +27,11 @@ import sonar.logistics.client.models.ModelDirectionalConnector;
 import sonar.logistics.client.models.ModelEntityNode;
 import sonar.logistics.client.models.ModelHammer;
 import sonar.logistics.client.models.ModelInfoCreator;
+import sonar.logistics.client.models.ModelItemRouter;
 import sonar.logistics.client.models.ModelRedstoneSignaller;
 import sonar.logistics.common.tileentity.TileEntityEntityNode;
 import sonar.logistics.common.tileentity.TileEntityHammer;
+import sonar.logistics.common.tileentity.TileEntityItemRouter;
 import sonar.logistics.registries.BlockRegistry;
 
 public class RenderHandlers {
@@ -166,6 +170,7 @@ public class RenderHandlers {
 
 		}
 	}
+
 	public static class FluidReader extends InfoReader {
 		public FluidReader() {
 			super.texture = modelFolder + "fluidReader.png";
@@ -347,4 +352,112 @@ public class RenderHandlers {
 		}
 	}
 
+	public static class ItemRouter extends TileEntitySpecialRenderer {
+		public ModelItemRouter model = new ModelItemRouter();
+		public String texture = modelFolder + "itemRouter.png";
+
+		public ResourceLocation none = new ResourceLocation(modelFolder + "router_none.png");
+		public ResourceLocation input = new ResourceLocation(modelFolder + "router_input.png");
+		public ResourceLocation output = new ResourceLocation(modelFolder + "router_output.png");
+
+		@Override
+		public void renderTileEntityAt(TileEntity entity, double x, double y, double z, float f) {
+			RenderHelper.beginRender(x + 0.5F, y + 1.5F, z + 0.5F, 0, texture);
+			model.render((Entity) null, 0.0F, 0.0F, -0.1F, 0.0F, 0.0F, 0.0625F);
+			if (entity != null && entity instanceof TileEntityItemRouter) {
+				GL11.glTranslated(-0.5, 0.5, -0.5);
+				TileEntityItemRouter router = (TileEntityItemRouter) entity;
+				int[] sides = new int[6];
+				
+				if (entity.getWorldObj() != null) {
+					for (int i = 0; i < 6; i++) {
+						sides[i] = router.handler.sideConfigs[i].getInt();
+					}
+
+				}
+				Tessellator tes = Tessellator.instance;
+				// bottom
+				tes.startDrawingQuads();
+				
+				Minecraft.getMinecraft().getTextureManager().bindTexture(sides[1] == 0 ? none : sides[1] == 1 ? input : output);
+				tes.addVertexWithUV(0, 0.0002, 0, 0, 0);
+				tes.addVertexWithUV(1, 0.0002, 0, 0, 1);
+				tes.addVertexWithUV(1, 0.0002, 1, 1, 1);
+				tes.addVertexWithUV(0, 0.0002, 1, 1, 0);
+
+				tes.addVertexWithUV(0, 0.1250, 0, 0, 0);
+				tes.addVertexWithUV(0, 0.1250, 1, 1, 0);
+				tes.addVertexWithUV(1, 0.1250, 1, 1, 1);
+				tes.addVertexWithUV(1, 0.1250, 0, 0, 1);
+				tes.draw();
+				
+				// top
+				tes.startDrawingQuads();
+				Minecraft.getMinecraft().getTextureManager().bindTexture(sides[0] == 0 ? none : sides[0] == 1 ? input : output);
+				tes.addVertexWithUV(0, 0.9998, 0, 0, 0);
+				tes.addVertexWithUV(1, 0.9998, 0, 0, 1);
+				tes.addVertexWithUV(1, 0.9998, 1, 1, 1);
+				tes.addVertexWithUV(0, 0.9998, 1, 1, 0);
+
+				tes.addVertexWithUV(0, 0.875, 0, 0, 0);
+				tes.addVertexWithUV(0, 0.875, 1, 1, 0);
+				tes.addVertexWithUV(1, 0.875, 1, 1, 1);
+				tes.addVertexWithUV(1, 0.875, 0, 0, 1);
+				tes.draw();
+
+				tes.startDrawingQuads();
+				Minecraft.getMinecraft().getTextureManager().bindTexture(sides[3] == 0 ? none : sides[3] == 1 ? input : output);
+				tes.addVertexWithUV(0, 0, 0.0002, 0, 0);
+				tes.addVertexWithUV(0, 1, 0.0002, 0, 1);
+				tes.addVertexWithUV(1, 1, 0.0002, 1, 1);
+				tes.addVertexWithUV(1, 0, 0.0002, 1, 0);
+
+				tes.addVertexWithUV(0, 1, 0.1250, 0, 1);
+				tes.addVertexWithUV(0, 0, 0.1250, 0, 0);
+				tes.addVertexWithUV(1, 0, 0.1250, 1, 0);
+				tes.addVertexWithUV(1, 1, 0.1250, 1, 1);
+				tes.draw();
+
+				tes.startDrawingQuads();
+				Minecraft.getMinecraft().getTextureManager().bindTexture(sides[2] == 0 ? none : sides[2] == 1 ? input : output);
+				tes.addVertexWithUV(0, 0, 0.9998, 0, 0);
+				tes.addVertexWithUV(0, 1, 0.9998, 0, 1);
+				tes.addVertexWithUV(1, 1, 0.9998, 1, 1);
+				tes.addVertexWithUV(1, 0, 0.9998, 1, 0);
+
+				tes.addVertexWithUV(0, 1, 0.875, 0, 1);
+				tes.addVertexWithUV(0, 0, 0.875, 0, 0);
+				tes.addVertexWithUV(1, 0, 0.875, 1, 0);
+				tes.addVertexWithUV(1, 1, 0.875, 1, 1);
+				tes.draw();
+
+				tes.startDrawingQuads();
+				Minecraft.getMinecraft().getTextureManager().bindTexture(sides[4] == 0 ? none : sides[4] == 1 ? input : output);
+				tes.addVertexWithUV(0.0002, 0, 0, 1, 1);
+				tes.addVertexWithUV(0.0002, 0, 1, 1, 0);
+				tes.addVertexWithUV(0.0002, 1, 1, 0, 0);
+				tes.addVertexWithUV(0.0002, 1, 0, 0, 1);
+
+				tes.addVertexWithUV(0.1250, 0, 1, 1, 0);
+				tes.addVertexWithUV(0.1250, 0, 0, 1, 1);
+				tes.addVertexWithUV(0.1250, 1, 0, 0, 1);
+				tes.addVertexWithUV(0.1250, 1, 1, 0, 0);
+				tes.draw();
+
+				tes.startDrawingQuads();
+				Minecraft.getMinecraft().getTextureManager().bindTexture(sides[5] == 0 ? none : sides[5] == 1 ? input : output);
+				tes.addVertexWithUV(0.9998, 0, 0, 1, 1);
+				tes.addVertexWithUV(0.9998, 0, 1, 1, 0);
+				tes.addVertexWithUV(0.9998, 1, 1, 0, 0);
+				tes.addVertexWithUV(0.9998, 1, 0, 0, 1);
+
+				tes.addVertexWithUV(0.875, 0, 1, 1, 0);
+				tes.addVertexWithUV(0.875, 0, 0, 1, 1);
+				tes.addVertexWithUV(0.875, 1, 0, 0, 1);
+				tes.addVertexWithUV(0.875, 1, 1, 0, 0);
+				tes.draw();
+			}
+			RenderHelper.finishRender();
+		}
+	}
 }

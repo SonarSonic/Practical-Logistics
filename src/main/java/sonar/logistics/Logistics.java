@@ -23,6 +23,7 @@ import sonar.logistics.registries.CraftingRegistry;
 import sonar.logistics.registries.EmitterRegistry;
 import sonar.logistics.registries.EventRegistry;
 import sonar.logistics.registries.InfoTypeRegistry;
+import sonar.logistics.registries.ItemFilterRegistry;
 import sonar.logistics.registries.ItemRegistry;
 import sonar.logistics.registries.OreDictRegistry;
 import sonar.logistics.utils.SapphireOreGen;
@@ -53,6 +54,7 @@ public class Logistics {
 	public static Logger logger = (Logger) LogManager.getLogger(modid);
 
 	public static InfoTypeRegistry infoTypes = new InfoTypeRegistry();
+	public static ItemFilterRegistry itemFilters = new ItemFilterRegistry();
 	public static TileProviderRegistry tileProviders = new TileProviderRegistry();
 	public static EntityProviderRegistry entityProviders = new EntityProviderRegistry();
 	public static InventoryProviderRegistry inventoryProviders = new InventoryProviderRegistry();
@@ -132,11 +134,13 @@ public class Logistics {
 	@EventHandler
 	public void postLoad(FMLPostInitializationEvent evt) {
 		infoTypes.register();
+		itemFilters.register();
 		tileProviders.register();
 		entityProviders.register();
 		inventoryProviders.register();
 		fluidProviders.register();
 		logger.info("Registered " + infoTypes.getObjects().size() + " Info Types");
+		logger.info("Registered " + itemFilters.getObjects().size() + " Item Filters");
 		logger.info("Registered " + tileProviders.getObjects().size() + " Tile Providers");
 		logger.info("Registered " + entityProviders.getObjects().size() + " Entity Providers");
 		logger.info("Registered " + inventoryProviders.getObjects().size() + " Inventory Providers");

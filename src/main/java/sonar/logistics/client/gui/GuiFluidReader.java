@@ -120,7 +120,7 @@ public class GuiFluidReader extends GuiSonar {
 							Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.locationBlocksTexture);
 
 							RenderItem.getInstance().renderIcon(13 + (X * 18), 32 + (Y * 18), fluidStack.fluid.getFluid().getIcon(), 16, 16);
-							RenderHelper.renderFluidInGUI(Minecraft.getMinecraft().fontRenderer, Minecraft.getMinecraft().getTextureManager(), fluidStack.fluid, fluidStack.stored, 13 + (X * 18), 32 + (Y * 18), null);
+							//RenderHelper.renderFluidInGUI(Minecraft.getMinecraft().fontRenderer, Minecraft.getMinecraft().getTextureManager(), fluidStack.fluid, fluidStack.stored, 13 + (X * 18), 32 + (Y * 18), null);
 						}
 					}
 					i++;

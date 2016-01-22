@@ -101,7 +101,7 @@ public class CableHelper {
 					dataProvider = FMPHelper.checkObject(dataProvider);
 					if (dataProvider != null) {
 						if (dataProvider instanceof IDataReceiver) {
-							Object emitterBlock = getConnectedEmitter((IDataReceiver) target, tile);
+							Object emitterBlock = getConnectedEmitter((IDataReceiver) dataProvider, tile);
 							if (emitterBlock != null) {
 								return emitterBlock;
 							}

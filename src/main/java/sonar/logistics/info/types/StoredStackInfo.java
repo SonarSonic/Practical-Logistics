@@ -88,24 +88,16 @@ public class StoredStackInfo extends Info {
 			FontRenderer rend = Minecraft.getMinecraft().fontRenderer;
 			stack.item.stackSize = 1;
 
-			final int br = 16 << 20 | 16 << 4;
-			final int var11 = br % 65536;
-			final int var12 = br / 65536;
-			OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, var11 * 0.8F, var12 * 0.8F);
-
 			GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 
 			GL11.glDisable(GL12.GL_RESCALE_NORMAL);
 			GL11.glEnable(GL11.GL_CULL_FACE);
 			tess.setColorOpaque_F(1.0f, 1.0f, 1.0f);
 			double sizing = Math.round(Math.min((maxX - minX), (maxY - minY)));
-			double itemScale = sizing >= 2 ? (2.5F + sizing-1*1.0F) : scale >= 120 ? 0.8F : 1.4F;
-			GL11.glTranslatef(0.0f, (float) (scale >= 120 ? 0.07F : 0.13F + ((sizing-1)*0.15)), zOffset - 0.01F);
+			double itemScale = sizing >= 2 ? (2.5F + sizing - 1 * 1.0F) : scale >= 120 ? 0.8F : 1.4F;
+			GL11.glTranslatef(0.0f, (float) (scale >= 120 ? 0.07F : 0.13F + ((sizing - 1) * 0.15)), zOffset - 0.01F);
 			GL11.glScaled(itemScale, itemScale, itemScale);
 			GL11.glTranslatef(0.0f, 0.0f, +0.25f);
-
-	        net.minecraft.client.renderer.RenderHelper.enableGUIStandardItemLighting();
-	        //net.minecraft.client.renderer.RenderHelper.enableStandardItemLighting();
 			RenderHelper.doRenderItem(stack.item, tile.getWorldObj(), false);
 			GL11.glDisable(GL11.GL_CULL_FACE);
 			GL11.glEnable(GL12.GL_RESCALE_NORMAL);

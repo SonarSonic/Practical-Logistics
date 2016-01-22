@@ -21,6 +21,7 @@ import sonar.logistics.common.tileentity.TileEntityHolographicDisplay;
 import sonar.logistics.common.tileentity.TileEntityInfoCreator;
 import sonar.logistics.common.tileentity.TileEntityInfoReader;
 import sonar.logistics.common.tileentity.TileEntityInventoryReader;
+import sonar.logistics.common.tileentity.TileEntityItemRouter;
 import sonar.logistics.common.tileentity.TileEntityLargeScreen;
 import sonar.logistics.common.tileentity.TileEntityRedstoneSignaller;
 import sonar.logistics.registries.BlockRegistry;
@@ -54,8 +55,7 @@ public class LogisticsClient extends LogisticsCommon {
 		TileEntitySpecialRenderer infoCreator = new RenderHandlers.InfoCreator();
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityInfoCreator.class, infoCreator);
 		MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(BlockRegistry.infoCreator), new RenderItemHandlers.DataModifier(infoCreator, new TileEntityInfoCreator()));
-		
-		
+				
 		TileEntitySpecialRenderer infoReader = new RenderHandlers.InfoReader();
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityInfoReader.class, infoReader);
 		MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(BlockRegistry.infoReader), new RenderItemHandlers.Reader(infoReader, new TileEntityInfoReader()));
@@ -89,6 +89,10 @@ public class LogisticsClient extends LogisticsCommon {
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityHammer.class, hammer);
 		MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(BlockRegistry.hammer), new RenderItemHandlers.Hammer(hammer, new TileEntityHammer()));
 		MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(BlockRegistry.hammer_air), new RenderItemHandlers.Hammer(hammer, new TileEntityHammer()));
-
+		
+		TileEntitySpecialRenderer itemRouter = new RenderHandlers.ItemRouter();
+		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityItemRouter.class, itemRouter);
+		MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(BlockRegistry.itemRouter), new RenderItemHandlers.ItemRouter(itemRouter, new TileEntityItemRouter()));
+		
 	}
 }

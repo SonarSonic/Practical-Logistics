@@ -16,8 +16,10 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.inventory.StoredItemStack;
 import sonar.core.utils.helpers.SonarHelper;
+import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.Info;
+import sonar.logistics.api.ItemFilter;
 import sonar.logistics.api.StandardInfo;
 import sonar.logistics.api.providers.EntityProvider;
 import sonar.logistics.api.providers.InventoryProvider;
@@ -287,6 +289,62 @@ public class InfoHelper {
 	}
 
 	public static void writeInfo(NBTTagCompound tag, Info info) {
+		if (info != null) {
+			tag.setString("type", info.getName());
+			info.writeToNBT(tag);
+		} else {
+			tag.setString("type", "NULLED");
+		}
+	}
+
+	public static ItemFilter readFilter(ByteBuf buf) {
+		if (buf.readBoolean()) {
+			String type = ByteBufUtils.readUTF8String(buf);
+			if (Logistics.infoTypes.getRegisteredObject(type) == null) {
+				Logistics.logger.warn("Unregistered Info Type: " + type);
+				return null;
+			}
+			ItemFilter info = Logistics.itemFilters.getRegisteredObject(type).instance();
+			info.readFromNBT(ByteBufUtils.readTag(buf));
+			return info;
+
+		} else {
+			return null;
+		}
+	}
+
+	public static void writeFilter(ByteBuf buf, ItemFilter info) {
+		if (info != null) {
+			buf.writeBoolean(true);
+			ByteBufUtils.writeUTF8String(buf, info.getName());
+			NBTTagCompound tag = new NBTTagCompound();
+			info.writeToNBT(tag);
+			ByteBufUtils.writeTag(buf, tag);
+		} else {
+			buf.writeBoolean(false);
+		}
+	}
+
+	public static ItemFilter readFilter(NBTTagCompound tag) {
+		if (tag.hasKey("type")) {
+			String type = tag.getString("type");
+			if (type.equals("NULLED")) {
+				return null;
+			}
+			if (Logistics.itemFilters.getRegisteredObject(type) == null) {
+				Logistics.logger.warn("Unregistered Item Filter: " + type);
+				return null;
+			}
+			ItemFilter filter = Logistics.itemFilters.getRegisteredObject(type).instance();
+			filter.readFromNBT(tag);
+
+			return filter;
+		} else {
+			return null;
+		}
+	}
+
+	public static void writeFilter(NBTTagCompound tag, ItemFilter info) {
 		if (info != null) {
 			tag.setString("type", info.getName());
 			info.writeToNBT(tag);

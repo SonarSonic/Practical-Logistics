@@ -3,8 +3,11 @@ package sonar.logistics.client.renderers;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelSign;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
+import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.util.ForgeDirection;
 
@@ -59,15 +62,16 @@ public class RenderDisplayScreen extends TileEntitySpecialRenderer {
 		GL11.glRotatef(-f3, 0.0F, 1.0F, 0.0F);
 		GL11.glTranslatef(0.0F, -0.3125F, -0.459F);
 		this.modelSign.signStick.showModel = false;
-		Minecraft.getMinecraft().getTextureManager().bindTexture(tex);
 		GL11.glPushMatrix();
 		GL11.glScalef(f1, -f1, -f1);
+		Minecraft.getMinecraft().getTextureManager().bindTexture(tex);
+		GL11.glEnable(GL11.GL_LIGHTING);
 		this.modelSign.renderSign();
 
 		RenderHelper.finishRender();
 
 		final Tessellator tess = Tessellator.instance;
-
+		
 		if (entity.getWorldObj() != null) {
 			GL11.glPushMatrix();
 			GL11.glTranslated(x + 0.5, y + 0.5, z + 0.5);
