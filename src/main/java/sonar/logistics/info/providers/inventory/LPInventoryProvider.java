@@ -50,4 +50,5 @@ public class LPInventoryProvider extends InventoryProvider {
 	public boolean isLoadable() {
 		return Loader.isModLoaded("LogisticsPipes");
 	}
+
 }

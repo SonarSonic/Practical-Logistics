@@ -242,7 +242,7 @@ public class InfoHelper {
 		}
 		return primary;
 	}
-
+/*
 	public static Info readInfo(ByteBuf buf) {
 		if (buf.readBoolean()) {
 			String type = ByteBufUtils.readUTF8String(buf);
@@ -250,7 +250,7 @@ public class InfoHelper {
 				Logistics.logger.warn("Unregistered Info Type: " + type);
 				return null;
 			}
-			Info info = Logistics.infoTypes.getRegisteredObject(type).newInfo();
+			Info info = Logistics.infoTypes.getRegisteredObject(type).instance();
 			info.readFromBuf(buf);
 			return info;
 
@@ -258,7 +258,7 @@ public class InfoHelper {
 			return null;
 		}
 	}
-
+	*/
 	public static void writeInfo(ByteBuf buf, Info info) {
 		if (info != null) {
 			buf.writeBoolean(true);
@@ -268,7 +268,7 @@ public class InfoHelper {
 			buf.writeBoolean(false);
 		}
 	}
-
+	/*
 	public static Info readInfo(NBTTagCompound tag) {
 		if (tag.hasKey("type")) {
 			String type = tag.getString("type");
@@ -279,7 +279,7 @@ public class InfoHelper {
 				Logistics.logger.warn("Unregistered Info Type: " + type);
 				return null;
 			}
-			Info info = Logistics.infoTypes.getRegisteredObject(type).newInfo();
+			Info info = Logistics.infoTypes.getRegisteredObject(type).instance();
 			info.readFromNBT(tag);
 
 			return info;
@@ -287,7 +287,6 @@ public class InfoHelper {
 			return null;
 		}
 	}
-
 	public static void writeInfo(NBTTagCompound tag, Info info) {
 		if (info != null) {
 			tag.setString("type", info.getName());
@@ -352,4 +351,6 @@ public class InfoHelper {
 			tag.setString("type", "NULLED");
 		}
 	}
+	
+*/
 }

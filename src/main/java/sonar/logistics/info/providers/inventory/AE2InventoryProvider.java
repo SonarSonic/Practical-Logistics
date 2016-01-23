@@ -52,4 +52,5 @@ public class AE2InventoryProvider extends InventoryProvider {
 	public boolean isLoadable() {
 		return Loader.isModLoaded("appliedenergistics2");
 	}
+
 }

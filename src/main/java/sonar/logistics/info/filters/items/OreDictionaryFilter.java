@@ -1,7 +1,10 @@
 package sonar.logistics.info.filters.items;
 
+import io.netty.buffer.ByteBuf;
+
 import java.util.List;
 
+import cpw.mods.fml.common.network.ByteBufUtils;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.oredict.OreDictionary;
@@ -9,7 +12,7 @@ import sonar.logistics.api.ItemFilter;
 
 public class OreDictionaryFilter extends ItemFilter<OreDictionaryFilter> {
 
-	String oreDict = " ";
+	public String oreDict = " ";
 
 	@Override
 	public String getName() {
@@ -18,14 +21,20 @@ public class OreDictionaryFilter extends ItemFilter<OreDictionaryFilter> {
 
 	@Override
 	public boolean matchesFilter(ItemStack stack) {
+
 		if (oreDict != null && stack != null) {
-			List<ItemStack> ores = OreDictionary.getOres(oreDict);
-			for (ItemStack item : ores) {
-				if (item.isItemEqual(stack) && ItemStack.areItemStackTagsEqual(item, stack)) {
+
+			int[] names = OreDictionary.getOreIDs(stack);
+
+			for (Integer id : names) {
+				if (OreDictionary.getOreName(id).equals(oreDict)) {
 					return true;
 				}
 			}
+
+			// List<ItemStack> ores = OreDictionary.getOres(oreDict);
 		}
+
 		return false;
 	}
 
@@ -47,6 +56,16 @@ public class OreDictionaryFilter extends ItemFilter<OreDictionaryFilter> {
 	@Override
 	public void readFromNBT(NBTTagCompound tag) {
 		oreDict = tag.getString("ore");
+	}
+
+	@Override
+	public void readFromBuf(ByteBuf buf) {
+		oreDict = ByteBufUtils.readUTF8String(buf);
+	}
+
+	@Override
+	public void writeToBuf(ByteBuf buf) {
+		ByteBufUtils.writeUTF8String(buf, oreDict);
 	}
 
 	@Override

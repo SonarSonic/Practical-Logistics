@@ -8,7 +8,9 @@ import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.network.sync.SyncString;
 import sonar.core.utils.BlockCoords;
+import sonar.core.utils.helpers.NBTHelper;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
+import sonar.logistics.Logistics;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.StandardInfo;
 import sonar.logistics.helpers.CableHelper;
@@ -40,7 +42,7 @@ public class InfoCreatorHandler extends TileHandler {
 
 			if (type == SyncType.SAVE) {
 				if (nbt.hasKey("currentInfo")) {
-					info = InfoHelper.readInfo(nbt.getCompoundTag("currentInfo"));
+					info = Logistics.infoTypes.readFromNBT(nbt.getCompoundTag("currentInfo"));
 				}
 			}
 		}
@@ -54,7 +56,7 @@ public class InfoCreatorHandler extends TileHandler {
 			if (type == SyncType.SAVE) {
 				if (info != null) {
 					NBTTagCompound infoTag = new NBTTagCompound();
-					InfoHelper.writeInfo(infoTag, info);
+					Logistics.infoTypes.writeToNBT(infoTag, info);
 					nbt.setTag("currentInfo", infoTag);
 				}
 			}

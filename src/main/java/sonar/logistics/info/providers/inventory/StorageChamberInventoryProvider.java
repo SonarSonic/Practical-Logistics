@@ -50,4 +50,5 @@ public class StorageChamberInventoryProvider extends InventoryProvider {
 	public boolean isLoadable() {
 		return Loader.isModLoaded("Calculator");
 	}
+	
 }

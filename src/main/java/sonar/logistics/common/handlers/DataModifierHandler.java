@@ -9,11 +9,11 @@ import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.network.sync.SyncString;
 import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
+import sonar.logistics.Logistics;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.StandardInfo;
 import sonar.logistics.api.connecting.IDataConnection;
 import sonar.logistics.helpers.CableHelper;
-import sonar.logistics.helpers.InfoHelper;
 
 public class DataModifierHandler extends TileHandler {
 
@@ -41,7 +41,7 @@ public class DataModifierHandler extends TileHandler {
 			prefix.readFromNBT(nbt, type);
 			suffix.readFromNBT(nbt, type);
 			if (nbt.hasKey("currentInfo")) {
-				info = InfoHelper.readInfo(nbt.getCompoundTag("currentInfo"));
+				info = Logistics.infoTypes.readFromNBT(nbt.getCompoundTag("currentInfo"));
 			}
 
 		}
@@ -55,7 +55,7 @@ public class DataModifierHandler extends TileHandler {
 			suffix.writeToNBT(nbt, type);
 			if (info != null) {
 				NBTTagCompound infoTag = new NBTTagCompound();
-				InfoHelper.writeInfo(infoTag, info);
+				Logistics.infoTypes.writeToNBT(infoTag, info);
 				nbt.setTag("currentInfo", infoTag);
 			}
 

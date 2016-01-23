@@ -1,6 +1,6 @@
 package sonar.logistics.registries;
 
-import sonar.core.utils.helpers.RegistryHelper;
+import sonar.core.utils.helpers.NBTRegistryHelper;
 import sonar.logistics.api.EntityInfo;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.StandardInfo;
@@ -13,7 +13,7 @@ import sonar.logistics.info.types.ProgressInfo;
 import sonar.logistics.info.types.StoredStackInfo;
 import sonar.logistics.info.types.ThaumcraftAspectInfo;
 
-public class InfoTypeRegistry extends RegistryHelper<Info> {
+public class InfoTypeRegistry extends NBTRegistryHelper.Buf<Info> {
 
 	@Override
 	public void register() {

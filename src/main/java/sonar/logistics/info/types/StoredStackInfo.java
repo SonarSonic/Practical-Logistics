@@ -140,7 +140,7 @@ public class StoredStackInfo extends Info {
 	}
 
 	@Override
-	public StoredStackInfo newInfo() {
+	public StoredStackInfo instance() {
 		return new StoredStackInfo();
 	}
 

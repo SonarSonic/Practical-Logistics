@@ -10,6 +10,8 @@ import net.minecraft.tileentity.TileEntity;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.ITileHandler;
 import sonar.core.integration.fmp.handlers.TileHandler;
+import sonar.core.utils.helpers.NBTHelper;
+import sonar.logistics.Logistics;
 import sonar.logistics.api.Info;
 import sonar.logistics.common.handlers.InfoReaderHandler;
 import sonar.logistics.helpers.InfoHelper;
@@ -42,7 +44,7 @@ public class PacketProviders implements IMessage {
 			info = new ArrayList();
 			int size = buf.readInt();
 			for (int i = 0; i < size; i++) {
-				info.add(InfoHelper.readInfo(buf));
+				info.add(Logistics.infoTypes.readFromBuf(buf));
 			}
 		}
 		TileEntity tile = Minecraft.getMinecraft().thePlayer.worldObj.getTileEntity(xCoord, yCoord, zCoord);
@@ -80,7 +82,7 @@ public class PacketProviders implements IMessage {
 			buf.writeBoolean(true);
 			buf.writeInt(info.size());
 			for (int i = 0; i < info.size(); i++) {
-				InfoHelper.writeInfo(buf, info.get(i));
+				Logistics.infoTypes.writeToBuf(buf, info.get(i));
 			}
 		} else {
 			buf.writeBoolean(false);

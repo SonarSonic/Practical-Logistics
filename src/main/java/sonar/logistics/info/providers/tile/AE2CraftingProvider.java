@@ -5,6 +5,7 @@ import java.util.List;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
+import sonar.core.utils.IRegistryObject;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.StandardInfo;
 import sonar.logistics.api.providers.TileProvider;
@@ -53,4 +54,5 @@ public class AE2CraftingProvider extends TileProvider {
 	public boolean isLoadable() {
 		return Loader.isModLoaded("appliedenergistics2");
 	}
+
 }

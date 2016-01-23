@@ -82,7 +82,7 @@ public class CategoryInfo extends Info {
 	}
 
 	@Override
-	public CategoryInfo newInfo() {
+	public CategoryInfo instance() {
 		return new CategoryInfo();
 	}
 

@@ -6,6 +6,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.common.tileentity.TileEntityHandlerInventory;
 import sonar.core.integration.fmp.handlers.TileHandler;
+import sonar.core.inventory.IFilteredInventory;
 import sonar.core.utils.BlockCoords;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.connecting.IDataConnection;
@@ -13,7 +14,7 @@ import sonar.logistics.common.handlers.InventoryReaderHandler;
 import sonar.logistics.common.handlers.ItemRouterHandler;
 import sonar.logistics.info.types.BlockCoordsInfo;
 
-public class TileEntityItemRouter extends TileEntityHandlerInventory implements IDataConnection, ISidedInventory {
+public class TileEntityItemRouter extends TileEntityHandlerInventory implements IDataConnection, ISidedInventory, IFilteredInventory {
 
 	public ItemRouterHandler handler = new ItemRouterHandler(false);
 
@@ -49,6 +50,16 @@ public class TileEntityItemRouter extends TileEntityHandlerInventory implements 
 	@Override
 	public boolean canExtractItem(int slot, ItemStack stack, int side) {
 		return handler.canExtractItem(slot, stack, side);
+	}
+
+	@Override
+	public boolean canPushItem(ItemStack item, int side) {
+		return handler.matchesFilters(item, handler.whitelist[side], handler.blacklist[side]);
+	}
+
+	@Override
+	public boolean canPullItem(ItemStack item, int side) {
+		return handler.matchesFilters(item, handler.whitelist[side], handler.blacklist[side]);
 	}
 
 }

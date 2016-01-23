@@ -7,7 +7,10 @@ import sonar.core.utils.IRegistryObject;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.Info;
 
-/** used for providing information on Entities for the Info Reader to read, the Provider must be registered in the PractialLogisticsAPI to be used */
+/**
+ * used for providing information on Entities for the Info Reader to read, the
+ * Provider must be registered in the PractialLogisticsAPI to be used
+ */
 public abstract class EntityProvider implements IRegistryObject {
 
 	public byte getID() {
@@ -37,7 +40,10 @@ public abstract class EntityProvider implements IRegistryObject {
 
 	public abstract String getSubCategory(byte id);
 
-	/** used when the provider is loaded normally used to check if relevant mods are loaded for APIs to work */
+	/**
+	 * used when the provider is loaded normally used to check if relevant mods
+	 * are loaded for APIs to work
+	 */
 	public boolean isLoadable() {
 		return true;
 	}

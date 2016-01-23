@@ -3,7 +3,9 @@ package sonar.logistics.network;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.nbt.NBTTagCompound;
 import sonar.core.network.sync.ISyncPart;
+import sonar.core.utils.helpers.NBTHelper;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
+import sonar.logistics.Logistics;
 import sonar.logistics.api.Info;
 import sonar.logistics.helpers.InfoHelper;
 
@@ -36,7 +38,7 @@ public class SyncInfo implements ISyncPart {
 	public void writeToBuf(ByteBuf buf) {
 		if (!equal()) {
 			buf.writeBoolean(true);
-			InfoHelper.writeInfo(buf, c);
+			Logistics.infoTypes.writeToBuf(buf, c);
 			last = c;
 		} else
 			buf.writeBoolean(false);
@@ -45,7 +47,7 @@ public class SyncInfo implements ISyncPart {
 	@Override
 	public void readFromBuf(ByteBuf buf) {
 		if (buf.readBoolean()) {
-			this.c = InfoHelper.readInfo(buf);
+			this.c = Logistics.infoTypes.readFromBuf(buf);
 		}
 	}
 
@@ -53,14 +55,14 @@ public class SyncInfo implements ISyncPart {
 		if (type == SyncType.SYNC) {
 			if (!equal()) {
 				NBTTagCompound infoTag = new NBTTagCompound();
-				InfoHelper.writeInfo(infoTag, c);
+				Logistics.infoTypes.writeToNBT(infoTag, c);
 				nbt.setTag(String.valueOf(id), infoTag);
 				last = c;
 			}
 		}
 		if (type == SyncType.SAVE) {
 			NBTTagCompound infoTag = new NBTTagCompound();
-			InfoHelper.writeInfo(infoTag, c);
+			Logistics.infoTypes.writeToNBT(infoTag, c);
 			nbt.setTag(String.valueOf(id), infoTag);
 
 		}
@@ -69,12 +71,12 @@ public class SyncInfo implements ISyncPart {
 	public void readFromNBT(NBTTagCompound nbt, SyncType type) {
 		if (type == SyncType.SYNC) {
 			if (nbt.hasKey(String.valueOf(id))) {
-				this.c = InfoHelper.readInfo(nbt.getCompoundTag(String.valueOf(id)));
+				this.c = Logistics.infoTypes.readFromNBT(nbt.getCompoundTag(String.valueOf(id)));
 			}
 		}
 		if (type == SyncType.SAVE) {
 			if (nbt.hasKey(String.valueOf(id))) {
-				this.c = InfoHelper.readInfo(nbt.getCompoundTag(String.valueOf(id)));
+				this.c = Logistics.infoTypes.readFromNBT(nbt.getCompoundTag(String.valueOf(id)));
 			}
 		}
 	}

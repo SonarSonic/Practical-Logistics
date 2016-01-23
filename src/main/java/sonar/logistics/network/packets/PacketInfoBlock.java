@@ -6,6 +6,8 @@ import net.minecraft.world.World;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.ITileHandler;
 import sonar.core.integration.fmp.handlers.TileHandler;
+import sonar.core.utils.helpers.NBTHelper;
+import sonar.logistics.Logistics;
 import sonar.logistics.api.Info;
 import sonar.logistics.common.handlers.InfoReaderHandler;
 import sonar.logistics.helpers.InfoHelper;
@@ -46,7 +48,7 @@ public class PacketInfoBlock implements IMessage {
 		this.setNull = buf.readBoolean();
 		this.primary = buf.readBoolean();
 		if (setNull == false) {
-			this.info = InfoHelper.readInfo(buf);
+			this.info = Logistics.infoTypes.readFromBuf(buf);
 		}
 	}
 
@@ -58,7 +60,7 @@ public class PacketInfoBlock implements IMessage {
 		buf.writeBoolean(setNull);
 		buf.writeBoolean(primary);
 		if (setNull == false) {
-			InfoHelper.writeInfo(buf, info);
+			Logistics.infoTypes.writeToBuf(buf, info);
 		}
 
 	}

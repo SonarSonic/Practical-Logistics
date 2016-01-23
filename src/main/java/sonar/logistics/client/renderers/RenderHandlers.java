@@ -394,15 +394,15 @@ public class RenderHandlers {
 				// top
 				tes.startDrawingQuads();
 				Minecraft.getMinecraft().getTextureManager().bindTexture(sides[0] == 0 ? none : sides[0] == 1 ? input : output);
-				tes.addVertexWithUV(0, 0.9998, 0, 0, 0);
-				tes.addVertexWithUV(1, 0.9998, 0, 0, 1);
-				tes.addVertexWithUV(1, 0.9998, 1, 1, 1);
-				tes.addVertexWithUV(0, 0.9998, 1, 1, 0);
-
 				tes.addVertexWithUV(0, 0.875, 0, 0, 0);
-				tes.addVertexWithUV(0, 0.875, 1, 1, 0);
-				tes.addVertexWithUV(1, 0.875, 1, 1, 1);
 				tes.addVertexWithUV(1, 0.875, 0, 0, 1);
+				tes.addVertexWithUV(1, 0.875, 1, 1, 1);
+				tes.addVertexWithUV(0, 0.875, 1, 1, 0);
+
+				tes.addVertexWithUV(0, 0.9998, 0, 0, 0);
+				tes.addVertexWithUV(0, 0.9998, 1, 1, 0);
+				tes.addVertexWithUV(1, 0.9998, 1, 1, 1);
+				tes.addVertexWithUV(1, 0.9998, 0, 0, 1);
 				tes.draw();
 
 				tes.startDrawingQuads();
@@ -417,20 +417,20 @@ public class RenderHandlers {
 				tes.addVertexWithUV(1, 0, 0.1250, 1, 0);
 				tes.addVertexWithUV(1, 1, 0.1250, 1, 1);
 				tes.draw();
-
+				
 				tes.startDrawingQuads();
 				Minecraft.getMinecraft().getTextureManager().bindTexture(sides[2] == 0 ? none : sides[2] == 1 ? input : output);
-				tes.addVertexWithUV(0, 0, 0.9998, 0, 0);
-				tes.addVertexWithUV(0, 1, 0.9998, 0, 1);
-				tes.addVertexWithUV(1, 1, 0.9998, 1, 1);
-				tes.addVertexWithUV(1, 0, 0.9998, 1, 0);
-
-				tes.addVertexWithUV(0, 1, 0.875, 0, 1);
 				tes.addVertexWithUV(0, 0, 0.875, 0, 0);
-				tes.addVertexWithUV(1, 0, 0.875, 1, 0);
+				tes.addVertexWithUV(0, 1, 0.875, 0, 1);
 				tes.addVertexWithUV(1, 1, 0.875, 1, 1);
-				tes.draw();
+				tes.addVertexWithUV(1, 0, 0.875, 1, 0);
 
+				tes.addVertexWithUV(0, 1, 0.9998, 0, 1);
+				tes.addVertexWithUV(0, 0, 0.9998, 0, 0);
+				tes.addVertexWithUV(1, 0, 0.9998, 1, 0);
+				tes.addVertexWithUV(1, 1, 0.9998, 1, 1);
+				tes.draw();
+				
 				tes.startDrawingQuads();
 				Minecraft.getMinecraft().getTextureManager().bindTexture(sides[4] == 0 ? none : sides[4] == 1 ? input : output);
 				tes.addVertexWithUV(0.0002, 0, 0, 1, 1);
@@ -443,19 +443,20 @@ public class RenderHandlers {
 				tes.addVertexWithUV(0.1250, 1, 0, 0, 1);
 				tes.addVertexWithUV(0.1250, 1, 1, 0, 0);
 				tes.draw();
-
+				
 				tes.startDrawingQuads();
 				Minecraft.getMinecraft().getTextureManager().bindTexture(sides[5] == 0 ? none : sides[5] == 1 ? input : output);
-				tes.addVertexWithUV(0.9998, 0, 0, 1, 1);
-				tes.addVertexWithUV(0.9998, 0, 1, 1, 0);
-				tes.addVertexWithUV(0.9998, 1, 1, 0, 0);
-				tes.addVertexWithUV(0.9998, 1, 0, 0, 1);
-
-				tes.addVertexWithUV(0.875, 0, 1, 1, 0);
 				tes.addVertexWithUV(0.875, 0, 0, 1, 1);
-				tes.addVertexWithUV(0.875, 1, 0, 0, 1);
+				tes.addVertexWithUV(0.875, 0, 1, 1, 0);
 				tes.addVertexWithUV(0.875, 1, 1, 0, 0);
+				tes.addVertexWithUV(0.875, 1, 0, 0, 1);
+
+				tes.addVertexWithUV(0.9998, 0, 1, 1, 0);
+				tes.addVertexWithUV(0.9998, 0, 0, 1, 1);
+				tes.addVertexWithUV(0.9998, 1, 0, 0, 1);
+				tes.addVertexWithUV(0.9998, 1, 1, 0, 0);
 				tes.draw();
+				
 			}
 			RenderHelper.finishRender();
 		}

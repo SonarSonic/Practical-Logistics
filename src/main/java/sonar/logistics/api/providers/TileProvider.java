@@ -47,4 +47,5 @@ public abstract class TileProvider implements IRegistryObject {
 	public boolean isLoadable() {
 		return true;
 	}
+	
 }

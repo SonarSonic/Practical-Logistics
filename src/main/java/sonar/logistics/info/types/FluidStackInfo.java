@@ -134,7 +134,7 @@ public class FluidStackInfo extends Info {
 	}
 
 	@Override
-	public FluidStackInfo newInfo() {
+	public FluidStackInfo instance() {
 		return new FluidStackInfo();
 	}
 

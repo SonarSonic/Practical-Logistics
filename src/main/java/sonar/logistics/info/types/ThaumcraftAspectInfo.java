@@ -89,7 +89,7 @@ public class ThaumcraftAspectInfo extends StandardInfo {
 		InfoRenderer.renderStandardInfo(this, rend, minX, minY, maxX, maxY, zOffset, scale);
 	}
 	@Override
-	public ThaumcraftAspectInfo newInfo() {
+	public ThaumcraftAspectInfo instance() {
 		return new ThaumcraftAspectInfo();
 	}
 }

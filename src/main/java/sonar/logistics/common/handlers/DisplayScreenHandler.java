@@ -12,7 +12,9 @@ import sonar.core.SonarCore;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.network.utils.IByteBufTile;
+import sonar.core.utils.helpers.NBTHelper;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
+import sonar.logistics.Logistics;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.StandardInfo;
 import sonar.logistics.api.connecting.IDataConnection;
@@ -127,7 +129,7 @@ public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 	public void readPacket(ByteBuf buf, int id) {
 		if (id == 0) {
 			if (buf.readBoolean()) {
-				info = InfoHelper.readInfo(buf);
+				info = Logistics.infoTypes.readFromBuf(buf);
 			} else {
 				info = null;
 			}
@@ -142,7 +144,7 @@ public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 		super.readData(nbt, type);
 		if (type == SyncType.SAVE) {
 			if (nbt.hasKey("currentInfo")) {
-				info = InfoHelper.readInfo(nbt.getCompoundTag("currentInfo"));
+				info = Logistics.infoTypes.readFromNBT(nbt.getCompoundTag("currentInfo"));
 			}
 		}
 	}
@@ -152,7 +154,7 @@ public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 		if (type == SyncType.SAVE) {
 			if (info != null) {
 				NBTTagCompound infoTag = new NBTTagCompound();
-				InfoHelper.writeInfo(infoTag, info);
+				Logistics.infoTypes.writeToNBT(infoTag, info);
 				nbt.setTag("currentInfo", infoTag);
 			}
 		}

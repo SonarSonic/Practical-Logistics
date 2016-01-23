@@ -89,7 +89,7 @@ public class BlockCoordsInfo extends Info {
 	}
 
 	@Override
-	public BlockCoordsInfo newInfo() {
+	public BlockCoordsInfo instance() {
 		return new BlockCoordsInfo();
 	}
 

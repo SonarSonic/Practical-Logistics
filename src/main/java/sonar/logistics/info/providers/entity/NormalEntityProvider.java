@@ -8,6 +8,7 @@ import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.player.EntityPlayer;
+import sonar.core.utils.IRegistryObject;
 import sonar.logistics.api.EntityInfo;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.providers.EntityProvider;
@@ -41,8 +42,8 @@ public class NormalEntityProvider extends EntityProvider {
 			}
 			infoList.add(new EntityInfo(id, 0, 1, living.getAge()));
 
-			infoList.add(new EntityInfo(id, 0, 2, (int)living.getHealth(), "HP"));
-			infoList.add(new EntityInfo(id, 0, 3, (int)living.getMaxHealth(), "HP"));
+			infoList.add(new EntityInfo(id, 0, 2, (int) living.getHealth(), "HP"));
+			infoList.add(new EntityInfo(id, 0, 3, (int) living.getMaxHealth(), "HP"));
 			if (entity instanceof EntityMob) {
 				infoList.add(new EntityInfo(id, 0, 4, true));
 			} else {

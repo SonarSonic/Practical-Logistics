@@ -132,7 +132,7 @@ public class ManaInfo extends ProgressInfo {
 	}
 
 	@Override
-	public ManaInfo newInfo() {
+	public ManaInfo instance() {
 		return new ManaInfo();
 	}
 

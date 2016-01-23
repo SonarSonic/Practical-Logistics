@@ -5,10 +5,12 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import sonar.core.utils.IBufObject;
+import sonar.core.utils.INBTObject;
 import sonar.core.utils.IRegistryObject;
 import sonar.logistics.api.render.InfoRenderer;
 
-public abstract class Info<T extends Info> implements IRegistryObject {
+public abstract class Info<T extends Info> implements INBTObject, IBufObject {
 
 	public abstract String getName();
 
@@ -35,8 +37,6 @@ public abstract class Info<T extends Info> implements IRegistryObject {
 	public abstract boolean isEqualType(Info info);
 
 	public abstract void emptyData();
-
-	public abstract T newInfo();
 
 	public boolean isDataEqualType(Info info) {
 		if (info == null) {

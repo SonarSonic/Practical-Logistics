@@ -16,7 +16,9 @@ import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.network.PacketTileSync;
 import sonar.core.utils.BlockCoords;
+import sonar.core.utils.helpers.NBTHelper;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
+import sonar.logistics.Logistics;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.StandardInfo;
 import sonar.logistics.api.connecting.IDataCable;
@@ -223,14 +225,14 @@ public class InfoReaderHandler extends TileHandler implements IWailaInfo  {
 				switch (compound.getByte("f")) {
 				case 0:
 					if (set)
-						clientInfo.set(slot, InfoHelper.readInfo(compound));
+						clientInfo.set(slot, Logistics.infoTypes.readFromNBT(compound));
 					else
-						clientInfo.add(slot, InfoHelper.readInfo(compound));
+						clientInfo.add(slot, Logistics.infoTypes.readFromNBT(compound));
 					break;
 				case 1:
 					long stored = compound.getLong("Stored");
 					if (stored != 0) {
-						clientInfo.set(slot, InfoHelper.readInfo(compound));
+						clientInfo.set(slot, Logistics.infoTypes.readFromNBT(compound));
 						// clientInfo.set(slot, new StoredItemStack(clientInfo.get(slot).item, stored));
 					} else {
 						clientInfo.set(slot, null);
@@ -293,14 +295,14 @@ public class InfoReaderHandler extends TileHandler implements IWailaInfo  {
 						if (!current.isEqualType(last) || !current.isDataEqualType(last)) {
 							compound.setByte("f", (byte) 0);
 							this.lastInfo.set(i, current);
-							InfoHelper.writeInfo(compound, this.clientInfo.get(i));
+							Logistics.infoTypes.writeToNBT(compound, this.clientInfo.get(i));
 						} else if (!current.isDataEqualType(last)) {
 							/* compound.setByte("f", (byte) 1); this.lastInfo.set(i, current); InfoHelper.writeInfo(compound, this.clientInfo.get(i)); */
 						}
 					} else {
 						compound.setByte("f", (byte) 0);
 						this.lastInfo.add(i, current);
-						InfoHelper.writeInfo(compound, this.clientInfo.get(i));
+						Logistics.infoTypes.writeToNBT(compound, this.clientInfo.get(i));
 					}
 				} else if (last != null) {
 					this.lastInfo.set(i, null);

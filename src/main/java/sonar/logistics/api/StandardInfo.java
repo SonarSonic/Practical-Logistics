@@ -201,7 +201,7 @@ public class StandardInfo extends Info {
 	}
 
 	@Override
-	public StandardInfo newInfo() {
+	public StandardInfo instance() {
 		return new StandardInfo();
 	}
 

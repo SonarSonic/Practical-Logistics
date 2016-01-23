@@ -5,6 +5,7 @@ import java.util.List;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
+import sonar.core.utils.IRegistryObject;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.StandardInfo;
 import sonar.logistics.api.providers.TileProvider;
@@ -15,8 +16,8 @@ import cpw.mods.fml.common.Loader;
 public class AE2EnergyProvider extends TileProvider {
 
 	public static String name = "AE2-Energy-Provider";
-	public String[] categories = new String[] { "AE2 Energy"};
-	public String[] subcategories = new String[] { "Stored Power", "Max Power", "Avg Power Injection", "Avg Power Usage", "Idle Power Usage"};
+	public String[] categories = new String[] { "AE2 Energy" };
+	public String[] subcategories = new String[] { "Stored Power", "Max Power", "Avg Power Injection", "Avg Power Usage", "Idle Power Usage" };
 
 	@Override
 	public String getName() {
@@ -26,7 +27,7 @@ public class AE2EnergyProvider extends TileProvider {
 	@Override
 	public boolean canProvideInfo(World world, int x, int y, int z, ForgeDirection dir) {
 		TileEntity target = world.getTileEntity(x, y, z);
-		return target!=null && (target instanceof IAEPowerStorage || target instanceof IEnergyGrid);
+		return target != null && (target instanceof IAEPowerStorage || target instanceof IEnergyGrid);
 	}
 
 	@Override
@@ -35,16 +36,16 @@ public class AE2EnergyProvider extends TileProvider {
 		TileEntity target = world.getTileEntity(x, y, z);
 		if (target instanceof IAEPowerStorage) {
 			IAEPowerStorage power = (IAEPowerStorage) target;
-			infoList.add(new StandardInfo(id, 0, 0, (int)power.getAECurrentPower(), "ae"));
-			infoList.add(new StandardInfo(id, 0, 1, (int)power.getAEMaxPower(), "ae"));
+			infoList.add(new StandardInfo(id, 0, 0, (int) power.getAECurrentPower(), "ae"));
+			infoList.add(new StandardInfo(id, 0, 1, (int) power.getAEMaxPower(), "ae"));
 		}
 		if (target instanceof IEnergyGrid) {
 			IEnergyGrid grid = (IEnergyGrid) target;
-			infoList.add(new StandardInfo(id, 0, 2, (int)grid.getAvgPowerInjection(), "ae/t"));
-			infoList.add(new StandardInfo(id, 0, 3, (int)grid.getAvgPowerUsage(), "ae/t"));
-			infoList.add(new StandardInfo(id, 0, 4, (int)grid.getIdlePowerUsage(), "ae/t"));
-			infoList.add(new StandardInfo(id, 0, 0, (int)grid.getStoredPower(), "ae"));
-			infoList.add(new StandardInfo(id, 0, 1, (int)grid.getMaxStoredPower(), "ae"));
+			infoList.add(new StandardInfo(id, 0, 2, (int) grid.getAvgPowerInjection(), "ae/t"));
+			infoList.add(new StandardInfo(id, 0, 3, (int) grid.getAvgPowerUsage(), "ae/t"));
+			infoList.add(new StandardInfo(id, 0, 4, (int) grid.getIdlePowerUsage(), "ae/t"));
+			infoList.add(new StandardInfo(id, 0, 0, (int) grid.getStoredPower(), "ae"));
+			infoList.add(new StandardInfo(id, 0, 1, (int) grid.getMaxStoredPower(), "ae"));
 		}
 	}
 
@@ -61,4 +62,5 @@ public class AE2EnergyProvider extends TileProvider {
 	public boolean isLoadable() {
 		return Loader.isModLoaded("appliedenergistics2");
 	}
+
 }

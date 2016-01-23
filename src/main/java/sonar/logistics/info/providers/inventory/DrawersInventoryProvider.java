@@ -51,4 +51,5 @@ public class DrawersInventoryProvider extends InventoryProvider {
 	public boolean isLoadable() {
 		return Loader.isModLoaded("StorageDrawers");
 	}
+
 }

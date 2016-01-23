@@ -94,7 +94,7 @@ public class FluidInfo extends StandardInfo {
 	}
 
 	@Override
-	public FluidInfo newInfo() {
+	public FluidInfo instance() {
 		return new FluidInfo();
 	}
 }
