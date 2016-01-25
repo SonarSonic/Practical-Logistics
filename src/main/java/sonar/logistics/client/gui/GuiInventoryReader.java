@@ -31,10 +31,17 @@ import cpw.mods.fml.relauncher.SideOnly;
 
 public class GuiInventoryReader extends GuiSonar {
 
-	public int xCoord, yCoord, zCoord;
+	public static final ResourceLocation bground = new ResourceLocation("PracticalLogistics:textures/gui/inventoryReader.png");
 
 	public InventoryReaderHandler handler;
 	public TileEntity tile;
+	public int xCoord, yCoord, zCoord;
+
+	private float currentScroll;
+	private boolean isScrolling;
+	private boolean wasClicking;
+	public int scrollerLeft, scrollerStart, scrollerEnd, scrollerWidth;
+	public int cycle;
 
 	public GuiInventoryReader(InventoryReaderHandler handler, TileEntity entity, InventoryPlayer inventoryPlayer) {
 		super(new ContainerInventoryReader(handler, entity, inventoryPlayer), entity);
@@ -44,14 +51,6 @@ public class GuiInventoryReader extends GuiSonar {
 		this.handler = handler;
 		this.tile = entity;
 	}
-
-	public static final ResourceLocation bground = new ResourceLocation("PracticalLogistics:textures/gui/inventoryReader.png");
-
-	private float currentScroll;
-	private boolean isScrolling;
-	private boolean wasClicking;
-	public int scrollerLeft, scrollerStart, scrollerEnd, scrollerWidth;
-	public int cycle;
 
 	@Override
 	public void initGui() {
@@ -68,21 +67,14 @@ public class GuiInventoryReader extends GuiSonar {
 		scrollerWidth = 10;
 	}
 
-	public List<Integer> getCategoryPositions() {
-		if (getStacks() == null) {
-			return null;
-		}
-		List<Integer> positions = new ArrayList();
-		int start = (int) (stackListSize() * this.currentScroll);
-		int finish = Math.min(start + (12 * 7), stackListSize());
-		for (int i = start; i < finish; i++) {
-			if (getStacks().get(i) != null) {
-				StoredItemStack info = getStacks().get(i);
-			}
-		}
-		return positions;
-	}
-
+	/*
+	 * public List<Integer> getCategoryPositions() { if (getStacks() == null) {
+	 * return null; } List<Integer> positions = new ArrayList(); int start =
+	 * (int) (stackListSize() * this.currentScroll); int finish = Math.min(start
+	 * + (12 * 7), stackListSize()); for (int i = start; i < finish; i++) { if
+	 * (getStacks().get(i) != null) { StoredItemStack info = getStacks().get(i);
+	 * } } return positions; }
+	 */
 	@Override
 	protected void mouseClicked(int x, int y, int button) {
 		super.mouseClicked(x, y, button);

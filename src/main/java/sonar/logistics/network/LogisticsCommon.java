@@ -18,6 +18,7 @@ import sonar.logistics.client.gui.GuiHammer;
 import sonar.logistics.client.gui.GuiInfoCreator;
 import sonar.logistics.client.gui.GuiInfoReader;
 import sonar.logistics.client.gui.GuiInventoryReader;
+import sonar.logistics.client.gui.GuiItemRouter;
 import sonar.logistics.client.gui.GuiRedstoneSignaller;
 import sonar.logistics.client.gui.GuiRenameEmitter;
 import sonar.logistics.common.containers.ContainerDataReceiver;
@@ -26,11 +27,13 @@ import sonar.logistics.common.containers.ContainerFluidReader;
 import sonar.logistics.common.containers.ContainerHammer;
 import sonar.logistics.common.containers.ContainerInfoNode;
 import sonar.logistics.common.containers.ContainerInventoryReader;
+import sonar.logistics.common.containers.ContainerItemRouter;
 import sonar.logistics.common.handlers.DataModifierHandler;
 import sonar.logistics.common.handlers.FluidReaderHandler;
 import sonar.logistics.common.handlers.InfoCreatorHandler;
 import sonar.logistics.common.handlers.InfoReaderHandler;
 import sonar.logistics.common.handlers.InventoryReaderHandler;
+import sonar.logistics.common.handlers.ItemRouterHandler;
 import sonar.logistics.common.tileentity.TileEntityDataEmitter;
 import sonar.logistics.common.tileentity.TileEntityDataModifier;
 import sonar.logistics.common.tileentity.TileEntityDataReceiver;
@@ -40,6 +43,7 @@ import sonar.logistics.common.tileentity.TileEntityHammer;
 import sonar.logistics.common.tileentity.TileEntityInfoCreator;
 import sonar.logistics.common.tileentity.TileEntityInfoReader;
 import sonar.logistics.common.tileentity.TileEntityInventoryReader;
+import sonar.logistics.common.tileentity.TileEntityItemRouter;
 import sonar.logistics.common.tileentity.TileEntityRedstoneSignaller;
 import sonar.logistics.integration.multipart.DataModifierPart;
 import sonar.logistics.integration.multipart.FluidReaderPart;
@@ -52,6 +56,7 @@ import sonar.logistics.network.packets.PacketFluidReader;
 import sonar.logistics.network.packets.PacketInfoBlock;
 import sonar.logistics.network.packets.PacketInventoryReader;
 import sonar.logistics.network.packets.PacketProviders;
+import sonar.logistics.network.packets.PacketRouterGui;
 import cpw.mods.fml.common.network.IGuiHandler;
 import cpw.mods.fml.relauncher.Side;
 
@@ -66,6 +71,7 @@ public class LogisticsCommon implements IGuiHandler {
 		Logistics.network.registerMessage(PacketDataReceiver.Handler.class, PacketDataReceiver.class, 3, Side.SERVER);
 		Logistics.network.registerMessage(PacketInventoryReader.Handler.class, PacketInventoryReader.class, 4, Side.SERVER);
 		Logistics.network.registerMessage(PacketFluidReader.Handler.class, PacketFluidReader.class, 5, Side.SERVER);
+		Logistics.network.registerMessage(PacketRouterGui.Handler.class, PacketRouterGui.class, 6, Side.SERVER);
 	}
 
 	@Override
@@ -126,6 +132,12 @@ public class LogisticsCommon implements IGuiHandler {
 					TileHandler handler = FMPHelper.getHandler(tile);
 					if (handler != null && handler instanceof FluidReaderHandler)
 						return new ContainerFluidReader((FluidReaderHandler) handler, tile, player.inventory);
+				}
+			case LogisticsGui.itemRouter:
+				if (entity instanceof TileEntityItemRouter) {
+					TileHandler handler = FMPHelper.getHandler(tile);
+					if (handler != null && handler instanceof ItemRouterHandler)
+						return new ContainerItemRouter((TileEntityItemRouter) tile, player.inventory);
 				}
 			}
 
@@ -190,6 +202,12 @@ public class LogisticsCommon implements IGuiHandler {
 					TileHandler handler = FMPHelper.getHandler(tile);
 					if (handler != null && handler instanceof FluidReaderHandler)
 						return new GuiFluidReader((FluidReaderHandler) handler, tile, player.inventory);
+				}
+			case LogisticsGui.itemRouter:
+				if (entity instanceof TileEntityItemRouter) {
+					TileHandler handler = FMPHelper.getHandler(tile);
+					if (handler != null && handler instanceof ItemRouterHandler)
+						return new GuiItemRouter((ItemRouterHandler) handler, (TileEntityItemRouter) tile, player);
 				}
 			}
 

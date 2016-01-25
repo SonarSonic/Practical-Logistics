@@ -264,7 +264,7 @@ public class GuiInfoReader extends GuiSonar {
 							} else {
 								Logistics.network.sendToServer(new PacketInfoBlock(xCoord, yCoord, zCoord, info, true));
 								if (handler.isMultipart.getBoolean()) {
-									handler.primaryInfo.setInfo(info);
+									handler.primaryInfo.setObject(info);
 								}
 							}
 
@@ -278,7 +278,7 @@ public class GuiInfoReader extends GuiSonar {
 								} else {
 									Logistics.network.sendToServer(new PacketInfoBlock(xCoord, yCoord, zCoord, info, false));
 									if (handler.isMultipart.getBoolean()) {
-										handler.secondaryInfo.setInfo(info);
+										handler.secondaryInfo.setObject(info);
 									}
 								}
 							}
@@ -341,11 +341,11 @@ public class GuiInfoReader extends GuiSonar {
 	}
 
 	public Info getPrimaryInfo(){
-		return handler.primaryInfo.getInfo();
+		return handler.primaryInfo.getObject();
 	}
 
 	public Info getSecondInfo(){
-		return handler.secondaryInfo.getInfo();
+		return handler.secondaryInfo.getObject();
 	}
 
 }

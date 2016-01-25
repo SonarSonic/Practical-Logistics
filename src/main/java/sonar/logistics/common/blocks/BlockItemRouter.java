@@ -31,24 +31,25 @@ public class BlockItemRouter extends BaseNode {
 	@Override
 	public void openGui(World world, int x, int y, int z, EntityPlayer player) {
 		if (player != null && !world.isRemote) {
-			// player.openGui(Logistics.instance, LogisticsGui.entityNode,
-			// world, x, y, z);
+			player.openGui(Logistics.instance, LogisticsGui.itemRouter, world, x, y, z);
 		}
 	}
 
 	@Override
 	public boolean operateBlock(World world, int x, int y, int z, EntityPlayer player, int side, float hitx, float hity, float hitz) {
-		if (!world.isRemote && player != null && player.isSneaking()) {
+		if (!world.isRemote && player != null) {
 			TileEntity target = world.getTileEntity(x, y, z);
 			if (target instanceof TileEntityItemRouter) {
 				TileEntityItemRouter router = (TileEntityItemRouter) target;
-				if(router.handler.sideConfigs[side].getInt()<2){
-					router.handler.sideConfigs[side].increaseBy(1);
-				}else{
-					router.handler.sideConfigs[side].setInt(0);
+				if (player.isSneaking()) {
+					if (router.handler.sideConfigs[side].getInt() < 2) {
+						router.handler.sideConfigs[side].increaseBy(1);
+					} else {
+						router.handler.sideConfigs[side].setInt(0);
+					}
+					return true;
 				}
 			}
-			return true;
 		}
 
 		return super.operateBlock(world, x, y, z, player, side, hitx, hity, hitz);

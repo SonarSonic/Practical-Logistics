@@ -23,7 +23,7 @@ public class TileEntityHammer extends TileEntityInventory implements ISidedInven
 		if (isClient()) {
 			return;
 		}
-		if(this.worldObj.isBlockIndirectlyGettingPowered(xCoord, yCoord, zCoord)){
+		if (this.worldObj.isBlockIndirectlyGettingPowered(xCoord, yCoord, zCoord)) {
 			return;
 		}
 		if (coolDown.getInt() != 0) {
@@ -34,13 +34,13 @@ public class TileEntityHammer extends TileEntityInventory implements ISidedInven
 				progress.increaseBy(1);
 			} else {
 				finishProcess();
-				this.coolDown.setInt(speed*2);
+				this.coolDown.setInt(speed * 2);
 				progress.setInt(0);
 				this.worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
 			}
 			SonarCore.sendFullSyncAround(this, 64);
 		} else {
-			this.coolDown.setInt(this.progress.getInt()*2);
+			this.coolDown.setInt(this.progress.getInt() * 2);
 			this.progress.setInt(0);
 		}
 	}
@@ -115,16 +115,24 @@ public class TileEntityHammer extends TileEntityInventory implements ISidedInven
 
 	@Override
 	public int[] getAccessibleSlotsFromSide(int side) {
-		return new int[]{0,1};
+		return new int[] { 0, 1 };
 	}
 
 	@Override
 	public boolean canInsertItem(int slot, ItemStack item, int side) {
-		return slot==0;
+		return slot == 0;
 	}
 
 	@Override
 	public boolean canExtractItem(int slot, ItemStack item, int side) {
-		return slot==1;
+		return slot == 1;
+	}
+
+	@Override
+	public void setInventorySlotContents(int i, ItemStack itemstack) {
+		super.setInventorySlotContents(i, itemstack);
+		if (i == 1) {
+			SonarCore.sendFullSyncAround(this, 64);
+		}
 	}
 }

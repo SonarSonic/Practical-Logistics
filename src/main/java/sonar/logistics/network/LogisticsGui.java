@@ -13,6 +13,7 @@ public class LogisticsGui {
 	public static final int hammer =  8;
 	public static final int entityNode =  9;
 	public static final int fluidReader =  10;
+	public static final int itemRouter =  11;
 	
 
 }

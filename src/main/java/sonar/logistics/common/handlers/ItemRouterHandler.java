@@ -1,8 +1,15 @@
 package sonar.logistics.common.handlers;
 
+import io.netty.buffer.ByteBuf;
+
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+import cpw.mods.fml.common.network.ByteBufUtils;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -14,13 +21,17 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldProvider;
 import net.minecraftforge.common.util.ForgeDirection;
+import sonar.calculator.mod.Calculator;
 import sonar.core.SonarCore;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.handlers.InventoryTileHandler;
 import sonar.core.inventory.StoredItemStack;
 import sonar.core.network.sync.ISyncPart;
+import sonar.core.network.sync.SyncGeneric;
 import sonar.core.network.sync.SyncInt;
+import sonar.core.network.utils.IByteBufTile;
 import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.InventoryHelper;
 import sonar.core.utils.helpers.InventoryHelper.IInventoryFilter;
@@ -41,10 +52,14 @@ import sonar.logistics.info.filters.items.OreDictionaryFilter;
 import sonar.logistics.info.types.BlockCoordsInfo;
 import sonar.logistics.info.types.StoredStackInfo;
 
-public class ItemRouterHandler extends InventoryTileHandler implements ISidedInventory {
+public class ItemRouterHandler extends InventoryTileHandler implements ISidedInventory, IByteBufTile {
 
 	// 0=nothing, 1=input, 2=output
 	public SyncInt[] sideConfigs = new SyncInt[6];
+	public SyncInt listType = new SyncInt(7);
+	public SyncInt side = new SyncInt(8);
+	public SyncInt filterPos = new SyncInt(9);
+
 	public BlockCoords[] coords = new BlockCoords[6];
 	public List<ItemFilter>[] lastWhitelist = new List[6];
 	public List<ItemFilter>[] whitelist = new List[6];
@@ -55,11 +70,14 @@ public class ItemRouterHandler extends InventoryTileHandler implements ISidedInv
 	public int update = 0;
 	public int updateTime = 20;
 
+	public int clientClick = -1;
+	public ItemStackFilter clientStackFilter = new ItemStackFilter();
+
 	public ItemRouterHandler(boolean isMultipart) {
 		super(isMultipart);
 		super.slots = new ItemStack[9];
 		for (int i = 0; i < 6; i++) {
-			sideConfigs[i] = new SyncInt(i);
+			sideConfigs[i] = new SyncInt(i + 1);
 			lastWhitelist[i] = new ArrayList();
 			whitelist[i] = new ArrayList();
 			lastBlacklist[i] = new ArrayList();
@@ -157,6 +175,9 @@ public class ItemRouterHandler extends InventoryTileHandler implements ISidedInv
 	public void readData(NBTTagCompound nbt, SyncType type) {
 		super.readData(nbt, type);
 		if (type == SyncType.SAVE || type == SyncType.SYNC) {
+			listType.readFromNBT(nbt, type);
+			side.readFromNBT(nbt, type);
+			filterPos.readFromNBT(nbt, type);
 			NBTTagList sideList = nbt.getTagList("Sides", 10);
 			for (int i = 0; i < 6; i++) {
 				NBTTagCompound compound = sideList.getCompoundTagAt(i);
@@ -174,20 +195,8 @@ public class ItemRouterHandler extends InventoryTileHandler implements ISidedInv
 				update = nbt.getInteger("update");
 
 				for (int l = 0; l < 6; l++) {
-					NBTTagList whitelist = nbt.getTagList("white" + l, 10);
-					NBTTagList blacklist = nbt.getTagList("black" + l, 10);
-					this.whitelist[l] = new ArrayList();
-					this.blacklist[l] = new ArrayList();
-					for (int i = 0; i < whitelist.tagCount(); i++) {
-						NBTTagCompound compound = whitelist.getCompoundTagAt(i);
-						this.whitelist[l].add((ItemFilter) NBTHelper.readNBTObject(compound, Logistics.itemFilters));
-
-					}
-					for (int i = 0; i < blacklist.tagCount(); i++) {
-						NBTTagCompound compound = blacklist.getCompoundTagAt(i);
-						this.whitelist[l].add((ItemFilter) NBTHelper.readNBTObject(compound, Logistics.itemFilters));
-
-					}
+					whitelist[l] = (List<ItemFilter>) NBTHelper.readNBTObjectList("white" + l, nbt, Logistics.itemFilters);
+					blacklist[l] = (List<ItemFilter>) NBTHelper.readNBTObjectList("black" + l, nbt, Logistics.itemFilters);
 				}
 			}
 		}
@@ -200,6 +209,9 @@ public class ItemRouterHandler extends InventoryTileHandler implements ISidedInv
 	public void writeData(NBTTagCompound nbt, SyncType type) {
 		super.writeData(nbt, type);
 		if (type == SyncType.SAVE || type == SyncType.SYNC) {
+			listType.writeToNBT(nbt, type);
+			side.writeToNBT(nbt, type);
+			filterPos.writeToNBT(nbt, type);
 			NBTTagList sideList = new NBTTagList();
 			for (int i = 0; i < 6; i++) {
 				NBTTagCompound compound = new NBTTagCompound();
@@ -224,29 +236,6 @@ public class ItemRouterHandler extends InventoryTileHandler implements ISidedInv
 				for (int l = 0; l < 6; l++) {
 					NBTHelper.writeNBTObjectList("white" + l, nbt, whitelist[l]);
 					NBTHelper.writeNBTObjectList("black" + l, nbt, blacklist[l]);
-					/*
-					 * NBTTagList whiteList = new NBTTagList(); NBTTagList
-					 * blackList = new NBTTagList(); if (whitelist[l] == null) {
-					 * whitelist[l] = new ArrayList(); } if (blacklist[l] ==
-					 * null) { blacklist[l] = new ArrayList(); } for (int i = 0;
-					 * i < this.whitelist[l].size(); i++) { if
-					 * (this.whitelist[l].get(i) != null) { NBTTagCompound
-					 * compound = new NBTTagCompound();
-					 * InfoHelper.writeFilter(compound,
-					 * this.whitelist[l].get(i));
-					 * NBTHelper.writeNBTObject(object, tag);
-					 * whiteList.appendTag(compound); } }
-					 * 
-					 * for (int i = 0; i < this.blacklist[l].size(); i++) { if
-					 * (this.blacklist[l].get(i) != null) { NBTTagCompound
-					 * compound = new NBTTagCompound();
-					 * InfoHelper.writeFilter(compound,
-					 * this.blacklist[l].get(i)); blackList.appendTag(compound);
-					 * } }
-					 * 
-					 * nbt.setTag("white" + l, whiteList); nbt.setTag("black" +
-					 * l, blackList);
-					 */
 				}
 			}
 
@@ -278,15 +267,6 @@ public class ItemRouterHandler extends InventoryTileHandler implements ISidedInv
 						filters[f].set(slot, Logistics.itemFilters.readFromNBT(compound));
 					else
 						filters[f].add(slot, Logistics.itemFilters.readFromNBT(compound));
-					break;
-				case 1:
-					long stored = compound.getLong("Stored");
-					if (stored != 0) {
-						filters[f].set(slot, Logistics.itemFilters.readFromNBT(compound));
-					} else {
-						filters[f].set(slot, null);
-
-					}
 					break;
 				case 2:
 					filters[f].set(slot, null);
@@ -323,7 +303,7 @@ public class ItemRouterHandler extends InventoryTileHandler implements ISidedInv
 				NBTTagCompound compound = new NBTTagCompound();
 				if (current != null) {
 					if (last != null) {
-						if (!current.equalFilter(last)) {
+						if ((true)) {
 							compound.setByte("f", (byte) 0);
 							lastFilters[f].set(i, current);
 							Logistics.itemFilters.writeToNBT(compound, filters[f].get(i));
@@ -365,10 +345,12 @@ public class ItemRouterHandler extends InventoryTileHandler implements ISidedInv
 	}
 
 	public static boolean matchesFilters(ItemStack stack, List<ItemFilter> whitelist, List<ItemFilter> blacklist) {
+		if (stack == null) {
+			return false;
+		}
 		if (blacklist != null && !blacklist.isEmpty()) {
 			for (ItemFilter filter : blacklist) {
 				if (filter != null) {
-
 					if (filter.matchesFilter(stack)) {
 						return false;
 					}
@@ -381,11 +363,9 @@ public class ItemRouterHandler extends InventoryTileHandler implements ISidedInv
 		}
 		for (ItemFilter filter : whitelist) {
 			if (filter != null) {
-
 				if (filter.matchesFilter(stack)) {
 					return true;
 				}
-
 			}
 		}
 
@@ -405,5 +385,137 @@ public class ItemRouterHandler extends InventoryTileHandler implements ISidedInv
 			return matchesFilters(stack, whitelist, blacklist);
 		}
 
+	}
+
+	@Override
+	public void writePacket(ByteBuf buf, int id) {
+		if (id == -1) {
+			clientStackFilter.writeToBuf(buf);
+		}
+		if (id == 0) {
+			if (side.getInt() + 1 < 6) {
+				side.increaseBy(1);
+			} else {
+				side.setInt(0);
+			}
+			buf.writeInt(side.getInt());
+		}
+		if (id == 1) {
+			if (sideConfigs[side.getInt()].getInt() < 2) {
+				sideConfigs[side.getInt()].increaseBy(1);
+			} else {
+				sideConfigs[side.getInt()].setInt(0);
+			}
+			buf.writeInt(sideConfigs[side.getInt()].getInt());
+		}
+		if (id == 2) {
+			if (listType.getInt() == 0) {
+				listType.setInt(1);
+			} else {
+				listType.setInt(0);
+			}
+			buf.writeInt(listType.getInt());
+		}
+
+		if (id == 3) {
+			String name = Minecraft.getMinecraft().thePlayer.getGameProfile().getName();
+			ByteBufUtils.writeUTF8String(buf, name);
+		}
+		if (id == 8) {
+			if (listType.getInt() == 0) {
+				if (clientClick < whitelist[side.getInt()].size()) {
+					if (whitelist[side.getInt()].get(clientClick) != null) {
+						buf.writeInt(clientClick);
+					}
+				}
+			} else {
+				if (clientClick < blacklist[side.getInt()].size()) {
+					if (blacklist[side.getInt()].get(clientClick) != null) {
+						buf.writeInt(clientClick);
+					}
+				}
+			}
+			buf.writeInt(-1);
+		}
+	}
+
+	@Override
+	public void readPacket(ByteBuf buf, int id) {
+		if (id == -1) {
+			clientStackFilter = new ItemStackFilter();
+			clientStackFilter.readFromBuf(buf);
+			if (clientStackFilter != null && clientStackFilter.filters[0] != null) {
+				if (listType.getInt() == 0) {
+					whitelist[side.getInt()].add(clientStackFilter);
+				} else {
+					blacklist[side.getInt()].add(clientStackFilter);
+				}
+			}
+			filterPos.setInt(-1);
+		}
+		if (id == 0) {
+			side.setInt(buf.readInt());
+			filterPos.setInt(-1);
+		}
+		if (id == 1) {
+			sideConfigs[side.getInt()].setInt(buf.readInt());
+		}
+		if (id == 2) {
+			listType.setInt(buf.readInt());
+			filterPos.setInt(-1);
+		}
+		if (id == 3) {
+			/*
+			 * filt.ignoreDamage = true; if (listType.getInt() == 0) {
+			 * whitelist[side.getInt()].add(filt); } else {
+			 * blacklist[side.getInt()].add(filt); }
+			 */
+		}
+		if (id == 5) {
+			if (filterPos.getInt() != -1 && filterPos.getInt() != 0) {
+				if (listType.getInt() == 0) {
+					if (filterPos.getInt() - 1 < whitelist[side.getInt()].size()) {
+						Collections.swap(whitelist[side.getInt()], filterPos.getInt(), filterPos.getInt() - 1);
+						filterPos.setInt(filterPos.getInt() - 1);
+					}
+				} else {
+					if (filterPos.getInt() - 1 < blacklist[side.getInt()].size()) {
+						Collections.swap(whitelist[side.getInt()], filterPos.getInt(), filterPos.getInt() - 1);
+						filterPos.setInt(filterPos.getInt() - 1);
+					}
+				}
+			}
+		}
+		if (id == 6) {
+			if (filterPos.getInt() != -1) {
+				if (listType.getInt() == 0) {
+					if (filterPos.getInt() + 1 < whitelist[side.getInt()].size()) {
+						Collections.swap(whitelist[side.getInt()], filterPos.getInt(), filterPos.getInt() + 1);
+						filterPos.setInt(filterPos.getInt() + 1);
+					}
+				} else {
+					if (filterPos.getInt() + 1 < blacklist[side.getInt()].size()) {
+						Collections.swap(whitelist[side.getInt()], filterPos.getInt(), filterPos.getInt() + 1);
+						filterPos.setInt(filterPos.getInt() + 1);
+					}
+				}
+			}
+		}
+
+		if (id == 7) {
+			if (filterPos.getInt() != -1) {
+				if (listType.getInt() == 0) {
+					if (filterPos.getInt() < whitelist[side.getInt()].size())
+						whitelist[side.getInt()].remove(filterPos.getInt());
+				} else {
+					if (filterPos.getInt() < blacklist[side.getInt()].size())
+						blacklist[side.getInt()].remove(filterPos.getInt());
+				}
+				filterPos.setInt(-1);
+			}
+		}
+		if (id == 8) {
+			filterPos.setInt(buf.readInt());
+		}
 	}
 }

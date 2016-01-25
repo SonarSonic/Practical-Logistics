@@ -15,6 +15,7 @@ import sonar.core.integration.IWailaInfo;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.network.PacketTileSync;
+import sonar.core.network.sync.SyncGeneric;
 import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.NBTHelper;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
@@ -27,9 +28,8 @@ import sonar.logistics.common.tileentity.TileEntityEntityNode;
 import sonar.logistics.helpers.CableHelper;
 import sonar.logistics.helpers.InfoHelper;
 import sonar.logistics.info.types.CategoryInfo;
-import sonar.logistics.network.SyncInfo;
 
-public class InfoReaderHandler extends TileHandler implements IWailaInfo  {
+public class InfoReaderHandler extends TileHandler implements IWailaInfo {
 
 	public InfoReaderHandler(boolean isMultipart) {
 		super(isMultipart);
@@ -38,8 +38,8 @@ public class InfoReaderHandler extends TileHandler implements IWailaInfo  {
 	public List<Info> clientInfo;
 	public List<Info> lastInfo;
 
-	public SyncInfo primaryInfo = new SyncInfo(0);
-	public SyncInfo secondaryInfo = new SyncInfo(1);
+	public SyncGeneric<Info> primaryInfo = new SyncGeneric(Logistics.infoTypes, 0);
+	public SyncGeneric<Info> secondaryInfo = new SyncGeneric(Logistics.infoTypes, 1);
 	public BlockCoords coords;
 
 	@Override
@@ -64,15 +64,15 @@ public class InfoReaderHandler extends TileHandler implements IWailaInfo  {
 			}
 		}
 
-		if (this.primaryInfo.getInfo() != null) {
+		if (this.primaryInfo.getObject() != null) {
 			if (this.coords != null) {
 				TileEntity tile = this.coords.getTileEntity();
 				if (tile != null && tile instanceof TileEntityBlockNode) {
-					this.setData(te, InfoHelper.getLatestTileInfo(primaryInfo.getInfo(), (TileEntityBlockNode) tile), true);
-					this.setData(te, InfoHelper.getLatestTileInfo(secondaryInfo.getInfo(), (TileEntityBlockNode) tile), false);
+					this.setData(te, InfoHelper.getLatestTileInfo(primaryInfo.getObject(), (TileEntityBlockNode) tile), true);
+					this.setData(te, InfoHelper.getLatestTileInfo(secondaryInfo.getObject(), (TileEntityBlockNode) tile), false);
 				} else if (tile != null && tile instanceof TileEntityEntityNode) {
-					this.setData(te, InfoHelper.getLatestEntityInfo(primaryInfo.getInfo(), (TileEntityEntityNode) tile), true);
-					this.setData(te, InfoHelper.getLatestEntityInfo(secondaryInfo.getInfo(), (TileEntityEntityNode) tile), false);
+					this.setData(te, InfoHelper.getLatestEntityInfo(primaryInfo.getObject(), (TileEntityEntityNode) tile), true);
+					this.setData(te, InfoHelper.getLatestEntityInfo(secondaryInfo.getObject(), (TileEntityEntityNode) tile), false);
 				} else {
 					this.setData(te, null, true);
 					this.setData(te, null, false);
@@ -97,47 +97,47 @@ public class InfoReaderHandler extends TileHandler implements IWailaInfo  {
 
 	public Info currentInfo(TileEntity te) {
 
-		if (secondaryInfo.getInfo() == null || !te.getWorldObj().isBlockIndirectlyGettingPowered(te.xCoord, te.yCoord, te.zCoord)) {
+		if (secondaryInfo.getObject() == null || !te.getWorldObj().isBlockIndirectlyGettingPowered(te.xCoord, te.yCoord, te.zCoord)) {
 
-			if (primaryInfo.getInfo() == null) {
+			if (primaryInfo.getObject() == null) {
 				return new StandardInfo((byte) -1, "", "", "NO DATA");
 			}
-			return primaryInfo.getInfo();
+			return primaryInfo.getObject();
 		} else {
-			if (secondaryInfo.getInfo() == null) {
+			if (secondaryInfo.getObject() == null) {
 				return new StandardInfo((byte) -1, "", "", "NO DATA");
 			}
-			return secondaryInfo.getInfo();
+			return secondaryInfo.getObject();
 		}
 	}
 
 	public Info getSecondaryInfo(TileEntity te) {
-		if (primaryInfo.getInfo() == null || !te.getWorldObj().isBlockIndirectlyGettingPowered(te.xCoord, te.yCoord, te.zCoord)) {
+		if (primaryInfo.getObject() == null || !te.getWorldObj().isBlockIndirectlyGettingPowered(te.xCoord, te.yCoord, te.zCoord)) {
 
-			if (secondaryInfo.getInfo() == null) {
+			if (secondaryInfo.getObject() == null) {
 				return new StandardInfo((byte) -1, "", "", "NO DATA");
 			}
-			return secondaryInfo.getInfo();
+			return secondaryInfo.getObject();
 		} else {
-			if (primaryInfo.getInfo() == null) {
+			if (primaryInfo.getObject() == null) {
 				return new StandardInfo((byte) -1, "", "", "NO DATA");
 			}
-			return primaryInfo.getInfo();
+			return primaryInfo.getObject();
 		}
 	}
 
 	public void setData(TileEntity te, Info info, boolean primary) {
 		if (info != null) {
 			if (primary) {
-				this.primaryInfo.setInfo(info);
+				this.primaryInfo.setObject(info);
 			} else {
-				this.secondaryInfo.setInfo(info);
+				this.secondaryInfo.setObject(info);
 			}
-		} else if (primary && this.primaryInfo.getInfo() != null) {
-			this.primaryInfo.getInfo().emptyData();
+		} else if (primary && this.primaryInfo.getObject() != null) {
+			this.primaryInfo.getObject().emptyData();
 
-		} else if (!primary && this.secondaryInfo.getInfo() != null) {
-			this.secondaryInfo.getInfo().emptyData();
+		} else if (!primary && this.secondaryInfo.getObject() != null) {
+			this.secondaryInfo.getObject().emptyData();
 		}
 
 		CableHelper.updateAdjacentCoord(te, new BlockCoords(te.xCoord, te.yCoord, te.zCoord), false, ForgeDirection.getOrientation(FMPHelper.getMeta(te)));
@@ -210,6 +210,7 @@ public class InfoReaderHandler extends TileHandler implements IWailaInfo  {
 			}
 		}
 		if (type == SyncType.SPECIAL) {
+
 			if (nbt.hasKey("null")) {
 				this.clientInfo = new ArrayList();
 				return;
@@ -233,7 +234,6 @@ public class InfoReaderHandler extends TileHandler implements IWailaInfo  {
 					long stored = compound.getLong("Stored");
 					if (stored != 0) {
 						clientInfo.set(slot, Logistics.infoTypes.readFromNBT(compound));
-						// clientInfo.set(slot, new StoredItemStack(clientInfo.get(slot).item, stored));
 					} else {
 						clientInfo.set(slot, null);
 
@@ -243,8 +243,8 @@ public class InfoReaderHandler extends TileHandler implements IWailaInfo  {
 					clientInfo.set(slot, null);
 					break;
 				}
-
 			}
+
 		}
 	}
 
@@ -297,7 +297,12 @@ public class InfoReaderHandler extends TileHandler implements IWailaInfo  {
 							this.lastInfo.set(i, current);
 							Logistics.infoTypes.writeToNBT(compound, this.clientInfo.get(i));
 						} else if (!current.isDataEqualType(last)) {
-							/* compound.setByte("f", (byte) 1); this.lastInfo.set(i, current); InfoHelper.writeInfo(compound, this.clientInfo.get(i)); */
+							/*
+							 * compound.setByte("f", (byte) 1);
+							 * this.lastInfo.set(i, current);
+							 * InfoHelper.writeInfo(compound,
+							 * this.clientInfo.get(i));
+							 */
 						}
 					} else {
 						compound.setByte("f", (byte) 0);
@@ -313,9 +318,9 @@ public class InfoReaderHandler extends TileHandler implements IWailaInfo  {
 					list.appendTag(compound);
 				}
 
-			}
-			if (list.tagCount() != 0) {
-				nbt.setTag("Info", list);
+				if (list.tagCount() != 0) {
+					nbt.setTag("Info", list);
+				}
 			}
 		}
 	}

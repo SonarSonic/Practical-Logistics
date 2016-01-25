@@ -1,17 +1,25 @@
 package sonar.logistics.info.filters.items;
 
+import java.util.List;
+
 import cpw.mods.fml.common.network.ByteBufUtils;
+import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.common.registry.GameRegistry.UniqueIdentifier;
 import io.netty.buffer.ByteBuf;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.oredict.OreDictionary;
+import scala.actors.threadpool.Arrays;
+import sonar.core.utils.helpers.ItemStackHelper;
 import sonar.logistics.api.ItemFilter;
 
-public class ItemStackFilter extends ItemFilter<ItemStackFilter> {
+public class ItemStackFilter extends ItemFilter<ItemStackFilter> implements IInventory {
 
-	public ItemStack filter = null;
-	public boolean matchNBT, ignoreDamage, matchOreDict, blacklisted;
+	public ItemStack[] filters = new ItemStack[1];
+	public boolean matchNBT, ignoreDamage, matchOreDict, matchModid;
 
 	@Override
 	public String getName() {
@@ -20,32 +28,24 @@ public class ItemStackFilter extends ItemFilter<ItemStackFilter> {
 
 	@Override
 	public boolean matchesFilter(ItemStack stack) {
-		if (stack != null && filter != null) {
-			int[] stackIDs = OreDictionary.getOreIDs(stack);
-			int[] filterIDs = OreDictionary.getOreIDs(filter);
-			for (int sID : stackIDs) {
-				for (int fID : filterIDs) {
-					if (sID == fID) {
+		int slotID = 0;
+		if (stack != null && filters[slotID] != null) {
+			if (stack.getItem() == filters[slotID].getItem() || (matchModid && ItemStackHelper.matchingModid(filters[slotID], stack)) || (matchOreDict && ItemStackHelper.matchingOreDictID(filters[slotID], stack))) {
+				if (ignoreDamage || stack.getItemDamage() == filters[slotID].getItemDamage()) {
+					if (!matchNBT || ItemStack.areItemStackTagsEqual(stack, filters[slotID])) {
 						return true;
 					}
-				}
-			}
-			if (stack.getItem() == filter.getItem()) {
-				if (ignoreDamage || stack.getItemDamage() == filter.getItemDamage()) {
-					if (!matchNBT || ItemStack.areItemStackTagsEqual(stack, filter)) {
-						return blacklisted ? false : true;
 
-					}
 				}
 			}
 		}
-		return blacklisted ? true : false;
+		return false;
 	}
 
 	public boolean equalFilter(ItemFilter itemFilter) {
 		if (itemFilter != null && itemFilter instanceof ItemStackFilter) {
 			ItemStackFilter sFilter = (ItemStackFilter) itemFilter;
-			if (filter != null && sFilter.matchNBT == matchNBT && sFilter.ignoreDamage == ignoreDamage && sFilter.matchOreDict == matchOreDict && sFilter.blacklisted == blacklisted && ItemStack.areItemStacksEqual(filter, sFilter.filter)) {
+			if (filters[0] != null && sFilter.matchNBT == matchNBT && sFilter.ignoreDamage == ignoreDamage && sFilter.matchOreDict == matchOreDict && sFilter.matchModid == matchModid && ItemStack.areItemStacksEqual(filters[0], sFilter.filters[0])) {
 				return true;
 			}
 		}
@@ -54,14 +54,19 @@ public class ItemStackFilter extends ItemFilter<ItemStackFilter> {
 	}
 
 	@Override
+	public List<ItemStack> getFilters() {
+		return Arrays.asList(filters);
+	}
+
+	@Override
 	public void writeToNBT(NBTTagCompound tag) {
 		tag.setBoolean("matchNBT", matchNBT);
 		tag.setBoolean("dam", ignoreDamage);
 		tag.setBoolean("oreDict", matchOreDict);
-		tag.setBoolean("blacklist", blacklisted);
+		tag.setBoolean("modid", matchModid);
 		NBTTagCompound stackTag = new NBTTagCompound();
-		if (filter != null) {
-			filter.writeToNBT(stackTag);
+		if (filters[0] != null) {
+			filters[0].writeToNBT(stackTag);
 			tag.setTag("stackTag", stackTag);
 		}
 	}
@@ -71,9 +76,9 @@ public class ItemStackFilter extends ItemFilter<ItemStackFilter> {
 		matchNBT = tag.getBoolean("matchNBT");
 		ignoreDamage = tag.getBoolean("dam");
 		matchOreDict = tag.getBoolean("oreDict");
-		blacklisted = tag.getBoolean("blacklist");
+		matchModid = tag.getBoolean("modid");
 		if (tag.hasKey("stackTag"))
-			filter = ItemStack.loadItemStackFromNBT(tag.getCompoundTag("stackTag"));
+			filters[0] = ItemStack.loadItemStackFromNBT(tag.getCompoundTag("stackTag"));
 	}
 
 	@Override
@@ -81,9 +86,9 @@ public class ItemStackFilter extends ItemFilter<ItemStackFilter> {
 		matchNBT = buf.readBoolean();
 		ignoreDamage = buf.readBoolean();
 		matchOreDict = buf.readBoolean();
-		blacklisted = buf.readBoolean();
+		matchModid = buf.readBoolean();
 		if (buf.readBoolean()) {
-			filter = ByteBufUtils.readItemStack(buf);
+			filters[0] = ByteBufUtils.readItemStack(buf);
 		}
 	}
 
@@ -91,11 +96,11 @@ public class ItemStackFilter extends ItemFilter<ItemStackFilter> {
 	public void writeToBuf(ByteBuf buf) {
 		buf.writeBoolean(matchNBT);
 		buf.writeBoolean(ignoreDamage);
-		buf.writeBoolean(blacklisted);
-		buf.writeBoolean(matchNBT);
-		if (filter != null) {
+		buf.writeBoolean(matchOreDict);
+		buf.writeBoolean(matchModid);
+		if (filters[0] != null) {
 			buf.writeBoolean(true);
-			ByteBufUtils.writeItemStack(buf, filter);
+			ByteBufUtils.writeItemStack(buf, filters[0]);
 		} else {
 			buf.writeBoolean(false);
 		}
@@ -104,6 +109,75 @@ public class ItemStackFilter extends ItemFilter<ItemStackFilter> {
 	@Override
 	public ItemStackFilter instance() {
 		return new ItemStackFilter();
+	}
+
+	@Override
+	public int getSizeInventory() {
+		return filters.length;
+	}
+
+	@Override
+	public ItemStack getStackInSlot(int slot) {
+		return filters[slot];
+	}
+
+	@Override
+	public ItemStack decrStackSize(int slot, int size) {
+		filters[slot] = null;
+		return null;
+	}
+
+	@Override
+	public ItemStack getStackInSlotOnClosing(int slot) {
+		return null;
+	}
+
+	@Override
+	public void setInventorySlotContents(int slot, ItemStack stack) {
+		if (stack != null) {
+			ItemStack filterStack = stack.copy();
+			filterStack.stackSize = 1;
+			filters[slot] = filterStack;
+		} else {
+			filters[slot] = null;
+		}
+	}
+
+	@Override
+	public String getInventoryName() {
+		return "ItemStack Filter";
+	}
+
+	@Override
+	public boolean hasCustomInventoryName() {
+		return false;
+	}
+
+	@Override
+	public int getInventoryStackLimit() {
+		return 64;
+	}
+
+	@Override
+	public void markDirty() {
+	}
+
+	@Override
+	public boolean isUseableByPlayer(EntityPlayer player) {
+		return true;
+	}
+
+	@Override
+	public void openInventory() {
+	}
+
+	@Override
+	public void closeInventory() {
+	}
+
+	@Override
+	public boolean isItemValidForSlot(int slot, ItemStack stack) {
+		return true;
 	}
 
 }

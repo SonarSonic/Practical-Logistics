@@ -107,7 +107,6 @@ public class RenderItemHandlers {
 		@Override
 		public void renderItem(IItemRenderer.ItemRenderType type, ItemStack item, Object... data) {
 			GL11.glScaled(1.2, 1.2, 1.2);
-			GL11.glTranslated(0.0, 0.1, 0.0);
 			if (type == IItemRenderer.ItemRenderType.INVENTORY) {
 				GL11.glTranslatef(-0.5F, -0.5F, 0.5F);
 				GL11.glRotated(90, 0, 1, 0);

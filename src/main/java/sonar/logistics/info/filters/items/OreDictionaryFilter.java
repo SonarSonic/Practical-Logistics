@@ -2,6 +2,7 @@ package sonar.logistics.info.filters.items;
 
 import io.netty.buffer.ByteBuf;
 
+import java.util.Collections;
 import java.util.List;
 
 import cpw.mods.fml.common.network.ByteBufUtils;
@@ -71,6 +72,13 @@ public class OreDictionaryFilter extends ItemFilter<OreDictionaryFilter> {
 	@Override
 	public OreDictionaryFilter instance() {
 		return new OreDictionaryFilter();
+	}
+
+	@Override
+	public List<ItemStack> getFilters() {
+		if (oreDict != null)
+			return OreDictionary.getOres(oreDict);
+		return Collections.EMPTY_LIST;
 	}
 
 }

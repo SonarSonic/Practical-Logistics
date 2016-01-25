@@ -27,11 +27,22 @@ public class InfoTypeRegistry extends NBTRegistryHelper.Buf<Info> {
 		registerObject(new ThaumcraftAspectInfo());
 		registerObject(new ManaInfo());
 		registerObject(new FluidStackInfo());
-		
+
 	}
 
 	@Override
 	public String registeryType() {
 		return "Info Type";
+	}
+
+	@Override
+	public boolean equalTypes(Info target, Info current) {
+		if (target == null && current != null) {
+			return false;
+		}
+		if (current == null) {
+			return false;
+		}
+		return (target.isEqualType(current) && target.isDataEqualType(current));
 	}
 }

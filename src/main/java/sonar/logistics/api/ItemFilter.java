@@ -32,6 +32,8 @@ public abstract class ItemFilter<T extends ItemFilter> implements INBTObject, IB
 
 	public abstract T instance();
 
+	public abstract List<ItemStack> getFilters();
+
 	/**
 	 * used when the provider is loaded normally used to check if relevant mods
 	 * are loaded for APIs to work

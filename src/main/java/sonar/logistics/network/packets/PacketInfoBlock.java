@@ -81,9 +81,9 @@ public class PacketInfoBlock implements IMessage {
 				if(handler!=null && handler instanceof InfoReaderHandler){
 					InfoReaderHandler reader = (InfoReaderHandler) handler;					
 					if (message.primary) {
-						reader.primaryInfo.setInfo(message.info);
+						reader.primaryInfo.setObject(message.info);
 					} else {
-						reader.secondaryInfo.setInfo(message.info);
+						reader.secondaryInfo.setObject(message.info);
 					}
 				}
 			}

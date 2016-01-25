@@ -19,6 +19,7 @@ tile.Hammer_Air.name=Forging Hammer
 tile.EntityNode.name=Entity Node
 tile.LargeDisplayScreen.name=Large Display Screen
 tile.FluidReader.name=Fluid Reader
+tile.ItemRouter.name=Item Router
 
 //items
 item.EnergyScreenItem.name=Energy Screen

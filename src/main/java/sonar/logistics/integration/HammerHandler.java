@@ -14,9 +14,6 @@ import sonar.logistics.utils.HammerRecipes;
 import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenMethod;
 
-/**
- * Created by AEnterprise
- */
 @ZenClass("mods.logistics.hammer")
 public class HammerHandler {
 
@@ -31,7 +28,7 @@ public class HammerHandler {
 	}
 
 	private static class AddRecipeAction implements IUndoableAction {
-		private Object input1;
+		private Object input;
 		private ItemStack output;
 
 		public AddRecipeAction(Object input1, ItemStack output) {
@@ -45,27 +42,27 @@ public class HammerHandler {
 				input1 = output = null;
 			}
 
-			this.input1 = input1;
+			this.input = input1;
 			this.output = output;
 		}
 
 		@Override
 		public void apply() {
-			if (input1 == null || output == null)
+			if (input == null || output == null)
 				return;
-			HammerRecipes.instance().addRecipe(input1, output);
+			HammerRecipes.instance().addRecipe(input, output);
 		}
 
 		@Override
 		public void undo() {
-			if (input1 == null || output == null)
+			if (input == null || output == null)
 				return;
-			HammerRecipes.instance().removeRecipe(input1);
+			HammerRecipes.instance().removeRecipe(input);
 		}
 
 		@Override
 		public String describe() {
-			return String.format("Adding Forging Hammer recipe (%s = %s)", input1, output);
+			return String.format("Adding Forging Hammer recipe (%s = %s)", input, output);
 		}
 
 		@Override
@@ -86,37 +83,37 @@ public class HammerHandler {
 	}
 
 	private static class RemoveRecipeAction implements IUndoableAction {
-		private Object input1;
+		private Object input;
 		private ItemStack output;
 
-		public RemoveRecipeAction(Object input1) {
-			if (input1 instanceof IItemStack)
-				input1 = MineTweakerMC.getItemStack((IItemStack) input1);
-			if (input1 instanceof IOreDictEntry)
-				input1 = new RecipeHelper.OreStack(((IOreDictEntry) input1).getName(), 1);
+		public RemoveRecipeAction(Object input) {
+			if (input instanceof IItemStack)
+				input = MineTweakerMC.getItemStack((IItemStack) input);
+			if (input instanceof IOreDictEntry)
+				input = new RecipeHelper.OreStack(((IOreDictEntry) input).getName(), 1);
 
-			if (input1 instanceof ILiquidStack) {
+			if (input instanceof ILiquidStack) {
 				MineTweakerAPI.logError("A liquid was passed into a Forging Hammer Recipe, aborting!");
-				input1 = output = null;
+				input = output = null;
 			}
 
-			this.input1 = input1;
+			this.input = input;
 
 			ItemStack dummyInput1 = null;
 
-			if (input1 instanceof ItemStack)
-				dummyInput1 = (ItemStack) input1;
-			if (input1 instanceof RecipeHelper.OreStack)
-				dummyInput1 = OreDictionary.getOres(((RecipeHelper.OreStack) input1).oreString).get(0);
+			if (input instanceof ItemStack)
+				dummyInput1 = (ItemStack) input;
+			if (input instanceof RecipeHelper.OreStack)
+				dummyInput1 = OreDictionary.getOres(((RecipeHelper.OreStack) input).oreString).get(0);
 
 			output = HammerRecipes.instance().getCraftingResult(dummyInput1);
 		}
 
 		@Override
 		public void apply() {
-			if (input1 == null || output == null)
+			if (input == null || output == null)
 				return;
-			HammerRecipes.instance().removeRecipe(input1);
+			HammerRecipes.instance().removeRecipe(input);
 		}
 
 		@Override
@@ -126,14 +123,14 @@ public class HammerHandler {
 
 		@Override
 		public void undo() {
-			if (input1 == null || output == null)
+			if (input == null || output == null)
 				return;
-			HammerRecipes.instance().addRecipe(input1, output);
+			HammerRecipes.instance().addRecipe(input, output);
 		}
 
 		@Override
 		public String describe() {
-			return String.format("Removing Forging Hammer Recipe (%s = %s)", input1, output);
+			return String.format("Removing Forging Hammer Recipe (%s = %s)", input, output);
 		}
 
 		@Override
