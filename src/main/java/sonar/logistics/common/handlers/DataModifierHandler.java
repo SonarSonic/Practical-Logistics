@@ -22,8 +22,8 @@ public class DataModifierHandler extends TileHandler {
 	public SyncString suffix = new SyncString(2);
 	public Info info;
 
-	public DataModifierHandler(boolean isMultipart) {
-		super(isMultipart);
+	public DataModifierHandler(boolean isMultipart, TileEntity tile) {
+		super(isMultipart, tile);
 	}
 
 	public void update(TileEntity te) {

@@ -30,8 +30,8 @@ public class LargeDisplayScreenHandler extends DisplayScreenHandler implements I
 	public boolean resetSizing = true;
 	public BlockCoords connectedTile = null;
 
-	public LargeDisplayScreenHandler(boolean isMultipart) {
-		super(isMultipart);
+	public LargeDisplayScreenHandler(boolean isMultipart, TileEntity tile) {
+		super(isMultipart, tile);	
 	}
 
 	@Override

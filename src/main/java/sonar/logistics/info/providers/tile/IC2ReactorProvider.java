@@ -14,7 +14,7 @@ import sonar.logistics.api.providers.TileProvider;
 
 public class IC2ReactorProvider extends TileProvider {
 
-	public static String name = "IC2-REACTOR";
+	public static String name = "IC2-Reactor";
 	public String[] categories = new String[] { "IC2 Reactor" };
 	public String[] subcategories = new String[] { "Is Active", "Heat", "Max Heat", "Energy Output", "Fluid Cooled" };
 

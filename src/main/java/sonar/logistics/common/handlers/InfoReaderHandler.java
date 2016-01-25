@@ -31,8 +31,8 @@ import sonar.logistics.info.types.CategoryInfo;
 
 public class InfoReaderHandler extends TileHandler implements IWailaInfo {
 
-	public InfoReaderHandler(boolean isMultipart) {
-		super(isMultipart);
+	public InfoReaderHandler(boolean isMultipart, TileEntity tile) {
+		super(isMultipart, tile);
 	}
 
 	public List<Info> clientInfo;
@@ -327,7 +327,7 @@ public class InfoReaderHandler extends TileHandler implements IWailaInfo {
 
 	@Override
 	public List<String> getWailaInfo(List<String> currenttip) {
-		currenttip.add("TESTING WAILA!");
+		//currenttip.add("TESTING WAILA!");
 		return currenttip;
 	}
 

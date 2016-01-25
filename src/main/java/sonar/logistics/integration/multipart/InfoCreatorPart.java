@@ -20,7 +20,7 @@ import codechicken.lib.vec.Cuboid6;
 
 public class InfoCreatorPart extends SonarHandlerPart implements IDataConnection, ICableRenderer, ITextField {
 
-	public InfoCreatorHandler handler = new InfoCreatorHandler(true);
+	public InfoCreatorHandler handler = new InfoCreatorHandler(true, tile());
 
 	public InfoCreatorPart() {
 		super();

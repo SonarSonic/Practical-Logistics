@@ -113,7 +113,7 @@ public class BlockRegistry extends Logistics {
 		GameRegistry.registerBlock(largeDisplayScreen, SonarBlockTip.class, "LargeDisplayScreen");
 		GameRegistry.registerTileEntity(TileEntityLargeScreen.class, "LargeDisplayScreen");
 
-		itemRouter = new BlockItemRouter().setBlockName("ItemRouter").setHardness(1.0F).setResistance(20.0F).setCreativeTab(Logistics.creativeTab).setBlockTextureName(modid + ":" + "data_cable");
+		itemRouter = new BlockItemRouter().setBlockName("ItemRouter").setHardness(1.0F).setResistance(100.0F).setCreativeTab(Logistics.creativeTab).setBlockTextureName(modid + ":" + "data_cable");
 		GameRegistry.registerBlock(itemRouter, SonarBlockTip.class, "ItemRouter");
 		GameRegistry.registerTileEntity(TileEntityItemRouter.class, "ItemRouter");
 	}

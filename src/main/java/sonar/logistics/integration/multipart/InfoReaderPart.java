@@ -19,7 +19,7 @@ import codechicken.lib.vec.Cuboid6;
 
 public class InfoReaderPart extends SonarHandlerPart implements IDataConnection, IInfoReader {
 
-	public InfoReaderHandler handler = new InfoReaderHandler(true);
+	public InfoReaderHandler handler = new InfoReaderHandler(true, tile());
 
 	public InfoReaderPart() {
 		super();

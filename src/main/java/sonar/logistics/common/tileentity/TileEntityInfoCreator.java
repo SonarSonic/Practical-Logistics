@@ -11,7 +11,7 @@ import sonar.logistics.common.handlers.InfoCreatorHandler;
 
 public class TileEntityInfoCreator extends TileEntityHandler implements IDataConnection, ICableRenderer, ITextField {
 
-	public InfoCreatorHandler handler = new InfoCreatorHandler(false);
+	public InfoCreatorHandler handler = new InfoCreatorHandler(false, this);
 
 	@Override
 	public TileHandler getTileHandler() {

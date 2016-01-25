@@ -12,7 +12,7 @@ import sonar.logistics.common.handlers.InfoReaderHandler;
 
 public class TileEntityInfoReader extends TileEntityHandler implements IDataConnection, IInfoReader, ITileHandler {
 
-	public InfoReaderHandler handler = new InfoReaderHandler(false);
+	public InfoReaderHandler handler = new InfoReaderHandler(false, this);
 
 	@Override
 	public TileHandler getTileHandler() {

@@ -15,6 +15,8 @@ import sonar.logistics.info.providers.tile.HammerProvider;
 import sonar.logistics.info.providers.tile.IC2ReactorProvider;
 import sonar.logistics.info.providers.tile.LogisticsPipesProvider;
 import sonar.logistics.info.providers.tile.ManaProvider;
+import sonar.logistics.info.providers.tile.MekanismGeneralProvider;
+import sonar.logistics.info.providers.tile.MekanismReactorProvider;
 import sonar.logistics.info.providers.tile.RFEnergyProvider;
 import sonar.logistics.info.providers.tile.ThaumcraftProvider;
 import sonar.logistics.info.providers.tile.VanillaTileEntityProvider;
@@ -25,7 +27,7 @@ public class TileProviderRegistry extends RegistryHelper<TileProvider> {
 	public void register() {
 		registerObject(new BlockProvider());
 		registerObject(new RFEnergyProvider());
-		//registerObject(new TankProvider());
+		// registerObject(new TankProvider());
 		registerObject(new GrowableProvider());
 		registerObject(new VanillaTileEntityProvider());
 		registerObject(new CalculatorProvider());
@@ -40,10 +42,13 @@ public class TileProviderRegistry extends RegistryHelper<TileProvider> {
 		registerObject(new AE2GridProvider());
 		registerObject(new LogisticsPipesProvider());
 		registerObject(new BuildcraftProvider());
+		registerObject(new MekanismGeneralProvider());
+		registerObject(new MekanismReactorProvider());
+
 	}
 
 	@Override
-	public String registeryType() {		
+	public String registeryType() {
 		return "Tile Provider";
 	}
 

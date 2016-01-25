@@ -9,7 +9,7 @@ import sonar.logistics.common.handlers.InventoryReaderHandler;
 
 public class TileEntityInventoryReader extends TileEntityHandlerInventory implements IDataConnection {
 
-	public InventoryReaderHandler handler = new InventoryReaderHandler(false);
+	public InventoryReaderHandler handler = new InventoryReaderHandler(false, this);
 
 	@Override
 	public TileHandler getTileHandler() {

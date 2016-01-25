@@ -9,7 +9,7 @@ import sonar.logistics.common.handlers.LargeDisplayScreenHandler;
 
 public class TileEntityLargeScreen extends TileEntityHandler implements IDataConnection {
 
-	public LargeDisplayScreenHandler handler = new LargeDisplayScreenHandler(false);
+	public LargeDisplayScreenHandler handler = new LargeDisplayScreenHandler(false, this);
 
 	@Override
 	public TileHandler getTileHandler() {

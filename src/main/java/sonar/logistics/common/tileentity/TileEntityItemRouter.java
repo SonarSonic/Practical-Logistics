@@ -18,7 +18,7 @@ import sonar.logistics.info.types.BlockCoordsInfo;
 
 public class TileEntityItemRouter extends TileEntityHandlerInventory implements IDataConnection, ISidedInventory, IFilteredInventory {
 	
-	public ItemRouterHandler handler = new ItemRouterHandler(false);
+	public ItemRouterHandler handler = new ItemRouterHandler(false, this);
 
 	@Override
 	public TileHandler getTileHandler() {

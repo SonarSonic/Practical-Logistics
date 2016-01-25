@@ -7,6 +7,7 @@ import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -19,6 +20,7 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
+import buildcraft.core.lib.inventory.filters.OreStackFilter;
 import sonar.core.SonarCore;
 import sonar.core.inventory.GuiSonar;
 import sonar.core.inventory.SonarButtons;
@@ -30,6 +32,7 @@ import sonar.logistics.common.containers.ContainerItemRouter;
 import sonar.logistics.common.handlers.ItemRouterHandler;
 import sonar.logistics.common.tileentity.TileEntityItemRouter;
 import sonar.logistics.info.filters.items.ItemStackFilter;
+import sonar.logistics.info.filters.items.OreDictionaryFilter;
 import sonar.logistics.network.packets.PacketRouterGui;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -39,25 +42,24 @@ public class GuiItemRouter extends GuiSonar {
 	public static final ResourceLocation bground = new ResourceLocation("PracticalLogistics:textures/gui/itemRouter.png");
 	public static final ResourceLocation itemFilter = new ResourceLocation("PracticalLogistics:textures/gui/itemRouter_item.png");
 
+	public static final int MAIN = 0, ITEM = 1, ORE = 2;
+
 	public TileEntityItemRouter tile;
 	public EntityPlayer player;
 	public ItemRouterHandler handler;
-	public int xCoord, yCoord, zCoord;
-	public int type = 0;
 	private float currentScroll;
 	private boolean isScrolling;
 	private boolean wasClicking;
 	public int scrollerLeft, scrollerStart, scrollerEnd, scrollerWidth;
 	public int cycle;
 	private GuiButton rselectButton;
+	private GuiTextField oreDictField;
+	boolean switching = true;
 
 	public int state = 0;
 
 	public GuiItemRouter(ItemRouterHandler handler, TileEntityItemRouter entity, EntityPlayer player) {
 		super(new ContainerItemRouter(entity, player.inventory), entity);
-		this.xCoord = entity.xCoord;
-		this.yCoord = entity.yCoord;
-		this.zCoord = entity.zCoord;
 		this.handler = handler;
 		this.tile = entity;
 		this.player = player;
@@ -65,19 +67,21 @@ public class GuiItemRouter extends GuiSonar {
 
 	@Override
 	public void initGui() {
-		Keyboard.enableRepeatEvents(true);
+		Keyboard.enableRepeatEvents(false);
+		switching = true;
+		this.currentScroll = 0;
 		this.mc.thePlayer.openContainer = this.inventorySlots;
-		if (state == 0) {
+		if (state == MAIN) {
 			this.xSize = 176;
 			this.ySize = 233;
 		}
-		if (state == 1) {
+		if (state == ITEM || state == ORE) {
 			this.xSize = 176;
 			this.ySize = 138;
 		}
 		this.guiLeft = (this.width - this.xSize) / 2;
 		this.guiTop = (this.height - this.ySize) / 2;
-		if (state == 0) {
+		if (state == MAIN) {
 			scrollerLeft = this.guiLeft + 157;
 			scrollerStart = this.guiTop + 33;
 			scrollerEnd = scrollerStart + 92;
@@ -87,13 +91,19 @@ public class GuiItemRouter extends GuiSonar {
 			for (int i = 1; i < 8; i++) {
 				this.buttonList.add(new ListButton(i, guiLeft + 57 + ((i - 1) * 14), guiTop + 20));
 			}
-		}
-		if (state == 1) {
+		} else if (state == ITEM) {
 			for (int i = 0; i < 6; i++) {
 				this.buttonList.add(new FilterButton(i, guiLeft + 46 + ((i) * 22), guiTop + 23));
 			}
 			this.buttonList.add(new SideButton(6, guiLeft + 6, guiTop + 6, 34, 12, "DONE"));
+		} else if (state == ORE) {
+			Keyboard.enableRepeatEvents(true);
+			oreDictField = new GuiTextField(this.fontRendererObj, 44, 25, 109, 12);
+			oreDictField.setMaxStringLength(20);
+			oreDictField.setText(handler.clientOreFilter.oreDict);
+			this.buttonList.add(new SideButton(12, guiLeft + 6, guiTop + 6, 34, 12, "DONE"));
 		}
+		switching = false;
 	}
 
 	public int getFilterPosition() {
@@ -123,15 +133,14 @@ public class GuiItemRouter extends GuiSonar {
 
 	@Override
 	public void drawGuiContainerForegroundLayer(int x, int y) {
-		if (state == 0) {
+		if (state == MAIN) {
 			FontHelper.textCentre(StatCollector.translateToLocal("tile.ItemRouter.name"), xSize, 7, 1);
 			GL11.glTranslated(0, 0.5, 0);
 			FontHelper.textOffsetCentre(ForgeDirection.getOrientation(handler.side.getInt()).name(), 31, 22, -1);
 			GL11.glTranslated(0, -0.5, 0);
 
 			super.drawGuiContainerForegroundLayer(x, y);
-
-			List<ItemFilter> filters = handler.listType.getInt() == 0 ? handler.whitelist[handler.side.getInt()] : handler.blacklist[handler.side.getInt()];
+			List<ItemFilter> filters = handler.getFilters();
 			if (filters != null) {
 				int size = filters.size();
 				int start = (int) (size * this.currentScroll);
@@ -143,10 +152,17 @@ public class GuiItemRouter extends GuiSonar {
 						String type = filter.getName() + " : " + i;
 						if (filter instanceof ItemStackFilter) {
 							ItemStackFilter stackFilter = (ItemStackFilter) filter;
-							FontHelper.text("Item Filter", 32, 38 + (i * 18) - (start * 18), colour);
+							FontHelper.textOffsetCentre("Item Stack Filter", 90, 38 + (i * 18) - (start * 18), colour);
 
 							double scale = 0.5;
 							RenderItem.getInstance().renderItemAndEffectIntoGUI(fontRendererObj, this.mc.getTextureManager(), stackFilter.getFilters().get(0), 10, 34 + (i * 18) - (start * 18));
+						}
+						if (filter instanceof OreDictionaryFilter) {
+							OreDictionaryFilter oreFilter = (OreDictionaryFilter) filter;
+							if (oreFilter.getFilters() != null && oreFilter.getFilters().size() != 0) {
+								RenderItem.getInstance().renderItemAndEffectIntoGUI(fontRendererObj, this.mc.getTextureManager(), oreFilter.getFilters().get(0), 10, 34 + (i * 18) - (start * 18));
+							}
+							FontHelper.textOffsetCentre("Ore Dictionary Filter ", 90, 38 + (i * 18) - (start * 18), colour);
 						}
 					}
 
@@ -155,9 +171,8 @@ public class GuiItemRouter extends GuiSonar {
 				if (x - guiLeft >= 13 && x - guiLeft <= 152 && y - guiTop >= 32 && y - guiTop <= 32 + (7 * 18)) {
 					int X = (x - guiLeft - 13) / 18;
 					int Y = (y - guiTop - 32) / 18;
-					int i = ((start * 5) + Y);
-
-					if (i < filters.size()) {
+					int i = ((start) + Y);
+					if (i < filters.size() && Y < finish) {
 						ItemFilter filter = filters.get(i);
 						if (filter instanceof ItemStackFilter) {
 							ItemStackFilter stackFilter = (ItemStackFilter) filter;
@@ -166,20 +181,22 @@ public class GuiItemRouter extends GuiSonar {
 								List itemTip = stackFilter.getFilters().get(0).getTooltip(this.mc.thePlayer, this.mc.gameSettings.advancedItemTooltips);
 								if (itemTip != null && itemTip.size() != 0)
 									list.add(0, stackFilter.getFilters().get(0).getRarity().rarityColor + (String) itemTip.get(0));
-
-								list.add(1, (EnumChatFormatting.GRAY) + "Ignore Damage: " + stackFilter.ignoreDamage);
-								list.add(2, (EnumChatFormatting.GRAY) + "Use NBT: " + stackFilter.matchNBT);
-
-								list.add(3, (EnumChatFormatting.GRAY) + "Use OreDict: " + stackFilter.matchOreDict);
-								list.add(4, (EnumChatFormatting.GRAY) + "Use Modid: " + stackFilter.matchModid);
-
+								list.add(1, (EnumChatFormatting.GRAY) + "Use NBT: " + (stackFilter.matchNBT ? EnumChatFormatting.WHITE : "") + stackFilter.matchNBT);
+								list.add(2, (EnumChatFormatting.GRAY) + "Use OreDict: " + (stackFilter.matchOreDict ? EnumChatFormatting.WHITE : "") + stackFilter.matchOreDict);
+								list.add(3, (EnumChatFormatting.GRAY) + "Ignore Damage: " + (stackFilter.ignoreDamage ? EnumChatFormatting.WHITE : "") + stackFilter.ignoreDamage);
+								list.add(4, (EnumChatFormatting.GRAY) + "Use Modid: " + (stackFilter.matchModid ? EnumChatFormatting.WHITE : "") + stackFilter.matchModid);
 								FontRenderer font = stackFilter.getFilters().get(0).getItem().getFontRenderer(stackFilter.getFilters().get(0));
-								GL11.glDisable(GL11.GL_DEPTH_TEST);
-								GL11.glDisable(GL11.GL_LIGHTING);
-								drawHoveringText(list, x - guiLeft, y - guiTop, (font == null ? fontRendererObj : font));
-								GL11.glEnable(GL11.GL_LIGHTING);
-								GL11.glEnable(GL11.GL_DEPTH_TEST);
-								net.minecraft.client.renderer.RenderHelper.enableGUIStandardItemLighting();
+								drawSpecialToolTip(list, x, y, font);
+
+							}
+						}
+
+						if (filter instanceof OreDictionaryFilter) {
+							OreDictionaryFilter oreFilter = (OreDictionaryFilter) filter;
+							if (oreFilter.getFilters() != null && !oreFilter.getFilters().isEmpty() && oreFilter.getFilters().get(0) != null) {
+								List list = new ArrayList();
+								list.add(0, (EnumChatFormatting.WHITE) + "Ore String: " + (EnumChatFormatting.AQUA) + oreFilter.oreDict);
+								drawSpecialToolTip(list, x, y, null);
 							}
 						}
 
@@ -187,21 +204,34 @@ public class GuiItemRouter extends GuiSonar {
 				}
 
 			}
-		}
-		if (state == 1) {
+		} else if (state == ITEM) {
 			FontHelper.textCentre(StatCollector.translateToLocal("Create Item Filter"), xSize, 9, 1);
+			super.drawGuiContainerForegroundLayer(x, y);
+		} else if (state == ORE) {
+			FontHelper.textCentre(StatCollector.translateToLocal("Create Ore Filter"), xSize, 9, 1);
+			oreDictField.drawTextBox();
+			List<ItemStack> filters = handler.clientOreFilter.getFilters();
+			if (filters != null && filters.size() != 0) {
+				ItemStack stack = filters.get(0);
+				net.minecraft.client.renderer.RenderHelper.enableGUIStandardItemLighting();
+				RenderItem.getInstance().renderItemAndEffectIntoGUI(fontRendererObj, this.mc.getTextureManager(), stack, 23, 23);
+
+				if (x - guiLeft >= 23 && x - guiLeft <= 23 + 16 && y - guiTop >= 23 && y - guiTop <= 23 + 16) {
+					this.drawNormalToolTip(stack, x, y);
+				}
+			}
 			super.drawGuiContainerForegroundLayer(x, y);
 		}
 	}
 
 	public void handleMouseInput() {
 		super.handleMouseInput();
-		if (state == 0) {
+		if (state == MAIN) {
 			float lastScroll = currentScroll;
 			int i = Mouse.getEventDWheel();
 
 			if (i != 0 && this.needsScrollBars()) {
-				List<ItemFilter> filters = handler.listType.getInt() == 0 ? handler.whitelist[handler.side.getInt()] : handler.blacklist[handler.side.getInt()];
+				List<ItemFilter> filters = handler.getFilters();
 				int size = filters == null ? 0 : filters.size();
 				int j = size + 1;
 
@@ -228,12 +258,12 @@ public class GuiItemRouter extends GuiSonar {
 
 	public void drawScreen(int x, int y, float var) {
 		super.drawScreen(x, y, var);
-		if(cycle<40){
+		if (cycle < 40) {
 			cycle++;
-		}else{
-			cycle=0;
+		} else {
+			cycle = 0;
 		}
-		if (state == 0) {
+		if (state == MAIN) {
 			float lastScroll = currentScroll;
 			boolean flag = Mouse.isButtonDown(0);
 
@@ -265,22 +295,44 @@ public class GuiItemRouter extends GuiSonar {
 	@Override
 	protected void mouseClicked(int x, int y, int button) {
 		super.mouseClicked(x, y, button);
-		if (state == 0) {
-			if (button == 0 || button == 1) {
-
-				List<ItemFilter> filters = handler.listType.getInt() == 0 ? handler.whitelist[handler.side.getInt()] : handler.blacklist[handler.side.getInt()];
+		if (state == MAIN && !switching) {
+			if (button == 1 || button == 0) {
+				List<ItemFilter> filters = handler.getFilters();
 				if (filters != null) {
 					int size = filters.size();
 					if (x - guiLeft >= 13 && x - guiLeft <= 152 && y - guiTop >= 32 && y - guiTop <= 32 + (7 * 18)) {
-						int start = (int) (size / 12 * this.currentScroll);
-						int X = (x - guiLeft - 13) / 18;
+						int start = (int) (size * this.currentScroll);
 						int Y = (y - guiTop - 32) / 18;
-						handler.clientClick = ((start * 5) + Y);
-						SonarCore.network.sendToServer(new PacketByteBufServer(handler, tile.xCoord, tile.yCoord, tile.zCoord, 8));
+						int i = ((start) + Y);
+						int finish = Math.min(start + 5, size);
+						if (Y < finish) {
+							if (button == 0 && !switching) {
+								handler.clientClick = i;
+								SonarCore.network.sendToServer(new PacketByteBufServer(handler, tile.xCoord, tile.yCoord, tile.zCoord, 8));
+							} else {
+								if (i < filters.size() && filters.get(i) != null) {
+									handler.clientClick = i;
+									ItemFilter filter = filters.get(i);
+									if (filter instanceof ItemStackFilter) {
+										handler.editStack = i;
+										handler.editOre = -1;
+										SonarCore.network.sendToServer(new PacketByteBufServer(handler, tile.xCoord, tile.yCoord, tile.zCoord, 9));
+										switchState(1);
+									} else {
+										handler.editStack = -1;
+										handler.editOre = i;
+										SonarCore.network.sendToServer(new PacketByteBufServer(handler, tile.xCoord, tile.yCoord, tile.zCoord, 9));
+										switchState(2);
+									}
 
+								}
+							}
+						}
 					}
 				}
 			}
+		} else if (state == ORE) {
+			oreDictField.mouseClicked(x - guiLeft, y - guiTop, button);
 		}
 	}
 
@@ -295,22 +347,23 @@ public class GuiItemRouter extends GuiSonar {
 
 	protected void buttonPressed(GuiButton button, int buttonID) {
 		if (button != null) {
-			if (state == 0) {
+			if (state == MAIN) {
 				if (button.id == 3) {
-					handler.clientStackFilter = new ItemStackFilter();
-					state = 1;
-					Logistics.network.sendToServer(new PacketRouterGui(tile.xCoord, tile.yCoord, tile.zCoord, state));
-					if (this.mc.thePlayer.openContainer instanceof ContainerItemRouter) {
-						((ContainerItemRouter) this.mc.thePlayer.openContainer).switchState(player.inventory, tile, state);
-					}
-					this.inventorySlots = this.mc.thePlayer.openContainer;
-					reset();
+					switchState(1);
+				} else if (button.id == 4) {
+					switchState(2);
 				} else {
 					SonarCore.network.sendToServer(new PacketByteBufServer(handler, tile.xCoord, tile.yCoord, tile.zCoord, button.id));
-					if (button.id == 0)
+					if (button.id == 0) {
+						this.currentScroll = 0;
 						reset();
+					}
+					if (button.id == 7 || button.id == 2) {
+						this.currentScroll = 0;
+					}
+
 				}
-			} else if (state == 1) {
+			} else if (state == ITEM) {
 				if (button.id == 0) {
 					handler.clientStackFilter.matchNBT = !handler.clientStackFilter.matchNBT;
 				}
@@ -321,24 +374,38 @@ public class GuiItemRouter extends GuiSonar {
 					handler.clientStackFilter.ignoreDamage = !handler.clientStackFilter.ignoreDamage;
 				}
 				if (button.id == 3) {
-					System.out.print("modid");
 					handler.clientStackFilter.matchModid = !handler.clientStackFilter.matchModid;
 				}
 				if (button.id == 4) {
 					SonarCore.network.sendToServer(new PacketByteBufServer(handler, tile.xCoord, tile.yCoord, tile.zCoord, 2));
 				}
 				if (button.id == 6) {
-					state = 0;
+					switching = true;
 					SonarCore.network.sendToServer(new PacketByteBufServer(handler, tile.xCoord, tile.yCoord, tile.zCoord, -1));
-					Logistics.network.sendToServer(new PacketRouterGui(tile.xCoord, tile.yCoord, tile.zCoord, state));
-					if (this.mc.thePlayer.openContainer instanceof ContainerItemRouter) {
-						((ContainerItemRouter) this.mc.thePlayer.openContainer).switchState(player.inventory, tile, state);
-					}
-					this.inventorySlots = this.mc.thePlayer.openContainer;
-					reset();
+					handler.editStack = -1;
+					switchState(0);
+				}
+			} else if (state == ORE) {
+				if (button.id == 12) {
+					switching = true;
+					SonarCore.network.sendToServer(new PacketByteBufServer(handler, tile.xCoord, tile.yCoord, tile.zCoord, -2));
+					handler.editOre = -1;
+					switchState(0);
 				}
 			}
 		}
+	}
+
+	public void switchState(int state) {
+		switching = true;
+		this.currentScroll = 0;
+		Logistics.network.sendToServer(new PacketRouterGui(tile.xCoord, tile.yCoord, tile.zCoord, state));
+		if (this.mc.thePlayer.openContainer instanceof ContainerItemRouter) {
+			((ContainerItemRouter) this.mc.thePlayer.openContainer).switchState(player.inventory, tile, state);
+		}
+		this.inventorySlots = this.mc.thePlayer.openContainer;
+		this.state = state;
+		reset();
 	}
 
 	protected void actionPerformed(GuiButton button) {
@@ -347,13 +414,32 @@ public class GuiItemRouter extends GuiSonar {
 	}
 
 	@Override
+	protected void keyTyped(char c, int i) {
+		if (state == ORE && oreDictField.isFocused()) {
+			if (c == 13 || c == 27) {
+				oreDictField.setFocused(false);
+			} else {
+				oreDictField.textboxKeyTyped(c, i);
+				final String text = oreDictField.getText();
+				if (text.isEmpty() || text == "" || text == null) {
+					handler.clientOreFilter.oreDict = " ";
+				} else {
+					handler.clientOreFilter.oreDict = text;
+				}
+			}
+		} else {
+			super.keyTyped(c, i);
+		}
+	}
+
+	@Override
 	protected void drawGuiContainerBackgroundLayer(float var1, int var2, int var3) {
 		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 
 		Minecraft.getMinecraft().getTextureManager().bindTexture(this.getBackground());
 		drawTexturedModalRect(this.guiLeft, this.guiTop, 0, 0, this.xSize, this.ySize);
-		if (state == 0) {
-			List<ItemFilter> filters = handler.listType.getInt() == 0 ? handler.whitelist[handler.side.getInt()] : handler.blacklist[handler.side.getInt()];
+		if (state == MAIN) {
+			List<ItemFilter> filters = handler.getFilters();
 
 			if (filters != null) {
 
@@ -371,17 +457,13 @@ public class GuiItemRouter extends GuiSonar {
 	}
 
 	private boolean needsScrollBars() {
-		List<ItemFilter> filters = handler.listType.getInt() == 0 ? handler.whitelist[handler.side.getInt()] : handler.blacklist[handler.side.getInt()];
+		List<ItemFilter> filters = handler.getFilters();
 		int size = filters == null ? 0 : filters.size();
-		if (size <= 11)
+		if (size <= 5)
 			return false;
 
 		return true;
 
-	}
-
-	public ItemFilter getCurrentFilter() {
-		return null;
 	}
 
 	@SideOnly(Side.CLIENT)
@@ -538,6 +620,11 @@ public class GuiItemRouter extends GuiSonar {
 		@Override
 		public void drawButton(Minecraft minecraft, int x, int y) {
 
+		}
+
+		public void func_146111_b(int x, int y) {
+			if (displayString != null)
+				drawCreativeTabHoveringText(displayString, x, y);
 		}
 	}
 

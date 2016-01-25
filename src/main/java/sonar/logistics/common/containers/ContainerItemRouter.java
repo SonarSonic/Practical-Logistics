@@ -24,6 +24,8 @@ import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.common.handlers.InventoryReaderHandler;
 import sonar.logistics.common.handlers.ItemRouterHandler;
 import sonar.logistics.common.tileentity.TileEntityItemRouter;
+import sonar.logistics.info.filters.items.ItemStackFilter;
+import sonar.logistics.info.filters.items.OreDictionaryFilter;
 
 public class ContainerItemRouter extends ContainerSync {
 
@@ -60,13 +62,15 @@ public class ContainerItemRouter extends ContainerSync {
 			for (int i = 0; i < 9; ++i) {
 				this.addSlotToContainer(new Slot(player, i, 8 + i * 18, 114));
 			}
-			addSlotToContainer(new SlotList(entity.handler.clientStackFilter, 0, 23, 23));
+			if (state == 1)
+				addSlotToContainer(new SlotList(entity.handler.clientStackFilter, 0, 23, 23));
 
 		}
-
 	}
 
 	public void switchState(InventoryPlayer player, TileEntityItemRouter entity, int state) {
+		entity.handler.resetClientStackFilter();
+		entity.handler.resetClientOreFilter();
 		this.state = state;
 		this.inventoryItemStacks.clear();
 		this.inventorySlots.clear();
@@ -82,12 +86,13 @@ public class ContainerItemRouter extends ContainerSync {
 				TileHandler handler = FMPHelper.getHandler(tile);
 				handler.writeData(tag, SyncType.SPECIAL);
 				if (tag.hasNoTags()) {
+					//System.out.print("no tag");
 					return;
 				}
 				for (Object o : crafters) {
 					if (o != null && o instanceof EntityPlayerMP) {
 						SonarCore.network.sendTo(new PacketTileSync(tile.xCoord, tile.yCoord, tile.zCoord, tag, SyncType.SPECIAL), (EntityPlayerMP) o);
-
+						System.out.print("hasTag");
 					}
 				}
 
@@ -133,8 +138,8 @@ public class ContainerItemRouter extends ContainerSync {
 
 				}
 			} else {
-				if (id < 36) {
-					((Slot) this.inventorySlots.get(36)).putStack(itemstack1.copy());		
+				if (state == 1 && id < 36) {
+					((Slot) this.inventorySlots.get(36)).putStack(itemstack1.copy());
 
 				} else if (id < 27) {
 					if (!this.mergeItemStack(itemstack1, 27, 36, false)) {

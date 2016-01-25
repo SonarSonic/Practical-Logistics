@@ -11,7 +11,7 @@ import sonar.logistics.common.handlers.DataModifierHandler;
 
 public class TileEntityDataModifier extends TileEntityHandler implements IDataConnection, ICableRenderer, ITextField {
 
-	public DataModifierHandler handler = new DataModifierHandler(false);
+	public DataModifierHandler handler = new DataModifierHandler(false, this);
 
 	@Override
 	public TileHandler getTileHandler() {

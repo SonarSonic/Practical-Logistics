@@ -18,7 +18,7 @@ import codechicken.lib.vec.Cuboid6;
 
 public class DisplayScreenPart extends SonarHandlerPart implements IDataConnection {
 
-	public DisplayScreenHandler handler = new DisplayScreenHandler(true);
+	public DisplayScreenHandler handler = new DisplayScreenHandler(true, tile());
 
 	public DisplayScreenPart() {
 		super();

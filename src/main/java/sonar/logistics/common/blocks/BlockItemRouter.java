@@ -1,12 +1,17 @@
 package sonar.logistics.common.blocks;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import sonar.core.SonarCore;
 import sonar.core.common.block.SonarMaterials;
 import sonar.core.common.tileentity.TileEntitySonar;
+import sonar.core.network.PacketTileSync;
 import sonar.core.utils.helpers.FontHelper;
+import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.Logistics;
 import sonar.logistics.common.tileentity.TileEntityEntityNode;
 import sonar.logistics.common.tileentity.TileEntityItemRouter;
@@ -31,6 +36,9 @@ public class BlockItemRouter extends BaseNode {
 	@Override
 	public void openGui(World world, int x, int y, int z, EntityPlayer player) {
 		if (player != null && !world.isRemote) {
+			NBTTagCompound packetTag = new NBTTagCompound();
+			((TileEntityItemRouter) world.getTileEntity(x, y, z)).writeData(packetTag, SyncType.PACKET);
+			SonarCore.network.sendTo(new PacketTileSync(x, y, z, packetTag, SyncType.PACKET), (EntityPlayerMP) player);
 			player.openGui(Logistics.instance, LogisticsGui.itemRouter, world, x, y, z);
 		}
 	}
@@ -47,6 +55,8 @@ public class BlockItemRouter extends BaseNode {
 					} else {
 						router.handler.sideConfigs[side].setInt(0);
 					}
+
+					SonarCore.sendFullSyncAround(router, 64);
 					return true;
 				}
 			}

@@ -31,8 +31,8 @@ public class InventoryReaderHandler extends InventoryTileHandler {
 
 	public ItemStack current;
 
-	public InventoryReaderHandler(boolean isMultipart) {
-		super(isMultipart);
+	public InventoryReaderHandler(boolean isMultipart, TileEntity tile) {
+		super(isMultipart, tile);	
 		super.slots = new ItemStack[1];
 	}
 	

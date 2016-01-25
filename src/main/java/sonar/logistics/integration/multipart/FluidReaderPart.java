@@ -18,7 +18,7 @@ import codechicken.lib.vec.Cuboid6;
 
 public class FluidReaderPart extends SonarHandlerPart implements IDataConnection{
 
-	public FluidReaderHandler handler = new FluidReaderHandler(true);
+	public FluidReaderHandler handler = new FluidReaderHandler(true, tile());
 
 	public FluidReaderPart() {
 		super();

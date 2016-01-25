@@ -13,11 +13,11 @@ import sonar.logistics.api.ItemFilter;
 
 public class OreDictionaryFilter extends ItemFilter<OreDictionaryFilter> {
 
-	public String oreDict = " ";
+	public String oreDict = "";
 
 	@Override
 	public String getName() {
-		return "OreDict - Filter";
+		return "OreDict Filter";
 	}
 
 	@Override

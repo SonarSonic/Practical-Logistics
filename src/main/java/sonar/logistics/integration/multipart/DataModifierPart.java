@@ -20,7 +20,7 @@ import codechicken.lib.vec.Cuboid6;
 
 public class DataModifierPart extends SonarHandlerPart implements IDataConnection, ICableRenderer, ITextField {
 
-	public DataModifierHandler handler = new DataModifierHandler(true);
+	public DataModifierHandler handler = new DataModifierHandler(true, tile());
 
 	public DataModifierPart() {
 		super();

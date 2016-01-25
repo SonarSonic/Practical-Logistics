@@ -30,8 +30,8 @@ public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 
 	public Info info;
 
-	public DisplayScreenHandler(boolean isMultipart) {
-		super(isMultipart);
+	public DisplayScreenHandler(boolean isMultipart, TileEntity tile) {
+		super(isMultipart, tile);
 	}
 
 	@Override

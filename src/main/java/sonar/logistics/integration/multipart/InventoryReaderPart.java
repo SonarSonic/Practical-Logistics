@@ -18,7 +18,7 @@ import codechicken.lib.vec.Cuboid6;
 
 public class InventoryReaderPart extends SonarHandlerPart implements IDataConnection{
 
-	public InventoryReaderHandler handler = new InventoryReaderHandler(true);
+	public InventoryReaderHandler handler = new InventoryReaderHandler(true, tile());
 
 	public InventoryReaderPart() {
 		super();

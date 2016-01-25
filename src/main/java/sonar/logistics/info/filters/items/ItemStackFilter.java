@@ -61,9 +61,10 @@ public class ItemStackFilter extends ItemFilter<ItemStackFilter> implements IInv
 	@Override
 	public void writeToNBT(NBTTagCompound tag) {
 		tag.setBoolean("matchNBT", matchNBT);
-		tag.setBoolean("dam", ignoreDamage);
-		tag.setBoolean("oreDict", matchOreDict);
-		tag.setBoolean("modid", matchModid);
+		tag.setBoolean("ignoreDamage", ignoreDamage);
+		tag.setBoolean("matchOreDict", matchOreDict);
+		tag.setBoolean("matchModid", matchModid);
+
 		NBTTagCompound stackTag = new NBTTagCompound();
 		if (filters[0] != null) {
 			filters[0].writeToNBT(stackTag);
@@ -74,9 +75,10 @@ public class ItemStackFilter extends ItemFilter<ItemStackFilter> implements IInv
 	@Override
 	public void readFromNBT(NBTTagCompound tag) {
 		matchNBT = tag.getBoolean("matchNBT");
-		ignoreDamage = tag.getBoolean("dam");
-		matchOreDict = tag.getBoolean("oreDict");
-		matchModid = tag.getBoolean("modid");
+		ignoreDamage = tag.getBoolean("ignoreDamage");
+		matchOreDict = tag.getBoolean("matchOreDict");
+		matchModid = tag.getBoolean("matchModid");
+
 		if (tag.hasKey("stackTag"))
 			filters[0] = ItemStack.loadItemStackFromNBT(tag.getCompoundTag("stackTag"));
 	}
@@ -87,6 +89,7 @@ public class ItemStackFilter extends ItemFilter<ItemStackFilter> implements IInv
 		ignoreDamage = buf.readBoolean();
 		matchOreDict = buf.readBoolean();
 		matchModid = buf.readBoolean();
+
 		if (buf.readBoolean()) {
 			filters[0] = ByteBufUtils.readItemStack(buf);
 		}
@@ -98,6 +101,7 @@ public class ItemStackFilter extends ItemFilter<ItemStackFilter> implements IInv
 		buf.writeBoolean(ignoreDamage);
 		buf.writeBoolean(matchOreDict);
 		buf.writeBoolean(matchModid);
+
 		if (filters[0] != null) {
 			buf.writeBoolean(true);
 			ByteBufUtils.writeItemStack(buf, filters[0]);

@@ -9,7 +9,7 @@ import sonar.logistics.common.handlers.FluidReaderHandler;
 
 public class TileEntityFluidReader extends TileEntityHandler implements IDataConnection {
 
-	public FluidReaderHandler handler = new FluidReaderHandler(false);
+	public FluidReaderHandler handler = new FluidReaderHandler(false, this);
 
 	@Override
 	public TileHandler getTileHandler() {

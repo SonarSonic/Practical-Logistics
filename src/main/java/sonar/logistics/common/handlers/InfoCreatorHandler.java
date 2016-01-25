@@ -18,8 +18,8 @@ import sonar.logistics.helpers.InfoHelper;
 
 public class InfoCreatorHandler extends TileHandler {
 
-	public InfoCreatorHandler(boolean isMultipart) {
-		super(isMultipart);
+	public InfoCreatorHandler(boolean isMultipart, TileEntity tile) {
+		super(isMultipart, tile);
 	}
 
 	public SyncString subCategory = new SyncString(0);

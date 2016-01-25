@@ -31,8 +31,8 @@ public class FluidReaderHandler extends TileHandler {
 
 	public FluidStack current;
 
-	public FluidReaderHandler(boolean isMultipart) {
-		super(isMultipart);
+	public FluidReaderHandler(boolean isMultipart, TileEntity tile) {
+		super(isMultipart, tile);
 	}
 
 	@Override

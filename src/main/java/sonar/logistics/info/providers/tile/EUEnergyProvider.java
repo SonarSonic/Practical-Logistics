@@ -37,12 +37,12 @@ public class EUEnergyProvider extends TileProvider {
 		if (target instanceof IEnergySink) {
 			IEnergySink energy = (IEnergySink) target;
 			infoList.add(new StandardInfo(id, 0, 0, energy.getSinkTier()));
-			infoList.add(new StandardInfo(id, 0, 1, (int) energy.getDemandedEnergy()));
+			infoList.add(new StandardInfo(id, 0, 1, (int) energy.getDemandedEnergy(), "EU"));
 		}
 		if (target instanceof IEnergySource) {
 			IEnergySource energy = (IEnergySource) target;
 			infoList.add(new StandardInfo(id, 0, 2, (int) energy.getSourceTier()));
-			infoList.add(new StandardInfo(id, 0, 3, (int) energy.getOfferedEnergy()));
+			infoList.add(new StandardInfo(id, 0, 3, (int) energy.getOfferedEnergy(), "EU"));
 		}
 	}
 
