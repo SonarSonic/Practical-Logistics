@@ -1,6 +1,7 @@
 package sonar.logistics.common.tileentity;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import net.minecraft.nbt.NBTTagCompound;
@@ -13,7 +14,7 @@ import sonar.logistics.helpers.CableHelper;
 
 public class TileEntityMultiDataCable extends TileEntitySonar implements IMultiDataCable {
 
-	public List<BlockCoords> coords;
+	public List<BlockCoords> coords = Collections.EMPTY_LIST;
 
 	@Override
 	public List<BlockCoords> getCoords() {
@@ -43,11 +44,6 @@ public class TileEntityMultiDataCable extends TileEntitySonar implements IMultiD
 		}
 	}
 
-	/*
-	 * @Override public void setCoords(BlockCoords coords) { if
-	 * (!BlockCoords.equalCoords(this.coords, coords)) { this.coords = coords;
-	 * CableHelper.updateAdjacentCoords(this, coords, true); } }
-	 */
 	@Override
 	public boolean isBlocked(ForgeDirection dir) {
 		return false;
@@ -72,21 +68,29 @@ public class TileEntityMultiDataCable extends TileEntitySonar implements IMultiD
 	public void writeData(NBTTagCompound nbt, SyncType type) {
 		super.writeData(nbt, type);
 		if (type == SyncType.SAVE) {
-			NBTTagCompound infoTag = new NBTTagCompound();
 			BlockCoords.writeBlockCoords(nbt, coords, "tiles");
-
 		}
 	}
 
 	public void validate() {
-		this.coords = null;
+		this.coords = Collections.EMPTY_LIST;
 		super.validate();
 	}
 
 	public void invalidate() {
-		this.coords = null;
+		this.coords = Collections.EMPTY_LIST;
 		super.invalidate();
 		CableHelper.updateAdjacentCoords(worldObj, xCoord, yCoord, zCoord, null, true);
+	}
+
+	@Override
+	public boolean updateConnections() {
+		return false;
+	}
+
+	@Override
+	public void setCoords(List<BlockCoords> coords) {
+		
 	}
 
 }

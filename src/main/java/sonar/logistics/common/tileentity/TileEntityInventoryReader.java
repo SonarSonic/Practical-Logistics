@@ -3,11 +3,12 @@ package sonar.logistics.common.tileentity;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.common.tileentity.TileEntityHandlerInventory;
 import sonar.core.integration.fmp.handlers.TileHandler;
+import sonar.core.inventory.IDropInventory;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.connecting.IDataConnection;
 import sonar.logistics.common.handlers.InventoryReaderHandler;
 
-public class TileEntityInventoryReader extends TileEntityHandlerInventory implements IDataConnection {
+public class TileEntityInventoryReader extends TileEntityHandlerInventory implements IDataConnection, IDropInventory {
 
 	public InventoryReaderHandler handler = new InventoryReaderHandler(false, this);
 
@@ -28,6 +29,16 @@ public class TileEntityInventoryReader extends TileEntityHandlerInventory implem
 
 	public boolean maxRender() {
 		return true;
+	}
+
+	@Override
+	public int[] dropSlots() {
+		return null;
+	}
+
+	@Override
+	public boolean canDrop() {
+		return false;
 	}
 
 }

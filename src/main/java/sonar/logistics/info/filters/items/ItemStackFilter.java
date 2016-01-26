@@ -1,5 +1,6 @@
 package sonar.logistics.info.filters.items;
 
+import java.util.Arrays;
 import java.util.List;
 
 import cpw.mods.fml.common.network.ByteBufUtils;
@@ -12,7 +13,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.oredict.OreDictionary;
-import scala.actors.threadpool.Arrays;
 import sonar.core.utils.helpers.ItemStackHelper;
 import sonar.logistics.api.ItemFilter;
 

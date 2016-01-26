@@ -18,6 +18,7 @@ import sonar.logistics.info.providers.tile.ManaProvider;
 import sonar.logistics.info.providers.tile.MekanismGeneralProvider;
 import sonar.logistics.info.providers.tile.MekanismReactorProvider;
 import sonar.logistics.info.providers.tile.RFEnergyProvider;
+import sonar.logistics.info.providers.tile.RotaryCraftProvider;
 import sonar.logistics.info.providers.tile.ThaumcraftProvider;
 import sonar.logistics.info.providers.tile.VanillaTileEntityProvider;
 
@@ -44,6 +45,7 @@ public class TileProviderRegistry extends RegistryHelper<TileProvider> {
 		registerObject(new BuildcraftProvider());
 		registerObject(new MekanismGeneralProvider());
 		registerObject(new MekanismReactorProvider());
+		registerObject(new RotaryCraftProvider());
 
 	}
 

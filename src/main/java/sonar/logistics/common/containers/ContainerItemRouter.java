@@ -185,11 +185,4 @@ public class ContainerItemRouter extends ContainerSync {
 		return super.slotClick(slotID, buttonID, flag, player);
 	}
 
-	@SideOnly(Side.CLIENT)
-	public void putStacksInSlots(ItemStack[] items) {
-		for (int i = 0; i < items.length; ++i) {
-			if (i < (state == 0 ? 45 : 37))
-				this.getSlot(i).putStack(items[i]);
-		}
-	}
 }
