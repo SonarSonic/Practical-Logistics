@@ -3,8 +3,8 @@ package sonar.logistics.api.connecting;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.utils.BlockCoords;
 
-/** implemented by Tile Enties which can connect to Multi Data Cables */
-public interface IMultiTile {
+/** implemented by Tile Enties which can connect to Data Cables */
+public interface ILogicTile {
 
 	/**this tile entities's coordinates, for convenience and prevent the need to find the FMP Tile**/
 	public BlockCoords getCoords();

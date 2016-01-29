@@ -9,7 +9,7 @@ import java.util.Map;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.utils.BlockCoords;
 import sonar.logistics.api.connecting.IInfoEmitter;
-import sonar.logistics.api.connecting.IMultiDataCable;
+import sonar.logistics.api.connecting.IDataCable;
 import sonar.logistics.helpers.CableHelper;
 
 public class CableRegistry {
@@ -62,11 +62,11 @@ public class CableRegistry {
 	public static void addCable(int registryID, BlockCoords cable) {
 		if (registryID != -1 && cable != null) {
 			Object target = FMPHelper.checkObject(cable.getTileEntity());
-			if (target != null && target instanceof IMultiDataCable) {
+			if (target != null && target instanceof IDataCable) {
 				if (cables.get(registryID) == null) {
 					cables.put(registryID, new ArrayList());
 					cables.get(registryID).add(cable);
-					((IMultiDataCable) target).setRegistryID(registryID);
+					((IDataCable) target).setRegistryID(registryID);
 					return;
 
 				}
@@ -77,7 +77,7 @@ public class CableRegistry {
 					}
 				}
 				cables.get(registryID).add(cable);
-				((IMultiDataCable) target).setRegistryID(registryID);
+				((IDataCable) target).setRegistryID(registryID);
 			}
 		}
 	}
@@ -105,7 +105,7 @@ public class CableRegistry {
 		}
 	}
 
-	public static void removeCable(int registryID, IMultiDataCable cable) {
+	public static void removeCable(int registryID, IDataCable cable) {
 		if (registryID != -1 && cable.getCoords() != null) {
 			if (cables.get(registryID) == null) {
 				return;
@@ -135,15 +135,15 @@ public class CableRegistry {
 			int newID = getNextAvailableID();
 			for (BlockCoords oldCable : oldCables) {
 				Object target = FMPHelper.checkObject(oldCable.getTileEntity());
-				if (target != null && target instanceof IMultiDataCable) {
-					IMultiDataCable tile = (IMultiDataCable) target;
+				if (target != null && target instanceof IDataCable) {
+					IDataCable tile = (IDataCable) target;
 					tile.setRegistryID(-1);
 				}
 			}
 			for (BlockCoords oldCable : oldCables) {
 				Object target = FMPHelper.checkObject(oldCable.getTileEntity());
-				if (target != null && target instanceof IMultiDataCable) {
-					IMultiDataCable tile = (IMultiDataCable) target;
+				if (target != null && target instanceof IDataCable) {
+					IDataCable tile = (IDataCable) target;
 					CableHelper.addCable(tile);
 				}
 			}

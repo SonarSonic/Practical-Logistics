@@ -29,7 +29,6 @@ public class BlockInfoReader extends BlockDirectionalConnector {
 		TileEntity target = world.getTileEntity(x, y, z);
 		if (!world.isRemote && target != null && target instanceof TileEntityInfoReader) {
 			TileEntityInfoReader node = (TileEntityInfoReader) target;
-			//node.sendAvailableData(player);
 			player.openGui(Logistics.instance, LogisticsGui.infoNode, world, x, y, z);
 		}
 	}

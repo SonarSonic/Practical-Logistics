@@ -23,33 +23,7 @@ public class BlockDataCable extends SonarMachineBlock {
 		super(SonarMaterials.machine, false);
 		this.setBlockBounds((float) 0.0625 * 3, (float) 0.0625 * 3, (float) 0.0625 * 3, (float) (1 - (0.0625 * 3)), (float) (1 - (0.0625 * 3)), (float) (1 - (0.0625 * 3)));
 	}
-
-	@Override
-	public void onNeighborChange(IBlockAccess world, int x, int y, int z, int tileX, int tileY, int tileZ) {
-		TileEntity tileentity = world.getTileEntity(x, y, z);
-		if (tileentity != null && tileentity instanceof TileEntityDataCable) {
-			TileEntityDataCable cable = (TileEntityDataCable) world.getTileEntity(x, y, z);
-			//CableHelper.updateAdjacentCoords(cable, cable.coords, true);
-
-		}
-	}
-
-	@Override
-	public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase entity, ItemStack itemstack) {
-		super.onBlockPlacedBy(world, x, y, z, entity, itemstack);
-		TileEntity target = world.getTileEntity(x, y, z);
-		if (entity instanceof EntityPlayer && target instanceof TileEntityDataCable) {
-			TileEntityDataCable cable = (TileEntityDataCable) target;
-			//CableHelper.updateAdjacentCoords(cable, cable.coords, true);
-		}
-	}
-
-	@Override
-	public void breakBlock(World world, int x, int y, int z, Block oldblock, int oldMetadata) {
-		super.breakBlock(world, x, y, z, oldblock, oldMetadata);
-		//CableHelper.updateAdjacentCoords(world, x, y, z, null, true);
-	}
-
+	
 	@Override
 	public TileEntity createNewTileEntity(World world, int i) {
 		return new TileEntityDataCable();

@@ -19,7 +19,7 @@ import sonar.logistics.api.Info;
 import sonar.logistics.api.StandardInfo;
 import sonar.logistics.api.connecting.IInfoEmitter;
 import sonar.logistics.api.connecting.IInfoReader;
-import sonar.logistics.api.connecting.IMultiDataCable;
+import sonar.logistics.api.connecting.IDataCable;
 import sonar.logistics.common.tileentity.TileEntityInventoryReader;
 import sonar.logistics.helpers.CableHelper;
 import sonar.logistics.helpers.InfoHelper;
@@ -45,9 +45,9 @@ public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 
 	public void updateData(TileEntity te, TileEntity packetTile, ForgeDirection dir) {
 		Object tile = FMPHelper.checkObject(BlockCoords.translateCoords(new BlockCoords(te), dir.getOpposite()).getTileEntity());
-		if (tile != null && tile instanceof IMultiDataCable) {
+		if (tile != null && tile instanceof IDataCable) {
 			System.out.print("tile");
-			IMultiDataCable cable = (IMultiDataCable) tile;
+			IDataCable cable = (IDataCable) tile;
 			this.info = new StandardInfo(-1, "NETWORK", "Cables: " + CableRegistry.getCables(cable.registryID()).size(), " " + cable.registryID());
 
 			SonarCore.sendPacketAround(packetTile, 64, 0);

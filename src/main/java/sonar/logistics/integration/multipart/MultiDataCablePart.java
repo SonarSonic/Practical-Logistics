@@ -6,7 +6,7 @@ import net.minecraft.block.Block;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.integration.fmp.SonarTilePart;
 import sonar.core.utils.BlockCoords;
-import sonar.logistics.api.connecting.IMultiDataCable;
+import sonar.logistics.api.connecting.IDataCable;
 import sonar.logistics.client.renderers.RenderHandlers;
 import sonar.logistics.helpers.CableHelper;
 import sonar.logistics.registries.BlockRegistry;
@@ -14,7 +14,7 @@ import codechicken.lib.vec.Cuboid6;
 import codechicken.multipart.NormallyOccludedPart;
 import codechicken.multipart.TMultiPart;
 
-public class MultiDataCablePart extends SonarTilePart implements IMultiDataCable {
+public class MultiDataCablePart extends SonarTilePart implements IDataCable {
 
 	public int registryID = -1;
 	

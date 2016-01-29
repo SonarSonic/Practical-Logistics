@@ -44,30 +44,6 @@ public class BlockDataReceiver extends BaseNode {
 	public boolean hasSpecialRenderer() {
 		return true;
 	}
-
-	@Override
-	public boolean operateBlock(World world, int x, int y, int z, EntityPlayer player, int side, float hitx, float hity, float hitz) {
-		
-		return super.operateBlock(world, x, y, z, player, side, hitx, hity, hitz);
-	}
-
-	@Override
-	public void breakBlock(World world, int x, int y, int z, Block oldblock, int oldMetadata) {
-		super.breakBlock(world, x, y, z, oldblock, oldMetadata);
-		ForgeDirection dir = ForgeDirection.getOrientation(oldMetadata);
-		TileEntity tile = world.getTileEntity(x + dir.offsetX, y + dir.offsetY, z + dir.offsetZ);
-		/*
-		if (tile != null) {
-			if (tile instanceof IDataCable) {
-				IDataCable cable = (IDataCable) tile;
-				if (cable.getCoords() != null) {
-					cable.setCoords(null);
-				}
-			}
-		}
-		*/
-	}
-
 	public boolean hasSpecialCollisionBox() {
 		return true;
 	}

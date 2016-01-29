@@ -4,7 +4,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 import sonar.logistics.api.render.ICableRenderer;
 
 /**implemented on Tile Entities and Forge Multipart parts which are cables*/
-public interface IMultiDataCable extends ICableRenderer, IMultiTile {
+public interface IDataCable extends ICableRenderer, ILogicTile {
 	/**
 	 * checks if the cable is blocked in a given direction (e.g. other FMP part is blocking the connection
 	 */

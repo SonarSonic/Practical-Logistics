@@ -5,13 +5,13 @@ import java.util.List;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.common.tileentity.TileEntitySonar;
 import sonar.core.utils.BlockCoords;
-import sonar.logistics.api.connecting.IMultiDataCable;
+import sonar.logistics.api.connecting.IDataCable;
 import sonar.logistics.helpers.CableHelper;
 import sonar.logistics.registries.CableRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-public class TileEntityMultiDataCable extends TileEntitySonar implements IMultiDataCable {
+public class TileEntityMultiDataCable extends TileEntitySonar implements IDataCable {
 
 	public int registryID = -1;
 

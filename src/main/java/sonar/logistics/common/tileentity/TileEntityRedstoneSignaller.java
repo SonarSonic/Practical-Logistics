@@ -13,12 +13,12 @@ import sonar.core.utils.IMachineButtons;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.connecting.IInfoEmitter;
-import sonar.logistics.api.connecting.IMultiTile;
+import sonar.logistics.api.connecting.ILogicTile;
 import sonar.logistics.common.blocks.BlockRedstoneSignaller;
 import sonar.logistics.helpers.CableHelper;
 import sonar.logistics.registries.BlockRegistry;
 
-public class TileEntityRedstoneSignaller extends TileEntitySonar implements IMultiTile, IMachineButtons, ITextField {
+public class TileEntityRedstoneSignaller extends TileEntitySonar implements ILogicTile, IMachineButtons, ITextField {
 
 	public Info currentInfo;
 	public SyncInt integerEmitType = new SyncInt(0);

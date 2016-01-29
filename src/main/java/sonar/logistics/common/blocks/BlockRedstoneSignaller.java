@@ -29,7 +29,6 @@ public class BlockRedstoneSignaller extends BaseNode {
 		this.on = on;
 	}
 
-
 	@Override
 	public TileEntity createNewTileEntity(World world, int i) {
 		return new TileEntityRedstoneSignaller();
@@ -43,7 +42,7 @@ public class BlockRedstoneSignaller extends BaseNode {
 	@Override
 	public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase entity, ItemStack itemstack) {
 		super.onBlockPlacedBy(world, x, y, z, entity, itemstack);
-		
+
 	}
 
 	@Override

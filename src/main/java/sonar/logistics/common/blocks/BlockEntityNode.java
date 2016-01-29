@@ -18,6 +18,7 @@ public class BlockEntityNode extends BaseNode {
 	public boolean hasSpecialRenderer() {
 		return true;
 	}
+
 	@Override
 	public boolean hasGui() {
 		return true;
@@ -28,15 +29,15 @@ public class BlockEntityNode extends BaseNode {
 		if (player != null && !world.isRemote)
 			player.openGui(Logistics.instance, LogisticsGui.entityNode, world, x, y, z);
 	}
+
 	@Override
 	public TileEntity createNewTileEntity(World world, int i) {
 		return new TileEntityEntityNode();
 	}
 
-
 	@Override
 	public void setBlockBoundsBasedOnState(IBlockAccess world, int x, int y, int z) {
 		this.setBlockBounds((float) 0.0625 * 5, (float) 0.0625 * 6, (float) 0.0625 * 5, (float) (1 - (0.0625 * 5)), (float) (1 - (0.0625 * 3)), (float) (1 - (0.0625 * 5)));
 	}
-	
+
 }
