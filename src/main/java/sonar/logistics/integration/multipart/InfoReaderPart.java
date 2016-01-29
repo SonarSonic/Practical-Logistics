@@ -5,19 +5,21 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraftforge.common.util.ForgeDirection;
-import sonar.core.integration.fmp.SonarHandlerPart;
+import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.handlers.TileHandler;
+import sonar.core.utils.BlockCoords;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.Info;
-import sonar.logistics.api.connecting.IDataConnection;
+import sonar.logistics.api.connecting.IInfoEmitter;
 import sonar.logistics.api.connecting.IInfoReader;
 import sonar.logistics.client.renderers.RenderHandlers;
 import sonar.logistics.common.handlers.InfoReaderHandler;
+import sonar.logistics.helpers.CableHelper;
 import sonar.logistics.network.LogisticsGui;
 import sonar.logistics.registries.BlockRegistry;
 import codechicken.lib.vec.Cuboid6;
 
-public class InfoReaderPart extends SonarHandlerPart implements IDataConnection, IInfoReader {
+public class InfoReaderPart extends ConnectionPart implements IInfoEmitter, IInfoReader {
 
 	public InfoReaderHandler handler = new InfoReaderHandler(true, tile());
 
@@ -87,5 +89,20 @@ public class InfoReaderPart extends SonarHandlerPart implements IDataConnection,
 	@Override
 	public String getType() {
 		return "Info Reader";
+	}
+
+	@Override
+	public BlockCoords getCoords() {
+		return new BlockCoords(tile());
+	}
+
+	@Override
+	public void addConnections() {
+		CableHelper.addConnection(tile(), ForgeDirection.getOrientation(FMPHelper.getMeta(tile())));
+	}
+
+	@Override
+	public void removeConnections() {
+		CableHelper.removeConnection(tile(), ForgeDirection.getOrientation(FMPHelper.getMeta(tile())));
 	}
 }

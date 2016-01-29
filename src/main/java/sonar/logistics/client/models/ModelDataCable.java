@@ -1,12 +1,15 @@
 package sonar.logistics.client.models;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.logistics.api.render.ICableRenderer;
+import sonar.logistics.client.renderers.RenderHandlers;
 import sonar.logistics.common.tileentity.TileEntityBlockNode;
 
 public class ModelDataCable extends ModelBase {
@@ -18,6 +21,9 @@ public class ModelDataCable extends ModelBase {
 	ModelRenderer Arm2;
 	ModelRenderer Arm3;
 	ModelRenderer Arm4;
+
+	public ResourceLocation cable = new ResourceLocation(RenderHandlers.modelFolder + "dataCable.png");
+	public ResourceLocation multicable = new ResourceLocation(RenderHandlers.modelFolder + "dataMultiCable.png");
 
 	public ModelDataCable() {
 		textureWidth = 64;
@@ -81,35 +87,48 @@ public class ModelDataCable extends ModelBase {
 		if (tile.getWorldObj() != null && object instanceof ICableRenderer) {
 			ICableRenderer cable = (ICableRenderer) object;
 			boolean renderCentre = false;
-			if (cable.canRenderConnection(ForgeDirection.DOWN)) {
+
+			if (setTexture(cable, ForgeDirection.DOWN)) {
 				Bottom.render(f5);
-				renderCentre=true;
+				renderCentre = true;
 			}
-			
-			if (cable.canRenderConnection(ForgeDirection.UP)) {
+			if (setTexture(cable, ForgeDirection.UP)) {
 				Top.render(f5);
-				renderCentre=true;
+				renderCentre = true;
 			}
-			if (cable.canRenderConnection(ForgeDirection.NORTH)) {
+			if (setTexture(cable, ForgeDirection.NORTH)) {
 				Arm1.render(f5);
-				renderCentre=true;
+				renderCentre = true;
 			}
-			if (cable.canRenderConnection(ForgeDirection.WEST)) {
+			if (setTexture(cable, ForgeDirection.WEST)) {
 				Arm2.render(f5);
-				renderCentre=true;
+				renderCentre = true;
 			}
-			if (cable.canRenderConnection(ForgeDirection.SOUTH)) {
+			if (setTexture(cable, ForgeDirection.SOUTH)) {
 				Arm3.render(f5);
-				renderCentre=true;
+				renderCentre = true;
 			}
-			if (cable.canRenderConnection(ForgeDirection.EAST)) {
+			if (setTexture(cable, ForgeDirection.EAST)) {
 				Arm4.render(f5);
-				renderCentre=true;
+				renderCentre = true;
 			}
-			if(blockNode&&renderCentre){
+			if (blockNode && renderCentre) {
 				Centre.render(f5);
 			}
 		}
+	}
+
+	private boolean setTexture(ICableRenderer rend, ForgeDirection dir) {
+		int type = rend.canRenderConnection(dir);
+		switch (type) {
+		case 1:
+			Minecraft.getMinecraft().getTextureManager().bindTexture(cable);
+			return true;
+		case 2:
+			Minecraft.getMinecraft().getTextureManager().bindTexture(multicable);
+			return true;
+		}
+		return false;
 	}
 
 	private void setRotation(ModelRenderer model, float x, float y, float z) {

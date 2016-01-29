@@ -6,7 +6,6 @@ import java.util.List;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.FluidStack;
 import sonar.core.fluid.StoredFluidStack;
@@ -16,9 +15,6 @@ import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.StandardInfo;
-import sonar.logistics.api.connecting.IDataCable;
-import sonar.logistics.common.tileentity.TileEntityBlockNode;
-import sonar.logistics.common.tileentity.TileEntityEntityNode;
 import sonar.logistics.helpers.CableHelper;
 import sonar.logistics.helpers.FluidHelper;
 import sonar.logistics.info.types.FluidStackInfo;
@@ -40,37 +36,7 @@ public class FluidReaderHandler extends TileHandler {
 		if (te.getWorldObj().isRemote) {
 			return;
 		}
-		updateData(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)));
-	}
-
-	public void updateData(TileEntity te, ForgeDirection dir) {
-		Object target = CableHelper.getConnectedTile(te, dir.getOpposite());
-		target = FMPHelper.checkObject(target);
-		if (target == null) {
-			this.setCoords(null);
-		} else {
-			if (target instanceof TileEntityBlockNode || target instanceof TileEntityEntityNode) {
-				TileEntity node = (TileEntity) target;
-				this.setCoords(new BlockCoords(node, node.getWorldObj().provider.dimensionId));
-			} else {
-				this.setCoords(null);
-			}
-		}
-
-		if (this.coords != null) {
-			TileEntity tile = this.coords.getTileEntity();
-			if (tile != null && tile instanceof TileEntityBlockNode) {
-				TileEntityBlockNode node = (TileEntityBlockNode) target;
-				stacks = FluidHelper.getFluids(node);
-				CableHelper.updateAdjacentCoord(te, new BlockCoords(te.xCoord, te.yCoord, te.zCoord), false, ForgeDirection.getOrientation(FMPHelper.getMeta(te)));
-
-			} else {
-				stacks = null;
-			}
-		} else {
-			stacks = null;
-		}
-
+		stacks = FluidHelper.getFluids(CableHelper.getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite()));
 	}
 
 	public boolean canConnect(TileEntity te, ForgeDirection dir) {
@@ -96,22 +62,6 @@ public class FluidReaderHandler extends TileHandler {
 
 		}
 		return new StandardInfo((byte) -1, "ITEMREND", " ", "NO DATA");
-	}
-
-	@Override
-	public void removed(World world, int x, int y, int z, int meta) {
-		ForgeDirection dir = ForgeDirection.getOrientation(meta);
-		Object tile = world.getTileEntity(x + dir.offsetX, y + dir.offsetY, z + dir.offsetZ);
-		tile = FMPHelper.checkObject(tile);
-		if (tile != null) {
-			if (tile instanceof IDataCable) {
-				IDataCable cable = (IDataCable) tile;
-				if (cable.getCoords() != null) {
-					cable.setCoords(null);
-				}
-			}
-		}
-
 	}
 
 	public void readData(NBTTagCompound nbt, SyncType type) {

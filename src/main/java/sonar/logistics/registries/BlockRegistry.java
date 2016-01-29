@@ -16,6 +16,7 @@ import sonar.logistics.common.blocks.BlockInfoCreator;
 import sonar.logistics.common.blocks.BlockInfoReader;
 import sonar.logistics.common.blocks.BlockInventoryReader;
 import sonar.logistics.common.blocks.BlockItemRouter;
+import sonar.logistics.common.blocks.BlockMultiDataCable;
 import sonar.logistics.common.blocks.BlockNode;
 import sonar.logistics.common.blocks.BlockRedstoneSignaller;
 import sonar.logistics.common.blocks.BlockSapphireOre;
@@ -36,12 +37,13 @@ import sonar.logistics.common.tileentity.TileEntityInfoReader;
 import sonar.logistics.common.tileentity.TileEntityInventoryReader;
 import sonar.logistics.common.tileentity.TileEntityItemRouter;
 import sonar.logistics.common.tileentity.TileEntityLargeScreen;
+import sonar.logistics.common.tileentity.TileEntityMultiDataCable;
 import sonar.logistics.common.tileentity.TileEntityRedstoneSignaller;
 import cpw.mods.fml.common.registry.GameRegistry;
 
 public class BlockRegistry extends Logistics {
 
-	public static Block displayScreen, largeDisplayScreen, node, entityNode, infoReader, dataCable, dataReceiver, dataEmitter, inventoryReader, redstoneSignaller_on, redstoneSignaller_off, holographicDisplay, dataModifier, infoCreator, sapphire_ore, hammer, hammer_air, fluidReader, itemRouter;
+	public static Block displayScreen, largeDisplayScreen, node, entityNode, infoReader, dataCable, dataMultiCable, dataReceiver, dataEmitter, inventoryReader, redstoneSignaller_on, redstoneSignaller_off, holographicDisplay, dataModifier, infoCreator, sapphire_ore, hammer, hammer_air, fluidReader, itemRouter;
 
 	public static void registerBlocks() {
 
@@ -62,7 +64,11 @@ public class BlockRegistry extends Logistics {
 		dataCable = new BlockDataCable().setBlockName("DataCable").setHardness(0.1F).setCreativeTab(Logistics.creativeTab).setResistance(20.0F).setBlockTextureName(modid + ":" + "data_cable");
 		GameRegistry.registerBlock(dataCable, SonarBlockTip.class, "DataCable");
 		GameRegistry.registerTileEntity(TileEntityDataCable.class, "DataCable");
-
+		
+		dataMultiCable = new BlockMultiDataCable().setBlockName("MultiCable").setHardness(0.1F).setCreativeTab(Logistics.creativeTab).setResistance(20.0F).setBlockTextureName(modid + ":" + "data_cable");
+		GameRegistry.registerBlock(dataMultiCable, SonarBlockTip.class, "MultiCable");
+		GameRegistry.registerTileEntity(TileEntityMultiDataCable.class, "MultiCable");
+		
 		node = new BlockNode().setBlockName("Node").setHardness(1.0F).setResistance(20.0F).setCreativeTab(Logistics.creativeTab).setBlockTextureName(modid + ":" + "data_cable");
 		GameRegistry.registerBlock(node, SonarBlockTip.class, "Node");
 		GameRegistry.registerTileEntity(TileEntityBlockNode.class, "Node");

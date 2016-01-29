@@ -5,11 +5,11 @@ import io.netty.buffer.ByteBuf;
 import java.util.Collections;
 import java.util.List;
 
-import cpw.mods.fml.common.network.ByteBufUtils;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.oredict.OreDictionary;
 import sonar.logistics.api.ItemFilter;
+import cpw.mods.fml.common.network.ByteBufUtils;
 
 public class OreDictionaryFilter extends ItemFilter<OreDictionaryFilter> {
 

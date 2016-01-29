@@ -3,11 +3,12 @@ package sonar.logistics.common.tileentity;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.common.tileentity.TileEntityHandler;
 import sonar.core.integration.fmp.handlers.TileHandler;
+import sonar.core.utils.BlockCoords;
 import sonar.logistics.api.Info;
-import sonar.logistics.api.connecting.IDataConnection;
+import sonar.logistics.api.connecting.IInfoTile;
 import sonar.logistics.common.handlers.LargeDisplayScreenHandler;
 
-public class TileEntityLargeScreen extends TileEntityHandler implements IDataConnection {
+public class TileEntityLargeScreen extends TileEntityHandler implements IInfoTile {
 
 	public LargeDisplayScreenHandler handler = new LargeDisplayScreenHandler(false, this);
 
@@ -28,6 +29,11 @@ public class TileEntityLargeScreen extends TileEntityHandler implements IDataCon
 
 	public boolean maxRender() {
 		return true;
+	}
+
+	@Override
+	public BlockCoords getCoords() {
+		return new BlockCoords(this);
 	}
 
 }

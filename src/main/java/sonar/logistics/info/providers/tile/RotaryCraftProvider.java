@@ -2,22 +2,18 @@ package sonar.logistics.info.providers.tile;
 
 import java.util.List;
 
-import Reika.RotaryCraft.API.Interfaces.BasicMachine;
-import Reika.RotaryCraft.API.Interfaces.TemperatureTile;
-import Reika.RotaryCraft.API.Interfaces.TensionStorage;
-import Reika.RotaryCraft.API.Power.PowerAcceptor;
-import Reika.RotaryCraft.API.Power.PowerGenerator;
-import Reika.RotaryCraft.API.Power.PowerTracker;
-import Reika.RotaryCraft.API.Power.ShaftMachine;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.StandardInfo;
 import sonar.logistics.api.providers.TileProvider;
-import cofh.api.energy.IEnergyConnection;
-import cofh.api.energy.IEnergyHandler;
-import cofh.api.energy.IEnergyStorage;
+import Reika.RotaryCraft.API.Interfaces.TemperatureTile;
+import Reika.RotaryCraft.API.Interfaces.TensionStorage;
+import Reika.RotaryCraft.API.Power.PowerAcceptor;
+import Reika.RotaryCraft.API.Power.PowerGenerator;
+import Reika.RotaryCraft.API.Power.PowerTracker;
+import Reika.RotaryCraft.API.Power.ShaftMachine;
 import cpw.mods.fml.common.Loader;
 
 public class RotaryCraftProvider extends TileProvider {

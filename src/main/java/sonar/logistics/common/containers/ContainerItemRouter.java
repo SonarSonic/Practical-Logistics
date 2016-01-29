@@ -1,31 +1,19 @@
 package sonar.logistics.common.containers;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.ICrafting;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
-import sonar.calculator.mod.Calculator;
-import sonar.calculator.mod.common.item.calculators.CalculatorItem;
 import sonar.core.SonarCore;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.inventory.ContainerSync;
-import sonar.core.inventory.slots.SlotAllowed;
 import sonar.core.inventory.slots.SlotList;
 import sonar.core.network.PacketTileSync;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
-import sonar.logistics.common.handlers.InventoryReaderHandler;
-import sonar.logistics.common.handlers.ItemRouterHandler;
 import sonar.logistics.common.tileentity.TileEntityItemRouter;
-import sonar.logistics.info.filters.items.ItemStackFilter;
-import sonar.logistics.info.filters.items.OreDictionaryFilter;
 
 public class ContainerItemRouter extends ContainerSync {
 
@@ -86,13 +74,11 @@ public class ContainerItemRouter extends ContainerSync {
 				TileHandler handler = FMPHelper.getHandler(tile);
 				handler.writeData(tag, SyncType.SPECIAL);
 				if (tag.hasNoTags()) {
-					//System.out.print("no tag");
 					return;
 				}
 				for (Object o : crafters) {
 					if (o != null && o instanceof EntityPlayerMP) {
 						SonarCore.network.sendTo(new PacketTileSync(tile.xCoord, tile.yCoord, tile.zCoord, tag, SyncType.SPECIAL), (EntityPlayerMP) o);
-						System.out.print("hasTag");
 					}
 				}
 

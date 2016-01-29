@@ -31,7 +31,7 @@ public class LargeDisplayScreenHandler extends DisplayScreenHandler implements I
 	public BlockCoords connectedTile = null;
 
 	public LargeDisplayScreenHandler(boolean isMultipart, TileEntity tile) {
-		super(isMultipart, tile);	
+		super(isMultipart, tile);
 	}
 
 	@Override
@@ -48,7 +48,7 @@ public class LargeDisplayScreenHandler extends DisplayScreenHandler implements I
 			connectedTile = getConnectedTile(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)));
 			if (connectedTile == null || connectedTile.getTileEntity(te.getWorldObj()) == null) {
 				this.updateData(te, te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)));
-			} else {				
+			} else {
 				this.updateData(connectedTile.getTileEntity(te.getWorldObj()), te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)));
 			}
 		}
@@ -58,13 +58,11 @@ public class LargeDisplayScreenHandler extends DisplayScreenHandler implements I
 	public BlockCoords getConnectedTile(TileEntity te, ForgeDirection dir) {
 		if (displays != null) {
 			for (BlockCoords coords : displays) {
-				TileEntity target = coords.getTileEntity(te.getWorldObj());
-
-				Object connectedTile = CableHelper.getConnectedTile(target, dir.getOpposite());
-				connectedTile = FMPHelper.checkObject(connectedTile);
-
-				if (connectedTile != null) {
-					return coords;
+				if (coords != null && coords.getTileEntity() != null) {
+					List<BlockCoords> connections = CableHelper.getConnections(coords.getTileEntity(), dir.getOpposite());
+					if (!connections.isEmpty()) {
+						return coords;
+					}
 				}
 			}
 		}

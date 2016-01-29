@@ -7,10 +7,11 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import sonar.core.utils.IBufObject;
 import sonar.core.utils.INBTObject;
-import sonar.core.utils.IRegistryObject;
 import sonar.logistics.api.render.InfoRenderer;
 
 public abstract class Info<T extends Info> implements INBTObject, IBufObject {
+
+	public String providerID = "";
 
 	public abstract String getName();
 

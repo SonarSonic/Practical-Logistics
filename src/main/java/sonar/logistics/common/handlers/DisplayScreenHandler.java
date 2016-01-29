@@ -12,16 +12,18 @@ import sonar.core.SonarCore;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.network.utils.IByteBufTile;
-import sonar.core.utils.helpers.NBTHelper;
+import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.StandardInfo;
-import sonar.logistics.api.connecting.IDataConnection;
+import sonar.logistics.api.connecting.IInfoEmitter;
 import sonar.logistics.api.connecting.IInfoReader;
+import sonar.logistics.api.connecting.IMultiDataCable;
 import sonar.logistics.common.tileentity.TileEntityInventoryReader;
 import sonar.logistics.helpers.CableHelper;
 import sonar.logistics.helpers.InfoHelper;
+import sonar.logistics.registries.CableRegistry;
 import cpw.mods.fml.common.network.ByteBufUtils;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -42,48 +44,59 @@ public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 	}
 
 	public void updateData(TileEntity te, TileEntity packetTile, ForgeDirection dir) {
-		Object target = CableHelper.getConnectedTile(te, dir.getOpposite());
-		target = FMPHelper.checkObject(target);
-		if (target == null) {
+		Object tile = FMPHelper.checkObject(BlockCoords.translateCoords(new BlockCoords(te), dir.getOpposite()).getTileEntity());
+		if (tile != null && tile instanceof IMultiDataCable) {
+			System.out.print("tile");
+			IMultiDataCable cable = (IMultiDataCable) tile;
+			this.info = new StandardInfo(-1, "NETWORK", "Cables: " + CableRegistry.getCables(cable.registryID()).size(), " " + cable.registryID());
+
+			SonarCore.sendPacketAround(packetTile, 64, 0);
 			return;
-		} else {
-			Info lastInfo = info;
-			if (target instanceof IInfoReader) {
-				IInfoReader infoReader = (IInfoReader) target;
-				if (infoReader.currentInfo() != null && infoReader.getSecondaryInfo() != null) {
-					this.info = InfoHelper.combineData(infoReader.currentInfo(), infoReader.getSecondaryInfo());
-				} else if (infoReader.currentInfo() != null) {
-					this.info = infoReader.currentInfo();
-				} else if (this.info != null) {
-					this.info.emptyData();
-				}
-			} else if (target instanceof TileEntityInventoryReader) {
-				TileEntityInventoryReader infoNode = (TileEntityInventoryReader) target;
-				if (infoNode.currentInfo() != null) {
-					this.info = infoNode.currentInfo();
-				} else if (this.info != null) {
-					this.info.emptyData();
-				}
-			} else if (target instanceof IDataConnection) {
-				IDataConnection infoNode = (IDataConnection) target;
-				if (infoNode.currentInfo() != null) {
-					this.info = infoNode.currentInfo();
-				} else if (this.info != null) {
-					this.info.emptyData();
-				}
-
-			}
-
-			if (info != null) {
-				if (!info.isEqualType(lastInfo)||!info.isDataEqualType(lastInfo)) {
-					if (info instanceof StandardInfo && info.isEqualType(lastInfo)) {
-						SonarCore.sendPacketAround(packetTile, 64, 0);
-					} else {
-						SonarCore.sendPacketAround(packetTile, 64, 0);
+		}
+		List<BlockCoords> connections = CableHelper.getConnections(te, dir.getOpposite());
+		if (!connections.isEmpty() && connections.get(0) != null) {
+			Object target = CableHelper.getTile(connections.get(0).getTileEntity());
+			if (target == null) {
+				return;
+			} else {
+				Info lastInfo = info;
+				if (target instanceof IInfoReader) {
+					IInfoReader infoReader = (IInfoReader) target;
+					if (infoReader.currentInfo() != null && infoReader.getSecondaryInfo() != null) {
+						this.info = InfoHelper.combineData(infoReader.currentInfo(), infoReader.getSecondaryInfo());
+					} else if (infoReader.currentInfo() != null) {
+						this.info = infoReader.currentInfo();
+					} else if (this.info != null) {
+						this.info.emptyData();
 					}
+				} else if (target instanceof TileEntityInventoryReader) {
+					TileEntityInventoryReader infoNode = (TileEntityInventoryReader) target;
+					if (infoNode.currentInfo() != null) {
+						this.info = infoNode.currentInfo();
+					} else if (this.info != null) {
+						this.info.emptyData();
+					}
+				} else if (target instanceof IInfoEmitter) {
+					IInfoEmitter infoNode = (IInfoEmitter) target;
+					if (infoNode.currentInfo() != null) {
+						this.info = infoNode.currentInfo();
+					} else if (this.info != null) {
+						this.info.emptyData();
+					}
+
 				}
-			}else{
-				SonarCore.sendPacketAround(packetTile, 64, 0);
+
+				if (info != null) {
+					if (!info.isEqualType(lastInfo) || !info.isDataEqualType(lastInfo)) {
+						if (info instanceof StandardInfo && info.isEqualType(lastInfo)) {
+							SonarCore.sendPacketAround(packetTile, 64, 0);
+						} else {
+							SonarCore.sendPacketAround(packetTile, 64, 0);
+						}
+					}
+				} else {
+					SonarCore.sendPacketAround(packetTile, 64, 0);
+				}
 			}
 		}
 	}
@@ -92,7 +105,6 @@ public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 		return info;
 	}
 
-	
 	public boolean canConnect(TileEntity te, ForgeDirection dir) {
 		return dir.equals(ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite());
 	}
@@ -104,7 +116,7 @@ public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 		}
 		return currenttip;
 	}
-	
+
 	@Override
 	public void removed(World world, int x, int y, int z, int meta) {
 
@@ -122,7 +134,7 @@ public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 		}
 		if (id == 1) {
 			ByteBufUtils.writeUTF8String(buf, info.getData());
-		}		
+		}
 	}
 
 	@Override
@@ -139,7 +151,7 @@ public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 			standardInfo.setData(ByteBufUtils.readUTF8String(buf));
 		}
 	}
-	
+
 	public void readData(NBTTagCompound nbt, SyncType type) {
 		super.readData(nbt, type);
 		if (type == SyncType.SAVE) {

@@ -4,6 +4,7 @@ import java.util.List;
 
 import sonar.core.utils.BlockCoords;
 
+/**current Interface for large display screens, will be changed in the very near future*/
 public interface ILargeDisplay {
 
 	public boolean isHandler();

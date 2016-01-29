@@ -3,11 +3,8 @@ package sonar.logistics.client.renderers;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelSign;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
-import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.util.ForgeDirection;
 
@@ -17,7 +14,7 @@ import sonar.core.integration.SonarAPI;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.utils.helpers.RenderHelper;
 import sonar.logistics.api.Info;
-import sonar.logistics.api.connecting.IDataConnection;
+import sonar.logistics.api.connecting.IInfoTile;
 import sonar.logistics.integration.multipart.DisplayScreenPart;
 import codechicken.multipart.TileMultipart;
 import cpw.mods.fml.relauncher.Side;
@@ -90,8 +87,8 @@ public class RenderDisplayScreen extends TileEntitySpecialRenderer {
 		int x = tile.xCoord, y = tile.yCoord, z = tile.zCoord;
 
 		Object screen = FMPHelper.checkObject(tile);
-		if (screen instanceof IDataConnection) {
-			Info info = ((IDataConnection) screen).currentInfo();
+		if (screen instanceof IInfoTile) {
+			Info info = ((IInfoTile) screen).currentInfo();
 			if (info == null) {
 				return;
 			}

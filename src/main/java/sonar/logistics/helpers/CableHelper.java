@@ -1,165 +1,214 @@
 package sonar.logistics.helpers;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
-import sonar.core.integration.SonarAPI;
 import sonar.core.integration.fmp.FMPHelper;
+import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.SonarHelper;
-import sonar.logistics.api.connecting.IDataCable;
-import sonar.logistics.api.connecting.IDataConnection;
 import sonar.logistics.api.connecting.IDataReceiver;
-import sonar.logistics.api.connecting.IDataTile;
+import sonar.logistics.api.connecting.IInfoEmitter;
+import sonar.logistics.api.connecting.IMultiDataCable;
+import sonar.logistics.api.connecting.IMultiTile;
 import sonar.logistics.common.tileentity.TileEntityDataEmitter;
-import codechicken.multipart.TileMultipart;
+import sonar.logistics.registries.CableRegistry;
 
 public class CableHelper {
 
-	public static void updateAdjacentCoords(TileEntity tile, BlockCoords coords, boolean overwrite) {
-		updateAdjacentCoords(tile.getWorldObj(), tile.xCoord, tile.yCoord, tile.zCoord, coords, overwrite);
-	}
-
-	public static void updateAdjacentCoords(World world, int x, int y, int z, BlockCoords newCoords, boolean overwrite) {
-		for (int i = 0; i < 6; i++) {
-			ForgeDirection dir = ForgeDirection.getOrientation(i);
-			updateAdjacentCoord(world, x, y, z, newCoords, overwrite, dir);
-		}
-	}
-
-	public static void updateAdjacentCoords(TileEntity tile, BlockCoords coords, boolean overwrite, ForgeDirection[] remove) {
-		updateAdjacentCoords(tile.getWorldObj(), tile.xCoord, tile.yCoord, tile.zCoord, coords, overwrite, remove);
-	}
-
-	public static void updateAdjacentCoords(World world, int x, int y, int z, BlockCoords newCoords, boolean overwrite, ForgeDirection[] remove) {
-		for (int i = 0; i < 6; i++) {
-			ForgeDirection dir = ForgeDirection.getOrientation(i);
-			if (remove != null) {
-				for (int d = 0; d < remove.length; d++) {
-					if (!dir.equals(remove[d])) {
-						updateAdjacentCoord(world, x, y, z, newCoords, overwrite, dir);
-					}
-				}
-			} else {
-				updateAdjacentCoord(world, x, y, z, newCoords, overwrite, dir);
-			}
-		}
-	}
-
-	public static void updateAdjacentCoord(TileEntity tile, BlockCoords coords, boolean overwrite, ForgeDirection dir) {
-		updateAdjacentCoord(tile.getWorldObj(), tile.xCoord, tile.yCoord, tile.zCoord, coords, overwrite, dir);
-	}
-
-	public static void updateAdjacentCoord(World world, int x, int y, int z, BlockCoords newCoords, boolean overwrite, ForgeDirection dir) {
-		Object tile = world.getTileEntity(x + dir.offsetX, y + dir.offsetY, z + dir.offsetZ);
-		Object originTile = world.getTileEntity(x, y, z);
-		tile = FMPHelper.checkObject(tile);
-		originTile = FMPHelper.checkObject(originTile);
-		if (tile != null && tile instanceof IDataCable) {
-			IDataCable cable = (IDataCable) tile;
-			if (originTile != null && originTile instanceof IDataCable) {
-				IDataCable originCable = (IDataCable) originTile;
-				if (originCable.isBlocked(dir)) {
-					return;
-				}
-			}
-			if (!cable.isBlocked(dir.getOpposite())) {
-				if (cable.getCoords() == null || overwrite && newCoords == null) {
-					cable.setCoords(newCoords);
-				} else if (overwrite && !BlockCoords.equalCoords(cable.getCoords(), newCoords)) {
-					cable.setCoords(newCoords);
-				}
-			}
-
-		}
-	}
-
-	public static void removeAllBlockedAdjacentCoords(TileEntity tile) {
-		for (int i = 0; i < 6; i++) {
-			ForgeDirection dir = ForgeDirection.getOrientation(i);
-			Object target = tile.getWorldObj().getTileEntity(tile.xCoord + dir.offsetX, tile.yCoord + dir.offsetY, tile.zCoord + dir.offsetZ);
-			target = FMPHelper.checkObject(target);
-			if (target != null && target instanceof IDataCable) {
-				IDataCable cable = (IDataCable) target;
-				cable.setCoords(null);
-			}
-
-		}
-	}
-
-	public static Object getConnectedTile(TileEntity tile, ForgeDirection dir) {
-		Object target = SonarHelper.getAdjacentTileEntity(tile, dir);
-		target = FMPHelper.checkObject(target);
-		if (target == null) {
+	public static Object getAdjacentTile(TileEntity tile, ForgeDirection side) {
+		if (tile == null || side == null) {
 			return null;
 		}
-		if (target instanceof IDataCable) {
-			IDataCable cable = (IDataCable) target;
-			if (!cable.isBlocked(dir.getOpposite())) {
-				if (cable.getCoords() != null) {
-					Object dataProvider = cable.getCoords().getTileEntity(tile.getWorldObj());
-					dataProvider = FMPHelper.checkObject(dataProvider);
-					if (dataProvider != null) {
-						if (dataProvider instanceof IDataReceiver) {
-							Object emitterBlock = getConnectedEmitter((IDataReceiver) dataProvider, tile);
-							if (emitterBlock != null) {
-								return emitterBlock;
+		BlockCoords origin = new BlockCoords(tile);
+		BlockCoords target = BlockCoords.translateCoords(origin, side);
+		return getTile(target.getTileEntity(tile.getWorldObj()));
+	}
+
+	public static Object getTile(Object tile) {
+		tile = FMPHelper.checkObject(tile);
+		return tile;
+	}
+
+	public static void addConnection(TileEntity connection, ForgeDirection side) {
+		Object adjacent = getAdjacentTile(connection, side);
+		if (adjacent != null) {
+			if (adjacent instanceof IMultiDataCable) {
+				IMultiDataCable cable = ((IMultiDataCable) adjacent);
+				CableRegistry.addConnection(cable.registryID(), new BlockCoords(connection));
+			}
+		}
+	}
+
+	public static void removeConnection(TileEntity connection, ForgeDirection side) {
+		Object adjacent = getAdjacentTile(connection, side);
+		TileHandler handler = FMPHelper.getHandler(adjacent);
+		if (adjacent != null) {
+			if (adjacent instanceof IMultiDataCable) {
+				IMultiDataCable cable = ((IMultiDataCable) adjacent);
+				CableRegistry.removeConnection(cable.registryID(), new BlockCoords(connection));
+			}
+		}
+	}
+
+	public static void addCable(IMultiDataCable cable) {
+		Object cableTile = getTile(cable.getCoords().getTileEntity());
+		if (cableTile != null) {
+			List adjacents = new ArrayList();
+			List<Integer> ids = new ArrayList();
+
+			for (int i = 0; i < 6; i++) {
+				ForgeDirection dir = ForgeDirection.getOrientation(i);
+				if (!cable.isBlocked(dir)) {
+					Object adjacent = getTile(BlockCoords.translateCoords(cable.getCoords(), dir).getTileEntity());
+					if (adjacent != null && adjacent instanceof IMultiTile) {
+						if (adjacent instanceof IInfoEmitter) {
+							adjacents.add(adjacent);
+						}
+						if (adjacent instanceof IMultiDataCable) {
+							IMultiDataCable adjTile = (IMultiDataCable) adjacent;
+							if (adjTile.unlimitedChannels() == cable.unlimitedChannels()) {
+								if (!adjTile.isBlocked(dir.getOpposite())) {
+									adjacents.add(adjacent);
+									ids.add(adjTile.registryID());
+								} else {
+								}
 							}
-						} else if (dataProvider instanceof IDataConnection) {
-							return dataProvider;
 						}
 					}
 				}
 			}
-		}
-		if (target instanceof IDataReceiver) {
-			Object emitterBlock = getConnectedEmitter((IDataReceiver) target, tile);
-			if (emitterBlock != null) {
-				return emitterBlock;
+			int cableID = -1;
+			int lastSize = -1;
+			for (Integer id : ids) {
+				if (id != -1) {
+					List<BlockCoords> cables = CableRegistry.getCables(id);
+					if (cables.size() > lastSize) {
+						cableID = id;
+						lastSize = cables.size();
+					}
+				}
+			}
+			if (cableID == -1) {
+				cableID = CableRegistry.getNextAvailableID();
+			}
+			CableRegistry.addCable(cableID, cable.getCoords());
+
+			List<BlockCoords> coords = new ArrayList();
+			for (Object adjacent : adjacents) {
+				if ((adjacent instanceof IInfoEmitter)) {
+					IInfoEmitter adjTile = (IInfoEmitter) adjacent;
+					adjTile.addConnections();
+				}
+				if (adjacent instanceof IMultiDataCable) {
+					IMultiDataCable adjCable = (IMultiDataCable) adjacent;
+					if (adjCable.registryID() != cableID) {
+						CableRegistry.connectNetworks(cableID, adjCable.registryID());
+					}
+				}
 			}
 		}
-		if (target instanceof IDataConnection) {
-			if (((IDataConnection) target).canConnect(dir.getOpposite()))
-				return target;
-		}
-		if (SonarAPI.forgeMultipartLoaded() && target instanceof TileMultipart) {
-			return target;
-		}
-
-		return null;
-
 	}
 
-	public static Object getConnectedEmitter(IDataReceiver receiver, TileEntity tile) {
+	public static void removeCable(IMultiDataCable cable) {
+		CableRegistry.removeCable(cable.registryID(), cable);
+	}
+
+	public static List<BlockCoords> getConnections(TileEntity tile, ForgeDirection dir) {
+		List<BlockCoords> connections = new ArrayList();
+		int registryID = -1;
+		boolean unlimited = false;
+		Object adjacent = getAdjacentTile(tile, dir);
+		if (adjacent != null) {
+			if (adjacent instanceof IMultiDataCable) {
+				IMultiDataCable cable = ((IMultiDataCable) adjacent);
+				if (cable.isBlocked(dir.getOpposite())) {
+					return connections;
+				}
+				registryID = cable.registryID();
+				unlimited = cable.unlimitedChannels();
+			} else if (adjacent instanceof IInfoEmitter) {
+				IInfoEmitter connect = ((IInfoEmitter) adjacent);
+				connections.add(connect.getCoords());
+			}
+		}
+		for (BlockCoords coord : CableRegistry.getConnections(registryID)) {
+			TileEntity target = coord.getTileEntity();
+			if (target != null) {
+				if (target instanceof TileEntityDataEmitter) {
+					// don't connect
+				} else if (target instanceof IDataReceiver) {
+					TileEntityDataEmitter emitter = getConnectedEmitter((IDataReceiver) target, tile);
+					if (emitter != null) {
+						List<BlockCoords> emitterConnections = getConnections(emitter, ForgeDirection.getOrientation(emitter.getBlockMetadata()).getOpposite());
+						List<BlockCoords> toAdd = new ArrayList();
+						for (BlockCoords coords : emitterConnections) {
+							boolean hasCoords = false;
+							for (BlockCoords currentCoords : connections) {
+								if (BlockCoords.equalCoords(currentCoords, coords)) {
+									hasCoords = true;
+								}
+							}
+							if (!hasCoords) {
+								toAdd.add(coords);
+							}
+						}
+						if (unlimited) {
+							connections.addAll(toAdd);
+						} else if (!toAdd.isEmpty() && toAdd.get(0) != null) {
+							connections.add(toAdd.get(0));
+						}
+					}
+				} else if (target instanceof IMultiTile) {
+					connections.add(coord);
+				}
+			}
+			if (!unlimited) {
+				return connections;
+			}
+		}
+		return connections;
+	}
+
+	public static TileEntityDataEmitter getConnectedEmitter(IDataReceiver receiver, TileEntity tile) {
 		if (receiver.getEmitter() != null) {
 			TileEntity emitter = receiver.getEmitter().coords.getTileEntity();
 			if (emitter instanceof TileEntityDataEmitter) {
 				TileEntityDataEmitter dataemitter = (TileEntityDataEmitter) emitter;
 				if (tile.xCoord != dataemitter.xCoord || tile.yCoord != dataemitter.yCoord || tile.zCoord != dataemitter.zCoord) {
-					return dataemitter.getConnectedTile();
+					return dataemitter;
 				}
-			}
-			if (emitter != null) {
-				return emitter;
 			}
 		}
 		return null;
 	}
 
-	/** checks connection on direction */
-	public static boolean canRenderConnection(TileEntity te, ForgeDirection dir) {
+	public static int canRenderConnection(TileEntity te, ForgeDirection dir) {
+		Object target = getTile(te);
 		Object tile = SonarHelper.getAdjacentTileEntity(te, dir);
 		tile = FMPHelper.checkObject(tile);
 		if (tile != null) {
-			if (tile instanceof IDataTile) {
-				return (((IDataTile) tile).canConnect(dir.getOpposite()));
-			} else if (tile instanceof IDataCable) {
-				IDataCable cable = (IDataCable) tile;
-				if (!cable.isBlocked(dir.getOpposite())) {
-					return true;
+			if (tile instanceof IMultiDataCable) {
+				IMultiDataCable cable = (IMultiDataCable) tile;
+				if (target instanceof IMultiDataCable) {
+					if (cable.unlimitedChannels() != ((IMultiDataCable) target).unlimitedChannels()) {
+						return 0;
+					}
 				}
+				if (!cable.isBlocked(dir.getOpposite())) {
+					return cable.unlimitedChannels() ? 2 : 1;
+				}
+
+			} else if (tile instanceof IMultiTile) {
+				int connect = (((IMultiTile) tile).canConnect(dir.getOpposite())) ? 1 : 0;
+				if (connect != 0 && target instanceof IMultiDataCable) {
+					return ((IMultiDataCable) target).unlimitedChannels() ? 2 : 1;
+				}
+				return connect;
 			}
 		}
-		return false;
+		return 0;
 	}
 }

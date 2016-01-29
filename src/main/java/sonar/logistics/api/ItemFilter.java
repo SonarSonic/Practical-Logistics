@@ -4,13 +4,9 @@ import java.util.List;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.utils.IBufObject;
 import sonar.core.utils.INBTObject;
-import sonar.core.utils.IRegistryObject;
 import sonar.logistics.Logistics;
-import sonar.logistics.api.Info;
 
 /** used for filtering Item Router */
 public abstract class ItemFilter<T extends ItemFilter> implements INBTObject, IBufObject {

@@ -8,7 +8,6 @@ import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.player.EntityPlayer;
-import sonar.core.utils.IRegistryObject;
 import sonar.logistics.api.EntityInfo;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.providers.EntityProvider;

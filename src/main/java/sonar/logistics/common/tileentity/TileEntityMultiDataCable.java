@@ -1,55 +1,26 @@
 package sonar.logistics.common.tileentity;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.common.tileentity.TileEntitySonar;
 import sonar.core.utils.BlockCoords;
-import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.api.connecting.IMultiDataCable;
 import sonar.logistics.helpers.CableHelper;
+import sonar.logistics.registries.CableRegistry;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 public class TileEntityMultiDataCable extends TileEntitySonar implements IMultiDataCable {
 
-	public List<BlockCoords> coords = Collections.EMPTY_LIST;
-
-	@Override
-	public List<BlockCoords> getCoords() {
-		return coords;
-	}
-
-	@Override
-	public void addCoords(BlockCoords coords) {
-		for (BlockCoords tile : this.coords) {
-			if (BlockCoords.equalCoords(tile, coords)) {
-				return;
-			}
-		}
-		this.coords.add(coords);
-	}
-
-	@Override
-	public void removeCoords(BlockCoords coords) {
-		List<BlockCoords> removed = new ArrayList();
-		for (BlockCoords tile : this.coords) {
-			if (BlockCoords.equalCoords(tile, coords)) {
-				removed.add(tile);
-			}
-		}
-		for (BlockCoords remove : removed) {
-			this.coords.remove(remove);
-		}
-	}
+	public int registryID = -1;
 
 	@Override
 	public boolean isBlocked(ForgeDirection dir) {
 		return false;
 	}
 
-	public boolean canRenderConnection(ForgeDirection dir) {
+	public int canRenderConnection(ForgeDirection dir) {
 		return CableHelper.canRenderConnection(this, dir);
 	}
 
@@ -57,40 +28,54 @@ public class TileEntityMultiDataCable extends TileEntitySonar implements IMultiD
 		return true;
 	}
 
-	public void readData(NBTTagCompound nbt, SyncType type) {
-		super.readData(nbt, type);
-		if (type == SyncType.SAVE) {
-			coords = BlockCoords.readBlockCoords(nbt, "tiles");
-
-		}
-	}
-
-	public void writeData(NBTTagCompound nbt, SyncType type) {
-		super.writeData(nbt, type);
-		if (type == SyncType.SAVE) {
-			BlockCoords.writeBlockCoords(nbt, coords, "tiles");
-		}
+	public void onLoaded() {
+		super.onLoaded();
+		if (!this.worldObj.isRemote)
+			CableHelper.addCable(this);
 	}
 
 	public void validate() {
-		this.coords = Collections.EMPTY_LIST;
 		super.validate();
 	}
 
 	public void invalidate() {
-		this.coords = Collections.EMPTY_LIST;
+		CableHelper.removeCable(this);
 		super.invalidate();
-		CableHelper.updateAdjacentCoords(worldObj, xCoord, yCoord, zCoord, null, true);
+	}
+
+	@SideOnly(Side.CLIENT)
+	public List<String> getWailaInfo(List<String> currenttip) {
+		currenttip.add("Registry ID : " + registryID);
+		List<BlockCoords> coords = CableRegistry.getCables(registryID);
+		List<BlockCoords> connects = CableRegistry.getConnections(registryID);
+		currenttip.add("Cables : " + coords.size());
+		currenttip.add("Connections : " + connects.size());
+		return currenttip;
 	}
 
 	@Override
-	public boolean updateConnections() {
-		return false;
+	public BlockCoords getCoords() {
+		return new BlockCoords(this);
 	}
 
 	@Override
-	public void setCoords(List<BlockCoords> coords) {
-		
+	public int registryID() {
+		return registryID;
+	}
+
+	@Override
+	public void setRegistryID(int id) {
+		this.registryID = id;
+	}
+
+	@Override
+	public boolean unlimitedChannels() {
+		return true;
+	}
+
+	@Override
+	public boolean canConnect(ForgeDirection dir) {
+		return true;
 	}
 
 }

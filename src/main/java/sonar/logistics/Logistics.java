@@ -18,7 +18,7 @@ import sonar.logistics.integration.MineTweakerIntegration;
 import sonar.logistics.integration.multipart.ForgeMultipartHandler;
 import sonar.logistics.network.LogisticsCommon;
 import sonar.logistics.registries.BlockRegistry;
-import sonar.logistics.registries.ChannelRegistry;
+import sonar.logistics.registries.CableRegistry;
 import sonar.logistics.registries.CraftingRegistry;
 import sonar.logistics.registries.EmitterRegistry;
 import sonar.logistics.registries.EventRegistry;
@@ -155,6 +155,6 @@ public class Logistics {
 	@EventHandler
 	public void onClose(FMLServerStoppingEvent event) {
 		EmitterRegistry.removeAll();
-		ChannelRegistry.removeAll();
+		CableRegistry.removeAll();
 	}
 }

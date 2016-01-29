@@ -1,22 +1,18 @@
 package sonar.logistics.common.tileentity;
 
-import io.netty.buffer.ByteBuf;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.common.tileentity.TileEntityHandlerInventory;
 import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.inventory.IFilteredInventory;
-import sonar.core.network.utils.IByteBufTile;
 import sonar.core.utils.BlockCoords;
 import sonar.logistics.api.Info;
-import sonar.logistics.api.connecting.IDataConnection;
-import sonar.logistics.common.handlers.InventoryReaderHandler;
+import sonar.logistics.api.connecting.IInfoTile;
 import sonar.logistics.common.handlers.ItemRouterHandler;
 import sonar.logistics.info.types.BlockCoordsInfo;
 
-public class TileEntityItemRouter extends TileEntityHandlerInventory implements IDataConnection, ISidedInventory, IFilteredInventory {
+public class TileEntityItemRouter extends TileEntityHandlerInventory implements IInfoTile, ISidedInventory, IFilteredInventory {
 	
 	public ItemRouterHandler handler = new ItemRouterHandler(false, this);
 
@@ -63,5 +59,11 @@ public class TileEntityItemRouter extends TileEntityHandlerInventory implements 
 	public boolean canPullItem(ItemStack item, int side) {
 		return handler.matchesFilters(item, handler.whitelist[side], handler.blacklist[side]);
 	}
+
+	@Override
+	public BlockCoords getCoords() {
+		return new BlockCoords(this);
+	}
+
 
 }

@@ -15,7 +15,6 @@ import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 
 import sonar.core.integration.fmp.FMPHelper;
-import sonar.core.network.sync.SyncInt;
 import sonar.core.renderers.SonarTERender;
 import sonar.core.utils.helpers.RenderHelper;
 import sonar.logistics.Logistics;
@@ -97,7 +96,17 @@ public class RenderHandlers {
 			RenderHelper.finishRender();
 		}
 	}
+	public static class BlockMultiCable extends TileEntitySpecialRenderer {
+		public ModelDataCable model = new ModelDataCable();
+		public String texture = modelFolder + "dataMultiCable.png";
 
+		@Override
+		public void renderTileEntityAt(TileEntity entity, double x, double y, double z, float f) {
+			RenderHelper.beginRender(x + 0.5F, y + 1.5F, z + 0.5F, RenderHelper.setMetaData(entity), texture);
+			model.renderTile(entity, (Entity) null, 0.0F, 0.0F, -0.1F, 0.0F, 0.0F, 0.0625F);
+			RenderHelper.finishRender();
+		}
+	}
 	public static class DataModifier extends TileEntitySpecialRenderer {
 		public ModelDataCable modelCable = new ModelDataCable();
 		public String cableTex = modelFolder + "dataCable.png";

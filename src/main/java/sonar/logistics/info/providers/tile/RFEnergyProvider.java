@@ -2,6 +2,7 @@ package sonar.logistics.info.providers.tile;
 
 import java.util.List;
 
+import mekanism.api.energy.IStrictEnergyStorage;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -11,12 +12,13 @@ import sonar.logistics.api.providers.TileProvider;
 import cofh.api.energy.IEnergyConnection;
 import cofh.api.energy.IEnergyHandler;
 import cofh.api.energy.IEnergyStorage;
+import cpw.mods.fml.common.Loader;
 
 public class RFEnergyProvider extends TileProvider {
 
 	public static String name = "Redstone-Flux";
 	public String[] categories = new String[] { "ENERGY RF" };
-	public String[] subcategories = new String[] { "Connects: ","Current","Max Energy","Stored","Max Stored" };
+	public String[] subcategories = new String[] { "Connects: ", "Current", "Max Energy", "Stored", "Max Stored" };
 
 	@Override
 	public String getName() {
@@ -26,14 +28,17 @@ public class RFEnergyProvider extends TileProvider {
 	@Override
 	public boolean canProvideInfo(World world, int x, int y, int z, ForgeDirection dir) {
 		TileEntity target = world.getTileEntity(x, y, z);
-		return target != null && target instanceof IEnergyConnection;
+		return target != null && target instanceof IEnergyConnection && (!Loader.isModLoaded("Mekanism") || !(target instanceof IStrictEnergyStorage));
 	}
 
 	@Override
 	public void getHelperInfo(List<Info> infoList, World world, int x, int y, int z, ForgeDirection dir) {
 		byte id = this.getID();
-
 		TileEntity handler = world.getTileEntity(x, y, z);
+		boolean displayEnergy = true;
+		if (Loader.isModLoaded("Mekanism")) {
+			displayEnergy = !(handler instanceof IStrictEnergyStorage);
+		}
 		if (handler instanceof IEnergyConnection) {
 			IEnergyConnection info = (IEnergyConnection) handler;
 			boolean canConnect = info.canConnectEnergy(dir);

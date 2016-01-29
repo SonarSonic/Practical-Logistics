@@ -2,10 +2,7 @@ package sonar.logistics.common.blocks;
 
 import java.util.List;
 
-import net.minecraft.block.Block;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.IBlockAccess;
@@ -13,46 +10,20 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.common.block.SonarMachineBlock;
 import sonar.core.common.block.SonarMaterials;
-import sonar.logistics.common.tileentity.TileEntityDataCable;
+import sonar.logistics.common.tileentity.TileEntityMultiDataCable;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-public class BlockDataCable extends SonarMachineBlock {
+public class BlockMultiDataCable extends SonarMachineBlock {
 
-	public BlockDataCable() {
+	public BlockMultiDataCable() {
 		super(SonarMaterials.machine, false);
 		this.setBlockBounds((float) 0.0625 * 3, (float) 0.0625 * 3, (float) 0.0625 * 3, (float) (1 - (0.0625 * 3)), (float) (1 - (0.0625 * 3)), (float) (1 - (0.0625 * 3)));
 	}
 
 	@Override
-	public void onNeighborChange(IBlockAccess world, int x, int y, int z, int tileX, int tileY, int tileZ) {
-		TileEntity tileentity = world.getTileEntity(x, y, z);
-		if (tileentity != null && tileentity instanceof TileEntityDataCable) {
-			TileEntityDataCable cable = (TileEntityDataCable) world.getTileEntity(x, y, z);
-			//CableHelper.updateAdjacentCoords(cable, cable.coords, true);
-
-		}
-	}
-
-	@Override
-	public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase entity, ItemStack itemstack) {
-		super.onBlockPlacedBy(world, x, y, z, entity, itemstack);
-		TileEntity target = world.getTileEntity(x, y, z);
-		if (entity instanceof EntityPlayer && target instanceof TileEntityDataCable) {
-			TileEntityDataCable cable = (TileEntityDataCable) target;
-			//CableHelper.updateAdjacentCoords(cable, cable.coords, true);
-		}
-	}
-
-	@Override
-	public void breakBlock(World world, int x, int y, int z, Block oldblock, int oldMetadata) {
-		super.breakBlock(world, x, y, z, oldblock, oldMetadata);
-		//CableHelper.updateAdjacentCoords(world, x, y, z, null, true);
-	}
-
-	@Override
 	public TileEntity createNewTileEntity(World world, int i) {
-		return new TileEntityDataCable();
+		return new TileEntityMultiDataCable();
 	}
 
 	@Override
@@ -68,10 +39,9 @@ public class BlockDataCable extends SonarMachineBlock {
 	public void setBlockBoundsBasedOnState(IBlockAccess world, int x, int y, int z) {
 		super.setBlockBoundsBasedOnState(world, x, y, z);
 		TileEntity tileentity = world.getTileEntity(x, y, z);
-		if (tileentity != null && tileentity instanceof TileEntityDataCable) {
-			TileEntityDataCable cable = (TileEntityDataCable) world.getTileEntity(x, y, z);
-			this.setBlockBounds((float) (cable.canRenderConnection(ForgeDirection.WEST)!=0 ? 0 : 0.0625 * 6), (float) (cable.canRenderConnection(ForgeDirection.DOWN)!=0 ? 0 : 0.0625 * 6), (float) (cable.canRenderConnection(ForgeDirection.NORTH)!=0 ? 0 : 0.0625 * 6), (float) (cable.canRenderConnection(ForgeDirection.EAST)!=0 ? 1 : (1 - (0.0625 * 6))), (float) (cable.canRenderConnection(ForgeDirection.UP)!=0 ? 1
-					: (1 - (0.0625 * 6))), (float) (cable.canRenderConnection(ForgeDirection.SOUTH)!=0 ? 1 : (1 - (0.0625 * 6))));
+		if (tileentity != null && tileentity instanceof TileEntityMultiDataCable) {
+			TileEntityMultiDataCable cable = (TileEntityMultiDataCable) world.getTileEntity(x, y, z);
+			this.setBlockBounds((float) (cable.canRenderConnection(ForgeDirection.WEST)!=0 ? 0 : 0.0625 * 6), (float) (cable.canRenderConnection(ForgeDirection.DOWN)!=0 ? 0 : 0.0625 * 6), (float) (cable.canRenderConnection(ForgeDirection.NORTH)!=0 ? 0 : 0.0625 * 6), (float) (cable.canRenderConnection(ForgeDirection.EAST)!=0 ? 1 : (1 - (0.0625 * 6))), (float) (cable.canRenderConnection(ForgeDirection.UP)!=0 ? 1 : (1 - (0.0625 * 6))), (float) (cable.canRenderConnection(ForgeDirection.SOUTH)!=0 ? 1 : (1 - (0.0625 * 6))));
 		} else {
 			this.setBlockBounds((float) 0.0625 * 6, (float) 0.0625 * 6, (float) 0.0625 * 6, (float) (1 - (0.0625 * 6)), (float) (1 - (0.0625 * 6)), (float) (1 - (0.0625 * 6)));
 		}

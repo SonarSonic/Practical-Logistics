@@ -22,7 +22,6 @@ import sonar.core.fluid.StoredFluidStack;
 import sonar.core.inventory.GuiSonar;
 import sonar.core.inventory.SonarButtons;
 import sonar.core.utils.helpers.FontHelper;
-import sonar.core.utils.helpers.RenderHelper;
 import sonar.logistics.Logistics;
 import sonar.logistics.common.containers.ContainerFluidReader;
 import sonar.logistics.common.handlers.FluidReaderHandler;

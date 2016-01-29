@@ -6,17 +6,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.SonarCore;
-import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.handlers.InventoryTileHandler;
 import sonar.core.network.sync.SyncInt;
 import sonar.core.network.utils.IByteBufTile;
@@ -29,11 +26,9 @@ import sonar.core.utils.helpers.SonarHelper;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.ItemFilter;
 import sonar.logistics.common.tileentity.TileEntityBlockNode;
-import sonar.logistics.common.tileentity.TileEntityEntityNode;
 import sonar.logistics.helpers.CableHelper;
 import sonar.logistics.info.filters.items.ItemStackFilter;
 import sonar.logistics.info.filters.items.OreDictionaryFilter;
-import cpw.mods.fml.common.network.ByteBufUtils;
 
 public class ItemRouterHandler extends InventoryTileHandler implements ISidedInventory, IByteBufTile {
 
@@ -43,7 +38,7 @@ public class ItemRouterHandler extends InventoryTileHandler implements ISidedInv
 	public SyncInt side = new SyncInt(8);
 	public SyncInt filterPos = new SyncInt(9);
 
-	public BlockCoords[] coords = new BlockCoords[6];
+	public List<BlockCoords>[] coords = new List[6];
 	public List<ItemFilter>[] lastWhitelist = new List[6];
 	public List<ItemFilter>[] whitelist = new List[6];
 
@@ -67,6 +62,7 @@ public class ItemRouterHandler extends InventoryTileHandler implements ISidedInv
 			whitelist[i] = new ArrayList();
 			lastBlacklist[i] = new ArrayList();
 			blacklist[i] = new ArrayList();
+			coords[i] = new ArrayList();
 		}
 	}
 
@@ -91,18 +87,21 @@ public class ItemRouterHandler extends InventoryTileHandler implements ISidedInv
 			if (config != 0) {
 				TileEntity target = null;
 				ForgeDirection dir = null;
-				TileEntity tile = this.coords[update] != null ? this.coords[update].getTileEntity() : null;
-				if (tile != null && tile instanceof TileEntityBlockNode) {
-					TileEntityBlockNode node = (TileEntityBlockNode) tile;
-					dir = ForgeDirection.getOrientation(SonarHelper.invertMetadata(node.getBlockMetadata())).getOpposite();
-					target = node.getWorldObj().getTileEntity(node.xCoord + dir.offsetX, node.yCoord + dir.offsetY, node.zCoord + dir.offsetZ);
+				if (this.coords[update] != null) {
+					for (BlockCoords coords : this.coords[update]) {
+						TileEntity tile = coords.getTileEntity();
+						if (tile != null && tile instanceof TileEntityBlockNode) {
+							TileEntityBlockNode node = (TileEntityBlockNode) tile;
+							dir = ForgeDirection.getOrientation(SonarHelper.invertMetadata(node.getBlockMetadata())).getOpposite();
+							target = node.getWorldObj().getTileEntity(node.xCoord + dir.offsetX, node.yCoord + dir.offsetY, node.zCoord + dir.offsetZ);
 
-				} else {
-					dir = ForgeDirection.getOrientation(update);
-					target = te.getWorldObj().getTileEntity(te.xCoord + dir.offsetX, te.yCoord + dir.offsetY, te.zCoord + dir.offsetZ);
+						} else {
+							dir = ForgeDirection.getOrientation(update);
+							target = te.getWorldObj().getTileEntity(te.xCoord + dir.offsetX, te.yCoord + dir.offsetY, te.zCoord + dir.offsetZ);
+						}
+						routeInventory(te, config, target, dir);
+					}
 				}
-				routeInventory(te, config, target, dir);
-
 			}
 
 		}
@@ -127,10 +126,6 @@ public class ItemRouterHandler extends InventoryTileHandler implements ISidedInv
 			return;
 		}
 		this.getFilters().add(filter);
-		/*
-		 * if (listType.getInt() == 0) { whitelist[side.getInt()].add(filter); }
-		 * else { blacklist[side.getInt()].add(filter); }
-		 */
 	}
 
 	public void replaceItemFilter(int i, ItemFilter filter) {
@@ -140,7 +135,6 @@ public class ItemRouterHandler extends InventoryTileHandler implements ISidedInv
 		}
 		if (filters.get(i).getID() == filter.getID()) {
 			if (!filter.getFilters().isEmpty()) {
-				System.out.print("set");
 				this.getFilters().set(i, filter);
 			} else {
 				this.getFilters().remove(i);
@@ -174,17 +168,12 @@ public class ItemRouterHandler extends InventoryTileHandler implements ISidedInv
 		for (int i = 0; i < 6; i++) {
 			int config = sideConfigs[i].getInt();
 			if (config != 0) {
-				Object target = CableHelper.getConnectedTile(te, ForgeDirection.getOrientation(i));
-				target = FMPHelper.checkObject(target);
-				if (target == null) {
-					this.coords[i] = null;
-				} else {
-					if (target instanceof TileEntityBlockNode || target instanceof TileEntityEntityNode) {
-						TileEntity node = (TileEntity) target;
-						this.coords[i] = new BlockCoords(node, node.getWorldObj().provider.dimensionId);
-					} else {
-						this.coords[i] = null;
-					}
+				List<BlockCoords> connections = CableHelper.getConnections(te, ForgeDirection.getOrientation(i));
+				if (!connections.isEmpty()) {
+					this.coords[i] = connections;
+				}else{
+					this.coords[i]=new ArrayList();
+					this.coords[i].add(BlockCoords.translateCoords(new BlockCoords(te), ForgeDirection.getOrientation(i)));
 				}
 			}
 		}
@@ -211,18 +200,6 @@ public class ItemRouterHandler extends InventoryTileHandler implements ISidedInv
 			for (int i = 0; i < 6; i++) {
 				NBTTagCompound compound = sideList.getCompoundTagAt(i);
 				sideConfigs[i].readFromNBT(compound, type);
-			}
-
-			if (type == SyncType.SAVE) {
-				NBTTagList list = nbt.getTagList("Configs", 10);
-				for (int i = 0; i < 6; i++) {
-					NBTTagCompound compound = list.getCompoundTagAt(i);
-					if (compound.hasKey("x"))
-						coords[i] = BlockCoords.readFromNBT(compound);
-					list.appendTag(compound);
-				}
-				update = nbt.getInteger("update");
-
 			}
 		}
 		if (type == SyncType.SPECIAL) {
@@ -253,22 +230,6 @@ public class ItemRouterHandler extends InventoryTileHandler implements ISidedInv
 				sideList.appendTag(compound);
 			}
 			nbt.setTag("Sides", sideList);
-
-			if (type == SyncType.SAVE) {
-				NBTTagList list = new NBTTagList();
-				for (int i = 0; i < 6; i++) {
-					NBTTagCompound compound = new NBTTagCompound();
-					if (coords[i] != null) {
-						BlockCoords.writeToNBT(compound, coords[i]);
-					}
-					list.appendTag(compound);
-
-				}
-				nbt.setTag("Configs", list);
-				nbt.setInteger("update", update);
-
-			}
-
 		}
 		if (type == SyncType.SPECIAL) {
 			for (int l = 0; l < 6; l++) {
@@ -346,7 +307,6 @@ public class ItemRouterHandler extends InventoryTileHandler implements ISidedInv
 		case -1:
 			writePacket(buf, 9);
 			clientStackFilter.writeToBuf(buf);
-			System.out.print(clientStackFilter.matchOreDict);
 			break;
 		case 0:
 			if (side.getInt() + 1 < 6) {
@@ -424,13 +384,11 @@ public class ItemRouterHandler extends InventoryTileHandler implements ISidedInv
 					replaceItemFilter(editOre, clientOreFilter);
 			}
 			editOre = -1;
-			// filterPos.setInt(-1);
 			break;
 		case -1:
 			readPacket(buf, 9);
 			clientStackFilter = new ItemStackFilter();
 			clientStackFilter.readFromBuf(buf);
-			System.out.print(clientStackFilter.matchOreDict);
 			if (clientStackFilter != null) {
 				if (editStack == -1 && clientStackFilter.filters[0] != null) {
 					addItemFilter(clientStackFilter);
@@ -440,7 +398,6 @@ public class ItemRouterHandler extends InventoryTileHandler implements ISidedInv
 
 			}
 			editStack = -1;
-			// filterPos.setInt(-1);
 			break;
 		case 0:
 			side.setInt(buf.readInt());

@@ -20,7 +20,6 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
-import buildcraft.core.lib.inventory.filters.OreStackFilter;
 import sonar.core.SonarCore;
 import sonar.core.inventory.GuiSonar;
 import sonar.core.inventory.SonarButtons;

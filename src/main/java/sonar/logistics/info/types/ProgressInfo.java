@@ -13,11 +13,10 @@ import net.minecraftforge.fluids.FluidRegistry;
 
 import org.lwjgl.opengl.GL11;
 
-import cpw.mods.fml.common.network.ByteBufUtils;
 import sonar.core.utils.INBTObject;
-import sonar.core.utils.IRegistryObject;
 import sonar.logistics.api.Info;
 import sonar.logistics.client.renderers.RenderHandlers;
+import cpw.mods.fml.common.network.ByteBufUtils;
 
 public class ProgressInfo extends Info {
 

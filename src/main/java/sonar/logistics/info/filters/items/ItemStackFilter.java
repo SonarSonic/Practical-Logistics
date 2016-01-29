@@ -1,20 +1,17 @@
 package sonar.logistics.info.filters.items;
 
+import io.netty.buffer.ByteBuf;
+
 import java.util.Arrays;
 import java.util.List;
 
-import cpw.mods.fml.common.network.ByteBufUtils;
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.common.registry.GameRegistry.UniqueIdentifier;
-import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.common.util.Constants;
-import net.minecraftforge.oredict.OreDictionary;
 import sonar.core.utils.helpers.ItemStackHelper;
 import sonar.logistics.api.ItemFilter;
+import cpw.mods.fml.common.network.ByteBufUtils;
 
 public class ItemStackFilter extends ItemFilter<ItemStackFilter> implements IInventory {
 

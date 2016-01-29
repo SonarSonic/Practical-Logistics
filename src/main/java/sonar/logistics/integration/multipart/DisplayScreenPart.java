@@ -8,15 +8,16 @@ import net.minecraft.util.MovingObjectPosition;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.integration.fmp.SonarHandlerPart;
 import sonar.core.integration.fmp.handlers.TileHandler;
+import sonar.core.utils.BlockCoords;
 import sonar.logistics.api.Info;
-import sonar.logistics.api.connecting.IDataConnection;
+import sonar.logistics.api.connecting.IInfoTile;
 import sonar.logistics.client.renderers.RenderDisplayScreen;
 import sonar.logistics.common.handlers.DisplayScreenHandler;
 import sonar.logistics.registries.BlockRegistry;
 import sonar.logistics.registries.ItemRegistry;
 import codechicken.lib.vec.Cuboid6;
 
-public class DisplayScreenPart extends SonarHandlerPart implements IDataConnection {
+public class DisplayScreenPart extends SonarHandlerPart implements IInfoTile {
 
 	public DisplayScreenHandler handler = new DisplayScreenHandler(true, tile());
 
@@ -91,6 +92,11 @@ public class DisplayScreenPart extends SonarHandlerPart implements IDataConnecti
 	@Override
 	public Object getSpecialRenderer() {
 		return new RenderDisplayScreen();
+	}
+
+	@Override
+	public BlockCoords getCoords() {
+		return new BlockCoords(tile());
 	}
 
 }

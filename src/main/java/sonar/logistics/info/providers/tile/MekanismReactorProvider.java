@@ -2,7 +2,6 @@ package sonar.logistics.info.providers.tile;
 
 import java.util.List;
 
-import mekanism.api.ISalinationSolar;
 import mekanism.api.reactor.IFusionReactor;
 import mekanism.api.reactor.IReactorBlock;
 import net.minecraft.tileentity.TileEntity;
@@ -11,9 +10,6 @@ import net.minecraftforge.common.util.ForgeDirection;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.StandardInfo;
 import sonar.logistics.api.providers.TileProvider;
-import appeng.api.implementations.IPowerChannelState;
-import appeng.api.networking.IGridBlock;
-import appeng.api.networking.IGridConnection;
 import cpw.mods.fml.common.Loader;
 
 public class MekanismReactorProvider extends TileProvider {

@@ -1,32 +1,21 @@
 package sonar.logistics.api.connecting;
 
-import java.util.List;
-
 import net.minecraftforge.common.util.ForgeDirection;
-import sonar.core.utils.BlockCoords;
 import sonar.logistics.api.render.ICableRenderer;
 
-/**
- * Used by Data Cables both for Tiles and Forge Multipart parts Cables don't
- * store any data but instead store the the Coordinates of the block they are
- * connected to. Therefore cables can be used as a universal transfer method for
- * any type of data
- */
+/**implemented on Tile Entities and Forge Multipart parts which are cables*/
 public interface IMultiDataCable extends ICableRenderer, IMultiTile {
-
-	/** the Coordinates of the currently connected Tile Entity */
-	public List<BlockCoords> getCoords();
-
-	public void setCoords(List<BlockCoords> coords);
-
-	public void addCoords(BlockCoords coords);
-
-	public void removeCoords(BlockCoords coords);
-
 	/**
-	 * checks if the cable can connect in a given direction It will return true
-	 * if a FMP part is blocking it's connection
+	 * checks if the cable is blocked in a given direction (e.g. other FMP part is blocking the connection
 	 */
 	public boolean isBlocked(ForgeDirection dir);
 
+	/**when cables join together they create networks which are stored under IDs in the registry, this returns this id*/
+	public int registryID();
+
+	/**DON'T CALL THIS OUTSIDE OF THE CABLE REGISTRY - Once this is called the Registry will assume the id was successfully changed.*/
+	public void setRegistryID(int id);
+	
+	/**is the cable limited by the number of channels, true for Channelled Cables, false for Data Cables*/
+	public boolean unlimitedChannels();
 }

@@ -17,11 +17,12 @@ import sonar.logistics.api.DataEmitter;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.StandardInfo;
 import sonar.logistics.api.connecting.IDataReceiver;
+import sonar.logistics.api.connecting.IInfoEmitter;
 import sonar.logistics.helpers.CableHelper;
 import sonar.logistics.network.SyncEmitter;
 import sonar.logistics.registries.EmitterRegistry;
 
-public class TileEntityDataReceiver extends TileEntityNode implements IDataReceiver {
+public class TileEntityDataReceiver extends TileEntityNode implements IDataReceiver, IInfoEmitter {
 
 	// client list
 	public List<DataEmitter> emitters;
@@ -60,25 +61,24 @@ public class TileEntityDataReceiver extends TileEntityNode implements IDataRecei
 		if (isClient()) {
 			return;
 		}
-		CableHelper.updateAdjacentCoord(this, new BlockCoords(this.xCoord, this.yCoord, this.zCoord), false, ForgeDirection.getOrientation(this.getBlockMetadata()));
+		//CableHelper.updateAdjacentCoord(this, new BlockCoords(this.xCoord, this.yCoord, this.zCoord), false, ForgeDirection.getOrientation(this.getBlockMetadata()));
 
 	}
-	
-	
+
 	public boolean maxRender() {
 		return true;
 	}
 
 	public void sendAvailableData(TileEntity te, EntityPlayer player) {
-		if (player != null && player instanceof EntityPlayerMP) {			
-			emitters = EmitterRegistry.getEmitters(playerName);			
+		if (player != null && player instanceof EntityPlayerMP) {
+			emitters = EmitterRegistry.getEmitters(playerName);
 			NBTTagCompound syncData = new NBTTagCompound();
 			writeData(syncData, SyncType.SPECIAL);
 			SonarCore.network.sendTo(new PacketTileSync(te.xCoord, te.yCoord, te.zCoord, syncData, SyncType.SPECIAL), (EntityPlayerMP) player);
 		}
 
 	}
-	
+
 	public void readData(NBTTagCompound nbt, SyncType type) {
 		super.readData(nbt, type);
 		if (type == SyncType.SAVE) {
@@ -210,9 +210,42 @@ public class TileEntityDataReceiver extends TileEntityNode implements IDataRecei
 					list.appendTag(compound);
 				}
 			}
-
 			nbt.setTag("Emitters", list);
 		}
-
 	}
+
+	@Override
+	public BlockCoords getCoords() {
+		return new BlockCoords(this);
+	}
+
+	public void onLoaded() {
+		super.onLoaded();
+		if (!this.worldObj.isRemote) {
+			this.addConnections();
+		}
+	}
+
+	@Override
+	public void invalidate() {
+		super.invalidate();
+		if (!this.worldObj.isRemote) {
+			this.removeConnections();
+		}
+	}
+
+	@Override
+	public void addConnections() {
+		if (!this.worldObj.isRemote) {
+			CableHelper.addConnection(this, ForgeDirection.getOrientation(this.getBlockMetadata()));
+		}
+	}
+
+	@Override
+	public void removeConnections() {
+		if (!this.worldObj.isRemote) {
+			CableHelper.removeConnection(this, ForgeDirection.getOrientation(this.getBlockMetadata()));
+		}
+	}
+
 }

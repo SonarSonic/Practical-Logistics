@@ -1,16 +1,13 @@
 package sonar.logistics.registries;
 
 import gnu.trove.map.hash.THashMap;
-import io.netty.buffer.ByteBuf;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import sonar.core.utils.BlockCoords;
-import sonar.core.utils.IBufManager;
 import sonar.logistics.api.DataEmitter;
 import sonar.logistics.common.tileentity.TileEntityDataEmitter;
 

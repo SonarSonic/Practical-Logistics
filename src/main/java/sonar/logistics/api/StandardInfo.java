@@ -3,6 +3,7 @@ package sonar.logistics.api;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.nbt.NBTTagCompound;
 import sonar.logistics.Logistics;
+import sonar.logistics.api.providers.TileProvider;
 import cpw.mods.fml.common.network.ByteBufUtils;
 
 public class StandardInfo extends Info {
@@ -31,7 +32,7 @@ public class StandardInfo extends Info {
 		this.catID = (byte) category;
 		this.subCatID = (byte) subCategory;
 		this.data = data.toString();
-		this.dataType = data instanceof Integer ? 0 : 1;
+		this.dataType = data instanceof Long || data instanceof Integer || data instanceof Short ? 0 : 1;
 	}
 
 	public StandardInfo(int providerID, String category, String subCategory, Object data) {
@@ -39,7 +40,7 @@ public class StandardInfo extends Info {
 		this.category = category;
 		this.subCategory = subCategory;
 		this.data = data.toString();
-		this.dataType = data instanceof Integer ? 0 : 1;
+		this.dataType = data instanceof Long || data instanceof Integer || data instanceof Short ? 0 : 1;
 	}
 
 	@Override
@@ -54,18 +55,25 @@ public class StandardInfo extends Info {
 
 	@Override
 	public String getCategory() {
-		
-		return (catID==-1 ||providerID==-1)  ? category : Logistics.tileProviders.getRegisteredObject(providerID).getCategory(catID);
+		TileProvider provider = Logistics.tileProviders.getRegisteredObject(providerID);
+		if (providerID != -1 && provider == null) {
+			return "UNLOADED MOD";
+		}
+		return (catID == -1 || providerID == -1) ? category : provider.getCategory(catID);
 	}
 
 	@Override
 	public String getSubCategory() {
-		return (subCatID==-1||providerID==-1)  ? subCategory : Logistics.tileProviders.getRegisteredObject(providerID).getSubCategory(subCatID);
+		TileProvider provider = Logistics.tileProviders.getRegisteredObject(providerID);
+		if (providerID != -1 && provider == null) {
+			return "ERROR";
+		}
+		return (subCatID == -1 || providerID == -1) ? subCategory : provider.getSubCategory(subCatID);
 	}
 
 	@Override
 	public String getData() {
-		return !emptyData ? data : this.dataType==1? "NO DATA" : String.valueOf(0);
+		return !emptyData ? data : this.dataType == 1 ? "NO DATA" : String.valueOf(0);
 	}
 
 	@Override
@@ -85,7 +93,7 @@ public class StandardInfo extends Info {
 	@Override
 	public void readFromBuf(ByteBuf buf) {
 		this.providerID = buf.readByte();
-		
+
 		if (buf.readBoolean()) {
 			this.catID = buf.readByte();
 		} else {
@@ -96,7 +104,7 @@ public class StandardInfo extends Info {
 		} else {
 			this.subCategory = ByteBufUtils.readUTF8String(buf);
 		}
-		
+
 		this.data = ByteBufUtils.readUTF8String(buf);
 		this.dataType = buf.readInt();
 		this.emptyData = buf.readBoolean();
@@ -109,7 +117,7 @@ public class StandardInfo extends Info {
 	@Override
 	public void writeToBuf(ByteBuf buf) {
 		buf.writeByte(providerID);
-		
+
 		if (catID != -1) {
 			buf.writeBoolean(true);
 			buf.writeByte(catID);
@@ -124,7 +132,7 @@ public class StandardInfo extends Info {
 			buf.writeBoolean(false);
 			ByteBufUtils.writeUTF8String(buf, subCategory);
 		}
-	
+
 		ByteBufUtils.writeUTF8String(buf, data);
 		buf.writeInt(dataType);
 		buf.writeBoolean(emptyData);
@@ -148,7 +156,7 @@ public class StandardInfo extends Info {
 		} else {
 			this.subCategory = tag.getString("subCategory");
 		}
-		
+
 		this.data = tag.getString("data");
 		this.dataType = tag.getInteger("dataType");
 		this.emptyData = tag.getBoolean("emptyData");
@@ -183,7 +191,6 @@ public class StandardInfo extends Info {
 			tag.setBoolean("hasSuffix", false);
 		}
 	}
-
 
 	@Override
 	public boolean isEqualType(Info info) {

@@ -2,13 +2,16 @@ package sonar.logistics.common.tileentity;
 
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.common.tileentity.TileEntityHandlerInventory;
+import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.inventory.IDropInventory;
+import sonar.core.utils.BlockCoords;
 import sonar.logistics.api.Info;
-import sonar.logistics.api.connecting.IDataConnection;
+import sonar.logistics.api.connecting.IInfoEmitter;
 import sonar.logistics.common.handlers.InventoryReaderHandler;
+import sonar.logistics.helpers.CableHelper;
 
-public class TileEntityInventoryReader extends TileEntityHandlerInventory implements IDataConnection, IDropInventory {
+public class TileEntityInventoryReader extends TileEntityHandlerInventory implements IInfoEmitter, IDropInventory {
 
 	public InventoryReaderHandler handler = new InventoryReaderHandler(false, this);
 
@@ -39,6 +42,21 @@ public class TileEntityInventoryReader extends TileEntityHandlerInventory implem
 	@Override
 	public boolean canDrop() {
 		return false;
+	}
+
+	@Override
+	public BlockCoords getCoords() {
+		return new BlockCoords(this);
+	}
+
+	@Override
+	public void addConnections() {
+		CableHelper.addConnection(this, ForgeDirection.getOrientation(FMPHelper.getMeta(this)));
+	}
+
+	@Override
+	public void removeConnections() {
+		CableHelper.removeConnection(this, ForgeDirection.getOrientation(FMPHelper.getMeta(this)));
 	}
 
 }

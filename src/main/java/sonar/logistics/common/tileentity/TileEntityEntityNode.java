@@ -6,19 +6,18 @@ import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.util.ForgeDirection;
-import sonar.core.common.tileentity.TileEntitySonar;
 import sonar.core.network.sync.SyncInt;
 import sonar.core.utils.BlockCoords;
 import sonar.core.utils.IMachineButtons;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.core.utils.helpers.SonarHelper;
 import sonar.logistics.api.Info;
-import sonar.logistics.api.connecting.IDataConnection;
+import sonar.logistics.api.connecting.IInfoEmitter;
 import sonar.logistics.api.render.ICableRenderer;
 import sonar.logistics.helpers.CableHelper;
 import sonar.logistics.info.types.BlockCoordsInfo;
 
-public class TileEntityEntityNode extends TileEntitySonar implements ICableRenderer, IDataConnection, IMachineButtons {
+public class TileEntityEntityNode extends TileEntityConnection implements ICableRenderer, IInfoEmitter, IMachineButtons {
 
 	public SyncInt entityTarget = new SyncInt(0);
 	public float rotate = 0;
@@ -34,9 +33,9 @@ public class TileEntityEntityNode extends TileEntitySonar implements ICableRende
 	}
 
 	@Override
-	public boolean canRenderConnection(ForgeDirection dir) {
+	public int canRenderConnection(ForgeDirection dir) {
 		if (dir == dir.UP) {
-			return false;
+			return 0;
 		}
 		return CableHelper.canRenderConnection(this, dir);
 	}
@@ -51,8 +50,7 @@ public class TileEntityEntityNode extends TileEntitySonar implements ICableRende
 			}
 			return;
 		}
-		CableHelper.updateAdjacentCoords(this, new BlockCoords(this.xCoord, this.yCoord, this.zCoord), false, new ForgeDirection[] { ForgeDirection.UP });
-		
+
 	}
 
 	public boolean maxRender() {
@@ -85,11 +83,34 @@ public class TileEntityEntityNode extends TileEntitySonar implements ICableRende
 	public Entity getNearestEntity() {
 
 		switch (entityTarget.getInt()) {
-		case 1: return SonarHelper.getNearestEntity(EntityPlayer.class, this, 10);
-		case 2: return SonarHelper.getNearestEntity(EntityMob.class, this, 10);
-		case 3: return SonarHelper.getNearestEntity(EntityAnimal.class, this, 10);
+		case 1:
+			return SonarHelper.getNearestEntity(EntityPlayer.class, this, 10);
+		case 2:
+			return SonarHelper.getNearestEntity(EntityMob.class, this, 10);
+		case 3:
+			return SonarHelper.getNearestEntity(EntityAnimal.class, this, 10);
 		default:
 			return SonarHelper.getNearestEntity(Entity.class, this, 10);
+		}
+	}
+
+	@Override
+	public void addConnections() {
+		for (int i = 0; i < 6; i++) {
+			ForgeDirection dir = ForgeDirection.getOrientation(i);
+			if (dir != dir.UP) {
+				CableHelper.addConnection(this, dir);
+			}
+		}
+	}
+
+	@Override
+	public void removeConnections() {
+		for (int i = 0; i < 6; i++) {
+			ForgeDirection dir = ForgeDirection.getOrientation(i);
+			if (dir != dir.UP) {
+				CableHelper.removeConnection(this, dir);
+			}
 		}
 	}
 }

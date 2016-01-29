@@ -4,25 +4,22 @@ import java.util.List;
 
 import mekanism.api.IHeatTransfer;
 import mekanism.api.ISalinationSolar;
+import mekanism.api.energy.IStrictEnergyAcceptor;
+import mekanism.api.energy.IStrictEnergyStorage;
 import mekanism.api.lasers.ILaserReceptor;
-import mekanism.api.reactor.IFusionReactor;
-import mekanism.api.reactor.IReactorBlock;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.StandardInfo;
 import sonar.logistics.api.providers.TileProvider;
-import appeng.api.implementations.IPowerChannelState;
-import appeng.api.networking.IGridBlock;
-import appeng.api.networking.IGridConnection;
 import cpw.mods.fml.common.Loader;
 
 public class MekanismGeneralProvider extends TileProvider {
 
 	public static String name = "Mekanism-General";
-	public String[] categories = new String[] { "Mekanism General" };
-	public String[] subcategories = new String[] { "Temperature", "Can See Sun", "Can Laser Dig" };
+	public String[] categories = new String[] { "Mekanism General", "Mekanism Energy" };
+	public String[] subcategories = new String[] { "Temperature", "Can See Sun", "Can Laser Dig", "Stored", "Max Stored", "Can Connect" };
 
 	@Override
 	public String getName() {
@@ -32,7 +29,7 @@ public class MekanismGeneralProvider extends TileProvider {
 	@Override
 	public boolean canProvideInfo(World world, int x, int y, int z, ForgeDirection dir) {
 		TileEntity target = world.getTileEntity(x, y, z);
-		return target != null && (target instanceof IHeatTransfer || target instanceof ISalinationSolar || target instanceof ILaserReceptor);
+		return target != null && (target instanceof IHeatTransfer || target instanceof ISalinationSolar || target instanceof ILaserReceptor || target instanceof IStrictEnergyStorage);
 	}
 
 	@Override
@@ -50,6 +47,15 @@ public class MekanismGeneralProvider extends TileProvider {
 		if (target instanceof ILaserReceptor) {
 			ILaserReceptor block = (ILaserReceptor) target;
 			infoList.add(new StandardInfo(id, 0, 2, block.canLasersDig()));
+		}
+		if (target instanceof IStrictEnergyStorage) {
+			IStrictEnergyStorage block = (IStrictEnergyStorage) target;
+			infoList.add(new StandardInfo(id, 1, 3, (long) block.getEnergy(), "J"));
+			infoList.add(new StandardInfo(id, 1, 4, (long) block.getMaxEnergy(), "J"));
+		}
+		if (target instanceof IStrictEnergyAcceptor) {
+			IStrictEnergyAcceptor block = (IStrictEnergyAcceptor) target;
+			infoList.add(new StandardInfo(id, 1, 5, block.canReceiveEnergy(dir)));
 		}
 	}
 

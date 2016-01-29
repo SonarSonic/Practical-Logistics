@@ -7,21 +7,14 @@ import sonar.core.network.utils.ITextField;
 import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.api.Info;
-import sonar.logistics.api.connecting.IDataConnection;
+import sonar.logistics.api.connecting.IInfoEmitter;
 import sonar.logistics.helpers.CableHelper;
 import sonar.logistics.info.types.BlockCoordsInfo;
 import sonar.logistics.registries.EmitterRegistry;
 
-public class TileEntityDataEmitter extends TileEntityNode implements IDataConnection, ITextField {
+public class TileEntityDataEmitter extends TileEntityNode implements IInfoEmitter, ITextField{
 
 	public SyncString clientName = new SyncString(0, "Unnamed Emitter");
-
-	public TileEntityDataEmitter() {
-	}
-
-	public Object getConnectedTile() {
-		return CableHelper.getConnectedTile(this, ForgeDirection.getOrientation(this.getBlockMetadata()).getOpposite());
-	}
 
 	public void readData(NBTTagCompound nbt, SyncType type) {
 		super.readData(nbt, type);
@@ -52,7 +45,7 @@ public class TileEntityDataEmitter extends TileEntityNode implements IDataConnec
 	public void onChunkUnload() {
 		super.onChunkUnload();
 		if (!this.worldObj.isRemote) {
-			this.removeFromFrequency();
+			this.removeFromFrequency();			
 		}
 	}
 
@@ -60,6 +53,7 @@ public class TileEntityDataEmitter extends TileEntityNode implements IDataConnec
 		super.onLoaded();
 		if (!this.worldObj.isRemote) {
 			this.addToFrequency();
+			this.addConnections();
 		}
 	}
 
@@ -68,17 +62,13 @@ public class TileEntityDataEmitter extends TileEntityNode implements IDataConnec
 		super.invalidate();
 		if (!this.worldObj.isRemote) {
 			this.removeFromFrequency();
+			this.removeConnections();
 		}
 	}
 
 	@Override
 	public boolean canConnect(ForgeDirection dir) {
 		return dir == ForgeDirection.getOrientation(this.getBlockMetadata()).getOpposite();
-	}
-
-	@Override
-	public Info currentInfo() {
-		return BlockCoordsInfo.createInfo("Data Emitter", new BlockCoords(this));
 	}
 
 	public boolean maxRender() {
@@ -95,4 +85,29 @@ public class TileEntityDataEmitter extends TileEntityNode implements IDataConnec
 			}
 		}
 	}
+
+	@Override
+	public void addConnections() {
+		if (!this.worldObj.isRemote) {
+			CableHelper.addConnection(this, ForgeDirection.getOrientation(this.getBlockMetadata()).getOpposite());
+		}
+	}
+
+	@Override
+	public void removeConnections() {
+		if (!this.worldObj.isRemote) {
+			CableHelper.removeConnection(this, ForgeDirection.getOrientation(this.getBlockMetadata()).getOpposite());
+		}
+	}
+
+	@Override
+	public BlockCoords getCoords() {
+		return new BlockCoords(this);
+	}
+
+	@Override
+	public Info currentInfo() {
+		return BlockCoordsInfo.createInfo("Data Emitter", getCoords());
+	}
+
 }

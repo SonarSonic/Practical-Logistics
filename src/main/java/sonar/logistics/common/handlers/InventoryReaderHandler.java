@@ -7,7 +7,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.handlers.InventoryTileHandler;
@@ -16,7 +15,6 @@ import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.StandardInfo;
-import sonar.logistics.api.connecting.IDataCable;
 import sonar.logistics.common.tileentity.TileEntityBlockNode;
 import sonar.logistics.common.tileentity.TileEntityEntityNode;
 import sonar.logistics.helpers.CableHelper;
@@ -32,10 +30,10 @@ public class InventoryReaderHandler extends InventoryTileHandler {
 	public ItemStack current;
 
 	public InventoryReaderHandler(boolean isMultipart, TileEntity tile) {
-		super(isMultipart, tile);	
+		super(isMultipart, tile);
 		super.slots = new ItemStack[1];
 	}
-	
+
 	@Override
 	public void update(TileEntity te) {
 		if (te.getWorldObj().isRemote) {
@@ -44,39 +42,28 @@ public class InventoryReaderHandler extends InventoryTileHandler {
 		updateData(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)));
 	}
 
-	public void updateData(TileEntity te, ForgeDirection dir) {
-		Object target = CableHelper.getConnectedTile(te, dir.getOpposite());
-		target = FMPHelper.checkObject(target);
-		if (target == null) {
-			this.setCoords(null);
-		} else {
-			if (target instanceof TileEntityBlockNode || target instanceof TileEntityEntityNode) {
-				TileEntity node = (TileEntity) target;
-				this.setCoords(new BlockCoords(node, node.getWorldObj().provider.dimensionId));
-			} else {
-				this.setCoords(null);
+	public void updateData(TileEntity te, ForgeDirection dir) {	
+		List<BlockCoords> connections = CableHelper.getConnections(te, dir.getOpposite());
+		List<TileEntityBlockNode> nodes = new ArrayList();
+		List<TileEntityEntityNode> entityNodes = new ArrayList();
+
+		for (BlockCoords connect : connections) {
+			Object tile = connect.getTileEntity();
+			if (tile instanceof TileEntityBlockNode) {
+				nodes.add((TileEntityBlockNode) tile);
+			}
+			if (tile instanceof TileEntityEntityNode) {
+				entityNodes.add((TileEntityEntityNode) tile);
 			}
 		}
 
-		if (this.coords != null) {
-			TileEntity tile = this.coords.getTileEntity();
-			if (tile != null && tile instanceof TileEntityBlockNode) {
-				TileEntityBlockNode node = (TileEntityBlockNode) target;
-				stacks = InfoHelper.getTileInventory(node);
-				CableHelper.updateAdjacentCoord(te, new BlockCoords(te.xCoord, te.yCoord, te.zCoord), false, ForgeDirection.getOrientation(FMPHelper.getMeta(te)));
-
-			} else if (tile != null && tile instanceof TileEntityEntityNode) {
-				TileEntityEntityNode node = (TileEntityEntityNode) target;
-				stacks = InfoHelper.getEntityInventory(node);
-				CableHelper.updateAdjacentCoord(te, new BlockCoords(te.xCoord, te.yCoord, te.zCoord), false, ForgeDirection.getOrientation(FMPHelper.getMeta(te)));
-
-			} else {
-				stacks = null;
-			}
+		if (!nodes.isEmpty()) {
+			stacks = InfoHelper.getTileInventory(nodes);
+		} else if (!entityNodes.isEmpty()) {			
+			stacks = InfoHelper.getEntityInventory((TileEntityEntityNode) entityNodes.get(0));
 		} else {
-			stacks = null;
+			stacks = new ArrayList();
 		}
-
 	}
 
 	public boolean canConnect(TileEntity te, ForgeDirection dir) {
@@ -103,22 +90,6 @@ public class InventoryReaderHandler extends InventoryTileHandler {
 		return new StandardInfo((byte) -1, "ITEMREND", " ", "NO DATA");
 	}
 
-	@Override
-	public void removed(World world, int x, int y, int z, int meta) {
-		ForgeDirection dir = ForgeDirection.getOrientation(meta);
-		Object tile = world.getTileEntity(x + dir.offsetX, y + dir.offsetY, z + dir.offsetZ);
-		tile = FMPHelper.checkObject(tile);
-		if (tile != null) {
-			if (tile instanceof IDataCable) {
-				IDataCable cable = (IDataCable) tile;
-				if (cable.getCoords() != null) {
-					cable.setCoords(null);
-				}
-			}
-		}
-
-	}
-
 	public void readData(NBTTagCompound nbt, SyncType type) {
 		super.readData(nbt, type);
 		if (type == SyncType.SAVE) {
@@ -131,7 +102,7 @@ public class InventoryReaderHandler extends InventoryTileHandler {
 			}
 		}
 		if (type == SyncType.SPECIAL) {
-			
+
 			if (nbt.hasKey("null")) {
 				this.stacks = new ArrayList();
 				return;
@@ -168,7 +139,7 @@ public class InventoryReaderHandler extends InventoryTileHandler {
 				}
 
 			}
-			
+
 		}
 		if (type == SyncType.SYNC) {
 			NBTTagList list = nbt.getTagList("StoredStacks", 10);
@@ -249,7 +220,7 @@ public class InventoryReaderHandler extends InventoryTileHandler {
 			if (list.tagCount() != 0) {
 				nbt.setTag("Stacks", list);
 			}
-			
+
 		}
 		if (type == SyncType.SYNC) {
 			NBTTagList list = new NBTTagList();

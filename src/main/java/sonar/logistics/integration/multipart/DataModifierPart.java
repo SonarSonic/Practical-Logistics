@@ -5,20 +5,22 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraftforge.common.util.ForgeDirection;
-import sonar.core.integration.fmp.SonarHandlerPart;
+import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.network.utils.ITextField;
+import sonar.core.utils.BlockCoords;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.Info;
-import sonar.logistics.api.connecting.IDataConnection;
+import sonar.logistics.api.connecting.IInfoEmitter;
 import sonar.logistics.api.render.ICableRenderer;
 import sonar.logistics.client.renderers.RenderHandlers;
 import sonar.logistics.common.handlers.DataModifierHandler;
+import sonar.logistics.helpers.CableHelper;
 import sonar.logistics.network.LogisticsGui;
 import sonar.logistics.registries.BlockRegistry;
 import codechicken.lib.vec.Cuboid6;
 
-public class DataModifierPart extends SonarHandlerPart implements IDataConnection, ICableRenderer, ITextField {
+public class DataModifierPart extends ConnectionPart implements IInfoEmitter, ICableRenderer, ITextField {
 
 	public DataModifierHandler handler = new DataModifierHandler(true, tile());
 
@@ -48,14 +50,14 @@ public class DataModifierPart extends SonarHandlerPart implements IDataConnectio
 	@Override
 	public void textTyped(String string, int id) {
 		handler.textTyped(string, id);
-		
+
 	}
 
 	@Override
-	public boolean canRenderConnection(ForgeDirection dir) {
-		return handler.canRenderConnection(tile(), dir);
+	public int canRenderConnection(ForgeDirection dir) {
+		return handler.canRenderConnection(dir, tile());
 	}
-	
+
 	public boolean activate(EntityPlayer player, MovingObjectPosition pos, ItemStack stack) {
 		if (player != null) {
 			player.openGui(Logistics.instance, LogisticsGui.dataModifier, tile().getWorldObj(), x(), y(), z());
@@ -64,7 +66,7 @@ public class DataModifierPart extends SonarHandlerPart implements IDataConnectio
 		}
 		return false;
 	}
-	
+
 	@Override
 	public Cuboid6 getBounds() {
 		return new Cuboid6(4 * 0.0625, 4 * 0.0625, 4 * 0.0625, 1 - 4 * 0.0625, 1 - 4 * 0.0625, 1 - 4 * 0.0625);
@@ -85,5 +87,29 @@ public class DataModifierPart extends SonarHandlerPart implements IDataConnectio
 		return new RenderHandlers.DataModifier();
 	}
 
+	@Override
+	public BlockCoords getCoords() {
+		return new BlockCoords(tile());
+	}
+
+	@Override
+	public void addConnections() {
+		for (int i = 0; i < 6; i++) {
+			ForgeDirection dir = ForgeDirection.getOrientation(i);
+			if (dir != ForgeDirection.getOrientation(FMPHelper.getMeta(tile())).getOpposite()) {
+				CableHelper.addConnection(tile(), dir);
+			}
+		}
+	}
+
+	@Override
+	public void removeConnections() {
+		for (int i = 0; i < 6; i++) {
+			ForgeDirection dir = ForgeDirection.getOrientation(i);
+			if (dir != ForgeDirection.getOrientation(FMPHelper.getMeta(tile())).getOpposite()) {
+				CableHelper.removeConnection(tile(), dir);
+			}
+		}
+	}
 
 }

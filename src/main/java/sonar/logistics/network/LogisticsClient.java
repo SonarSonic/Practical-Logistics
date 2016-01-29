@@ -23,6 +23,7 @@ import sonar.logistics.common.tileentity.TileEntityInfoReader;
 import sonar.logistics.common.tileentity.TileEntityInventoryReader;
 import sonar.logistics.common.tileentity.TileEntityItemRouter;
 import sonar.logistics.common.tileentity.TileEntityLargeScreen;
+import sonar.logistics.common.tileentity.TileEntityMultiDataCable;
 import sonar.logistics.common.tileentity.TileEntityRedstoneSignaller;
 import sonar.logistics.registries.BlockRegistry;
 import cpw.mods.fml.client.registry.ClientRegistry;
@@ -47,6 +48,10 @@ public class LogisticsClient extends LogisticsCommon {
 		TileEntitySpecialRenderer dataCable = new RenderHandlers.BlockCable();
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityDataCable.class, dataCable);
 		MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(BlockRegistry.dataCable), new RenderItemHandlers.Cable(dataCable, new TileEntityDataCable()));
+		
+		TileEntitySpecialRenderer dataMultiCable = new RenderHandlers.BlockMultiCable();
+		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityMultiDataCable.class, dataMultiCable);
+		MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(BlockRegistry.dataMultiCable), new RenderItemHandlers.Cable(dataMultiCable, new TileEntityMultiDataCable()));
 		
 		TileEntitySpecialRenderer dataModifier = new RenderHandlers.DataModifier();
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityDataModifier.class, dataModifier);

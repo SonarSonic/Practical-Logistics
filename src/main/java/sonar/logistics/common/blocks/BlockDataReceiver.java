@@ -10,7 +10,6 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.common.block.SonarMaterials;
 import sonar.logistics.Logistics;
-import sonar.logistics.api.connecting.IDataCable;
 import sonar.logistics.common.tileentity.TileEntityDataReceiver;
 import sonar.logistics.network.LogisticsGui;
 
@@ -57,6 +56,7 @@ public class BlockDataReceiver extends BaseNode {
 		super.breakBlock(world, x, y, z, oldblock, oldMetadata);
 		ForgeDirection dir = ForgeDirection.getOrientation(oldMetadata);
 		TileEntity tile = world.getTileEntity(x + dir.offsetX, y + dir.offsetY, z + dir.offsetZ);
+		/*
 		if (tile != null) {
 			if (tile instanceof IDataCable) {
 				IDataCable cable = (IDataCable) tile;
@@ -65,6 +65,7 @@ public class BlockDataReceiver extends BaseNode {
 				}
 			}
 		}
+		*/
 	}
 
 	public boolean hasSpecialCollisionBox() {

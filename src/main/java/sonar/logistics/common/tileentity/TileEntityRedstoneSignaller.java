@@ -1,21 +1,24 @@
 package sonar.logistics.common.tileentity;
 
+import java.util.List;
+
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.common.tileentity.TileEntitySonar;
 import sonar.core.network.sync.SyncInt;
 import sonar.core.network.sync.SyncString;
 import sonar.core.network.utils.ITextField;
+import sonar.core.utils.BlockCoords;
 import sonar.core.utils.IMachineButtons;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.api.Info;
-import sonar.logistics.api.connecting.IDataConnection;
-import sonar.logistics.api.connecting.IDataTile;
+import sonar.logistics.api.connecting.IInfoEmitter;
+import sonar.logistics.api.connecting.IMultiTile;
 import sonar.logistics.common.blocks.BlockRedstoneSignaller;
 import sonar.logistics.helpers.CableHelper;
 import sonar.logistics.registries.BlockRegistry;
 
-public class TileEntityRedstoneSignaller extends TileEntitySonar implements IDataTile, IMachineButtons, ITextField {
+public class TileEntityRedstoneSignaller extends TileEntitySonar implements IMultiTile, IMachineButtons, ITextField {
 
 	public Info currentInfo;
 	public SyncInt integerEmitType = new SyncInt(0);
@@ -60,18 +63,19 @@ public class TileEntityRedstoneSignaller extends TileEntitySonar implements IDat
 			if (isOn != canEmit) {
 				block.updateSignallerState(canEmit, worldObj, xCoord, yCoord, zCoord);
 			}
-
-			Object object = CableHelper.getConnectedTile(this, ForgeDirection.getOrientation(this.getBlockMetadata()).getOpposite());
-			if (object != null) {
-				if (object instanceof IDataConnection) {
-					IDataConnection infoNode = (IDataConnection) object;
-					this.currentInfo = infoNode.currentInfo();
-
-				} else {
-					this.currentInfo = null;
+			boolean setNull = true;
+			List<BlockCoords> connections = CableHelper.getConnections(this, ForgeDirection.getOrientation(this.getBlockMetadata()).getOpposite());
+			if (!connections.isEmpty()) {
+				Object object = CableHelper.getTile(connections.get(0).getTileEntity());
+				if (object != null) {
+					if (object instanceof IInfoEmitter) {
+						IInfoEmitter infoNode = (IInfoEmitter) object;
+						this.currentInfo = infoNode.currentInfo();
+						setNull = false;
+					}
 				}
-
-			} else {
+			}
+			if (setNull) {
 				this.currentInfo = null;
 			}
 		}
@@ -86,7 +90,7 @@ public class TileEntityRedstoneSignaller extends TileEntitySonar implements IDat
 			if (currentInfo.getDataType() == dataType.getInt()) {
 				if (dataType.getInt() == 0) {
 					this.errorFlag.setInt(0);
-					int integer = Integer.parseInt(currentInfo.getData());
+					long integer = Long.parseLong(currentInfo.getData());
 					switch (integerEmitType.getInt()) {
 					case 0:
 						return integer == integerTarget.getInt();
@@ -142,5 +146,10 @@ public class TileEntityRedstoneSignaller extends TileEntitySonar implements IDat
 				;
 			}
 		}
+	}
+
+	@Override
+	public BlockCoords getCoords() {
+		return new BlockCoords(this);
 	}
 }

@@ -1,8 +1,9 @@
 package sonar.logistics.common.handlers;
 
+import java.util.List;
+
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.handlers.TileHandler;
@@ -12,7 +13,7 @@ import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.StandardInfo;
-import sonar.logistics.api.connecting.IDataConnection;
+import sonar.logistics.api.connecting.IInfoEmitter;
 import sonar.logistics.helpers.CableHelper;
 
 public class DataModifierHandler extends TileHandler {
@@ -30,7 +31,6 @@ public class DataModifierHandler extends TileHandler {
 		if (te.getWorldObj().isRemote) {
 			return;
 		}
-		CableHelper.updateAdjacentCoords(te, new BlockCoords(te.xCoord, te.yCoord, te.zCoord), false, new ForgeDirection[] { ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite() });
 		updateData(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)));
 	}
 
@@ -62,7 +62,7 @@ public class DataModifierHandler extends TileHandler {
 		}
 	}
 
-	public boolean canRenderConnection(TileEntity te, ForgeDirection dir) {
+	public int canRenderConnection(ForgeDirection dir, TileEntity te) {
 		return CableHelper.canRenderConnection(te, dir);
 	}
 
@@ -71,17 +71,20 @@ public class DataModifierHandler extends TileHandler {
 	}
 
 	public void updateData(TileEntity te, ForgeDirection dir) {
-		Object target = CableHelper.getConnectedTile(te, dir.getOpposite());
-		target = FMPHelper.checkObject(target);
-		if (target == null) {
-			return;
-		} else {
-			if (target instanceof IDataConnection) {
-				IDataConnection infoNode = (IDataConnection) target;
-				if (infoNode.currentInfo() != null) {
-					this.info = infoNode.currentInfo();
-				} else if (this.info != null) {
-					this.info.emptyData();
+		List<BlockCoords> connections = CableHelper.getConnections(te, dir.getOpposite());
+		if (!connections.isEmpty() && connections.get(0) != null) {
+			Object target = CableHelper.getTile(connections.get(0).getTileEntity());
+			if (target == null) {
+				return;
+			} else {
+				Info lastInfo = info;
+				if (target instanceof IInfoEmitter) {
+					IInfoEmitter infoNode = (IInfoEmitter) target;
+					if (infoNode.currentInfo() != null) {
+						this.info = infoNode.currentInfo();
+					} else if (this.info != null) {
+						this.info.emptyData();
+					}
 				}
 			}
 		}
@@ -118,10 +121,4 @@ public class DataModifierHandler extends TileHandler {
 			break;
 		}
 	}
-
-	@Override
-	public void removed(World world, int x, int y, int z, int meta) {
-		CableHelper.updateAdjacentCoords(world, x, y, z, null, true);
-	}
-
 }

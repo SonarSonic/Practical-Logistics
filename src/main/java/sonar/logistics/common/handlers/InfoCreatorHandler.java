@@ -2,19 +2,15 @@ package sonar.logistics.common.handlers;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.network.sync.SyncString;
-import sonar.core.utils.BlockCoords;
-import sonar.core.utils.helpers.NBTHelper;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.StandardInfo;
 import sonar.logistics.helpers.CableHelper;
-import sonar.logistics.helpers.InfoHelper;
 
 public class InfoCreatorHandler extends TileHandler {
 
@@ -30,8 +26,6 @@ public class InfoCreatorHandler extends TileHandler {
 		if (te.getWorldObj().isRemote) {
 			return;
 		}
-		CableHelper.updateAdjacentCoord(te.getWorldObj(), te.xCoord, te.yCoord, te.zCoord, new BlockCoords(te.xCoord, te.yCoord, te.zCoord), false, ForgeDirection.getOrientation(FMPHelper.getMeta(te)));
-
 	}
 
 	public void readData(NBTTagCompound nbt, SyncType type) {
@@ -63,11 +57,11 @@ public class InfoCreatorHandler extends TileHandler {
 		}
 	}
 
-	public boolean canRenderConnection(TileEntity te, ForgeDirection dir) {
+	public int canRenderConnection(TileEntity te, ForgeDirection dir) {
 		if (dir == ForgeDirection.getOrientation(FMPHelper.getMeta(te))) {
 			return CableHelper.canRenderConnection(te, dir);
 		} else {
-			return false;
+			return 0;
 		}
 	}
 
@@ -91,10 +85,4 @@ public class InfoCreatorHandler extends TileHandler {
 		}
 		this.info = new StandardInfo((byte) -1, "CREATOR", this.subCategory.getString(), this.data.getString());
 	}
-
-	@Override
-	public void removed(World world, int x, int y, int z, int meta) {
-		CableHelper.updateAdjacentCoords(world, x, y, z, null, true);
-	}
-
 }

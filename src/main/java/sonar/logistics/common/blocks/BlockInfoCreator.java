@@ -60,8 +60,8 @@ public class BlockInfoCreator extends BaseNode {
 		TileEntity tileentity = world.getTileEntity(x, y, z);
 		if (tileentity != null && tileentity instanceof TileEntityDataCable) {
 			TileEntityDataCable cable = (TileEntityDataCable) world.getTileEntity(x, y, z);
-			this.setBlockBounds((float) (cable.canRenderConnection(ForgeDirection.WEST) ? 0 : 0.0625 * 6), (float) (cable.canRenderConnection(ForgeDirection.DOWN) ? 0 : 0.0625 * 6), (float) (cable.canRenderConnection(ForgeDirection.NORTH) ? 0 : 0.0625 * 6), (float) (cable.canRenderConnection(ForgeDirection.EAST) ? 1 : (1 - (0.0625 * 6))), (float) (cable.canRenderConnection(ForgeDirection.UP) ? 1
-					: (1 - (0.0625 * 6))), (float) (cable.canRenderConnection(ForgeDirection.SOUTH) ? 1 : (1 - (0.0625 * 6))));
+			this.setBlockBounds((float) (cable.canRenderConnection(ForgeDirection.WEST)!=0 ? 0 : 0.0625 * 6), (float) (cable.canRenderConnection(ForgeDirection.DOWN)!=0 ? 0 : 0.0625 * 6), (float) (cable.canRenderConnection(ForgeDirection.NORTH)!=0 ? 0 : 0.0625 * 6), (float) (cable.canRenderConnection(ForgeDirection.EAST)!=0 ? 1 : (1 - (0.0625 * 6))), (float) (cable.canRenderConnection(ForgeDirection.UP)!=0 ? 1
+					: (1 - (0.0625 * 6))), (float) (cable.canRenderConnection(ForgeDirection.SOUTH)!=0 ? 1 : (1 - (0.0625 * 6))));
 		} else {
 			this.setBlockBounds((float) 0.0625 * 4, (float) 0.0625 * 4, (float) 0.0625 * 4, (float) (1 - (0.0625 * 4)), (float) (1 - (0.0625 * 4)), (float) (1 - (0.0625 * 4)));
 		}
