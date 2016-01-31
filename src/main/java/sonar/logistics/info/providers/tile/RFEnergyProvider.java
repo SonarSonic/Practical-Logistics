@@ -48,16 +48,16 @@ public class RFEnergyProvider extends TileProvider {
 		if (handler instanceof IEnergyStorage) {
 
 			IEnergyStorage info = (IEnergyStorage) handler;
-			infoList.add(new StandardInfo(id, 0, 1, info.getEnergyStored(), "RF"));
-			infoList.add(new StandardInfo(id, 0, 2, info.getMaxEnergyStored(), "RF"));
+			infoList.add(new StandardInfo(id, 0, 1, info.getEnergyStored()).addSuffix("RF"));
+			infoList.add(new StandardInfo(id, 0, 2, info.getMaxEnergyStored()).addSuffix("RF"));
 
 		} else if (handler instanceof IEnergyHandler) {
 			IEnergyHandler info = (IEnergyHandler) handler;
 			int energyStored = info.getEnergyStored(dir);
 			int maxStored = info.getMaxEnergyStored(dir);
 			if (maxStored != 0) {
-				infoList.add(new StandardInfo(id, 0, 3, energyStored, "RF"));
-				infoList.add(new StandardInfo(id, 0, 4, maxStored, "RF"));
+				infoList.add(new StandardInfo(id, 0, 3, energyStored).addSuffix("RF"));
+				infoList.add(new StandardInfo(id, 0, 4, maxStored).addSuffix("RF"));
 			}
 		}
 

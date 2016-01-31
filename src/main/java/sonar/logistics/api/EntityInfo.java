@@ -12,15 +12,7 @@ public class EntityInfo extends StandardInfo {
 	public EntityInfo() {
 
 	}
-
-	public EntityInfo(byte providerID, int category, int subCategory, Object data, String suffix) {
-		super(providerID, category, subCategory, data, suffix);
-	}
-
-	public EntityInfo(byte providerID, String category, String subCategory, Object data, String suffix) {
-		super(providerID, category, subCategory, data, suffix);
-	}
-
+	
 	public EntityInfo(byte providerID, int category, int subCategory, Object data) {
 		super(providerID, category, subCategory, data);
 	}

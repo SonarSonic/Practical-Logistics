@@ -37,8 +37,8 @@ public class MekanismReactorProvider extends TileProvider {
 			IReactorBlock block = (IReactorBlock) target;
 			if (block.getReactor() != null) {
 				IFusionReactor reactor = block.getReactor();
-				infoList.add(new StandardInfo(id, 0, 0, (int) reactor.getCaseTemp(), "degrees"));
-				infoList.add(new StandardInfo(id, 0, 1, (int) reactor.getPlasmaTemp(), "degrees"));
+				infoList.add(new StandardInfo(id, 0, 0, (int) reactor.getCaseTemp()).addSuffix("degrees"));
+				infoList.add(new StandardInfo(id, 0, 1, (int) reactor.getPlasmaTemp()).addSuffix("degrees"));
 				infoList.add(new StandardInfo(id, 0, 2, (int) reactor.getInjectionRate()));
 				infoList.add(new StandardInfo(id, 0, 3, reactor.isFormed()));
 				infoList.add(new StandardInfo(id, 0, 4, reactor.isBurning()));

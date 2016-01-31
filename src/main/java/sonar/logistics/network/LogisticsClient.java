@@ -10,6 +10,7 @@ import sonar.logistics.client.renderers.RenderItemHandlers;
 import sonar.logistics.client.renderers.RenderLargeDisplay;
 import sonar.logistics.common.tileentity.TileEntityBlockNode;
 import sonar.logistics.common.tileentity.TileEntityChannelSelector;
+import sonar.logistics.common.tileentity.TileEntityClock;
 import sonar.logistics.common.tileentity.TileEntityDataCable;
 import sonar.logistics.common.tileentity.TileEntityDataEmitter;
 import sonar.logistics.common.tileentity.TileEntityDataModifier;
@@ -56,15 +57,15 @@ public class LogisticsClient extends LogisticsCommon {
 		
 		TileEntitySpecialRenderer dataModifier = new RenderHandlers.DataModifier();
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityDataModifier.class, dataModifier);
-		MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(BlockRegistry.dataModifier), new RenderItemHandlers.DataModifier(dataModifier, new TileEntityDataModifier()));
+		MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(BlockRegistry.dataModifier), new RenderItemHandlers.FramedCable(dataModifier, new TileEntityDataModifier()));
 		
 		TileEntitySpecialRenderer infoCreator = new RenderHandlers.InfoCreator();
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityInfoCreator.class, infoCreator);
-		MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(BlockRegistry.infoCreator), new RenderItemHandlers.DataModifier(infoCreator, new TileEntityInfoCreator()));
+		MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(BlockRegistry.infoCreator), new RenderItemHandlers.FramedCable(infoCreator, new TileEntityInfoCreator()));
 		
 		TileEntitySpecialRenderer channelSelector = new RenderHandlers.ChannelSelector();
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityChannelSelector.class, channelSelector);
-		MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(BlockRegistry.channelSelector), new RenderItemHandlers.DataModifier(channelSelector, new TileEntityChannelSelector()));
+		MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(BlockRegistry.channelSelector), new RenderItemHandlers.FramedCable(channelSelector, new TileEntityChannelSelector()));
 			
 		TileEntitySpecialRenderer infoReader = new RenderHandlers.InfoReader();
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityInfoReader.class, infoReader);
@@ -103,6 +104,10 @@ public class LogisticsClient extends LogisticsCommon {
 		TileEntitySpecialRenderer itemRouter = new RenderHandlers.ItemRouter();
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityItemRouter.class, itemRouter);
 		MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(BlockRegistry.itemRouter), new RenderItemHandlers.ItemRouter(itemRouter, new TileEntityItemRouter()));
+		
+		TileEntitySpecialRenderer clock = new RenderHandlers.Clock();
+		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityClock.class, clock);
+		MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(BlockRegistry.clock), new RenderItemHandlers.Clock(clock, new TileEntityClock()));
 		
 	}
 }

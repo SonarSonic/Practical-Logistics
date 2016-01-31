@@ -35,16 +35,16 @@ public class AE2EnergyProvider extends TileProvider {
 		TileEntity target = world.getTileEntity(x, y, z);
 		if (target instanceof IAEPowerStorage) {
 			IAEPowerStorage power = (IAEPowerStorage) target;
-			infoList.add(new StandardInfo(id, 0, 0, (int) power.getAECurrentPower(), "ae"));
-			infoList.add(new StandardInfo(id, 0, 1, (int) power.getAEMaxPower(), "ae"));
+			infoList.add(new StandardInfo(id, 0, 0, (int) power.getAECurrentPower()).addSuffix("ae"));
+			infoList.add(new StandardInfo(id, 0, 1, (int) power.getAEMaxPower()).addSuffix("ae"));
 		}
 		if (target instanceof IEnergyGrid) {
 			IEnergyGrid grid = (IEnergyGrid) target;
-			infoList.add(new StandardInfo(id, 0, 2, (int) grid.getAvgPowerInjection(), "ae/t"));
-			infoList.add(new StandardInfo(id, 0, 3, (int) grid.getAvgPowerUsage(), "ae/t"));
-			infoList.add(new StandardInfo(id, 0, 4, (int) grid.getIdlePowerUsage(), "ae/t"));
-			infoList.add(new StandardInfo(id, 0, 0, (int) grid.getStoredPower(), "ae"));
-			infoList.add(new StandardInfo(id, 0, 1, (int) grid.getMaxStoredPower(), "ae"));
+			infoList.add(new StandardInfo(id, 0, 2, (int) grid.getAvgPowerInjection()).addSuffix("ae/t"));
+			infoList.add(new StandardInfo(id, 0, 3, (int) grid.getAvgPowerUsage()).addSuffix("ae/t"));
+			infoList.add(new StandardInfo(id, 0, 4, (int) grid.getIdlePowerUsage()).addSuffix("ae/t"));
+			infoList.add(new StandardInfo(id, 0, 0, (int) grid.getStoredPower()).addSuffix("ae"));
+			infoList.add(new StandardInfo(id, 0, 1, (int) grid.getMaxStoredPower()).addSuffix("ae"));
 		}
 	}
 

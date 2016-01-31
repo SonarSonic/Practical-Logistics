@@ -36,7 +36,7 @@ public class SyncIdentifiedCoords implements ISyncPart {
 	public void writeToBuf(ByteBuf buf) {
 		if (!equal()) {
 			buf.writeBoolean(true);
-			IdentifiedCoords.writeInfo(buf, c);
+			IdentifiedCoords.writeCoords(buf, c);
 			last = c;
 		} else
 			buf.writeBoolean(false);
@@ -45,7 +45,7 @@ public class SyncIdentifiedCoords implements ISyncPart {
 	@Override
 	public void readFromBuf(ByteBuf buf) {
 		if (buf.readBoolean()) {
-			this.c = IdentifiedCoords.readInfo(buf);
+			this.c = IdentifiedCoords.readCoords(buf);
 		}
 	}
 

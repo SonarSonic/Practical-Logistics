@@ -27,17 +27,17 @@ public class IdentifiedCoords {
 
 	}
 
-	public static void writeToNBT(NBTTagCompound tag, IdentifiedCoords info) {
-		if (info != null) {
+	public static void writeToNBT(NBTTagCompound tag, IdentifiedCoords coords) {
+		if (coords != null) {
 			tag.setBoolean("b", true);
-			tag.setString("clientName", info.name);
-			BlockCoords.writeToNBT(tag, info.coords);
+			tag.setString("clientName", coords.name);
+			BlockCoords.writeToNBT(tag, coords.coords);
 		} else {
 			tag.setBoolean("b", false);
 		}
 	}
 
-	public static IdentifiedCoords readInfo(ByteBuf buf) {
+	public static IdentifiedCoords readCoords(ByteBuf buf) {
 		if (buf.readBoolean()) {
 			String name = ByteBufUtils.readUTF8String(buf);
 			BlockCoords coords = BlockCoords.readFromBuf(buf);
@@ -48,11 +48,11 @@ public class IdentifiedCoords {
 		}
 	}
 
-	public static void writeInfo(ByteBuf buf, IdentifiedCoords info) {
-		if (info != null) {
+	public static void writeCoords(ByteBuf buf, IdentifiedCoords coords) {
+		if (coords != null) {
 			buf.writeBoolean(true);
-			ByteBufUtils.writeUTF8String(buf, info.name);
-			BlockCoords.writeToBuf(buf, info.coords);
+			ByteBufUtils.writeUTF8String(buf, coords.name);
+			BlockCoords.writeToBuf(buf, coords.coords);
 		} else {
 			buf.writeBoolean(false);
 		}

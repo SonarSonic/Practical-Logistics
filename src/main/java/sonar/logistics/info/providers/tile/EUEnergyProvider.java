@@ -39,19 +39,19 @@ public class EUEnergyProvider extends TileProvider {
 		TileEntity target = world.getTileEntity(x, y, z);
 		if (target instanceof IEnergyStorage) {
 			IEnergyStorage energy = (IEnergyStorage) target;
-			infoList.add(new StandardInfo(id, 0, 4, (long) energy.getStored(), "EU"));
-			infoList.add(new StandardInfo(id, 0, 5, (long) energy.getCapacity(), "EU"));
-			infoList.add(new StandardInfo(id, 0, 6, (long) energy.getOutput(), "EU/t"));
+			infoList.add(new StandardInfo(id, 0, 4, (long) energy.getStored()).addSuffix("EU"));
+			infoList.add(new StandardInfo(id, 0, 5, (long) energy.getCapacity()).addSuffix("EU"));
+			infoList.add(new StandardInfo(id, 0, 6, (long) energy.getOutput()).addSuffix("EU/t"));;
 		}
 		if (target instanceof IEnergySink) {
 			IEnergySink energy = (IEnergySink) target;
 			infoList.add(new StandardInfo(id, 0, 0, (long) energy.getSinkTier()));
-			infoList.add(new StandardInfo(id, 0, 1, (long) energy.getDemandedEnergy(), "EU"));
+			infoList.add(new StandardInfo(id, 0, 1, (long) energy.getDemandedEnergy()).addSuffix("EU"));
 		}
 		if (target instanceof IEnergySource) {
 			IEnergySource energy = (IEnergySource) target;
 			infoList.add(new StandardInfo(id, 0, 2, (long) energy.getSourceTier()));
-			infoList.add(new StandardInfo(id, 0, 3, (long) energy.getOfferedEnergy(), "EU"));
+			infoList.add(new StandardInfo(id, 0, 3, (long) energy.getOfferedEnergy()).addSuffix("EU"));
 		}
 	}
 

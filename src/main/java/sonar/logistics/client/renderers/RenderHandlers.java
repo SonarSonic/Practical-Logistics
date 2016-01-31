@@ -19,6 +19,7 @@ import sonar.core.renderers.SonarTERender;
 import sonar.core.utils.helpers.RenderHelper;
 import sonar.logistics.Logistics;
 import sonar.logistics.client.models.ModelBlockNode;
+import sonar.logistics.client.models.ModelClock;
 import sonar.logistics.client.models.ModelDataCable;
 import sonar.logistics.client.models.ModelDataModifier;
 import sonar.logistics.client.models.ModelDataReceiver;
@@ -28,6 +29,7 @@ import sonar.logistics.client.models.ModelHammer;
 import sonar.logistics.client.models.ModelInfoCreator;
 import sonar.logistics.client.models.ModelItemRouter;
 import sonar.logistics.client.models.ModelRedstoneSignaller;
+import sonar.logistics.common.tileentity.TileEntityClock;
 import sonar.logistics.common.tileentity.TileEntityEntityNode;
 import sonar.logistics.common.tileentity.TileEntityHammer;
 import sonar.logistics.common.tileentity.TileEntityItemRouter;
@@ -480,6 +482,23 @@ public class RenderHandlers {
 			super.cableTex = modelFolder + "dataMultiCable.png";
 		}
 
+	}
+
+	public static class Clock extends TileEntitySpecialRenderer {
+		public ModelClock model = new ModelClock();
+		public String texture = modelFolder + "clock.png";
+
+		@Override
+		public void renderTileEntityAt(TileEntity entity, double x, double y, double z, float f) {
+			RenderHelper.beginRender(x + 0.5F, y + 1.5F, z + 0.5F, RenderHelper.setMetaData(entity), texture);
+			float rotation = 0;
+			if (entity.getWorldObj() != null) {
+				TileEntityClock clock = (TileEntityClock) entity;
+				rotation = clock.rotation;
+			}
+			model.render((TileEntity) entity, 0.0F, 0.0F, -0.1F, 0.0F, 0.0F, 0.0625F, rotation);
+			RenderHelper.finishRender();
+		}
 	}
 
 }

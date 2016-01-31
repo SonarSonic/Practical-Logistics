@@ -39,8 +39,8 @@ public class TankProvider extends TileProvider {
 			IFluidTank tank = (IFluidTank) target;
 			int capacity = tank.getCapacity();
 			int currentStored = tank.getFluidAmount();
-			infoList.add(new StandardInfo(id, 0, 0, tank.getCapacity(), "MB"));
-			infoList.add(new StandardInfo(id, 0, 1, tank.getFluidAmount(), "MB"));
+			infoList.add(new StandardInfo(id, 0, 0, tank.getCapacity()).addSuffix("MB"));
+			infoList.add(new StandardInfo(id, 0, 1, tank.getFluidAmount()).addSuffix("MB"));
 			if (tank.getFluid() != null) {
 				FluidStack fluid = tank.getFluid();
 				infoList.add(new StandardInfo(id, 0, 2, fluid.getLocalizedName()));
@@ -59,16 +59,16 @@ public class TankProvider extends TileProvider {
 					}
 					if (tankInfo.fluid != null) {
 						int fluidID = tankInfo.fluid.getFluidID();
-						infoList.add(new FluidInfo(id, "TANK", prefix + "Capacity", tankInfo.capacity, "MB", fluidID));
-						infoList.add(new FluidInfo(id, "TANK", prefix + "Stored", tankInfo.fluid.amount, "MB", fluidID));
+						infoList.add(new FluidInfo(id, "TANK", prefix + "Capacity", tankInfo.capacity, fluidID).addSuffix("MB"));
+						infoList.add(new FluidInfo(id, "TANK", prefix + "Stored", tankInfo.fluid.amount, fluidID).addSuffix("MB"));
 						infoList.add(new FluidInfo(id, "TANK", prefix + "Fluid ID", tankInfo.fluid.getFluidID(), fluidID));
 						infoList.add(new FluidInfo(id, "TANK", prefix + "Fluid Name", tankInfo.fluid.getLocalizedName(), fluidID));
 						infoList.add(new FluidInfo(id, "TANK", prefix + "Temperature", tankInfo.fluid.getFluid().getTemperature(), fluidID));
 						infoList.add(new FluidInfo(id, "TANK", prefix + "Density", tankInfo.fluid.getFluid().getDensity(), fluidID));
 						infoList.add(new FluidInfo(id, "TANK", prefix + "Viscosity", tankInfo.fluid.getFluid().getViscosity(), fluidID));
 					} else {
-						infoList.add(new FluidInfo(id, "TANK", prefix + "Capacity", tankInfo.capacity, "MB", -1));
-						infoList.add(new FluidInfo(id, "TANK", prefix + "Stored", 0, "MB", -1));
+						infoList.add(new FluidInfo(id, "TANK", prefix + "Capacity", tankInfo.capacity, -1).addSuffix("MB"));
+						infoList.add(new FluidInfo(id, "TANK", prefix + "Stored", 0, -1).addSuffix("MB"));
 						infoList.add(new FluidInfo(id, "TANK", prefix + "Fluid Name", "NO FLUID", -1));
 					}
 				}

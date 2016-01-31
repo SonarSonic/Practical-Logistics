@@ -34,7 +34,7 @@ public class AE2CraftingProvider extends TileProvider {
 		TileEntity target = world.getTileEntity(x, y, z);
 		if (target instanceof ICraftingCPU) {
 			ICraftingCPU cpu = (ICraftingCPU) target;
-			infoList.add(new StandardInfo(id, 0, 0, cpu.getAvailableStorage(), "bytes"));
+			infoList.add(new StandardInfo(id, 0, 0, cpu.getAvailableStorage()).addSuffix("bytes"));
 			infoList.add(new StandardInfo(id, 0, 1, cpu.getCoProcessors()));
 			infoList.add(new StandardInfo(id, 0, 2, cpu.isBusy()));
 		}

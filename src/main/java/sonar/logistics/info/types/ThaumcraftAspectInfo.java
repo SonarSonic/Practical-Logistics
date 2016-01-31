@@ -18,22 +18,17 @@ public class ThaumcraftAspectInfo extends StandardInfo {
 
 	public String tex;
 
-	@Override
-	public String getName() {
-		return "Aspect-Info";
-	}
-
 	public ThaumcraftAspectInfo() {
-	}
-
-	public ThaumcraftAspectInfo(byte providerID, String category, String subCategory, Object data, String suffix, String tex) {
-		super(providerID, category, subCategory, data, suffix);
-		this.tex = tex;
 	}
 
 	public ThaumcraftAspectInfo(byte providerID, String category, String subCategory, Object data, String tex) {
 		super(providerID, category, subCategory, data);
 		this.tex = tex;
+	}
+
+	@Override
+	public String getName() {
+		return "Aspect-Info";
 	}
 
 	@Override
@@ -47,7 +42,7 @@ public class ThaumcraftAspectInfo extends StandardInfo {
 		super.writeToBuf(buf);
 		ByteBufUtils.writeUTF8String(buf, tex);
 	}
-	
+
 	public void readFromNBT(NBTTagCompound tag) {
 		super.readFromNBT(tag);
 		this.tex = tag.getString("tex");
@@ -65,7 +60,7 @@ public class ThaumcraftAspectInfo extends StandardInfo {
 		GL11.glTranslated(0, 0, zOffset);
 		float width = 1;
 		float height = 1;
-		double scaled = scale/400;
+		double scaled = scale / 400;
 		GL11.glScaled(scaled, scaled, scaled);
 		if (tex != null) {
 			GL11.glTranslated(-0.7, -0.55, 0.0);
@@ -88,6 +83,7 @@ public class ThaumcraftAspectInfo extends StandardInfo {
 		GL11.glTranslated(0, 0, -zOffset);
 		InfoRenderer.renderStandardInfo(this, rend, minX, minY, maxX, maxY, zOffset, scale);
 	}
+
 	@Override
 	public ThaumcraftAspectInfo instance() {
 		return new ThaumcraftAspectInfo();

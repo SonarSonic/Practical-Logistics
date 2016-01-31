@@ -15,6 +15,7 @@ public class LogisticsGui {
 	public static final int fluidReader =  10;
 	public static final int itemRouter =  11;
 	public static final int channelSelector =  12;
+	public static final int clock =  13;
 	
 
 }

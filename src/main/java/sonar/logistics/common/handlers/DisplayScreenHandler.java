@@ -72,7 +72,6 @@ public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 					} else if (this.info != null) {
 						this.info.emptyData();
 					}
-
 				}
 
 				if (info != null) {

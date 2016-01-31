@@ -42,9 +42,9 @@ public class BloodMagicProvider extends TileProvider {
 		if (te instanceof IBloodAltar) {
 			IBloodAltar altar = (IBloodAltar) te;
 			infoList.add(new StandardInfo(id, 0, 0, altar.getTier()));
-			infoList.add(new StandardInfo(id, 0, 1, altar.getCurrentBlood(), "LP"));
-			infoList.add(new StandardInfo(id, 0, 2, altar.getCapacity(), "LP"));
-			infoList.add(new StandardInfo(id, 0, 3, altar.getBufferCapacity(), "LP"));
+			infoList.add(new StandardInfo(id, 0, 1, altar.getCurrentBlood()).addSuffix("LP"));
+			infoList.add(new StandardInfo(id, 0, 2, altar.getCapacity()).addSuffix("LP"));
+			infoList.add(new StandardInfo(id, 0, 3, altar.getBufferCapacity()).addSuffix("LP"));
 			infoList.add(new StandardInfo(id, 0, 4, altar.getProgress()));
 			infoList.add(new StandardInfo(id, 0, 5, altar.hasDemonBlood()));
 		}

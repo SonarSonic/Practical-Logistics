@@ -44,8 +44,8 @@ public class VanillaTileEntityProvider extends TileProvider {
 			if (target instanceof TileEntityFurnace) {
 				TileEntityFurnace furnace = (TileEntityFurnace) target;
 				infoList.add(new StandardInfo(id, 0, 0, furnace.furnaceBurnTime));
-				infoList.add(new StandardInfo(id, 0, 1, furnace.furnaceCookTime, "ticks"));
-				infoList.add(new StandardInfo(id, 0, 2, 200, "ticks"));
+				infoList.add(new StandardInfo(id, 0, 1, furnace.furnaceCookTime).addSuffix("ticks"));
+				infoList.add(new StandardInfo(id, 0, 2, 200).addSuffix("ticks"));
 				infoList.add(new StandardInfo(id, 0, 3, furnace.currentItemBurnTime));
 			}
 			if (target instanceof TileEntityNote) {

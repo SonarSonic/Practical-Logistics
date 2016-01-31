@@ -4,6 +4,7 @@ import net.minecraft.block.Block;
 import sonar.core.common.block.SonarBlockTip;
 import sonar.logistics.Logistics;
 import sonar.logistics.common.blocks.BlockChannelSelector;
+import sonar.logistics.common.blocks.BlockClock;
 import sonar.logistics.common.blocks.BlockDataCable;
 import sonar.logistics.common.blocks.BlockDataEmitter;
 import sonar.logistics.common.blocks.BlockDataModifier;
@@ -25,6 +26,7 @@ import sonar.logistics.common.blocks.DisplayScreen;
 import sonar.logistics.common.blocks.LargeDisplayScreen;
 import sonar.logistics.common.tileentity.TileEntityBlockNode;
 import sonar.logistics.common.tileentity.TileEntityChannelSelector;
+import sonar.logistics.common.tileentity.TileEntityClock;
 import sonar.logistics.common.tileentity.TileEntityDataCable;
 import sonar.logistics.common.tileentity.TileEntityDataEmitter;
 import sonar.logistics.common.tileentity.TileEntityDataModifier;
@@ -45,7 +47,7 @@ import cpw.mods.fml.common.registry.GameRegistry;
 
 public class BlockRegistry extends Logistics {
 
-	public static Block displayScreen, largeDisplayScreen, node, entityNode, infoReader, dataCable, dataMultiCable, dataReceiver, dataEmitter, inventoryReader, redstoneSignaller_on, redstoneSignaller_off, holographicDisplay, dataModifier, infoCreator, channelSelector, sapphire_ore, hammer, hammer_air, fluidReader, itemRouter;
+	public static Block displayScreen, largeDisplayScreen, node, entityNode, infoReader, dataCable, dataMultiCable, dataReceiver, dataEmitter, inventoryReader, redstoneSignaller_on, redstoneSignaller_off, holographicDisplay, dataModifier, infoCreator, channelSelector, sapphire_ore, hammer, hammer_air, fluidReader, itemRouter, clock;
 
 	public static void registerBlocks() {
 
@@ -128,6 +130,11 @@ public class BlockRegistry extends Logistics {
 		itemRouter = new BlockItemRouter().setBlockName("ItemRouter").setHardness(1.0F).setResistance(100.0F).setCreativeTab(Logistics.creativeTab).setBlockTextureName(modid + ":" + "data_cable");
 		GameRegistry.registerBlock(itemRouter, SonarBlockTip.class, "ItemRouter");
 		GameRegistry.registerTileEntity(TileEntityItemRouter.class, "ItemRouter");
+		
+
+		clock = new BlockClock().setBlockName("Clock").setHardness(1.0F).setResistance(100.0F).setCreativeTab(Logistics.creativeTab).setBlockTextureName(modid + ":" + "data_cable");
+		GameRegistry.registerBlock(clock, SonarBlockTip.class, "Clock");
+		GameRegistry.registerTileEntity(TileEntityClock.class, "Clock");
 	}
 
 }

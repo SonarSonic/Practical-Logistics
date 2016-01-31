@@ -40,14 +40,14 @@ public class RotaryCraftProvider extends TileProvider {
 		TileEntity handler = world.getTileEntity(x, y, z);
 		if (handler instanceof TemperatureTile) {
 			TemperatureTile tile = (TemperatureTile) handler;
-			infoList.add(new StandardInfo(id, 0, 0, tile.getTemperature(), "degrees"));
-			infoList.add(new StandardInfo(id, 0, 0, tile.getMaxTemperature(), "degrees"));
+			infoList.add(new StandardInfo(id, 0, 0, tile.getTemperature()).addSuffix("degrees"));
+			infoList.add(new StandardInfo(id, 0, 0, tile.getMaxTemperature()).addSuffix("degrees"));
 		}
 		if (handler instanceof ShaftMachine) {
 			ShaftMachine tile = (ShaftMachine) handler;
-			infoList.add(new StandardInfo(id, 0, 0, tile.getOmega(), "rad/s"));
-			infoList.add(new StandardInfo(id, 0, 0, tile.getTorque(), "Nm"));
-			infoList.add(new StandardInfo(id, 0, 0, tile.getPower(), "watts"));
+			infoList.add(new StandardInfo(id, 0, 0, tile.getOmega()).addSuffix("rad/s"));
+			infoList.add(new StandardInfo(id, 0, 0, tile.getTorque()).addSuffix("Nm"));
+			infoList.add(new StandardInfo(id, 0, 0, tile.getPower()).addSuffix("watts"));
 		}
 		if (handler instanceof PowerAcceptor) {
 			PowerAcceptor tile = (PowerAcceptor) handler;
@@ -55,10 +55,10 @@ public class RotaryCraftProvider extends TileProvider {
 		}
 		if (handler instanceof PowerGenerator) {
 			PowerGenerator tile = (PowerGenerator) handler;
-			infoList.add(new StandardInfo(id, 0, 0, tile.getCurrentPower(), "watts"));
+			infoList.add(new StandardInfo(id, 0, 0, tile.getCurrentPower()).addSuffix("watts"));
 		}
 		if (handler instanceof TensionStorage) {
-			infoList.add(new StandardInfo(id, 0, 0, handler.getBlockMetadata(), "watts"));
+			infoList.add(new StandardInfo(id, 0, 0, handler.getBlockMetadata()).addSuffix("watts"));
 		}
 	}
 

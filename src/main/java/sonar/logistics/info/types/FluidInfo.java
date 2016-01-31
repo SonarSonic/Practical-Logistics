@@ -18,18 +18,7 @@ public class FluidInfo extends StandardInfo {
 
 	public int fluidID = -1;
 
-	@Override
-	public String getName() {
-		return "Fluid-Info";
-	}
-
-	public FluidInfo() {
-	}
-
-	public FluidInfo(byte providerID, String category, String subCategory, Object data, String suffix, int fluidID) {
-		super(providerID, category, subCategory, data, suffix);
-		this.fluidID = fluidID;
-	}
+	public FluidInfo() {}
 
 	public FluidInfo(byte providerID, String category, String subCategory, Object data, int fluidID) {
 		super(providerID, category, subCategory, data);
@@ -37,10 +26,15 @@ public class FluidInfo extends StandardInfo {
 	}
 
 	@Override
+	public String getName() {
+		return "Fluid-Info";
+	}
+
+	@Override
 	public void readFromBuf(ByteBuf buf) {
 		super.readFromBuf(buf);
 		fluidID = buf.readInt();
-		
+
 	}
 
 	@Override
@@ -48,7 +42,7 @@ public class FluidInfo extends StandardInfo {
 		super.writeToBuf(buf);
 		buf.writeInt(fluidID);
 	}
-	
+
 	@Override
 	public void readFromNBT(NBTTagCompound tag) {
 		super.readFromNBT(tag);
@@ -76,10 +70,10 @@ public class FluidInfo extends StandardInfo {
 
 					tess.startDrawingQuads();
 
-					double divide = Math.max((0.5+minX +(maxX - minX)), (0.5+(maxY - minY)));
-					double widthnew = (icon.getMinU() + (width * (icon.getMaxU() - icon.getMinU())/divide));
-					double heightnew = (icon.getMinV() + (maxY * (icon.getMaxV() - icon.getMinV())/divide));
-					
+					double divide = Math.max((0.5 + minX + (maxX - minX)), (0.5 + (maxY - minY)));
+					double widthnew = (icon.getMinU() + (width * (icon.getMaxU() - icon.getMinU()) / divide));
+					double heightnew = (icon.getMinV() + (maxY * (icon.getMaxV() - icon.getMinV()) / divide));
+
 					tess.addVertexWithUV((minX + 0), (minY + maxY), 0, icon.getMinU(), heightnew);
 					tess.addVertexWithUV((minX + width), (minY + maxY), 0, widthnew, heightnew);
 					tess.addVertexWithUV((minX + width), (minY + 0), 0, widthnew, icon.getMinV());

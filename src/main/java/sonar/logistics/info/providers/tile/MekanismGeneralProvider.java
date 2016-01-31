@@ -38,7 +38,7 @@ public class MekanismGeneralProvider extends TileProvider {
 		TileEntity target = world.getTileEntity(x, y, z);
 		if (target instanceof IHeatTransfer) {
 			IHeatTransfer block = (IHeatTransfer) target;
-			infoList.add(new StandardInfo(id, 0, 0, (int) block.getTemp(), "degrees"));
+			infoList.add(new StandardInfo(id, 0, 0, (int) block.getTemp()).addSuffix("degrees"));
 		}
 		if (target instanceof ISalinationSolar) {
 			ISalinationSolar block = (ISalinationSolar) target;
@@ -50,8 +50,8 @@ public class MekanismGeneralProvider extends TileProvider {
 		}
 		if (target instanceof IStrictEnergyStorage) {
 			IStrictEnergyStorage block = (IStrictEnergyStorage) target;
-			infoList.add(new StandardInfo(id, 1, 3, (long) block.getEnergy(), "J"));
-			infoList.add(new StandardInfo(id, 1, 4, (long) block.getMaxEnergy(), "J"));
+			infoList.add(new StandardInfo(id, 1, 3, (long) block.getEnergy()).addSuffix("J"));;
+			infoList.add(new StandardInfo(id, 1, 4, (long) block.getMaxEnergy()).addSuffix("J"));
 		}
 		if (target instanceof IStrictEnergyAcceptor) {
 			IStrictEnergyAcceptor block = (IStrictEnergyAcceptor) target;

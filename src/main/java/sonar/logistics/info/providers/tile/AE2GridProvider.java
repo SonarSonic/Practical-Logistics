@@ -36,7 +36,7 @@ public class AE2GridProvider extends TileProvider {
 		TileEntity target = world.getTileEntity(x, y, z);
 		if (target instanceof IGridBlock) {
 			IGridBlock grid = (IGridBlock) target;
-			infoList.add(new StandardInfo(id, 0, 0, (int) grid.getIdlePowerUsage(), "ae/t"));
+			infoList.add(new StandardInfo(id, 0, 0, (int) grid.getIdlePowerUsage()).addSuffix("ae/t"));
 		}
 		if (target instanceof IGridConnection) {
 			IGridConnection grid = (IGridConnection) target;

@@ -43,10 +43,10 @@ public class BuildcraftProvider extends TileProvider {
 		}
 		if (te instanceof IHeatable) {
 			IHeatable heat = (IHeatable) te;
-			infoList.add(new StandardInfo(id, 0, 1, (int)heat.getCurrentHeatValue(), " degrees"));
-			infoList.add(new StandardInfo(id, 0, 2, (int)heat.getMinHeatValue(), " degrees"));
-			infoList.add(new StandardInfo(id, 0, 3, (int)heat.getMaxHeatValue(), " degrees"));
-			infoList.add(new StandardInfo(id, 0, 4, (int)heat.getIdealHeatValue(), " degrees"));
+			infoList.add(new StandardInfo(id, 0, 1, (int)heat.getCurrentHeatValue()).addSuffix("degrees"));
+			infoList.add(new StandardInfo(id, 0, 2, (int)heat.getMinHeatValue()).addSuffix("degrees"));
+			infoList.add(new StandardInfo(id, 0, 3, (int)heat.getMaxHeatValue()).addSuffix("degrees"));
+			infoList.add(new StandardInfo(id, 0, 4, (int)heat.getIdealHeatValue()).addSuffix("degrees"));
 		}
 		if (te instanceof ILaserTarget) {
 			ILaserTarget laser = (ILaserTarget) te;

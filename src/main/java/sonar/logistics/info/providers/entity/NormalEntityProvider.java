@@ -41,8 +41,8 @@ public class NormalEntityProvider extends EntityProvider {
 			}
 			infoList.add(new EntityInfo(id, 0, 1, living.getAge()));
 
-			infoList.add(new EntityInfo(id, 0, 2, (int) living.getHealth(), "HP"));
-			infoList.add(new EntityInfo(id, 0, 3, (int) living.getMaxHealth(), "HP"));
+			infoList.add(new EntityInfo(id, 0, 2, (int) living.getHealth()).addSuffix("HP"));
+			infoList.add(new EntityInfo(id, 0, 3, (int) living.getMaxHealth()).addSuffix("HP"));
 			if (entity instanceof EntityMob) {
 				infoList.add(new EntityInfo(id, 0, 4, true));
 			} else {

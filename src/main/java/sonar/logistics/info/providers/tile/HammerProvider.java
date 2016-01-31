@@ -42,10 +42,10 @@ public class HammerProvider extends TileProvider {
 			}
 		}
 		if (hammer != null) {
-			infoList.add(new StandardInfo(id, 0, 0, hammer.progress.getInt(), "ticks"));
-			infoList.add(new StandardInfo(id, 0, 1, hammer.speed, "ticks"));
-			infoList.add(new StandardInfo(id, 0, 2, hammer.coolDown.getInt(), "ticks"));
-			infoList.add(new StandardInfo(id, 0, 3, hammer.speed * 2, "ticks"));
+			infoList.add(new StandardInfo(id, 0, 0, hammer.progress.getInt()).addSuffix("ticks"));
+			infoList.add(new StandardInfo(id, 0, 1, hammer.speed).addSuffix("ticks"));
+			infoList.add(new StandardInfo(id, 0, 2, hammer.coolDown.getInt()).addSuffix("ticks"));
+			infoList.add(new StandardInfo(id, 0, 3, hammer.speed * 2).addSuffix("ticks"));
 		}
 	}
 
