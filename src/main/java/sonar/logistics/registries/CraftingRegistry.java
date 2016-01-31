@@ -26,8 +26,10 @@ public class CraftingRegistry extends Logistics {
 		addShapelessOre(new ItemStack(BlockRegistry.fluidReader, 1), new Object[] { BlockRegistry.infoReader, Items.bucket });
 		addShapedOre(new ItemStack(BlockRegistry.node, 1), new Object[] { "   ", " C ", "PDP", 'P', ItemRegistry.stone_plate, 'D', "dustSapphire", 'C', BlockRegistry.dataCable });
 		addShapedOre(new ItemStack(BlockRegistry.hammer, 1), new Object[] { "ADA", "B B", "ACA", 'A', "logWood", 'B', "stickWood", 'C', "stone", 'D', "slabWood" });
-		addShapelessOre(new ItemStack(BlockRegistry.entityNode, 1), new Object[] { ItemRegistry.stone_plate, "gemSapphire", BlockRegistry.dataCable });	
+		addShapelessOre(new ItemStack(BlockRegistry.entityNode, 1), new Object[] { ItemRegistry.stone_plate, "gemSapphire", BlockRegistry.dataCable });
 		addShapedOre(new ItemStack(BlockRegistry.itemRouter, 1), new Object[] { "SIS", "IMI", "SIS", 'S', "gemSapphire", 'I', BlockRegistry.inventoryReader, 'M', BlockRegistry.dataModifier });
+		addShapedOre(new ItemStack(BlockRegistry.dataMultiCable, 6), new Object[] { "CCC", "SSS", "CCC", 'C', BlockRegistry.dataCable, 'S', "dustSapphire"});
+		addShapedOre(new ItemStack(BlockRegistry.channelSelector, 1), new Object[] { "CDC", "PCD", "CDC", 'P', ItemRegistry.stone_plate, 'D', "dustSapphire", 'C', BlockRegistry.dataMultiCable });
 
 	}
 

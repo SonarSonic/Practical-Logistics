@@ -13,27 +13,31 @@ import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.FontHelper;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.IdentifiedCoords;
+import sonar.logistics.common.containers.ContainerChannelSelector;
 import sonar.logistics.common.containers.ContainerDataReceiver;
+import sonar.logistics.common.handlers.ChannelSelectorHandler;
 import sonar.logistics.common.tileentity.TileEntityDataReceiver;
 import sonar.logistics.network.packets.PacketCoordsSelection;
 
-public class GuiDataReceiver extends GuiSelectionList<IdentifiedCoords> {
+public class GuiChannelSelector extends GuiSelectionList<IdentifiedCoords> {
 
-	public TileEntityDataReceiver tile;
+	public TileEntity tile;
+	public ChannelSelectorHandler handler;
 
-	public GuiDataReceiver(InventoryPlayer inventory, TileEntityDataReceiver tile) {
-		super(new ContainerDataReceiver(tile, inventory), tile);
+	public GuiChannelSelector(TileEntity tile, ChannelSelectorHandler handler, InventoryPlayer inventory) {
+		super(new ContainerChannelSelector(tile, handler, inventory), tile);
 		this.tile = tile;
+		this.handler = handler;
 	}
 
 	@Override
 	public List<IdentifiedCoords> getSelectionList() {
-		return tile.emitters;
+		return handler.channels;
 	}
 
 	@Override
 	public IdentifiedCoords getCurrentSelection() {
-		return tile.getChannel();
+		return handler.channel.getCoords();
 	}
 
 	@Override
@@ -43,8 +47,8 @@ public class GuiDataReceiver extends GuiSelectionList<IdentifiedCoords> {
 
 	@Override
 	public void renderStrings(int x, int y) {
-		FontHelper.textCentre(StatCollector.translateToLocal("tile.DataReceiver.name"), xSize, 6, 1);
-		FontHelper.textCentre("Select the emitter you wish to connect to", xSize, 18, 0);
+		FontHelper.textCentre(StatCollector.translateToLocal("tile.ChannelSelector.name"), xSize, 6, 1);
+		FontHelper.textCentre("Select the channel you wish to default to", xSize, 18, 0);
 	}
 
 	@Override

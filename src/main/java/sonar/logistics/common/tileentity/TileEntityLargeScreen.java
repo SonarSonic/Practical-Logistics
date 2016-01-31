@@ -6,9 +6,12 @@ import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.utils.BlockCoords;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.connecting.IInfoTile;
+import sonar.logistics.api.connecting.ILargeDisplay;
 import sonar.logistics.common.handlers.LargeDisplayScreenHandler;
+import sonar.logistics.helpers.CableHelper;
+import sonar.logistics.helpers.DisplayHelper;
 
-public class TileEntityLargeScreen extends TileEntityHandler implements IInfoTile {
+public class TileEntityLargeScreen extends TileEntityHandler implements IInfoTile, ILargeDisplay {
 
 	public LargeDisplayScreenHandler handler = new LargeDisplayScreenHandler(false, this);
 
@@ -36,4 +39,30 @@ public class TileEntityLargeScreen extends TileEntityHandler implements IInfoTil
 		return new BlockCoords(this);
 	}
 
+	public void onLoaded() {
+		super.onLoaded();
+		if (!this.worldObj.isRemote)
+			DisplayHelper.addScreen(this);
+	}
+
+	public void invalidate() {
+		if (!this.worldObj.isRemote)
+			DisplayHelper.removeScreen(this);
+		super.invalidate();
+	}
+
+	@Override
+	public int registryID() {
+		return handler.registryID;
+	}
+
+	@Override
+	public void setRegistryID(int id) {
+		handler.registryID = id;
+	}
+
+	@Override
+	public int getOrientation() {
+		return this.getBlockMetadata();
+	}
 }

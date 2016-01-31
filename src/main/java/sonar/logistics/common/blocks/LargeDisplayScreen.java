@@ -67,7 +67,6 @@ public class LargeDisplayScreen extends AbstractScreen {
 	public void onBlockAdded(World world, int x, int y, int z) {
 		super.onBlockAdded(world, x, y, z);
 		setDefaultDirection(world, x, y, z);
-		DisplayHelper.onDisplayAdded(world.getTileEntity(x, y, z));
 	}
 
 	public void setDefaultDirection(World world, int x, int y, int z) {
@@ -96,6 +95,7 @@ public class LargeDisplayScreen extends AbstractScreen {
 			}
 
 			world.setBlockMetadataWithNotify(x, y, x, b0, 2);
+			//DisplayHelper.onDisplayAdded(world.getTileEntity(x, y, z));
 		}
 	}
 
@@ -118,11 +118,12 @@ public class LargeDisplayScreen extends AbstractScreen {
 		if (l == 3) {
 			world.setBlockMetadataWithNotify(x, y, z, 4, 2);
 		}
+		//DisplayHelper.onDisplayAdded(world.getTileEntity(x, y, z));
 	}
 
 	@Override
 	public void breakBlock(World world, int x, int y, int z, Block oldblock, int oldMetadata) {
-		DisplayHelper.onDisplayRemoved(world.getTileEntity(x, y, z));
+		//DisplayHelper.onDisplayRemoved(world.getTileEntity(x, y, z));
 		super.breakBlock(world, x, y, z, oldblock, oldMetadata);
 	}
 

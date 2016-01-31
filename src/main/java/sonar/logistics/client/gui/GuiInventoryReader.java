@@ -132,17 +132,19 @@ public class GuiInventoryReader extends GuiSonar {
 			int Y = (y - guiTop - 32) / 18;
 			int i = (start * 12) + X + ((Y) * 12);
 
-			if (i < getStacks().size()) {
-				StoredItemStack storedStack = getStacks().get(i);
-				if (storedStack != null) {
+			if (getStacks() != null) {
+				if (i < getStacks().size()) {
+					StoredItemStack storedStack = getStacks().get(i);
+					if (storedStack != null) {
 
-					GL11.glDisable(GL11.GL_DEPTH_TEST);
-					GL11.glDisable(GL11.GL_LIGHTING);
-					this.renderToolTip(storedStack, x - guiLeft, y - guiTop);
-					GL11.glEnable(GL11.GL_LIGHTING);
-					GL11.glEnable(GL11.GL_DEPTH_TEST);
-					net.minecraft.client.renderer.RenderHelper.enableGUIStandardItemLighting();
+						GL11.glDisable(GL11.GL_DEPTH_TEST);
+						GL11.glDisable(GL11.GL_LIGHTING);
+						this.renderToolTip(storedStack, x - guiLeft, y - guiTop);
+						GL11.glEnable(GL11.GL_LIGHTING);
+						GL11.glEnable(GL11.GL_DEPTH_TEST);
+						net.minecraft.client.renderer.RenderHelper.enableGUIStandardItemLighting();
 
+					}
 				}
 			}
 		}

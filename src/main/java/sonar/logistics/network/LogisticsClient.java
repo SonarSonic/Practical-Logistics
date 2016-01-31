@@ -9,6 +9,7 @@ import sonar.logistics.client.renderers.RenderHolographicDisplay;
 import sonar.logistics.client.renderers.RenderItemHandlers;
 import sonar.logistics.client.renderers.RenderLargeDisplay;
 import sonar.logistics.common.tileentity.TileEntityBlockNode;
+import sonar.logistics.common.tileentity.TileEntityChannelSelector;
 import sonar.logistics.common.tileentity.TileEntityDataCable;
 import sonar.logistics.common.tileentity.TileEntityDataEmitter;
 import sonar.logistics.common.tileentity.TileEntityDataModifier;
@@ -60,7 +61,11 @@ public class LogisticsClient extends LogisticsCommon {
 		TileEntitySpecialRenderer infoCreator = new RenderHandlers.InfoCreator();
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityInfoCreator.class, infoCreator);
 		MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(BlockRegistry.infoCreator), new RenderItemHandlers.DataModifier(infoCreator, new TileEntityInfoCreator()));
-				
+		
+		TileEntitySpecialRenderer channelSelector = new RenderHandlers.ChannelSelector();
+		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityChannelSelector.class, channelSelector);
+		MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(BlockRegistry.channelSelector), new RenderItemHandlers.DataModifier(channelSelector, new TileEntityChannelSelector()));
+			
 		TileEntitySpecialRenderer infoReader = new RenderHandlers.InfoReader();
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityInfoReader.class, infoReader);
 		MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(BlockRegistry.infoReader), new RenderItemHandlers.Reader(infoReader, new TileEntityInfoReader()));

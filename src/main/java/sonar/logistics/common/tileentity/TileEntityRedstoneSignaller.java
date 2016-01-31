@@ -5,6 +5,7 @@ import java.util.List;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.common.tileentity.TileEntitySonar;
+import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.network.sync.SyncInt;
 import sonar.core.network.sync.SyncString;
 import sonar.core.network.utils.ITextField;
@@ -66,7 +67,7 @@ public class TileEntityRedstoneSignaller extends TileEntitySonar implements ILog
 			boolean setNull = true;
 			List<BlockCoords> connections = CableHelper.getConnections(this, ForgeDirection.getOrientation(this.getBlockMetadata()).getOpposite());
 			if (!connections.isEmpty()) {
-				Object object = CableHelper.getTile(connections.get(0).getTileEntity());
+				Object object = FMPHelper.getTile(connections.get(0).getTileEntity());
 				if (object != null) {
 					if (object instanceof IInfoEmitter) {
 						IInfoEmitter infoNode = (IInfoEmitter) object;

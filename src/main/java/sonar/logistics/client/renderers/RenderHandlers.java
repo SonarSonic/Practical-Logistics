@@ -96,6 +96,7 @@ public class RenderHandlers {
 			RenderHelper.finishRender();
 		}
 	}
+
 	public static class BlockMultiCable extends TileEntitySpecialRenderer {
 		public ModelDataCable model = new ModelDataCable();
 		public String texture = modelFolder + "dataMultiCable.png";
@@ -107,6 +108,7 @@ public class RenderHandlers {
 			RenderHelper.finishRender();
 		}
 	}
+
 	public static class DataModifier extends TileEntitySpecialRenderer {
 		public ModelDataCable modelCable = new ModelDataCable();
 		public String cableTex = modelFolder + "dataCable.png";
@@ -377,7 +379,7 @@ public class RenderHandlers {
 				GL11.glTranslated(-0.5, 0.5, -0.5);
 				TileEntityItemRouter router = (TileEntityItemRouter) entity;
 				int[] sides = new int[6];
-				
+
 				if (entity.getWorldObj() != null) {
 					for (int i = 0; i < 6; i++) {
 						sides[i] = router.handler.sideConfigs[i].getInt();
@@ -387,7 +389,7 @@ public class RenderHandlers {
 				Tessellator tes = Tessellator.instance;
 				// bottom
 				tes.startDrawingQuads();
-				
+
 				Minecraft.getMinecraft().getTextureManager().bindTexture(sides[1] == 0 ? none : sides[1] == 1 ? input : output);
 				tes.addVertexWithUV(0, 0.0002, 0, 0, 0);
 				tes.addVertexWithUV(1, 0.0002, 0, 0, 1);
@@ -399,7 +401,7 @@ public class RenderHandlers {
 				tes.addVertexWithUV(1, 0.1250, 1, 1, 1);
 				tes.addVertexWithUV(1, 0.1250, 0, 0, 1);
 				tes.draw();
-				
+
 				// top
 				tes.startDrawingQuads();
 				Minecraft.getMinecraft().getTextureManager().bindTexture(sides[0] == 0 ? none : sides[0] == 1 ? input : output);
@@ -426,7 +428,7 @@ public class RenderHandlers {
 				tes.addVertexWithUV(1, 0, 0.1250, 1, 0);
 				tes.addVertexWithUV(1, 1, 0.1250, 1, 1);
 				tes.draw();
-				
+
 				tes.startDrawingQuads();
 				Minecraft.getMinecraft().getTextureManager().bindTexture(sides[2] == 0 ? none : sides[2] == 1 ? input : output);
 				tes.addVertexWithUV(0, 0, 0.875, 0, 0);
@@ -439,7 +441,7 @@ public class RenderHandlers {
 				tes.addVertexWithUV(1, 0, 0.9998, 1, 0);
 				tes.addVertexWithUV(1, 1, 0.9998, 1, 1);
 				tes.draw();
-				
+
 				tes.startDrawingQuads();
 				Minecraft.getMinecraft().getTextureManager().bindTexture(sides[4] == 0 ? none : sides[4] == 1 ? input : output);
 				tes.addVertexWithUV(0.0002, 0, 0, 1, 1);
@@ -452,7 +454,7 @@ public class RenderHandlers {
 				tes.addVertexWithUV(0.1250, 1, 0, 0, 1);
 				tes.addVertexWithUV(0.1250, 1, 1, 0, 0);
 				tes.draw();
-				
+
 				tes.startDrawingQuads();
 				Minecraft.getMinecraft().getTextureManager().bindTexture(sides[5] == 0 ? none : sides[5] == 1 ? input : output);
 				tes.addVertexWithUV(0.875, 0, 0, 1, 1);
@@ -465,9 +467,19 @@ public class RenderHandlers {
 				tes.addVertexWithUV(0.9998, 1, 0, 0, 1);
 				tes.addVertexWithUV(0.9998, 1, 1, 0, 0);
 				tes.draw();
-				
+
 			}
 			RenderHelper.finishRender();
 		}
 	}
+
+	public static class ChannelSelector extends DataModifier {
+
+		public ChannelSelector() {
+			super.modelTex = modelFolder + "channelSelector.png";
+			super.cableTex = modelFolder + "dataMultiCable.png";
+		}
+
+	}
+
 }

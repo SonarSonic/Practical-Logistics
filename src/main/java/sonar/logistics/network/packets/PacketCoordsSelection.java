@@ -4,22 +4,25 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
-import sonar.logistics.api.DataEmitter;
+import sonar.core.integration.fmp.FMPHelper;
+import sonar.core.integration.fmp.handlers.TileHandler;
+import sonar.logistics.api.IdentifiedCoords;
+import sonar.logistics.common.handlers.ChannelSelectorHandler;
 import sonar.logistics.common.tileentity.TileEntityDataReceiver;
 import cpw.mods.fml.common.network.ByteBufUtils;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 
-public class PacketDataReceiver implements IMessage {
+public class PacketCoordsSelection implements IMessage {
 
 	public int xCoord, yCoord, zCoord;
-	public DataEmitter coords;
+	public IdentifiedCoords coords;
 
-	public PacketDataReceiver() {
+	public PacketCoordsSelection() {
 	}
 
-	public PacketDataReceiver(int xCoord, int yCoord, int zCoord, DataEmitter info) {
+	public PacketCoordsSelection(int xCoord, int yCoord, int zCoord, IdentifiedCoords info) {
 		this.coords = info;
 		this.xCoord = xCoord;
 		this.yCoord = yCoord;
@@ -31,7 +34,7 @@ public class PacketDataReceiver implements IMessage {
 		this.xCoord = buf.readInt();
 		this.yCoord = buf.readInt();
 		this.zCoord = buf.readInt();
-		this.coords = DataEmitter.readFromNBT(ByteBufUtils.readTag(buf));
+		this.coords = IdentifiedCoords.readFromNBT(ByteBufUtils.readTag(buf));
 	}
 
 	@Override
@@ -40,23 +43,27 @@ public class PacketDataReceiver implements IMessage {
 		buf.writeInt(yCoord);
 		buf.writeInt(zCoord);
 		NBTTagCompound tag = new NBTTagCompound();
-		DataEmitter.writeToNBT(tag, coords);
+		IdentifiedCoords.writeToNBT(tag, coords);
 		ByteBufUtils.writeTag(buf, tag);
-		
+
 	}
 
-	public static class Handler implements IMessageHandler<PacketDataReceiver, IMessage> {
+	public static class Handler implements IMessageHandler<PacketCoordsSelection, IMessage> {
 
 		@Override
-		public IMessage onMessage(PacketDataReceiver message, MessageContext ctx) {
+		public IMessage onMessage(PacketCoordsSelection message, MessageContext ctx) {
 			World world = ctx.getServerHandler().playerEntity.worldObj;
 			TileEntity te = world.getTileEntity(message.xCoord, message.yCoord, message.zCoord);
 			if (te == null) {
 				return null;
 			}
 			if (te != null && te instanceof TileEntityDataReceiver) {
-				TileEntityDataReceiver receiver = (TileEntityDataReceiver) te;
-				receiver.emitter.setEmitter(message.coords);
+				((TileEntityDataReceiver) te).emitter.setCoords(message.coords);
+			} else {
+				TileHandler handler = FMPHelper.getHandler(te);
+				if (handler != null && handler instanceof ChannelSelectorHandler) {
+					((ChannelSelectorHandler) handler).channel.setCoords(message.coords);
+				}
 			}
 
 			return null;

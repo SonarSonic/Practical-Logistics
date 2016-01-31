@@ -3,6 +3,7 @@ package sonar.logistics.registries;
 import net.minecraft.block.Block;
 import sonar.core.common.block.SonarBlockTip;
 import sonar.logistics.Logistics;
+import sonar.logistics.common.blocks.BlockChannelSelector;
 import sonar.logistics.common.blocks.BlockDataCable;
 import sonar.logistics.common.blocks.BlockDataEmitter;
 import sonar.logistics.common.blocks.BlockDataModifier;
@@ -23,6 +24,7 @@ import sonar.logistics.common.blocks.BlockSapphireOre;
 import sonar.logistics.common.blocks.DisplayScreen;
 import sonar.logistics.common.blocks.LargeDisplayScreen;
 import sonar.logistics.common.tileentity.TileEntityBlockNode;
+import sonar.logistics.common.tileentity.TileEntityChannelSelector;
 import sonar.logistics.common.tileentity.TileEntityDataCable;
 import sonar.logistics.common.tileentity.TileEntityDataEmitter;
 import sonar.logistics.common.tileentity.TileEntityDataModifier;
@@ -43,7 +45,7 @@ import cpw.mods.fml.common.registry.GameRegistry;
 
 public class BlockRegistry extends Logistics {
 
-	public static Block displayScreen, largeDisplayScreen, node, entityNode, infoReader, dataCable, dataMultiCable, dataReceiver, dataEmitter, inventoryReader, redstoneSignaller_on, redstoneSignaller_off, holographicDisplay, dataModifier, infoCreator, sapphire_ore, hammer, hammer_air, fluidReader, itemRouter;
+	public static Block displayScreen, largeDisplayScreen, node, entityNode, infoReader, dataCable, dataMultiCable, dataReceiver, dataEmitter, inventoryReader, redstoneSignaller_on, redstoneSignaller_off, holographicDisplay, dataModifier, infoCreator, channelSelector, sapphire_ore, hammer, hammer_air, fluidReader, itemRouter;
 
 	public static void registerBlocks() {
 
@@ -111,6 +113,10 @@ public class BlockRegistry extends Logistics {
 		GameRegistry.registerBlock(infoCreator, SonarBlockTip.class, "InfoCreator");
 		GameRegistry.registerTileEntity(TileEntityInfoCreator.class, "InfoCreator");
 
+		channelSelector = new BlockChannelSelector().setBlockName("ChannelSelector").setHardness(1.0F).setCreativeTab(Logistics.creativeTab).setResistance(20.0F).setBlockTextureName(modid + ":" + "data_cable");
+		GameRegistry.registerBlock(channelSelector, SonarBlockTip.class, "ChannelSelector");
+		GameRegistry.registerTileEntity(TileEntityChannelSelector.class, "ChannelSelector");
+		
 		holographicDisplay = new BlockHolographicDisplay().setBlockName("HolographicDisplay").setHardness(1.0F).setCreativeTab(Logistics.creativeTab).setResistance(20.0F).setBlockTextureName(modid + ":" + "data_cable");
 		GameRegistry.registerBlock(holographicDisplay, SonarBlockTip.class, "HolographicDisplay");
 		GameRegistry.registerTileEntity(TileEntityHolographicDisplay.class, "HolographicDisplay");

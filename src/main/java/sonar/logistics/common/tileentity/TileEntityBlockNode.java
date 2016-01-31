@@ -32,6 +32,7 @@ public class TileEntityBlockNode extends TileEntityConnection implements IInfoEm
 		if (this.worldObj.isRemote) {
 			return;
 		}
+		System.out.print(System.currentTimeMillis());
 	}
 
 	public boolean maxRender() {

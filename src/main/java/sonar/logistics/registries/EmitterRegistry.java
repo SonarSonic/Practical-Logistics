@@ -8,7 +8,7 @@ import java.util.Map;
 
 import net.minecraft.tileentity.TileEntity;
 import sonar.core.utils.BlockCoords;
-import sonar.logistics.api.DataEmitter;
+import sonar.logistics.api.IdentifiedCoords;
 import sonar.logistics.common.tileentity.TileEntityDataEmitter;
 
 public class EmitterRegistry {
@@ -18,11 +18,11 @@ public class EmitterRegistry {
 		emitters.clear();
 	}
 
-	public static List<DataEmitter> getEmitters(String playerName) {
+	public static List<IdentifiedCoords> getEmitters(String playerName) {
 		if (playerName == null || playerName.isEmpty()) {
 			return null;
 		}
-		List<DataEmitter> emitterList = new ArrayList();
+		List<IdentifiedCoords> emitterList = new ArrayList();
 		if (emitters.get(playerName) == null) {
 			return emitterList;
 		}
@@ -32,7 +32,7 @@ public class EmitterRegistry {
 				if (tile != null && tile instanceof TileEntityDataEmitter) {
 					TileEntityDataEmitter dataEmitter = (TileEntityDataEmitter) tile;
 					if (tile.getWorldObj() != null && !tile.isInvalid()) {
-						emitterList.add(new DataEmitter(dataEmitter.clientName.getString(), coords));
+						emitterList.add(new IdentifiedCoords(dataEmitter.clientName.getString(), coords));
 					}
 				}
 			}

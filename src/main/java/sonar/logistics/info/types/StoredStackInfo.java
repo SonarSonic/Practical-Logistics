@@ -94,7 +94,8 @@ public class StoredStackInfo extends Info {
 			tess.setColorOpaque_F(1.0f, 1.0f, 1.0f);
 			double sizing = Math.round(Math.min((maxX - minX), (maxY - minY)));
 			double itemScale = sizing >= 2 ? (2.5F + sizing - 1 * 1.0F) : scale >= 120 ? 0.8F : 1.4F;
-			GL11.glTranslatef(0.0f, (float) (scale >= 120 ? 0.07F : 0.13F + ((sizing - 1) * 0.15)), zOffset - 0.01F);
+			GL11.glTranslated(0.0, getXTranslate(scale, sizing), zOffset - 0.01);
+
 			GL11.glScaled(itemScale, itemScale, itemScale);
 			GL11.glTranslatef(0.0f, 0.0f, +0.25f);
 			RenderHelper.doRenderItem(stack.item, tile.getWorldObj(), false);
@@ -116,6 +117,14 @@ public class StoredStackInfo extends Info {
 			GL11.glDisable(GL11.GL_LIGHTING);
 			rend.drawString(s1, X, Y, 16777215);
 		}
+	}
+
+	public double getXTranslate(float scale, double sizing) {
+		if (scale >= 120) {
+			return 0.07F;
+		}
+		return (0.13F + ((sizing - 1) * 0.17));
+
 	}
 
 	@Override

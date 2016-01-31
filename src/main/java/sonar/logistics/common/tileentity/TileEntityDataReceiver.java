@@ -1,5 +1,7 @@
 package sonar.logistics.common.tileentity;
 
+import io.netty.buffer.ByteBuf;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,41 +13,41 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.SonarCore;
 import sonar.core.network.PacketTileSync;
+import sonar.core.network.utils.IByteBufTile;
 import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
-import sonar.logistics.api.DataEmitter;
+import sonar.logistics.api.IdentifiedCoords;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.StandardInfo;
-import sonar.logistics.api.connecting.IDataReceiver;
+import sonar.logistics.api.connecting.IChannelProvider;
 import sonar.logistics.api.connecting.IInfoEmitter;
 import sonar.logistics.helpers.CableHelper;
-import sonar.logistics.network.SyncEmitter;
+import sonar.logistics.network.SyncIdentifiedCoords;
 import sonar.logistics.registries.EmitterRegistry;
 
-public class TileEntityDataReceiver extends TileEntityNode implements IDataReceiver, IInfoEmitter {
+public class TileEntityDataReceiver extends TileEntityNode implements IChannelProvider, IInfoEmitter {
 
-	// client list
-	public List<DataEmitter> emitters;
-	public List<DataEmitter> lastemitters;
+	public List<IdentifiedCoords> emitters;
+	public List<IdentifiedCoords> lastemitters;
 
-	public SyncEmitter emitter = new SyncEmitter(0);
+	public SyncIdentifiedCoords emitter = new SyncIdentifiedCoords(0);
 
 	@Override
-	public DataEmitter getEmitter() {
-		if (emitter.getEmitter() != null) {
-			TileEntity tile = emitter.getEmitter().coords.getTileEntity();
+	public IdentifiedCoords getChannel() {
+		if (emitter.getCoords() != null) {
+			TileEntity tile = emitter.getCoords().coords.getTileEntity();
 			if (tile != null && tile instanceof TileEntityDataEmitter) {
 				TileEntityDataEmitter dataEmitter = (TileEntityDataEmitter) tile;
-				emitter.setEmitter(new DataEmitter(dataEmitter.clientName.getString(), emitter.getEmitter().coords));
+				emitter.setCoords(new IdentifiedCoords(dataEmitter.clientName.getString(), emitter.getCoords().coords));
 			}
 		}
-		return emitter.getEmitter();
+		return emitter.getCoords();
 	}
 
 	@Override
 	public Info currentInfo() {
-		if (emitter.getEmitter() != null) {
-			return new StandardInfo((byte) -1, "DEFAULT", "Connected: ", emitter.getEmitter().coords.getRender());
+		if (emitter.getCoords() != null) {
+			return new StandardInfo((byte) -1, "DEFAULT", "Connected: ", emitter.getCoords().coords.getRender());
 		} else {
 			return new StandardInfo((byte) -1, "DEFAULT", "Connection: ", "NOT CONNECTED");
 		}
@@ -61,8 +63,6 @@ public class TileEntityDataReceiver extends TileEntityNode implements IDataRecei
 		if (isClient()) {
 			return;
 		}
-		//CableHelper.updateAdjacentCoord(this, new BlockCoords(this.xCoord, this.yCoord, this.zCoord), false, ForgeDirection.getOrientation(this.getBlockMetadata()));
-
 	}
 
 	public boolean maxRender() {
@@ -86,11 +86,12 @@ public class TileEntityDataReceiver extends TileEntityNode implements IDataRecei
 		}
 		if (type == SyncType.SPECIAL) {
 			emitter.readFromNBT(nbt, SyncType.SYNC);
+
 			if (nbt.hasKey("null")) {
 				this.emitters = new ArrayList();
 				return;
 			}
-			NBTTagList list = nbt.getTagList("Emitters", 10);
+			NBTTagList list = nbt.getTagList("COORDS", 10);
 			if (this.emitters == null) {
 				this.emitters = new ArrayList();
 			}
@@ -101,14 +102,14 @@ public class TileEntityDataReceiver extends TileEntityNode implements IDataRecei
 				switch (compound.getByte("f")) {
 				case 0:
 					if (set)
-						emitters.set(slot, DataEmitter.readFromNBT(compound));
+						emitters.set(slot, IdentifiedCoords.readFromNBT(compound));
 					else
-						emitters.add(slot, DataEmitter.readFromNBT(compound));
+						emitters.add(slot, IdentifiedCoords.readFromNBT(compound));
 					break;
 				case 1:
 					String name = compound.getString("Name");
 					if (name != null) {
-						emitters.set(slot, new DataEmitter(name, emitters.get(slot).coords));
+						emitters.set(slot, new IdentifiedCoords(name, emitters.get(slot).coords));
 					} else {
 						emitters.set(slot, null);
 					}
@@ -122,14 +123,15 @@ public class TileEntityDataReceiver extends TileEntityNode implements IDataRecei
 				}
 
 			}
+
 		}
 		if (type == SyncType.SYNC) {
 			emitter.readFromNBT(nbt, SyncType.SAVE);
-			NBTTagList list = nbt.getTagList("Emitters", 10);
+			NBTTagList list = nbt.getTagList("COORDS", 10);
 			this.emitters = new ArrayList();
 			for (int i = 0; i < list.tagCount(); i++) {
 				NBTTagCompound compound = list.getCompoundTagAt(i);
-				this.emitters.add(DataEmitter.readFromNBT(compound));
+				this.emitters.add(IdentifiedCoords.readFromNBT(compound));
 
 			}
 		}
@@ -156,8 +158,8 @@ public class TileEntityDataReceiver extends TileEntityNode implements IDataRecei
 			NBTTagList list = new NBTTagList();
 			int size = Math.max(this.emitters.size(), this.lastemitters.size());
 			for (int i = 0; i < size; ++i) {
-				DataEmitter current = null;
-				DataEmitter last = null;
+				IdentifiedCoords current = null;
+				IdentifiedCoords last = null;
 				if (i < this.emitters.size()) {
 					current = this.emitters.get(i);
 				}
@@ -170,7 +172,7 @@ public class TileEntityDataReceiver extends TileEntityNode implements IDataRecei
 						if (!BlockCoords.equalCoords(current.coords, last.coords)) {
 							compound.setByte("f", (byte) 0);
 							this.lastemitters.set(i, current);
-							DataEmitter.writeToNBT(compound, this.emitters.get(i));
+							IdentifiedCoords.writeToNBT(compound, this.emitters.get(i));
 
 						} else if (!current.name.equals(last.name)) {
 							compound.setByte("f", (byte) 1);
@@ -180,7 +182,7 @@ public class TileEntityDataReceiver extends TileEntityNode implements IDataRecei
 					} else {
 						compound.setByte("f", (byte) 0);
 						this.lastemitters.add(i, current);
-						DataEmitter.writeToNBT(compound, this.emitters.get(i));
+						IdentifiedCoords.writeToNBT(compound, this.emitters.get(i));
 					}
 				} else if (last != null) {
 					this.lastemitters.set(i, null);
@@ -193,8 +195,9 @@ public class TileEntityDataReceiver extends TileEntityNode implements IDataRecei
 
 			}
 			if (list.tagCount() != 0) {
-				nbt.setTag("Emitters", list);
+				nbt.setTag("COORDS", list);
 			}
+
 		}
 		if (type == SyncType.SYNC) {
 			emitter.writeToNBT(nbt, SyncType.SAVE);
@@ -206,11 +209,11 @@ public class TileEntityDataReceiver extends TileEntityNode implements IDataRecei
 				if (this.emitters.get(i) != null) {
 					NBTTagCompound compound = new NBTTagCompound();
 					compound.setByte("Slot", (byte) i);
-					DataEmitter.writeToNBT(compound, this.emitters.get(i));
+					IdentifiedCoords.writeToNBT(compound, this.emitters.get(i));
 					list.appendTag(compound);
 				}
 			}
-			nbt.setTag("Emitters", list);
+			nbt.setTag("COORDS", list);
 		}
 	}
 

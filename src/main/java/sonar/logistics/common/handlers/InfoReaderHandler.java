@@ -200,7 +200,7 @@ public class InfoReaderHandler extends TileHandler implements IWailaInfo {
 					if (set)
 						clientInfo.set(slot, Logistics.infoTypes.readFromNBT(compound));
 					else
-						clientInfo.add(slot, Logistics.infoTypes.readFromNBT(compound));
+						clientInfo.add(Logistics.infoTypes.readFromNBT(compound));
 					break;
 				case 1:
 					long stored = compound.getLong("Stored");

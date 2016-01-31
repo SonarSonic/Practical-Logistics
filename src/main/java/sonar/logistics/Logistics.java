@@ -48,7 +48,7 @@ public class Logistics {
 	public static LogisticsCommon proxy;
 
 	public static final String modid = "PracticalLogistics";
-	public static final String version = "0.0.8";
+	public static final String version = "0.0.9";
 
 	public static SimpleNetworkWrapper network;
 	public static Logger logger = (Logger) LogManager.getLogger(modid);

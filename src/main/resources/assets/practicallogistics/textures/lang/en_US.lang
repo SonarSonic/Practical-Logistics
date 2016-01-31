@@ -21,6 +21,7 @@ tile.LargeDisplayScreen.name=Large Display Screen
 tile.FluidReader.name=Fluid Reader
 tile.ItemRouter.name=Item Router
 tile.MultiCable.name=Channelled Cable
+tile.ChannelSelector.name=Channel Selector
 
 //items
 item.EnergyScreenItem.name=Energy Screen

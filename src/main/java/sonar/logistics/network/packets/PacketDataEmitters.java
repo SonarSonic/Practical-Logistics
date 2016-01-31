@@ -8,7 +8,7 @@ import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import sonar.logistics.api.DataEmitter;
+import sonar.logistics.api.IdentifiedCoords;
 import sonar.logistics.common.tileentity.TileEntityDataReceiver;
 import cpw.mods.fml.common.network.ByteBufUtils;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
@@ -18,12 +18,12 @@ import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 public class PacketDataEmitters implements IMessage {
 
 	public int xCoord, yCoord, zCoord;
-	public List<DataEmitter> coords;
+	public List<IdentifiedCoords> coords;
 
 	public PacketDataEmitters() {
 	}
 
-	public PacketDataEmitters(int xCoord, int yCoord, int zCoord, List<DataEmitter> emitters) {
+	public PacketDataEmitters(int xCoord, int yCoord, int zCoord, List<IdentifiedCoords> emitters) {
 		this.coords = emitters;
 		this.xCoord = xCoord;
 		this.yCoord = yCoord;
@@ -39,7 +39,7 @@ public class PacketDataEmitters implements IMessage {
 			coords = new ArrayList();
 			int size = buf.readInt();
 			for (int i = 0; i < size; i++) {
-				coords.add(DataEmitter.readFromNBT(ByteBufUtils.readTag(buf)));
+				coords.add(IdentifiedCoords.readFromNBT(ByteBufUtils.readTag(buf)));
 			}
 		}
 		TileEntity tile = Minecraft.getMinecraft().thePlayer.worldObj.getTileEntity(xCoord, yCoord, zCoord);
@@ -60,7 +60,7 @@ public class PacketDataEmitters implements IMessage {
 			buf.writeInt(coords.size());
 			for (int i = 0; i < coords.size(); i++) {
 				NBTTagCompound tag = new NBTTagCompound();
-				DataEmitter.writeToNBT(tag, coords.get(i));
+				IdentifiedCoords.writeToNBT(tag, coords.get(i));
 				ByteBufUtils.writeTag(buf, tag);
 			}
 		} else {

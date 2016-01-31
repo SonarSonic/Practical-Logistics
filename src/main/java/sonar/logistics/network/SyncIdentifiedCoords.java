@@ -5,18 +5,18 @@ import net.minecraft.nbt.NBTTagCompound;
 import sonar.core.network.sync.ISyncPart;
 import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
-import sonar.logistics.api.DataEmitter;
+import sonar.logistics.api.IdentifiedCoords;
 
-public class SyncEmitter implements ISyncPart {
-	private DataEmitter c;
-	private DataEmitter last;
+public class SyncIdentifiedCoords implements ISyncPart {
+	private IdentifiedCoords c;
+	private IdentifiedCoords last;
 	private byte id;
 
-	public SyncEmitter(int id) {
+	public SyncIdentifiedCoords(int id) {
 		this.id = (byte) id;
 	}
 
-	public SyncEmitter(int id, DataEmitter def) {
+	public SyncIdentifiedCoords(int id, IdentifiedCoords def) {
 		this.id = (byte) id;
 		this.c = def;
 		this.last = def;
@@ -36,7 +36,7 @@ public class SyncEmitter implements ISyncPart {
 	public void writeToBuf(ByteBuf buf) {
 		if (!equal()) {
 			buf.writeBoolean(true);
-			DataEmitter.writeInfo(buf, c);
+			IdentifiedCoords.writeInfo(buf, c);
 			last = c;
 		} else
 			buf.writeBoolean(false);
@@ -45,7 +45,7 @@ public class SyncEmitter implements ISyncPart {
 	@Override
 	public void readFromBuf(ByteBuf buf) {
 		if (buf.readBoolean()) {
-			this.c = DataEmitter.readInfo(buf);
+			this.c = IdentifiedCoords.readInfo(buf);
 		}
 	}
 
@@ -53,14 +53,14 @@ public class SyncEmitter implements ISyncPart {
 		if (type == SyncType.SYNC) {
 			if (!equal()) {
 				NBTTagCompound infoTag = new NBTTagCompound();
-				DataEmitter.writeToNBT(infoTag, c);
+				IdentifiedCoords.writeToNBT(infoTag, c);
 				nbt.setTag(String.valueOf(id), infoTag);
 				last = c;
 			}
 		}
 		if (type == SyncType.SAVE) {
 			NBTTagCompound infoTag = new NBTTagCompound();
-			DataEmitter.writeToNBT(infoTag, c);
+			IdentifiedCoords.writeToNBT(infoTag, c);
 			nbt.setTag(String.valueOf(id), infoTag);
 
 		}
@@ -69,21 +69,21 @@ public class SyncEmitter implements ISyncPart {
 	public void readFromNBT(NBTTagCompound nbt, SyncType type) {
 		if (type == SyncType.SYNC) {
 			if (nbt.hasKey(String.valueOf(id))) {
-				this.c = DataEmitter.readFromNBT(nbt.getCompoundTag(String.valueOf(id)));
+				this.c = IdentifiedCoords.readFromNBT(nbt.getCompoundTag(String.valueOf(id)));
 			}
 		}
 		if (type == SyncType.SAVE) {
 			if (nbt.hasKey(String.valueOf(id))) {
-				this.c = DataEmitter.readFromNBT(nbt.getCompoundTag(String.valueOf(id)));
+				this.c = IdentifiedCoords.readFromNBT(nbt.getCompoundTag(String.valueOf(id)));
 			}
 		}
 	}
 
-	public void setEmitter(DataEmitter value) {
+	public void setCoords(IdentifiedCoords value) {
 		c = value;
 	}
 
-	public DataEmitter getEmitter() {
+	public IdentifiedCoords getCoords() {
 		return c;
 	}
 

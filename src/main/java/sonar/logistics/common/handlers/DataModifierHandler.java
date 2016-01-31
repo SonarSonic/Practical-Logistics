@@ -31,7 +31,25 @@ public class DataModifierHandler extends TileHandler {
 		if (te.getWorldObj().isRemote) {
 			return;
 		}
-		updateData(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)));
+		List<BlockCoords> connections = CableHelper.getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite());
+		if (connections.isEmpty() || connections.get(0) == null) {
+			return;
+		}
+		Object target = FMPHelper.getTile(connections.get(0).getTileEntity());
+		if (target == null) {
+			return;
+		} else {
+			Info lastInfo = info;
+			if (target instanceof IInfoEmitter) {
+				IInfoEmitter infoNode = (IInfoEmitter) target;
+				if (infoNode.currentInfo() != null) {
+					this.info = infoNode.currentInfo();
+				} else if (this.info != null) {
+					this.info.emptyData();
+				}
+			}
+		}
+
 	}
 
 	public void readData(NBTTagCompound nbt, SyncType type) {
@@ -68,26 +86,6 @@ public class DataModifierHandler extends TileHandler {
 
 	public boolean canConnect(ForgeDirection dir) {
 		return true;
-	}
-
-	public void updateData(TileEntity te, ForgeDirection dir) {
-		List<BlockCoords> connections = CableHelper.getConnections(te, dir.getOpposite());
-		if (!connections.isEmpty() && connections.get(0) != null) {
-			Object target = CableHelper.getTile(connections.get(0).getTileEntity());
-			if (target == null) {
-				return;
-			} else {
-				Info lastInfo = info;
-				if (target instanceof IInfoEmitter) {
-					IInfoEmitter infoNode = (IInfoEmitter) target;
-					if (infoNode.currentInfo() != null) {
-						this.info = infoNode.currentInfo();
-					} else if (this.info != null) {
-						this.info.emptyData();
-					}
-				}
-			}
-		}
 	}
 
 	public Info currentInfo() {

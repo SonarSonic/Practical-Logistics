@@ -20,15 +20,15 @@ import sonar.logistics.api.connecting.ILargeDisplay;
 import sonar.logistics.api.render.LargeScreenSizing;
 import sonar.logistics.helpers.CableHelper;
 import sonar.logistics.helpers.DisplayHelper;
+import sonar.logistics.registries.DisplayRegistry;
 
-public class LargeDisplayScreenHandler extends DisplayScreenHandler implements ILargeDisplay, IByteBufTile {
+public class LargeDisplayScreenHandler extends DisplayScreenHandler implements IByteBufTile {
 
 	public SyncBoolean isHandler = new SyncBoolean(0);
-	public List<BlockCoords> displays = new ArrayList();
-	public BlockCoords handler = null;
 	public LargeScreenSizing sizing;
 	public boolean resetSizing = true;
 	public BlockCoords connectedTile = null;
+	public int registryID = -1;
 
 	public LargeDisplayScreenHandler(boolean isMultipart, TileEntity tile) {
 		super(isMultipart, tile);
@@ -37,25 +37,38 @@ public class LargeDisplayScreenHandler extends DisplayScreenHandler implements I
 	@Override
 	public void update(TileEntity te) {
 		if (!te.getWorldObj().isRemote) {
-			if (!isHandler.getBoolean()) {
-				return;
+			boolean lastHandler = isHandler.getBoolean();
+			List<BlockCoords> displays = DisplayRegistry.getScreens(registryID);
+			if (displays != null) {
+				if (BlockCoords.equalCoords(displays.get(0), new BlockCoords(te))) {
+					isHandler.setBoolean(true);
+					LargeScreenSizing lastSize = sizing;
+					sizing = DisplayHelper.getScreenSizing(te);
+
+					if (sizing == null && lastSize!=null || (lastSize == null) || !lastSize.equals(sizing)) {
+						SonarCore.sendPacketAround(te, 64, 2);
+						//resetSizing = false;
+					}
+
+					connectedTile = getConnectedTile(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)));
+					if (connectedTile == null || connectedTile.getTileEntity(te.getWorldObj()) == null) {
+						this.updateData(te, te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)));
+					} else {
+						this.updateData(connectedTile.getTileEntity(te.getWorldObj()), te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)));
+					}
+				} else {
+					isHandler.setBoolean(false);
+				}
 			}
-			if (resetSizing) {
-				sizing = DisplayHelper.getScreenSizing(te);
-				SonarCore.sendPacketAround(te, 64, 2);
-				resetSizing = false;
-			}
-			connectedTile = getConnectedTile(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)));
-			if (connectedTile == null || connectedTile.getTileEntity(te.getWorldObj()) == null) {
-				this.updateData(te, te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)));
-			} else {
-				this.updateData(connectedTile.getTileEntity(te.getWorldObj()), te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)));
+			if (lastHandler != isHandler.getBoolean()) {
+				SonarCore.sendPacketAround(te, 64, 3);
 			}
 		}
 
 	}
 
 	public BlockCoords getConnectedTile(TileEntity te, ForgeDirection dir) {
+		List<BlockCoords> displays = DisplayRegistry.getScreens(registryID);
 		if (displays != null) {
 			for (BlockCoords coords : displays) {
 				if (coords != null && coords.getTileEntity() != null) {
@@ -81,6 +94,9 @@ public class LargeDisplayScreenHandler extends DisplayScreenHandler implements I
 				buf.writeBoolean(false);
 			}
 		}
+		if (id == 3) {
+			isHandler.writeToBuf(buf);
+		}
 	}
 
 	@Override
@@ -93,92 +109,17 @@ public class LargeDisplayScreenHandler extends DisplayScreenHandler implements I
 				sizing = null;
 			}
 		}
-	}
-
-	@Override
-	public boolean isHandler() {
-		return isHandler.getBoolean();
-	}
-
-	@Override
-	public List<BlockCoords> getConnectedScreens() {
-		if (displays == null) {
-			return Collections.EMPTY_LIST;
+		if (id == 3) {
+			isHandler.readFromBuf(buf);
 		}
-		return displays;
-	}
-
-	@Override
-	public BlockCoords getHandlerCoords() {
-		return handler;
-	}
-
-	@Override
-	public void setHandlerCoords(BlockCoords coords) {
-		this.handler = coords;
-	}
-
-	@Override
-	public void setHandler(boolean isHandler) {
-		this.isHandler.setBoolean(isHandler);
-	}
-
-	@Override
-	public void addDisplay(BlockCoords coords) {
-		if (displays == null) {
-			displays = new ArrayList();
-		}
-		displays.add(coords);
-		resetSizing();
-	}
-
-	@Override
-	public void removeDisplay(BlockCoords coords) {
-		for (BlockCoords display : displays) {
-			if (BlockCoords.equalCoords(display, coords)) {
-				displays.remove(display);
-				resetSizing();
-				return;
-			}
-		}
-	}
-
-	@Override
-	public void setConnectedScreens(List<BlockCoords> list) {
-		if (list == null) {
-			this.displays = new ArrayList();
-		} else
-			this.displays = list;
-
-	}
-
-	@Override
-	public void resetSizing() {
-		resetSizing = true;
 	}
 
 	public void readData(NBTTagCompound nbt, SyncType type) {
 		super.readData(nbt, type);
 		if (type == SyncType.SAVE || type == SyncType.SYNC) {
 			isHandler.readFromNBT(nbt, type);
-			if (nbt.hasKey("hCoords")) {
-				handler = BlockCoords.readFromNBT(nbt.getCompoundTag("hCoords"));
-			}
-			if (nbt.hasKey("cCoords")) {
-				connectedTile = BlockCoords.readFromNBT(nbt.getCompoundTag("cCoords"));
-			}
 			if (nbt.hasKey("mxY")) {
 				sizing = LargeScreenSizing.readFromNBT(nbt);
-			}
-
-			if (displays == null) {
-				displays = new ArrayList();
-			}
-			NBTTagList list = nbt.getTagList("BlockCoords", 10);
-			for (int i = 0; i < list.tagCount(); i++) {
-				NBTTagCompound compound = list.getCompoundTagAt(i);
-				displays.add(BlockCoords.readFromNBT(compound));
-
 			}
 
 		}
@@ -188,31 +129,10 @@ public class LargeDisplayScreenHandler extends DisplayScreenHandler implements I
 		super.writeData(nbt, type);
 		if (type == SyncType.SAVE || type == SyncType.SYNC) {
 			isHandler.writeToNBT(nbt, type);
-			if (handler != null) {
-				NBTTagCompound infoTag = new NBTTagCompound();
-				BlockCoords.writeToNBT(infoTag, handler);
-				nbt.setTag("hCoords", infoTag);
-			}
-			if (connectedTile != null) {
-				NBTTagCompound infoTag = new NBTTagCompound();
-				BlockCoords.writeToNBT(infoTag, connectedTile);
-				nbt.setTag("cCoords", infoTag);
-			}
 			if (sizing != null) {
 				sizing.writeToNBT(nbt);
 			}
-
-			NBTTagList list = new NBTTagList();
-			if (displays != null) {
-				for (int i = 0; i < displays.size(); i++) {
-					if (displays.get(i) != null) {
-						NBTTagCompound compound = new NBTTagCompound();
-						BlockCoords.writeToNBT(compound, displays.get(i));
-						list.appendTag(compound);
-					}
-				}
-			}
-			nbt.setTag("BlockCoords", list);
 		}
 	}
+
 }

@@ -19,11 +19,9 @@ import sonar.logistics.api.Info;
 import sonar.logistics.api.StandardInfo;
 import sonar.logistics.api.connecting.IInfoEmitter;
 import sonar.logistics.api.connecting.IInfoReader;
-import sonar.logistics.api.connecting.IDataCable;
 import sonar.logistics.common.tileentity.TileEntityInventoryReader;
 import sonar.logistics.helpers.CableHelper;
 import sonar.logistics.helpers.InfoHelper;
-import sonar.logistics.registries.CableRegistry;
 import cpw.mods.fml.common.network.ByteBufUtils;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -44,18 +42,9 @@ public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 	}
 
 	public void updateData(TileEntity te, TileEntity packetTile, ForgeDirection dir) {
-		Object tile = FMPHelper.checkObject(BlockCoords.translateCoords(new BlockCoords(te), dir.getOpposite()).getTileEntity());
-		if (tile != null && tile instanceof IDataCable) {
-			System.out.print("tile");
-			IDataCable cable = (IDataCable) tile;
-			this.info = new StandardInfo(-1, "NETWORK", "Cables: " + CableRegistry.getCables(cable.registryID()).size(), " " + cable.registryID());
-
-			SonarCore.sendPacketAround(packetTile, 64, 0);
-			return;
-		}
 		List<BlockCoords> connections = CableHelper.getConnections(te, dir.getOpposite());
 		if (!connections.isEmpty() && connections.get(0) != null) {
-			Object target = CableHelper.getTile(connections.get(0).getTileEntity());
+			Object target = FMPHelper.getTile(connections.get(0).getTileEntity());
 			if (target == null) {
 				return;
 			} else {

@@ -14,6 +14,7 @@ public class LogisticsGui {
 	public static final int entityNode =  9;
 	public static final int fluidReader =  10;
 	public static final int itemRouter =  11;
+	public static final int channelSelector =  12;
 	
 
 }

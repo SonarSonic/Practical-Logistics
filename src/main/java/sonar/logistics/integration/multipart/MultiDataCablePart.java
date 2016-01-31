@@ -1,12 +1,17 @@
 package sonar.logistics.integration.multipart;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import net.minecraft.block.Block;
 import net.minecraftforge.common.util.ForgeDirection;
+import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.SonarTilePart;
 import sonar.core.utils.BlockCoords;
 import sonar.logistics.api.connecting.IDataCable;
+import sonar.logistics.api.connecting.IInfoEmitter;
+import sonar.logistics.api.connecting.ILogicTile;
 import sonar.logistics.client.renderers.RenderHandlers;
 import sonar.logistics.helpers.CableHelper;
 import sonar.logistics.registries.BlockRegistry;
@@ -17,7 +22,7 @@ import codechicken.multipart.TMultiPart;
 public class MultiDataCablePart extends SonarTilePart implements IDataCable {
 
 	public int registryID = -1;
-	
+
 	public boolean occlusion;
 
 	// taken from Applied Energistics Code
@@ -87,7 +92,6 @@ public class MultiDataCablePart extends SonarTilePart implements IDataCable {
 		if (side == null || side == ForgeDirection.UNKNOWN || this.tile() == null) {
 			return false;
 		}
-
 		occlusion = true;
 		boolean blocked = !this.tile().canAddPart(new NormallyOccludedPart(SIDE_TESTS[side.ordinal()]));
 		occlusion = false;
@@ -101,7 +105,7 @@ public class MultiDataCablePart extends SonarTilePart implements IDataCable {
 		}
 		return CableHelper.canRenderConnection(tile(), dir);
 	}
-	
+
 	@Override
 	public BlockCoords getCoords() {
 		return new BlockCoords(tile());
@@ -120,8 +124,31 @@ public class MultiDataCablePart extends SonarTilePart implements IDataCable {
 	}
 
 	public void onPartChanged(TMultiPart part) {
-		CableHelper.removeCable(this);
 		super.onPartChanged(part);
+		List<ILogicTile> adjacents = new ArrayList();
+		for (int i = 0; i < 6; i++) {
+			ForgeDirection dir = ForgeDirection.getOrientation(i);
+			BlockCoords coords = new BlockCoords(tile());
+			Object object = FMPHelper.checkObject(BlockCoords.translateCoords(coords, dir).getTileEntity());
+			if (object != null && object instanceof ILogicTile) {
+				adjacents.add((ILogicTile) object);
+			}
+		}
+
+		for (ILogicTile tile : adjacents) {
+			if (tile instanceof IDataCable) {
+				IDataCable cable = (IDataCable) tile;
+				CableHelper.removeCable(cable);
+				CableHelper.addCable(cable);
+			}
+			if (tile instanceof IInfoEmitter) {
+				IInfoEmitter emitter = (IInfoEmitter) tile;
+				emitter.removeConnections();
+				emitter.addConnections();
+			}
+		}
+
+		CableHelper.removeCable(this);
 		CableHelper.addCable(this);
 	}
 

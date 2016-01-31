@@ -29,16 +29,6 @@ public class BlockHolographicDisplay extends BaseNode {
 		return true;
 	}
 
-	@Override
-	public void openGui(World world, int x, int y, int z, EntityPlayer player) {
-		TileEntity target = world.getTileEntity(x, y, z);
-		if (!world.isRemote && target != null && target instanceof TileEntityHolographicDisplay) {
-			TileEntityHolographicDisplay node = (TileEntityHolographicDisplay) target;
-			// node.sendAvailableData(player);
-		}
-		// player.openGui(Logistics.instance, LogisticsGui.infoNode, world, x, y, z);
-	}
-
 	public boolean hasSpecialRenderer() {
 		return true;
 	}

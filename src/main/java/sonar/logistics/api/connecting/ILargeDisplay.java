@@ -1,28 +1,18 @@
 package sonar.logistics.api.connecting;
 
-import java.util.List;
+import net.minecraftforge.common.util.ForgeDirection;
+import sonar.logistics.api.render.ICableRenderer;
 
-import sonar.core.utils.BlockCoords;
+/** implemented by LargeDisplays */
+public interface ILargeDisplay extends ILogicTile {
+	/**
+	 * when displays join together they create networks which are stored under
+	 * IDs in the registry, this returns this id
+	 */
+	public int registryID();
 
-/**current Interface for large display screens, will be changed in the very near future*/
-public interface ILargeDisplay {
+	/** DON'T CALL THIS OUTSIDE OF THE DISPLAY REGISTRY */
+	public void setRegistryID(int id);
 
-	public boolean isHandler();
-
-	public List<BlockCoords> getConnectedScreens();
-
-	public void setConnectedScreens(List<BlockCoords> list);
-
-	public void addDisplay(BlockCoords coords);
-
-	public void removeDisplay(BlockCoords coords);
-
-	public BlockCoords getHandlerCoords();
-
-	public void setHandlerCoords(BlockCoords coords);
-
-	public void setHandler(boolean isHandler);
-	
-	public void resetSizing();
-
+	public int getOrientation();
 }

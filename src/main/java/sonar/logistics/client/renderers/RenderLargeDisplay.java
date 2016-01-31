@@ -46,25 +46,17 @@ public class RenderLargeDisplay extends RenderDisplayScreen {
 			GL11.glTranslated(0, 2, 0);
 		}
 		GL11.glRotated(rotate, 0, 0, 1);
-
-		// GL11.glEnable(GL11.GL_CULL_FACE);
 		model.render((Entity) null, 0.0F, 0.0F, -0.1F, 0.0F, 0.0F, 0.0625F);
-		// RenderHelper.finishRender();
-		// GL11.glDisable(GL11.GL_CULL_FACE);
-
 		GL11.glPopMatrix();
 		GL11.glPopMatrix();
 		final Tessellator tess = Tessellator.instance;
 
 		if (entity.getWorldObj() != null) {
-			Object target = FMPHelper.checkObject(entity);
-			if (!(target instanceof ILargeDisplay)) {
-				target = FMPHelper.getHandler(target);
-			}
+			Object target = FMPHelper.getHandler(entity);
 
-			if (target instanceof ILargeDisplay) {
-				ILargeDisplay display = (ILargeDisplay) target;
-				if (display.isHandler()) {
+			if (target instanceof LargeDisplayScreenHandler) {
+				LargeDisplayScreenHandler display = (LargeDisplayScreenHandler) target;
+				if (display.isHandler.getBoolean()) {
 					GL11.glPushMatrix();
 					GL11.glTranslated(x + 0.5, y + 0.5, z + 0.5);
 					ForgeDirection d = ForgeDirection.getOrientation(RenderHelper.setMetaData(entity));
@@ -194,11 +186,7 @@ public class RenderLargeDisplay extends RenderDisplayScreen {
 
 	public void renderInfo(Tessellator tess, TileEntity tile, ForgeDirection side, Info info) {
 		LargeScreenSizing sizing = null;
-		Object target = FMPHelper.checkObject(tile);
-		if (!(target instanceof ILargeDisplay)) {
-			target = FMPHelper.getHandler(target);
-		}
-
+		Object target = FMPHelper.getHandler(FMPHelper.checkObject(tile));
 		if (target instanceof LargeDisplayScreenHandler) {
 			LargeDisplayScreenHandler display = (LargeDisplayScreenHandler) target;
 			sizing = display.sizing;

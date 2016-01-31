@@ -10,6 +10,7 @@ import net.minecraft.world.World;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.logistics.Logistics;
+import sonar.logistics.client.gui.GuiChannelSelector;
 import sonar.logistics.client.gui.GuiDataModifier;
 import sonar.logistics.client.gui.GuiDataReceiver;
 import sonar.logistics.client.gui.GuiEntityNode;
@@ -21,6 +22,7 @@ import sonar.logistics.client.gui.GuiInventoryReader;
 import sonar.logistics.client.gui.GuiItemRouter;
 import sonar.logistics.client.gui.GuiRedstoneSignaller;
 import sonar.logistics.client.gui.GuiRenameEmitter;
+import sonar.logistics.common.containers.ContainerChannelSelector;
 import sonar.logistics.common.containers.ContainerDataReceiver;
 import sonar.logistics.common.containers.ContainerEmptySync;
 import sonar.logistics.common.containers.ContainerFluidReader;
@@ -28,12 +30,14 @@ import sonar.logistics.common.containers.ContainerHammer;
 import sonar.logistics.common.containers.ContainerInfoNode;
 import sonar.logistics.common.containers.ContainerInventoryReader;
 import sonar.logistics.common.containers.ContainerItemRouter;
+import sonar.logistics.common.handlers.ChannelSelectorHandler;
 import sonar.logistics.common.handlers.DataModifierHandler;
 import sonar.logistics.common.handlers.FluidReaderHandler;
 import sonar.logistics.common.handlers.InfoCreatorHandler;
 import sonar.logistics.common.handlers.InfoReaderHandler;
 import sonar.logistics.common.handlers.InventoryReaderHandler;
 import sonar.logistics.common.handlers.ItemRouterHandler;
+import sonar.logistics.common.tileentity.TileEntityChannelSelector;
 import sonar.logistics.common.tileentity.TileEntityDataEmitter;
 import sonar.logistics.common.tileentity.TileEntityDataModifier;
 import sonar.logistics.common.tileentity.TileEntityDataReceiver;
@@ -51,7 +55,7 @@ import sonar.logistics.integration.multipart.InfoCreatorPart;
 import sonar.logistics.integration.multipart.InfoReaderPart;
 import sonar.logistics.integration.multipart.InventoryReaderPart;
 import sonar.logistics.network.packets.PacketDataEmitters;
-import sonar.logistics.network.packets.PacketDataReceiver;
+import sonar.logistics.network.packets.PacketCoordsSelection;
 import sonar.logistics.network.packets.PacketFluidReader;
 import sonar.logistics.network.packets.PacketInfoBlock;
 import sonar.logistics.network.packets.PacketInventoryReader;
@@ -68,7 +72,7 @@ public class LogisticsCommon implements IGuiHandler {
 		Logistics.network.registerMessage(PacketProviders.Handler.class, PacketProviders.class, 0, Side.CLIENT);
 		Logistics.network.registerMessage(PacketInfoBlock.Handler.class, PacketInfoBlock.class, 1, Side.SERVER);
 		Logistics.network.registerMessage(PacketDataEmitters.Handler.class, PacketDataEmitters.class, 2, Side.CLIENT);
-		Logistics.network.registerMessage(PacketDataReceiver.Handler.class, PacketDataReceiver.class, 3, Side.SERVER);
+		Logistics.network.registerMessage(PacketCoordsSelection.Handler.class, PacketCoordsSelection.class, 3, Side.SERVER);
 		Logistics.network.registerMessage(PacketInventoryReader.Handler.class, PacketInventoryReader.class, 4, Side.SERVER);
 		Logistics.network.registerMessage(PacketFluidReader.Handler.class, PacketFluidReader.class, 5, Side.SERVER);
 		Logistics.network.registerMessage(PacketRouterGui.Handler.class, PacketRouterGui.class, 6, Side.SERVER);
@@ -139,6 +143,12 @@ public class LogisticsCommon implements IGuiHandler {
 					if (handler != null && handler instanceof ItemRouterHandler)
 						return new ContainerItemRouter((TileEntityItemRouter) tile, player.inventory);
 				}
+			case LogisticsGui.channelSelector:
+				if (entity instanceof TileEntityChannelSelector) {
+					TileHandler handler = FMPHelper.getHandler(tile);
+					if (handler != null && handler instanceof ChannelSelectorHandler)
+						return new ContainerChannelSelector(tile, (ChannelSelectorHandler) handler, player.inventory);
+				}
 			}
 
 		}
@@ -208,6 +218,12 @@ public class LogisticsCommon implements IGuiHandler {
 					TileHandler handler = FMPHelper.getHandler(tile);
 					if (handler != null && handler instanceof ItemRouterHandler)
 						return new GuiItemRouter((ItemRouterHandler) handler, (TileEntityItemRouter) tile, player);
+				}
+			case LogisticsGui.channelSelector:
+				if (entity instanceof TileEntityChannelSelector) {
+					TileHandler handler = FMPHelper.getHandler(tile);
+					if (handler != null && handler instanceof ChannelSelectorHandler)
+						return new GuiChannelSelector(tile, (ChannelSelectorHandler) handler, player.inventory);
 				}
 			}
 

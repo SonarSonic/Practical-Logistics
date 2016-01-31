@@ -6,31 +6,35 @@ import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
 import sonar.core.inventory.ContainerSync;
 import sonar.core.utils.helpers.NBTHelper;
+import sonar.logistics.common.handlers.ChannelSelectorHandler;
 import sonar.logistics.common.tileentity.TileEntityDataReceiver;
 
-public class ContainerDataReceiver extends ContainerSync {
+public class ContainerChannelSelector extends ContainerSync {
 
-	public ContainerDataReceiver(TileEntityDataReceiver entity, InventoryPlayer inventoryPlayer) {
-		super(entity);
+	public ChannelSelectorHandler handler;
+
+	public ContainerChannelSelector(TileEntity tile, ChannelSelectorHandler handler, InventoryPlayer inventoryPlayer) {
+		super(handler, tile);
+		this.handler = handler;
 	}
 
 	@Override
 	public void detectAndSendChanges() {
-		if (tile instanceof TileEntityDataReceiver) {
-			if (sync != null) {
-				if (crafters != null) {
-					//NBTTagCompound syncData = new NBTTagCompound();
-					//sync.writeData(syncData, NBTHelper.SyncType.SYNC);
-					for (Object o : crafters) {
-						if (o != null && o instanceof EntityPlayerMP) {
-							((TileEntityDataReceiver) tile).sendAvailableData(tile, (EntityPlayerMP) o);
-						}
+		if (sync != null) {
+			if (crafters != null) {
+				NBTTagCompound syncData = new NBTTagCompound();
+				sync.writeData(syncData, NBTHelper.SyncType.SYNC);
+				for (Object o : crafters) {
+					if (o != null && o instanceof EntityPlayerMP) {
+						handler.sendAvailableData(tile, (EntityPlayerMP) o);
 					}
-
 				}
+
 			}
+
 		}
 	}
 

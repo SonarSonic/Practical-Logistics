@@ -85,4 +85,5 @@ public class InfoCreatorHandler extends TileHandler {
 		}
 		this.info = new StandardInfo((byte) -1, "CREATOR", this.subCategory.getString(), this.data.getString());
 	}
+
 }

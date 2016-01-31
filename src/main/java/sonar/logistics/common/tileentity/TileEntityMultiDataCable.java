@@ -34,10 +34,6 @@ public class TileEntityMultiDataCable extends TileEntitySonar implements IDataCa
 			CableHelper.addCable(this);
 	}
 
-	public void validate() {
-		super.validate();
-	}
-
 	public void invalidate() {
 		CableHelper.removeCable(this);
 		super.invalidate();
@@ -45,11 +41,6 @@ public class TileEntityMultiDataCable extends TileEntitySonar implements IDataCa
 
 	@SideOnly(Side.CLIENT)
 	public List<String> getWailaInfo(List<String> currenttip) {
-		currenttip.add("Registry ID : " + registryID);
-		List<BlockCoords> coords = CableRegistry.getCables(registryID);
-		List<BlockCoords> connects = CableRegistry.getConnections(registryID);
-		currenttip.add("Cables : " + coords.size());
-		currenttip.add("Connections : " + connects.size());
 		return currenttip;
 	}
 
