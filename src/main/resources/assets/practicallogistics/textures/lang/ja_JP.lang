@@ -20,6 +20,9 @@ tile.Hammer_Air.name=鍛造加工用ハンマー
 tile.EntityNode.name=エンティティ・ノード
 tile.LargeDisplayScreen.name=大きなスクリーン
 tile.FluidReader.name=流体読込器
+tile.ItemRouter.name=アイテムルーター
+tile.MultiCable.name=チャンネルケーブル
+tile.ChannelSelector.name=チャンネルセレクタ
 
 //items
 item.EnergyScreenItem.name=エネルギー用スクリーン
