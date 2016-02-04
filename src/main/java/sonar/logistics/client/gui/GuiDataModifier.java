@@ -51,7 +51,7 @@ public class GuiDataModifier extends GuiSonar {
 	@Override
 	public void drawGuiContainerForegroundLayer(int x, int y) {
 		super.drawGuiContainerForegroundLayer(x, y);
-		FontHelper.textCentre("Data Modifier", xSize, 6, 0);
+		FontHelper.textCentre(FontHelper.translate("tile.DataModifier.name"), xSize, 6, 0);
 		FontHelper.text("Name:", 6, 22, 0);
 		FontHelper.text("Prefix:", 6, 22 + 20, 0);
 		FontHelper.text("Suffix:", 6, 22 + 40, 0);

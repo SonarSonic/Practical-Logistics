@@ -20,12 +20,17 @@ import sonar.logistics.common.handlers.InventoryReaderHandler;
 public class ContainerInventoryReader extends ContainerSync {
 
 	private static final int INV_START = 1, INV_END = INV_START + 26, HOTBAR_START = INV_END + 1, HOTBAR_END = HOTBAR_START + 8;
+	public boolean stackMode = false;
 
 	public ContainerInventoryReader(InventoryReaderHandler handler, TileEntity entity, InventoryPlayer inventoryPlayer) {
 		super(handler, entity);
+		addSlots(handler, inventoryPlayer, handler.setting.getInt() == 0);
+	}
 
-		addSlotToContainer(new SlotList(handler, 0, 13, 9));
-
+	public void addSlots(InventoryReaderHandler handler, InventoryPlayer inventoryPlayer, boolean hasStack) {
+		stackMode = hasStack;
+		this.inventoryItemStacks.clear();
+		this.inventorySlots.clear();
 		for (int i = 0; i < 3; ++i) {
 			for (int j = 0; j < 9; ++j) {
 				this.addSlotToContainer(new Slot(inventoryPlayer, j + i * 9 + 9, 41 + j * 18, 174 + i * 18));
@@ -35,7 +40,8 @@ public class ContainerInventoryReader extends ContainerSync {
 		for (int i = 0; i < 9; ++i) {
 			this.addSlotToContainer(new Slot(inventoryPlayer, i, 41 + i * 18, 232));
 		}
-
+		if (hasStack)
+			addSlotToContainer(new SlotList(handler, 0, 103, 9));
 	}
 
 	@Override
@@ -78,27 +84,27 @@ public class ContainerInventoryReader extends ContainerSync {
 		return true;
 	}
 
-	public ItemStack transferStackInSlot(EntityPlayer par1EntityPlayer, int par2) {
+	public ItemStack transferStackInSlot(EntityPlayer player, int id) {
 		ItemStack itemstack = null;
-		Slot slot = (Slot) this.inventorySlots.get(par2);
-
+		Slot slot = (Slot) this.inventorySlots.get(id);
 		if (slot != null && slot.getHasStack()) {
 			ItemStack itemstack1 = slot.getStack();
 			itemstack = itemstack1.copy();
+			if (stackMode && id < 36) {
+				((Slot) this.inventorySlots.get(36)).putStack(itemstack1.copy());
 
-			if (par2 >= INV_START) {
-				if (!this.mergeItemStack(itemstack1.copy(), 0, INV_START, false)) {
+			} else if (id < 27) {
+				if (!this.mergeItemStack(itemstack1, 27, 36, false)) {
 					return null;
 				}
-			} else if (par2 >= INV_START && par2 < HOTBAR_START) {
-				if (!this.mergeItemStack(itemstack1, HOTBAR_START, HOTBAR_END + 1, false)) {
+			} else if (id >= 27 && id < 36) {
+				if (!this.mergeItemStack(itemstack1, 0, 27, false)) {
 					return null;
 				}
-			} else if (par2 >= HOTBAR_START && par2 < HOTBAR_END + 1) {
-				if (!this.mergeItemStack(itemstack1, INV_START, INV_END + 1, false)) {
-					return null;
-				}
+			} else if (!this.mergeItemStack(itemstack1, 0, 36, false)) {
+				return null;
 			}
+
 			if (itemstack1.stackSize == 0) {
 				slot.putStack((ItemStack) null);
 			} else {
@@ -109,9 +115,9 @@ public class ContainerInventoryReader extends ContainerSync {
 				return null;
 			}
 
-			slot.onPickupFromSlot(par1EntityPlayer, itemstack1);
-		}
+			slot.onPickupFromSlot(player, itemstack1);
 
+		}
 		return itemstack;
 	}
 

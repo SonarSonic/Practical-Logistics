@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.lwjgl.opengl.GL11;
 
+import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.common.registry.LanguageRegistry;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.tileentity.TileEntity;
@@ -53,7 +55,7 @@ public class GuiChannelSelector extends GuiSelectionList<IdentifiedCoords> {
 
 	@Override
 	public void renderSelection(IdentifiedCoords selection, boolean isSelected, int pos) {
-		FontHelper.text(selection.name, 10, 31 + (12 * pos), isSelected ? Color.GREEN.getRGB() : Color.WHITE.getRGB());
+		FontHelper.text(selection.name.substring(0, Math.min(22, selection.name.length())), 10, 31 + (12 * pos), isSelected ? Color.GREEN.getRGB() : Color.WHITE.getRGB());
 		GL11.glPushMatrix();
 		GL11.glScaled(0.75, 0.75, 0.75);
 		FontHelper.text(selection.coords.getRender(), 174, 43 + (16 * pos), isSelected ? Color.GREEN.getRGB() : Color.WHITE.getRGB());

@@ -1,5 +1,6 @@
 package sonar.logistics.info.providers.inventory;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import logisticspipes.api.ILPPipe;
@@ -30,21 +31,36 @@ public class LPInventoryProvider extends InventoryProvider {
 	}
 
 	@Override
+	public StoredItemStack getStack(int slot, World world, int x, int y, int z, ForgeDirection dir) {
+		List<ItemStack> items = getStackList(world, x, y, z);
+		if (slot < items.size()) {
+			return new StoredItemStack(items.get(slot));
+		}
+		return null;
+	}
+
+	@Override
 	public boolean getItems(List<StoredItemStack> storedStacks, World world, int x, int y, int z, ForgeDirection dir) {
+		List<ItemStack> items = getStackList(world, x, y, z);
+		for (ItemStack stack : items) {
+			InfoHelper.addStackToList(storedStacks, stack);
+		}
+
+		return false;
+
+	}
+
+	public List<ItemStack> getStackList(World world, int x, int y, int z) {
 		TileEntity tile = world.getTileEntity(x, y, z);
 		if (tile instanceof ILPPipeTile) {
 			ILPPipe pipe = ((ILPPipeTile) tile).getLPPipe();
 			if (pipe instanceof IRequestAPI) {
 				IRequestAPI request = (IRequestAPI) pipe;
 				List<ItemStack> items = request.getProvidedItems();
-				for (ItemStack stack : items) {
-					InfoHelper.addStackToList(storedStacks, stack);
-				}
-				return true;
+				return items;
 			}
 		}
-		return false;
-
+		return new ArrayList();
 	}
 
 	public boolean isLoadable() {

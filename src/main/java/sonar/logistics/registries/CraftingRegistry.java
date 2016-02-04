@@ -19,9 +19,9 @@ public class CraftingRegistry extends Logistics {
 		addShapedOre(new ItemStack(BlockRegistry.dataModifier, 1), new Object[] { "DCD", "PDC", "DCD", 'P', ItemRegistry.stone_plate, 'D', "dustSapphire", 'C', BlockRegistry.dataCable });
 		addShapedOre(new ItemStack(BlockRegistry.infoCreator, 1), new Object[] { "DPD", "PCD", "DPD", 'P', ItemRegistry.stone_plate, 'D', "dustSapphire", 'C', BlockRegistry.dataCable });
 		addShapedOre(new ItemStack(BlockRegistry.redstoneSignaller_off, 1), new Object[] { "P  ", "CT ", "PPP", 'P', ItemRegistry.stone_plate, 'T', Blocks.redstone_torch, 'C', BlockRegistry.dataCable });
-		addShapedOre(new ItemStack(BlockRegistry.dataEmitter, 1), new Object[] { "DPD", "PCP", "DDD", 'P', Items.redstone, 'D', ItemRegistry.stone_plate, 'C', Items.ender_pearl });
-		addShapedOre(new ItemStack(BlockRegistry.dataReceiver, 1), new Object[] { "DPD", "PCP", "DDD", 'P', Items.redstone, 'D', ItemRegistry.stone_plate, 'C', BlockRegistry.infoReader });
-		addShapedOre(new ItemStack(BlockRegistry.infoReader, 1), new Object[] { "PIP", "RDS", "PIP", 'R', Items.redstone, 'I', Items.iron_ingot, 'P', ItemRegistry.stone_plate, 'D', BlockRegistry.dataCable, 'S', "dustSapphire" });
+		addShapedOre(new ItemStack(BlockRegistry.dataEmitter, 1), new Object[] { "DPD", "PCP", "DDD", 'P', "dustRedstone", 'D', ItemRegistry.stone_plate, 'C', Items.ender_pearl });
+		addShapedOre(new ItemStack(BlockRegistry.dataReceiver, 1), new Object[] { "DPD", "PCP", "DDD", 'P', "dustRedstone", 'D', ItemRegistry.stone_plate, 'C', BlockRegistry.infoReader });
+		addShapedOre(new ItemStack(BlockRegistry.infoReader, 1), new Object[] { "PIP", "RDS", "PIP", 'R', "dustRedstone", 'I', Items.iron_ingot, 'P', ItemRegistry.stone_plate, 'D', BlockRegistry.dataCable, 'S', "dustSapphire" });
 		addShapelessOre(new ItemStack(BlockRegistry.inventoryReader, 1), new Object[] { BlockRegistry.infoReader, Blocks.chest });
 		addShapelessOre(new ItemStack(BlockRegistry.fluidReader, 1), new Object[] { BlockRegistry.infoReader, Items.bucket });
 		addShapedOre(new ItemStack(BlockRegistry.node, 1), new Object[] { "   ", " C ", "PDP", 'P', ItemRegistry.stone_plate, 'D', "dustSapphire", 'C', BlockRegistry.dataCable });
@@ -30,6 +30,7 @@ public class CraftingRegistry extends Logistics {
 		addShapedOre(new ItemStack(BlockRegistry.itemRouter, 1), new Object[] { "SIS", "IMI", "SIS", 'S', "gemSapphire", 'I', BlockRegistry.inventoryReader, 'M', BlockRegistry.dataModifier });
 		addShapedOre(new ItemStack(BlockRegistry.dataMultiCable, 6), new Object[] { "CCC", "SSS", "CCC", 'C', BlockRegistry.dataCable, 'S', "dustSapphire"});
 		addShapedOre(new ItemStack(BlockRegistry.channelSelector, 1), new Object[] { "CDC", "PCD", "CDC", 'P', ItemRegistry.stone_plate, 'D', "dustSapphire", 'C', BlockRegistry.dataMultiCable });
+		addShapedOre(new ItemStack(BlockRegistry.clock, 1), new Object[] { "   ", "DCR", "PPP", 'P', ItemRegistry.stone_plate, 'D', "dustSapphire", 'C', Items.clock, 'R', "dustRedstone" });
 
 	}
 

@@ -107,6 +107,10 @@ public class BlockRegistry extends Logistics {
 		GameRegistry.registerBlock(redstoneSignaller_off, SonarBlockTip.class, "RedstoneSignaller_OFF");
 		GameRegistry.registerTileEntity(TileEntityRedstoneSignaller.class, "RedstoneSignaller");
 
+		clock = new BlockClock().setBlockName("Clock").setHardness(1.0F).setResistance(100.0F).setCreativeTab(Logistics.creativeTab).setBlockTextureName(modid + ":" + "data_cable");
+		GameRegistry.registerBlock(clock, SonarBlockTip.class, "Clock");
+		GameRegistry.registerTileEntity(TileEntityClock.class, "Clock");
+		
 		dataModifier = new BlockDataModifier().setBlockName("DataModifier").setHardness(1.0F).setCreativeTab(Logistics.creativeTab).setResistance(20.0F).setBlockTextureName(modid + ":" + "data_cable");
 		GameRegistry.registerBlock(dataModifier, SonarBlockTip.class, "DataModifier");
 		GameRegistry.registerTileEntity(TileEntityDataModifier.class, "DataModifier");
@@ -131,10 +135,6 @@ public class BlockRegistry extends Logistics {
 		GameRegistry.registerBlock(itemRouter, SonarBlockTip.class, "ItemRouter");
 		GameRegistry.registerTileEntity(TileEntityItemRouter.class, "ItemRouter");
 		
-
-		clock = new BlockClock().setBlockName("Clock").setHardness(1.0F).setResistance(100.0F).setCreativeTab(Logistics.creativeTab).setBlockTextureName(modid + ":" + "data_cable");
-		GameRegistry.registerBlock(clock, SonarBlockTip.class, "Clock");
-		GameRegistry.registerTileEntity(TileEntityClock.class, "Clock");
 	}
 
 }

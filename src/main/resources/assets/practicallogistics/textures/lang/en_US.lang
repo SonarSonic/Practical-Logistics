@@ -22,6 +22,7 @@ tile.FluidReader.name=Fluid Reader
 tile.ItemRouter.name=Item Router
 tile.MultiCable.name=Channelled Cable
 tile.ChannelSelector.name=Channel Selector
+tile.Clock.name=Clock
 
 //items
 item.EnergyScreenItem.name=Energy Screen

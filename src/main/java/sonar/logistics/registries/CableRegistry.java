@@ -14,8 +14,8 @@ import sonar.logistics.helpers.CableHelper;
 
 public class CableRegistry {
 
-	private static Map<Integer, List<BlockCoords>> cables = new THashMap<Integer, List<BlockCoords>>();
-	private static Map<Integer, List<BlockCoords>> connections = new THashMap<Integer, List<BlockCoords>>();
+	private static Map<Integer, ArrayList<BlockCoords>> cables = new THashMap<Integer, ArrayList<BlockCoords>>();
+	private static Map<Integer, ArrayList<BlockCoords>> connections = new THashMap<Integer, ArrayList<BlockCoords>>();
 
 	public static void removeAll() {
 		connections.clear();
@@ -31,29 +31,29 @@ public class CableRegistry {
 		return cables.size();
 	}
 
-	public static List<BlockCoords> getCables(int registryID) {
+	public static ArrayList<BlockCoords> getCables(int registryID) {
 		if (registryID == -1) {
 			return new ArrayList();
 		}
-		List<BlockCoords> coords = cables.get(registryID);
+		ArrayList<BlockCoords> coords = cables.get(registryID);
 		if (coords == null) {
 			return new ArrayList();
 		}
 		return coords;
 	}
 
-	public static List<BlockCoords> getConnections(int registryID) {
+	public static ArrayList<BlockCoords> getConnections(int registryID) {
 		if (registryID == -1) {
 			return new ArrayList();
 		}
-		List<BlockCoords> coords = connections.get(registryID);
+		ArrayList<BlockCoords> coords = connections.get(registryID);
 		if (coords == null) {
 			return new ArrayList();
 		}
 		return coords;
 	}
 
-	public static void addCables(int registryID, List<BlockCoords> cables) {
+	public static void addCables(int registryID, ArrayList<BlockCoords> cables) {
 		for (BlockCoords coords : cables) {
 			addCable(registryID, coords);
 		}
@@ -70,7 +70,7 @@ public class CableRegistry {
 					return;
 
 				}
-				List<BlockCoords> removeList = new ArrayList();
+				ArrayList<BlockCoords> removeList = new ArrayList();
 				for (BlockCoords coords : cables.get(registryID)) {
 					if (BlockCoords.equalCoords(coords, cable)) {
 						return;
@@ -82,7 +82,7 @@ public class CableRegistry {
 		}
 	}
 
-	public static void addConnections(int registryID, List<BlockCoords> connections) {
+	public static void addConnections(int registryID, ArrayList<BlockCoords> connections) {
 		for (BlockCoords coords : connections) {
 			addConnection(registryID, coords);
 		}
@@ -95,7 +95,7 @@ public class CableRegistry {
 				connections.get(registryID).add(connection);
 				return;
 			}
-			List<BlockCoords> removeList = new ArrayList();
+			ArrayList<BlockCoords> removeList = new ArrayList();
 			for (BlockCoords coords : connections.get(registryID)) {
 				if (BlockCoords.equalCoords(coords, connection)) {
 					return;
@@ -110,7 +110,7 @@ public class CableRegistry {
 			if (cables.get(registryID) == null) {
 				return;
 			}
-			List<BlockCoords> removeList = new ArrayList();
+			ArrayList<BlockCoords> removeList = new ArrayList();
 			for (BlockCoords coords : cables.get(registryID)) {
 				if (BlockCoords.equalCoords(coords, cable.getCoords())) {
 					removeList.add(coords);
@@ -120,13 +120,13 @@ public class CableRegistry {
 				cables.get(registryID).remove(remove);
 			}
 
-			List<BlockCoords> oldCables = new ArrayList();
+			ArrayList<BlockCoords> oldCables = new ArrayList();
 			if (cables.get(registryID) != null) {
 				oldCables.addAll(cables.get(registryID));
 				cables.get(registryID).clear();
 			}
 
-			List<BlockCoords> oldConnections = new ArrayList();
+			ArrayList<BlockCoords> oldConnections = new ArrayList();
 			if (connections.get(registryID) != null) {
 				oldConnections.addAll(connections.get(registryID));
 				connections.get(registryID).clear();
@@ -160,13 +160,13 @@ public class CableRegistry {
 	}
 
 	public static void connectNetworks(int newID, int secondaryID) {
-		List<BlockCoords> oldCables = new ArrayList();
+		ArrayList<BlockCoords> oldCables = new ArrayList();
 		if (cables.get(secondaryID) != null) {
 			oldCables.addAll(cables.get(secondaryID));
 			cables.get(secondaryID).clear();
 		}
 
-		List<BlockCoords> oldConnections = new ArrayList();
+		ArrayList<BlockCoords> oldConnections = new ArrayList();
 		if (connections.get(secondaryID) != null) {
 			oldConnections.addAll(connections.get(secondaryID));
 			connections.get(secondaryID).clear();
@@ -181,7 +181,7 @@ public class CableRegistry {
 			if (connections.get(registryID) == null) {
 				return;
 			}
-			List<BlockCoords> removeList = new ArrayList();
+			ArrayList<BlockCoords> removeList = new ArrayList();
 			for (BlockCoords coords : connections.get(registryID)) {
 				if (BlockCoords.equalCoords(coords, connection)) {
 					removeList.add(coords);

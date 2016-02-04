@@ -25,16 +25,31 @@ public class DSUInventoryProvider extends InventoryProvider {
 	}
 
 	@Override
+	public StoredItemStack getStack(int slot, World world, int x, int y, int z, ForgeDirection dir) {
+		if (!(slot > 0)) {
+			return getStoredItem(world, x, y, z);
+		}
+		return null;
+	}
+
+	@Override
 	public boolean getItems(List<StoredItemStack> storedStacks, World world, int x, int y, int z, ForgeDirection dir) {
+		StoredItemStack stack = getStoredItem(world, x, y, z);
+		if (stack != null)
+			storedStacks.add(stack);
+		return false;
+
+	}
+
+	public StoredItemStack getStoredItem(World world, int x, int y, int z) {
 		TileEntity tile = world.getTileEntity(x, y, z);
 		if (tile instanceof IDeepStorageUnit) {
 			IDeepStorageUnit inv = (IDeepStorageUnit) tile;
 			if (inv.getStoredItemType() != null) {
-				storedStacks.add(new StoredItemStack(inv.getStoredItemType()));
-				return true;
+				return new StoredItemStack(inv.getStoredItemType());
 			}
 		}
-		return false;
-
+		return null;
 	}
+
 }

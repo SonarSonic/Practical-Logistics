@@ -12,6 +12,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.SonarCore;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.network.sync.SyncInt;
+import sonar.core.network.sync.SyncLong;
 import sonar.core.network.utils.IByteBufTile;
 import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
@@ -27,87 +28,78 @@ public class TileEntityClock extends TileEntityConnection implements IByteBufTil
 	// server only
 	public long lastMillis;// when the movement was started
 	public long currentMillis;// the current millis
-	public long tickTime;// tick time in millis
+	public long offset = 0;
+	// public long tickTime;// tick time in millis
+
+	public SyncLong tickTime = new SyncLong(0);
 
 	public float rotation;// 0-360 indicating rotation of the clock hand.
 	public boolean isSet;
 
 	public boolean lastSignal;
 	public boolean wasStarted;
+	public boolean powering;
 
 	public long finalStopTime;
-
-	/** 0 = Clock, 1 = Stop watch, 3 = Countdown */
-	public SyncInt setting = new SyncInt(0);
 
 	public void updateEntity() {
 		super.updateEntity();
 		if (isClient()) {
 			return;
 		}
-		this.setting.setInt(1);
-		currentMillis = worldObj.getTotalWorldTime() * 100;
-		if (setting.getInt() == 0) {
-			tickTime = 100000000;
-			if (tickTime == 0) {
-				return;
-			}
+		currentMillis = (worldObj.getTotalWorldTime() * 50);
+		if (!(tickTime.getLong() < 10)) {
 			long start = currentMillis - lastMillis;
-			rotation = start * 360 / tickTime;
-			if (currentMillis > lastMillis + tickTime) {
+			rotation = (start) * 360 / (tickTime.getLong());
+			if (start > tickTime.getLong()) {
 				this.lastMillis = currentMillis;
+				powering = true;
+				this.worldObj.notifyBlockChange(xCoord, yCoord, zCoord, getBlockType());
 				// send signal
+			} else {
+				if (powering) {
+					powering = false;
+					this.worldObj.notifyBlockChange(xCoord, yCoord, zCoord, getBlockType());
+				}
 			}
-
-		}
-		if (setting.getInt() == 1) {
-			long start = currentMillis - lastMillis;
-			rotation = start * 360 / 1000;
+			markDirty();
 		}
 		SonarCore.sendPacketAround(this, 64, 0);
 	}
 
 	public void checkStopwatch() {
-		if (isServer()) {
-			ForgeDirection dir = ForgeDirection.getOrientation(this.getBlockMetadata()).getOpposite();
-			System.out.print(dir);
-			int power = worldObj.isBlockProvidingPowerTo(xCoord+dir.offsetX,yCoord+ dir.offsetY, zCoord+dir.offsetZ, ForgeDirection.getOrientation(this.getBlockMetadata()).ordinal());
-			System.out.print(power);
-			if ((power != 0) != lastSignal) {
-				if (!wasStarted) {
-					this.lastMillis = worldObj.getTotalWorldTime() * 100;
-					wasStarted = true;
-				} else {
-					finalStopTime = worldObj.getTotalWorldTime() * 100 - lastMillis;
-					wasStarted = false;
-				}
-			}
-		}
+		/*
+		 * if (isServer()) { ForgeDirection dir =
+		 * ForgeDirection.getOrientation(this.getBlockMetadata()).getOpposite();
+		 * boolean power = worldObj.isBlockIndirectlyGettingPowered(xCoord,
+		 * yCoord, zCoord); if (power != lastSignal) { lastSignal = power; if
+		 * (!wasStarted) { this.lastMillis = worldObj.getTotalWorldTime() * 100;
+		 * wasStarted = true; } else { finalStopTime =
+		 * (worldObj.getTotalWorldTime()) - lastMillis; wasStarted = false; } }
+		 * }
+		 */
 	}
 
 	@Override
 	public Info currentInfo() {
-		long start = currentMillis - lastMillis;
-		if (setting.getInt() == 0) {
-
-			long second = (start / 1000) % 60;
-			long minute = (start / (1000 * 60)) % 60;
-			long hour = (start / (1000 * 60 * 60)) % 24;
-
-			String timeString = new SimpleDateFormat("HH:mm:ss:SSS").format(start - (60 * 60 * 1000)).substring(0, 11);
-			return new ProgressInfo(start, tickTime, timeString);
-		}
-		if (setting.getInt() == 1) {
-			if (wasStarted) {
-				String timeString = new SimpleDateFormat("HH:mm:ss:SSS").format(start - (60 * 60 * 1000)).substring(0, 11);
-				return new StandardInfo(-1, "TIME", " Running ", timeString);
-			} else {
-				String timeString = new SimpleDateFormat("HH:mm:ss:SSS").format(finalStopTime - (60 * 60 * 1000)).substring(0, 11);
-				return new StandardInfo(-1, "TIME", " Completed ", timeString);
-			}
+		if (!(tickTime.getLong() < 10)) {
+			long start = currentMillis - lastMillis;
+			String timeString = new SimpleDateFormat("HH:mm:ss:SSS").format((start) - (60 * 60 * 1000)).substring(0, 11);
+			return new ProgressInfo(start, tickTime.getLong(), timeString);
+		} else {
+			return BlockCoordsInfo.createInfo("CLOCK", new BlockCoords(this));
 		}
 
-		return BlockCoordsInfo.createInfo("CLOCK", new BlockCoords(this));
+		/*
+		 * if (setting.getInt() == 1) { if (wasStarted) { String timeString =
+		 * new SimpleDateFormat("HH:mm:ss:SSS").format(start * 100 - (60 * 60 *
+		 * 1000)).substring(0, 11); return new StandardInfo(-1, "TIME",
+		 * " Running ", timeString); } else { String timeString = new
+		 * SimpleDateFormat("HH:mm:ss:SSS").format(finalStopTime * 100 - (60 *
+		 * 60 * 1000)).substring(0, 11); return new StandardInfo(-1, "TIME",
+		 * " Completed ", timeString); } } return
+		 * BlockCoordsInfo.createInfo("CLOCK", new BlockCoords(this));
+		 */
 	}
 
 	@Override
@@ -132,20 +124,24 @@ public class TileEntityClock extends TileEntityConnection implements IByteBufTil
 
 	public void readData(NBTTagCompound nbt, SyncType type) {
 		super.readData(nbt, type);
+		tickTime.readFromNBT(nbt, type);
 		if (type == SyncType.SAVE) {
 			nbt.setBoolean("isSet", isSet);
-			nbt.setLong("tickTime", tickTime);
-			setting.readFromNBT(nbt, type);
+			nbt.setBoolean("lastSignal", lastSignal);
+			nbt.setBoolean("wasStarted", wasStarted);
+			nbt.setLong("finalStopTime", finalStopTime);
 		}
 
 	}
 
 	public void writeData(NBTTagCompound nbt, SyncType type) {
 		super.writeData(nbt, type);
+		tickTime.writeToNBT(nbt, type);
 		if (type == SyncType.SAVE) {
 			this.isSet = nbt.getBoolean("isSet");
-			this.tickTime = nbt.getLong("tickTime");
-			setting.writeToNBT(nbt, type);
+			this.lastSignal = nbt.getBoolean("lastSignal");
+			this.wasStarted = nbt.getBoolean("wasStarted");
+			this.finalStopTime = nbt.getLong("finalStopTime");
 		}
 	}
 
@@ -154,6 +150,9 @@ public class TileEntityClock extends TileEntityConnection implements IByteBufTil
 		if (id == 0) {
 			buf.writeFloat(rotation);
 		}
+		if (id == 1) {
+			tickTime.writeToBuf(buf);
+		}
 	}
 
 	@Override
@@ -161,7 +160,38 @@ public class TileEntityClock extends TileEntityConnection implements IByteBufTil
 		if (id == 0) {
 			rotation = buf.readFloat();
 		}
+		if (id == 1) {
+			tickTime.readFromBuf(buf);
+		}
+		if (id == 2) {
+			tickTime.increaseBy(100);
+		}
+		if (id == 3) {
+			tickTime.increaseBy(-100);
+		}
+		if (id == 4) {
+			tickTime.increaseBy(1000);
+		}
+		if (id == 5) {
+			tickTime.increaseBy(-1000);
+		}
+		if (id == 6) {
+			tickTime.increaseBy(60000);
+		}
+		if (id == 7) {
+			tickTime.increaseBy(-60000);
+		}
+		if (id == 8) {
+			tickTime.increaseBy(60000 * 60);
+		}
+		if (id == 9) {
+			tickTime.increaseBy(-(60000 * 60));
 
+		}
+		if (tickTime.getLong() < 0) {
+			tickTime.setLong(0);
+		} else if (tickTime.getLong() > (1000 * 60 * 60 * 24)) {
+			tickTime.setLong((1000 * 60 * 60 * 24)-1);
+		}
 	}
-
 }

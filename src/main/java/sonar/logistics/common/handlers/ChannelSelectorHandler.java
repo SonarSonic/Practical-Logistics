@@ -3,6 +3,7 @@ package sonar.logistics.common.handlers;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
@@ -17,11 +18,13 @@ import sonar.core.network.PacketTileSync;
 import sonar.core.network.sync.SyncString;
 import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
+import sonar.core.utils.helpers.SonarHelper;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.IdentifiedCoords;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.StandardInfo;
 import sonar.logistics.api.connecting.IInfoEmitter;
+import sonar.logistics.common.tileentity.TileEntityBlockNode;
 import sonar.logistics.helpers.CableHelper;
 import sonar.logistics.network.SyncIdentifiedCoords;
 import sonar.logistics.registries.EmitterRegistry;
@@ -41,18 +44,17 @@ public class ChannelSelectorHandler extends TileHandler {
 		if (te.getWorldObj().isRemote) {
 			return;
 		}
-		//System.out.print(channels.size());
 	}
 
 	public void sendAvailableData(TileEntity te, EntityPlayer player) {
 		if (player != null && player instanceof EntityPlayerMP) {
 			List<BlockCoords> coords = CableHelper.getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite());
-		//	System.out.print(coords.size());
 			channels = new ArrayList();
 			for (BlockCoords coord : coords) {
 				TileEntity target = coord.getTileEntity();
 				if (target != null) {
 					String name = StatCollector.translateToLocal(target.getBlockType().getLocalizedName());
+
 					channels.add(new IdentifiedCoords(name, coord));
 				}
 			}
@@ -70,7 +72,7 @@ public class ChannelSelectorHandler extends TileHandler {
 		}
 		List<BlockCoords> coords = CableHelper.getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite());
 		for (BlockCoords coord : coords) {
-			if(BlockCoords.equalCoords(coord, currentCoords.coords)){
+			if (BlockCoords.equalCoords(coord, currentCoords.coords)) {
 				return currentCoords;
 			}
 		}

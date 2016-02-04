@@ -64,4 +64,8 @@ public class EUEnergyProvider extends TileProvider {
 	public String getSubCategory(byte id) {
 		return subcategories[id];
 	}
+	
+	public boolean isLoadable() {
+		return Loader.isModLoaded("IC2");
+	}
 }

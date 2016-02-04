@@ -11,6 +11,7 @@ import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.logistics.Logistics;
 import sonar.logistics.client.gui.GuiChannelSelector;
+import sonar.logistics.client.gui.GuiClock;
 import sonar.logistics.client.gui.GuiDataModifier;
 import sonar.logistics.client.gui.GuiDataReceiver;
 import sonar.logistics.client.gui.GuiEntityNode;
@@ -38,6 +39,7 @@ import sonar.logistics.common.handlers.InfoReaderHandler;
 import sonar.logistics.common.handlers.InventoryReaderHandler;
 import sonar.logistics.common.handlers.ItemRouterHandler;
 import sonar.logistics.common.tileentity.TileEntityChannelSelector;
+import sonar.logistics.common.tileentity.TileEntityClock;
 import sonar.logistics.common.tileentity.TileEntityDataEmitter;
 import sonar.logistics.common.tileentity.TileEntityDataModifier;
 import sonar.logistics.common.tileentity.TileEntityDataReceiver;
@@ -60,6 +62,7 @@ import sonar.logistics.network.packets.PacketFluidReader;
 import sonar.logistics.network.packets.PacketInfoBlock;
 import sonar.logistics.network.packets.PacketInventoryReader;
 import sonar.logistics.network.packets.PacketProviders;
+import sonar.logistics.network.packets.PacketInventoryReaderGui;
 import sonar.logistics.network.packets.PacketRouterGui;
 import cpw.mods.fml.common.network.IGuiHandler;
 import cpw.mods.fml.relauncher.Side;
@@ -76,6 +79,7 @@ public class LogisticsCommon implements IGuiHandler {
 		Logistics.network.registerMessage(PacketInventoryReader.Handler.class, PacketInventoryReader.class, 4, Side.SERVER);
 		Logistics.network.registerMessage(PacketFluidReader.Handler.class, PacketFluidReader.class, 5, Side.SERVER);
 		Logistics.network.registerMessage(PacketRouterGui.Handler.class, PacketRouterGui.class, 6, Side.SERVER);
+		Logistics.network.registerMessage(PacketInventoryReaderGui.Handler.class, PacketInventoryReaderGui.class, 7, Side.SERVER);
 	}
 
 	@Override
@@ -148,6 +152,10 @@ public class LogisticsCommon implements IGuiHandler {
 					TileHandler handler = FMPHelper.getHandler(tile);
 					if (handler != null && handler instanceof ChannelSelectorHandler)
 						return new ContainerChannelSelector(tile, (ChannelSelectorHandler) handler, player.inventory);
+				}
+			case LogisticsGui.clock:
+				if (entity instanceof TileEntityClock) {
+					return new ContainerEmptySync((TileEntityClock) entity);
 				}
 			}
 
@@ -224,6 +232,10 @@ public class LogisticsCommon implements IGuiHandler {
 					TileHandler handler = FMPHelper.getHandler(tile);
 					if (handler != null && handler instanceof ChannelSelectorHandler)
 						return new GuiChannelSelector(tile, (ChannelSelectorHandler) handler, player.inventory);
+				}
+			case LogisticsGui.clock:
+				if (entity instanceof TileEntityClock) {
+					return new GuiClock((TileEntityClock) entity);
 				}
 			}
 

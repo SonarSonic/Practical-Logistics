@@ -33,20 +33,45 @@ public class AE2InventoryProvider extends InventoryProvider {
 	}
 
 	@Override
+	public StoredItemStack getStack(int slot, World world, int x, int y, int z, ForgeDirection dir) {
+		IItemList<IAEItemStack> items = getItemList(world, x, y, z, dir);
+		if (items == null) {
+			return null;
+		}
+		int current = 0;
+		for (IAEItemStack item : items) {
+			if (current == slot) {
+				return new StoredItemStack(item.getItemStack(), item.getStackSize());
+			}
+			current++;
+		}
+
+		return null;
+	}
+
+	@Override
 	public boolean getItems(List<StoredItemStack> storedStacks, World world, int x, int y, int z, ForgeDirection dir) {
+		IItemList<IAEItemStack> items = getItemList(world, x, y, z, dir);
+		if (items == null) {
+			return false;
+		}
+		for (IAEItemStack item : items) {
+			storedStacks.add(new StoredItemStack(item.getItemStack(), item.getStackSize()));
+		}
+		return false;
+	}
+
+	public IItemList<IAEItemStack> getItemList(World world, int x, int y, int z, ForgeDirection dir) {
 		TileEntity tile = world.getTileEntity(x, y, z);
 		if (tile instanceof ITileStorageMonitorable && tile instanceof IActionHost) {
 			IStorageMonitorable monitor = ((ITileStorageMonitorable) tile).getMonitorable(dir, new MachineSource(((IActionHost) tile)));
 			if (monitor != null) {
 				IMEMonitor<IAEItemStack> stacks = monitor.getItemInventory();
 				IItemList<IAEItemStack> items = stacks.getAvailableItems(AEApi.instance().storage().createItemList());
-				for (IAEItemStack item : items) {
-					storedStacks.add(new StoredItemStack(item.getItemStack(), item.getStackSize()));
-				}
-				return true;
+				return items;
 			}
 		}
-		return false;
+		return null;
 	}
 
 	public boolean isLoadable() {

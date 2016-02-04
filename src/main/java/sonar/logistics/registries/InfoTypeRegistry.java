@@ -8,6 +8,7 @@ import sonar.logistics.info.types.BlockCoordsInfo;
 import sonar.logistics.info.types.CategoryInfo;
 import sonar.logistics.info.types.FluidInfo;
 import sonar.logistics.info.types.FluidStackInfo;
+import sonar.logistics.info.types.InventoryInfo;
 import sonar.logistics.info.types.ManaInfo;
 import sonar.logistics.info.types.ProgressInfo;
 import sonar.logistics.info.types.StoredStackInfo;
@@ -27,6 +28,7 @@ public class InfoTypeRegistry extends NBTRegistryHelper.Buf<Info> {
 		registerObject(new ThaumcraftAspectInfo());
 		registerObject(new ManaInfo());
 		registerObject(new FluidStackInfo());
+		registerObject(new InventoryInfo());
 
 	}
 

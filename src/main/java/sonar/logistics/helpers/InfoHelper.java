@@ -14,6 +14,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.inventory.StoredItemStack;
+import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.SonarHelper;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.Info;
@@ -129,22 +130,90 @@ public class InfoHelper {
 		return blockInfo;
 	}
 
-	public static List<StoredItemStack> getTileInventory(List<TileEntityBlockNode> nodeList) {
-		List<StoredItemStack> storedStacks = new ArrayList();
-		for (TileEntityBlockNode node : nodeList) {
-			ForgeDirection dir = ForgeDirection.getOrientation(SonarHelper.invertMetadata(node.getBlockMetadata())).getOpposite();
-			TileEntity tile = node.getWorldObj().getTileEntity(node.xCoord + dir.offsetX, node.yCoord + dir.offsetY, node.zCoord + dir.offsetZ);
-			if (tile == null) {
-				return storedStacks;
-			}
-			boolean specialProvider = false;
-			for (InventoryProvider provider : Logistics.inventoryProviders.getObjects()) {
-				if (provider.canProvideItems(node.getWorldObj(), node.xCoord + dir.offsetX, node.yCoord + dir.offsetY, node.zCoord + dir.offsetZ, dir)) {
-					specialProvider = provider.getItems(storedStacks, node.getWorldObj(), node.xCoord + dir.offsetX, node.yCoord + dir.offsetY, node.zCoord + dir.offsetZ, dir);
+	public static StoredItemStack getStack(List<BlockCoords> connections, int slot) {
+		if (connections == null) {
+			return null;
+		}
+		for (BlockCoords connect : connections) {
+			Object tile = connect.getTileEntity();
+			if (tile != null) {
+				if (tile instanceof TileEntityBlockNode) {
+					return getTileStack((TileEntityBlockNode) tile, slot);
+				}
+				if (tile instanceof TileEntityEntityNode) {
+					return getEntityStack((TileEntityEntityNode) tile, slot);
 				}
 			}
-			if (!specialProvider && tile instanceof IInventory) {
-				addInventoryToList(storedStacks, (IInventory) tile);
+		}
+
+		return null;
+	}
+
+	public static StoredItemStack getTileStack(TileEntityBlockNode node, int slot) {
+		ForgeDirection dir = ForgeDirection.getOrientation(SonarHelper.invertMetadata(node.getBlockMetadata())).getOpposite();
+		TileEntity tile = node.getWorldObj().getTileEntity(node.xCoord + dir.offsetX, node.yCoord + dir.offsetY, node.zCoord + dir.offsetZ);
+		if (tile == null) {
+			return null;
+		}
+		boolean specialProvider = false;
+		for (InventoryProvider provider : Logistics.inventoryProviders.getObjects()) {
+			if (provider.canProvideItems(node.getWorldObj(), node.xCoord + dir.offsetX, node.yCoord + dir.offsetY, node.zCoord + dir.offsetZ, dir)) {
+				return provider.getStack(slot, node.getWorldObj(), node.xCoord + dir.offsetX, node.yCoord + dir.offsetY, node.zCoord + dir.offsetZ, dir);
+			}
+		}
+		if (!specialProvider && tile instanceof IInventory) {
+			IInventory inv = (IInventory) tile;
+			if (slot < inv.getSizeInventory()) {
+				ItemStack stack = inv.getStackInSlot(slot);
+				if (stack == null) {
+					return null;
+				} else {
+					return new StoredItemStack(stack);
+				}
+			}
+		}
+
+		return null;
+	}
+
+	public static StoredItemStack getEntityStack(TileEntityEntityNode node, int slot) {
+		List<StoredItemStack> storedStacks = new ArrayList();
+		Entity entity = node.getNearestEntity();
+		if (entity == null) {
+			return null;
+		}
+		if (entity instanceof EntityPlayer) {
+			EntityPlayer player = (EntityPlayer) entity;
+			IInventory inv = (IInventory) player.inventory;
+			if (slot < inv.getSizeInventory()) {
+				ItemStack stack = inv.getStackInSlot(slot);
+				if (stack == null) {
+					return null;
+				} else {
+					return new StoredItemStack(stack);
+				}
+			}
+
+		}
+
+		return null;
+	}
+
+	public static List<StoredItemStack> getInventories(List<BlockCoords> connections) {
+		List<StoredItemStack> storedStacks = new ArrayList();
+		if (connections == null) {
+			return storedStacks;
+		}
+		for (BlockCoords connect : connections) {
+			Object tile = connect.getTileEntity();
+			if (tile != null) {
+				if (tile instanceof TileEntityBlockNode) {
+					getTileInventory(storedStacks, (TileEntityBlockNode) tile);
+
+				}
+				if (tile instanceof TileEntityEntityNode) {
+					getEntityInventory(storedStacks, (TileEntityEntityNode) tile);
+				}
 			}
 		}
 		Collections.sort(storedStacks, new Comparator<StoredItemStack>() {
@@ -159,28 +228,33 @@ public class InfoHelper {
 		return storedStacks;
 	}
 
-	public static List<StoredItemStack> getEntityInventory(TileEntityEntityNode tileNode) {
-		List<StoredItemStack> storedStacks = new ArrayList();
+	public static List<StoredItemStack> getTileInventory(List<StoredItemStack> storedStacks, TileEntityBlockNode node) {
+		ForgeDirection dir = ForgeDirection.getOrientation(SonarHelper.invertMetadata(node.getBlockMetadata())).getOpposite();
+		TileEntity tile = node.getWorldObj().getTileEntity(node.xCoord + dir.offsetX, node.yCoord + dir.offsetY, node.zCoord + dir.offsetZ);
+		if (tile == null) {
+			return storedStacks;
+		}
+		boolean specialProvider = false;
+		for (InventoryProvider provider : Logistics.inventoryProviders.getObjects()) {
+			if (provider.canProvideItems(node.getWorldObj(), node.xCoord + dir.offsetX, node.yCoord + dir.offsetY, node.zCoord + dir.offsetZ, dir)) {
+				specialProvider = provider.getItems(storedStacks, node.getWorldObj(), node.xCoord + dir.offsetX, node.yCoord + dir.offsetY, node.zCoord + dir.offsetZ, dir);
+			}
+		}
+		if (!specialProvider && tile instanceof IInventory) {
+			addInventoryToList(storedStacks, (IInventory) tile);
+		}
+		return storedStacks;
+	}
+
+	public static List<StoredItemStack> getEntityInventory(List<StoredItemStack> storedStacks, TileEntityEntityNode tileNode) {
 		Entity entity = tileNode.getNearestEntity();
 		if (entity == null) {
-			return null;
+			return storedStacks;
 		}
 		if (entity instanceof EntityPlayer) {
 			EntityPlayer player = (EntityPlayer) entity;
 			addInventoryToList(storedStacks, player.inventory);
-		} else if (entity instanceof EntityPlayer) {
-			EntityPlayer player = (EntityPlayer) entity;
-			addInventoryToList(storedStacks, player.inventory);
 		}
-		Collections.sort(storedStacks, new Comparator<StoredItemStack>() {
-			public int compare(StoredItemStack str1, StoredItemStack str2) {
-				if (str1.stored < str2.stored)
-					return 1;
-				if (str1.stored == str2.stored)
-					return 0;
-				return -1;
-			}
-		});
 		return storedStacks;
 
 	}
@@ -241,16 +315,6 @@ public class InfoHelper {
 		return primary;
 	}
 
-	/*
-	 * public static Info readInfo(ByteBuf buf) { if (buf.readBoolean()) {
-	 * String type = ByteBufUtils.readUTF8String(buf); if
-	 * (Logistics.infoTypes.getRegisteredObject(type) == null) {
-	 * Logistics.logger.warn("Unregistered Info Type: " + type); return null; }
-	 * Info info = Logistics.infoTypes.getRegisteredObject(type).instance();
-	 * info.readFromBuf(buf); return info;
-	 * 
-	 * } else { return null; } }
-	 */
 	public static void writeInfo(ByteBuf buf, Info info) {
 		if (info != null) {
 			buf.writeBoolean(true);
@@ -260,48 +324,4 @@ public class InfoHelper {
 			buf.writeBoolean(false);
 		}
 	}
-	/*
-	 * public static Info readInfo(NBTTagCompound tag) { if (tag.hasKey("type"))
-	 * { String type = tag.getString("type"); if (type.equals("NULLED")) {
-	 * return null; } if (Logistics.infoTypes.getRegisteredObject(type) == null)
-	 * { Logistics.logger.warn("Unregistered Info Type: " + type); return null;
-	 * } Info info = Logistics.infoTypes.getRegisteredObject(type).instance();
-	 * info.readFromNBT(tag);
-	 * 
-	 * return info; } else { return null; } } public static void
-	 * writeInfo(NBTTagCompound tag, Info info) { if (info != null) {
-	 * tag.setString("type", info.getName()); info.writeToNBT(tag); } else {
-	 * tag.setString("type", "NULLED"); } }
-	 * 
-	 * public static ItemFilter readFilter(ByteBuf buf) { if (buf.readBoolean())
-	 * { String type = ByteBufUtils.readUTF8String(buf); if
-	 * (Logistics.infoTypes.getRegisteredObject(type) == null) {
-	 * Logistics.logger.warn("Unregistered Info Type: " + type); return null; }
-	 * ItemFilter info =
-	 * Logistics.itemFilters.getRegisteredObject(type).instance();
-	 * info.readFromNBT(ByteBufUtils.readTag(buf)); return info;
-	 * 
-	 * } else { return null; } }
-	 * 
-	 * public static void writeFilter(ByteBuf buf, ItemFilter info) { if (info
-	 * != null) { buf.writeBoolean(true); ByteBufUtils.writeUTF8String(buf,
-	 * info.getName()); NBTTagCompound tag = new NBTTagCompound();
-	 * info.writeToNBT(tag); ByteBufUtils.writeTag(buf, tag); } else {
-	 * buf.writeBoolean(false); } }
-	 * 
-	 * public static ItemFilter readFilter(NBTTagCompound tag) { if
-	 * (tag.hasKey("type")) { String type = tag.getString("type"); if
-	 * (type.equals("NULLED")) { return null; } if
-	 * (Logistics.itemFilters.getRegisteredObject(type) == null) {
-	 * Logistics.logger.warn("Unregistered Item Filter: " + type); return null;
-	 * } ItemFilter filter =
-	 * Logistics.itemFilters.getRegisteredObject(type).instance();
-	 * filter.readFromNBT(tag);
-	 * 
-	 * return filter; } else { return null; } }
-	 * 
-	 * public static void writeFilter(NBTTagCompound tag, ItemFilter info) { if
-	 * (info != null) { tag.setString("type", info.getName());
-	 * info.writeToNBT(tag); } else { tag.setString("type", "NULLED"); } }
-	 */
 }

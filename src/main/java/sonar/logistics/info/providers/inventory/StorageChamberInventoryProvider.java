@@ -27,6 +27,27 @@ public class StorageChamberInventoryProvider extends InventoryProvider {
 	}
 
 	@Override
+	public StoredItemStack getStack(int slot, World world, int x, int y, int z, ForgeDirection dir) {
+		TileEntity tile = world.getTileEntity(x, y, z);
+		if(!(slot<14)){
+			return null;
+		}
+		if (tile instanceof TileEntityStorageChamber) {
+			TileEntityStorageChamber chamber = (TileEntityStorageChamber) tile;
+			if (chamber != null) {
+				if (chamber.getSavedStack() != null) {
+					ItemStack stack = chamber.getFullStack(slot);
+					if (stack != null) {
+						return new StoredItemStack(stack);
+
+					}
+				}
+			}
+		}
+		return null;
+	}
+
+	@Override
 	public boolean getItems(List<StoredItemStack> storedStacks, World world, int x, int y, int z, ForgeDirection dir) {
 		TileEntity tile = world.getTileEntity(x, y, z);
 		if (tile instanceof TileEntityStorageChamber) {
@@ -50,5 +71,5 @@ public class StorageChamberInventoryProvider extends InventoryProvider {
 	public boolean isLoadable() {
 		return Loader.isModLoaded("Calculator");
 	}
-	
+
 }

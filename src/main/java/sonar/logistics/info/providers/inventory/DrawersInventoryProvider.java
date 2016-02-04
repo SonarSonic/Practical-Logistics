@@ -31,6 +31,25 @@ public class DrawersInventoryProvider extends InventoryProvider {
 	}
 
 	@Override
+	public StoredItemStack getStack(int slot, World world, int x, int y, int z, ForgeDirection dir) {
+		TileEntity tile = world.getTileEntity(x, y, z);
+		if (tile instanceof IDrawerGroup) {
+			IDrawerGroup drawers = (IDrawerGroup) tile;
+			if (slot < drawers.getDrawerCount()) {
+				IDrawer draw = drawers.getDrawer(slot);
+				ItemStack item = draw.getStoredItemCopy();
+				if (item != null) {
+					return new StoredItemStack(item);
+				} else {
+					return null;
+				}
+			}
+		}
+
+		return null;
+	}
+
+	@Override
 	public boolean getItems(List<StoredItemStack> storedStacks, World world, int x, int y, int z, ForgeDirection dir) {
 		TileEntity tile = world.getTileEntity(x, y, z);
 		if (tile instanceof IDrawerGroup) {

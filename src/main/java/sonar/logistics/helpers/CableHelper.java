@@ -69,7 +69,7 @@ public class CableHelper {
 						}
 					}
 				} else {
-					// System.out.print(dir);
+					
 				}
 			}
 			int cableID = -1;
@@ -109,7 +109,7 @@ public class CableHelper {
 	}
 
 	public static List<BlockCoords> getConnections(TileEntity tile, ForgeDirection dir) {
-		List<BlockCoords> connections = new ArrayList();
+		ArrayList<BlockCoords> connections = new ArrayList();
 		int registryID = -1;
 		boolean unlimited = false;
 		Object adjacent = FMPHelper.getAdjacentTile(tile, dir);
@@ -123,35 +123,20 @@ public class CableHelper {
 				unlimited = cable.unlimitedChannels();
 			} else if (adjacent instanceof IChannelProvider) {
 				addChannelConnections(connections, (IChannelProvider) adjacent, tile, true);
-				/*
-				 * TileEntityDataEmitter emitter =
-				 * getConnectedEmitter((IDataReceiver) adjacent, tile); if
-				 * (emitter != null) { List<BlockCoords> emitterConnections =
-				 * getConnections(emitter,
-				 * ForgeDirection.getOrientation(emitter.
-				 * getBlockMetadata()).getOpposite()); List<BlockCoords> toAdd =
-				 * new ArrayList(); for (BlockCoords coords :
-				 * emitterConnections) { boolean hasCoords = false; for
-				 * (BlockCoords currentCoords : connections) { if
-				 * (BlockCoords.equalCoords(currentCoords, coords)) { hasCoords
-				 * = true; } } if (!hasCoords) { toAdd.add(coords); } } if
-				 * (unlimited) { connections.addAll(toAdd); } else if
-				 * (!toAdd.isEmpty() && toAdd.get(0) != null) {
-				 * connections.add(toAdd.get(0)); } }
-				 */
 			} else if (adjacent instanceof IInfoEmitter) {
 				IInfoEmitter connect = ((IInfoEmitter) adjacent);
 				connections.add(connect.getCoords());
 			}
 		}
-		List<BlockCoords> currentConnections = CableRegistry.getConnections(registryID);
-		for (BlockCoords coord : currentConnections) {
+		for (BlockCoords coord : (ArrayList<BlockCoords>) CableRegistry.getConnections(registryID).clone()) {
 			TileEntity target = coord.getTileEntity();
 			if (target != null) {
 				if (target instanceof TileEntityDataEmitter) {
 
 				} else if (target instanceof IChannelProvider) {
+					List<BlockCoords> channels = new ArrayList();
 					addChannelConnections(connections, (IChannelProvider) target, tile, unlimited);
+					connections.addAll(connections);
 				} else if (target instanceof ILogicTile) {
 					connections.add(coord);
 				}
@@ -163,11 +148,11 @@ public class CableHelper {
 		return connections;
 	}
 
-	public static void addChannelConnections(List<BlockCoords> connections, IChannelProvider receiver, TileEntity tile, boolean unlimited) {
+	public static void addChannelConnections(ArrayList<BlockCoords> connections, IChannelProvider receiver, TileEntity tile, boolean unlimited) {
 		TileEntity emitter = null;
-		if (receiver.getChannel() != null) {
+		if (receiver.getChannel() != null && receiver.getChannel().coords != null) {
 			TileEntity target = receiver.getChannel().coords.getTileEntity();
-			if (target instanceof ILogicTile) {
+			if (target != null && target instanceof ILogicTile) {
 				ILogicTile dataemitter = (ILogicTile) target;
 				if (tile.xCoord != dataemitter.getCoords().getX() || tile.yCoord != dataemitter.getCoords().getY() || tile.zCoord != dataemitter.getCoords().getZ()) {
 					emitter = target;
@@ -182,7 +167,7 @@ public class CableHelper {
 				List<BlockCoords> toAdd = new ArrayList();
 				for (BlockCoords coords : emitterConnections) {
 					boolean hasCoords = false;
-					for (BlockCoords currentCoords : connections) {
+					for (BlockCoords currentCoords : (ArrayList<BlockCoords>) connections.clone()) {
 						if (BlockCoords.equalCoords(currentCoords, coords)) {
 							hasCoords = true;
 						}

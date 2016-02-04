@@ -17,7 +17,7 @@ buildscript {
 
 apply plugin: 'forge'
 
-version = "0.0.9"
+version = "0.1.0"
 group= "sonar.logistics.modid"
 archivesBaseName = "Practical-Logistics-1.7.10"
 
@@ -39,7 +39,7 @@ repositories {
 }
 
 dependencies {
-compile files('lib/SonarCore-1.7.10-1.0.4-dev.jar')
+compile files('lib/SonarCore-1.7.10-1.0.5-dev.jar')
 compile files('lib/Waila-1.5.10_1.7.10.jar')
 compile files('lib/NotEnoughItems-1.7.10-1.0.5.120-dev.jar')
 compile files('lib/ForgeMultipart-1.7.10-1.2.0.345-dev.jar')

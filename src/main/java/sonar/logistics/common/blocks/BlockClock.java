@@ -3,14 +3,17 @@ package sonar.logistics.common.blocks;
 import java.util.List;
 
 import net.minecraft.block.Block;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.common.block.SonarMaterials;
 import sonar.logistics.Logistics;
 import sonar.logistics.common.tileentity.TileEntityClock;
+import sonar.logistics.common.tileentity.TileEntityDataEmitter;
 import sonar.logistics.common.tileentity.TileEntityDataReceiver;
 import sonar.logistics.network.LogisticsGui;
 
@@ -33,6 +36,10 @@ public class BlockClock extends BaseNode {
 	@Override
 	public void openGui(World world, int x, int y, int z, EntityPlayer player) {
 		TileEntity target = world.getTileEntity(x, y, z);
+		if (target != null && target instanceof TileEntityClock) {
+			TileEntityClock clock = (TileEntityClock) target;
+			clock.sendSyncPacket(player);
+		}
 		player.openGui(Logistics.instance, LogisticsGui.clock, world, x, y, z);
 	}
 
@@ -47,12 +54,39 @@ public class BlockClock extends BaseNode {
 	public void onNeighborBlockChange(World world, int x, int y, int z, Block block) {
 		if (!world.isRemote) {
 			TileEntity target = world.getTileEntity(x, y, z);
-			if(target instanceof TileEntityClock){
+			if (target instanceof TileEntityClock) {
 				TileEntityClock clock = (TileEntityClock) target;
 				clock.checkStopwatch();
 			}
 		}
 
+	}
+
+	public boolean canProvidePower() {
+		return true;
+	}
+
+	public int isProvidingWeakPower(IBlockAccess world, int x, int y, int z, int side) {
+		if (world.getBlockMetadata(x, y, z) == side) {
+			TileEntity target = world.getTileEntity(x, y, z);
+			if (target instanceof TileEntityClock) {
+				TileEntityClock clock = (TileEntityClock) target;
+				return clock.powering ? 15 : 0;
+			}
+		}
+		return 0;
+	}
+
+	public int isProvidingStrongPower(IBlockAccess world, int x, int y, int z, int side) {
+		if (world.getBlockMetadata(x, y, z) == side) {
+			TileEntity target = world.getTileEntity(x, y, z);
+			if (target instanceof TileEntityClock) {
+				TileEntityClock clock = (TileEntityClock) target;
+				return clock.powering ? 15 : 0;
+			}
+			return 15;
+		}
+		return 0;
 	}
 
 }

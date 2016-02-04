@@ -5,6 +5,7 @@ import ic2.api.reactor.IReactorChamber;
 
 import java.util.List;
 
+import cpw.mods.fml.common.Loader;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -47,9 +48,7 @@ public class IC2ReactorProvider extends TileProvider {
 			infoList.add(new StandardInfo(id, 0, 2, reactor.getMaxHeat()));
 			infoList.add(new StandardInfo(id, 0, 3, (int) reactor.getReactorEUEnergyOutput()));
 			infoList.add(new StandardInfo(id, 0, 4, reactor.isFluidCooled()));
-
 		}
-
 	}
 
 	@Override
@@ -60,5 +59,9 @@ public class IC2ReactorProvider extends TileProvider {
 	@Override
 	public String getSubCategory(byte id) {
 		return subcategories[id];
+	}
+
+	public boolean isLoadable() {
+		return Loader.isModLoaded("IC2");
 	}
 }

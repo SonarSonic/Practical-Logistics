@@ -28,7 +28,7 @@ public abstract class InventoryProvider implements IRegistryObject {
 	 */
 	public abstract boolean canProvideItems(World world, int x, int y, int z, ForgeDirection dir);
 
-	
+	public abstract StoredItemStack getStack(int slot, World world, int x, int y, int z, ForgeDirection dir);
 	/**
 	 * only called if canProvideInfo is true
 	 * 

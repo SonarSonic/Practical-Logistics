@@ -1,5 +1,7 @@
 package sonar.logistics.common.handlers;
 
+import io.netty.buffer.ByteBuf;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,6 +13,8 @@ import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.handlers.InventoryTileHandler;
 import sonar.core.inventory.StoredItemStack;
+import sonar.core.network.sync.SyncInt;
+import sonar.core.network.utils.IByteBufTile;
 import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.api.Info;
@@ -19,15 +23,20 @@ import sonar.logistics.common.tileentity.TileEntityBlockNode;
 import sonar.logistics.common.tileentity.TileEntityEntityNode;
 import sonar.logistics.helpers.CableHelper;
 import sonar.logistics.helpers.InfoHelper;
+import sonar.logistics.info.types.InventoryInfo;
 import sonar.logistics.info.types.StoredStackInfo;
 
-public class InventoryReaderHandler extends InventoryTileHandler {
+public class InventoryReaderHandler extends InventoryTileHandler implements IByteBufTile {
 
 	public BlockCoords coords;
-	public List<StoredItemStack> stacks;
-	public List<StoredItemStack> lastStacks;
+	public List<StoredItemStack> stacks = new ArrayList();
+	public List<StoredItemStack> lastStacks = new ArrayList();
 
 	public ItemStack current;
+	// 0=Stack, 1=Slot (only accepts one input)
+	public SyncInt setting = new SyncInt(0);
+	public SyncInt targetSlot = new SyncInt(1);
+	public SyncInt posSlot = new SyncInt(2);
 
 	public InventoryReaderHandler(boolean isMultipart, TileEntity tile) {
 		super(isMultipart, tile);
@@ -39,31 +48,7 @@ public class InventoryReaderHandler extends InventoryTileHandler {
 		if (te.getWorldObj().isRemote) {
 			return;
 		}
-		updateData(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)));
-	}
-
-	public void updateData(TileEntity te, ForgeDirection dir) {	
-		List<BlockCoords> connections = CableHelper.getConnections(te, dir.getOpposite());
-		List<TileEntityBlockNode> nodes = new ArrayList();
-		List<TileEntityEntityNode> entityNodes = new ArrayList();
-
-		for (BlockCoords connect : connections) {
-			Object tile = connect.getTileEntity();
-			if (tile instanceof TileEntityBlockNode) {
-				nodes.add((TileEntityBlockNode) tile);
-			}
-			if (tile instanceof TileEntityEntityNode) {
-				entityNodes.add((TileEntityEntityNode) tile);
-			}
-		}
-
-		if (!nodes.isEmpty()) {
-			stacks = InfoHelper.getTileInventory(nodes);
-		} else if (!entityNodes.isEmpty()) {			
-			stacks = InfoHelper.getEntityInventory((TileEntityEntityNode) entityNodes.get(0));
-		} else {
-			stacks = new ArrayList();
-		}
+		stacks = InfoHelper.getInventories(CableHelper.getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite()));
 	}
 
 	public boolean canConnect(TileEntity te, ForgeDirection dir) {
@@ -77,21 +62,45 @@ public class InventoryReaderHandler extends InventoryTileHandler {
 	}
 
 	public Info currentInfo(TileEntity te) {
-		if (slots[0] != null) {
-			if (stacks != null) {
-				for (StoredItemStack stack : stacks) {
-					if (stack.equalStack(slots[0])) {
-						return StoredStackInfo.createInfo(stack);
+
+		switch (setting.getInt()) {
+		case 0:
+			if (slots[0] != null) {
+				if (stacks != null) {
+					for (StoredItemStack stack : stacks) {
+						if (stack.equalStack(slots[0])) {
+							return StoredStackInfo.createInfo(stack);
+						}
 					}
 				}
+				return StoredStackInfo.createInfo(new StoredItemStack(slots[0], 0));
 			}
-			return StoredStackInfo.createInfo(new StoredItemStack(slots[0], 0));
+			break;
+		case 1:
+			StoredItemStack stack = InfoHelper.getStack(CableHelper.getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite()), targetSlot.getInt());
+			if (stack != null) {
+				return StoredStackInfo.createInfo(stack);
+			}
+			return new StandardInfo((byte) -1, "ITEMREND", " ", " ");
+
+		case 2:
+			if (posSlot.getInt() < stacks.size()) {
+				return StoredStackInfo.createInfo(stacks.get(posSlot.getInt()));
+			}
+			break;
+		case 3:
+			if (stacks != null)
+				return InventoryInfo.createInfo(new BlockCoords(te));
+			break;
 		}
 		return new StandardInfo((byte) -1, "ITEMREND", " ", "NO DATA");
 	}
 
 	public void readData(NBTTagCompound nbt, SyncType type) {
 		super.readData(nbt, type);
+		setting.readFromNBT(nbt, type);
+		targetSlot.readFromNBT(nbt, type);
+		posSlot.readFromNBT(nbt, type);
 		if (type == SyncType.SAVE) {
 			if (nbt.hasKey("coords")) {
 				if (nbt.getCompoundTag("coords").getBoolean("hasCoords")) {
@@ -154,6 +163,9 @@ public class InventoryReaderHandler extends InventoryTileHandler {
 
 	public void writeData(NBTTagCompound nbt, SyncType type) {
 		super.writeData(nbt, type);
+		setting.writeToNBT(nbt, type);
+		targetSlot.writeToNBT(nbt, type);
+		posSlot.writeToNBT(nbt, type);
 		if (type == SyncType.SAVE) {
 			NBTTagCompound coordTag = new NBTTagCompound();
 			if (coords != null) {
@@ -236,6 +248,32 @@ public class InventoryReaderHandler extends InventoryTileHandler {
 			}
 
 			nbt.setTag("StoredStacks", list);
+		}
+	}
+
+	@Override
+	public void writePacket(ByteBuf buf, int id) {
+		if (id == 0) {
+			setting.writeToBuf(buf);
+		}
+		if (id == 1) {
+			targetSlot.writeToBuf(buf);
+		}
+		if (id == 2) {
+			posSlot.writeToBuf(buf);
+		}
+	}
+
+	@Override
+	public void readPacket(ByteBuf buf, int id) {
+		if (id == 0) {
+			setting.readFromBuf(buf);
+		}
+		if (id == 1) {
+			targetSlot.readFromBuf(buf);
+		}
+		if (id == 2) {
+			posSlot.readFromBuf(buf);
 		}
 	}
 }

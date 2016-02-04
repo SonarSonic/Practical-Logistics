@@ -4,6 +4,8 @@ import java.util.List;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
@@ -16,258 +18,207 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
+import sonar.core.SonarCore;
 import sonar.core.inventory.GuiSonar;
 import sonar.core.inventory.SonarButtons;
 import sonar.core.inventory.StoredItemStack;
+import sonar.core.network.PacketByteBufServer;
+import sonar.core.network.PacketMachineButton;
+import sonar.core.network.PacketTextField;
 import sonar.core.utils.helpers.FontHelper;
 import sonar.core.utils.helpers.RenderHelper;
 import sonar.logistics.Logistics;
 import sonar.logistics.common.containers.ContainerInventoryReader;
+import sonar.logistics.common.containers.ContainerItemRouter;
 import sonar.logistics.common.handlers.InventoryReaderHandler;
 import sonar.logistics.network.packets.PacketInventoryReader;
+import sonar.logistics.network.packets.PacketInventoryReaderGui;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-public class GuiInventoryReader extends GuiSonar {
+public class GuiInventoryReader extends GuiSelectionGrid<StoredItemStack> {
 
-	public static final ResourceLocation bground = new ResourceLocation("PracticalLogistics:textures/gui/inventoryReader.png");
+	public static final ResourceLocation stackBGround = new ResourceLocation("PracticalLogistics:textures/gui/inventoryReader_stack.png");
+
+	public static final ResourceLocation clearBGround = new ResourceLocation("PracticalLogistics:textures/gui/inventoryReader_clear.png");
 
 	public InventoryReaderHandler handler;
-	public TileEntity tile;
-	public int xCoord, yCoord, zCoord;
+	private GuiTextField slotField;
+	public static final int STACK = 0, SLOT = 1, POS = 2, INV = 3;
 
-	private float currentScroll;
-	private boolean isScrolling;
-	private boolean wasClicking;
-	public int scrollerLeft, scrollerStart, scrollerEnd, scrollerWidth;
-	public int cycle;
+	public InventoryPlayer inventoryPlayer;
 
 	public GuiInventoryReader(InventoryReaderHandler handler, TileEntity entity, InventoryPlayer inventoryPlayer) {
 		super(new ContainerInventoryReader(handler, entity, inventoryPlayer), entity);
-		this.xCoord = entity.xCoord;
-		this.yCoord = entity.yCoord;
-		this.zCoord = entity.zCoord;
 		this.handler = handler;
-		this.tile = entity;
+		this.inventoryPlayer = inventoryPlayer;
 	}
 
-	@Override
+	public int getSetting() {
+		return handler.setting.getInt();
+	}
+
 	public void initGui() {
-		Keyboard.enableRepeatEvents(true);
-		this.mc.thePlayer.openContainer = this.inventorySlots;
-		this.xSize = 176 + 72;
-		this.ySize = 256;
-
-		this.guiLeft = (this.width - this.xSize) / 2;
-		this.guiTop = (this.height - this.ySize) / 2;
-		scrollerLeft = this.guiLeft + 164 + 68;
-		scrollerStart = this.guiTop + 31;
-		scrollerEnd = scrollerStart + 128;
-		scrollerWidth = 10;
+		super.initGui();
+		this.buttonList.add(new GuiButton(0, guiLeft + 120 -(18*6), guiTop + 7, 65+7, 20, getSettingsString()));
+		switch (getSetting()) {
+		case SLOT:
+		case POS:
+			slotField = new GuiTextField(this.fontRendererObj, 193 -(18*5), 8, 34+18, 18);
+			slotField.setMaxStringLength(7);
+			if (getSetting() == SLOT)
+				slotField.setText("" + handler.targetSlot.getInt());
+			else if (getSetting() == POS)
+				slotField.setText("" + handler.posSlot.getInt());
+			break;
+		}
 	}
 
-	/*
-	 * public List<Integer> getCategoryPositions() { if (getStacks() == null) {
-	 * return null; } List<Integer> positions = new ArrayList(); int start =
-	 * (int) (stackListSize() * this.currentScroll); int finish = Math.min(start
-	 * + (12 * 7), stackListSize()); for (int i = start; i < finish; i++) { if
-	 * (getStacks().get(i) != null) { StoredItemStack info = getStacks().get(i);
-	 * } } return positions; }
-	 */
-	@Override
-	protected void mouseClicked(int x, int y, int button) {
-		super.mouseClicked(x, y, button);
-		if (button == 0 || button == 1) {
-			if (x - guiLeft >= 13 && x - guiLeft <= 13 + (12 * 18) && y - guiTop >= 32 && y - guiTop <= 32 + (7 * 18)) {
-				int start = (int) (stackListSize() / 12 * this.currentScroll);
-				int X = (x - guiLeft - 13) / 18;
-				int Y = (y - guiTop - 32) / 18;
-				int i = (start * 12) + X + ((Y) * 12);
-
-				if (i < getStacks().size()) {
-					StoredItemStack storedStack = getStacks().get(i);
-					if (storedStack != null) {
-						handler.current = storedStack.item;
-						handler.current.stackSize = 1;
-						Logistics.network.sendToServer(new PacketInventoryReader(tile.xCoord, tile.yCoord, tile.zCoord, handler.current));
-					}
+	protected void actionPerformed(GuiButton button) {
+		if (button != null) {
+			if (button.id == 0) {
+				if (!(handler.setting.getInt() > 2)) {
+					handler.setting.increaseBy(1);
+				} else {
+					handler.setting.setInt(0);
 				}
+				SonarCore.network.sendToServer(new PacketByteBufServer(handler, entity.xCoord, entity.yCoord, entity.zCoord, 0));
+				switchState();
 			}
 		}
+	}
+
+	public void switchState() {
+		Logistics.network.sendToServer(new PacketInventoryReaderGui(tile.xCoord, tile.yCoord, tile.zCoord, getSetting() == STACK));
+		if (this.mc.thePlayer.openContainer instanceof ContainerInventoryReader) {
+			((ContainerInventoryReader) this.mc.thePlayer.openContainer).addSlots(handler, inventoryPlayer, getSetting() == STACK);
+		}
+		this.inventorySlots = this.mc.thePlayer.openContainer;
+		reset();
 	}
 
 	@Override
 	public void drawGuiContainerForegroundLayer(int x, int y) {
+		switch (getSetting()) {
+		case SLOT:
+		case POS:
+			slotField.drawTextBox();
+			break;
+		}
 		super.drawGuiContainerForegroundLayer(x, y);
-		FontHelper.textCentre(StatCollector.translateToLocal("tile.InventoryReader.name"), xSize, 6, 1);
-		FontHelper.textCentre("Click the item you wish to monitor", xSize, 18, 0);
-		if (cycle == 100) {
-			cycle = 0;
-		} else {
-			cycle++;
-		}
-		if (getStacks() != null) {
-			int start = (int) (stackListSize() / 12 * this.currentScroll);
-			int i = start * 12;
-			int finish = Math.min(i + (12 * 7), stackListSize());
-			for (int Y = 0; Y < 7; Y++) {
-				for (int X = 0; X < 12; X++) {
-					if (i < finish) {
-						StoredItemStack storedStack = getStacks().get(i);
-						if (storedStack != null) {
+	}
 
-							ItemStack stack = storedStack.item;
-							stack.stackSize = (int) storedStack.stored;
-							RenderItem.getInstance().renderItemAndEffectIntoGUI(fontRendererObj, this.mc.getTextureManager(), stack, 13 + (X * 18), 32 + (Y * 18));
-							RenderHelper.renderStoredItemStackOverlay(this.fontRendererObj, this.mc.getTextureManager(), stack, storedStack.stored, 13 + (X * 18), 32 + (Y * 18), null);
-						}
-					}
-					i++;
-				}
-			}
-		}
-		if (x - guiLeft >= 13 && x - guiLeft <= 13 + (12 * 18) && y - guiTop >= 32 && y - guiTop <= 32 + (7 * 18)) {
-			int start = (int) (stackListSize() / 12 * this.currentScroll);
-			int X = (x - guiLeft - 13) / 18;
-			int Y = (y - guiTop - 32) / 18;
-			int i = (start * 12) + X + ((Y) * 12);
-
-			if (getStacks() != null) {
-				if (i < getStacks().size()) {
-					StoredItemStack storedStack = getStacks().get(i);
-					if (storedStack != null) {
-
-						GL11.glDisable(GL11.GL_DEPTH_TEST);
-						GL11.glDisable(GL11.GL_LIGHTING);
-						this.renderToolTip(storedStack, x - guiLeft, y - guiTop);
-						GL11.glEnable(GL11.GL_LIGHTING);
-						GL11.glEnable(GL11.GL_DEPTH_TEST);
-						net.minecraft.client.renderer.RenderHelper.enableGUIStandardItemLighting();
-
-					}
-				}
-			}
+	@Override
+	protected void mouseClicked(int i, int j, int k) {
+		super.mouseClicked(i, j, k);
+		switch (getSetting()) {
+		case SLOT:
+		case POS:
+			slotField.mouseClicked(i - guiLeft, j - guiTop, k);
+			break;
 		}
 	}
 
-	protected void renderToolTip(StoredItemStack stored, int x, int y) {
-		List list = stored.item.getTooltip(this.mc.thePlayer, this.mc.gameSettings.advancedItemTooltips);
-		list.add(1, "Stored: " + stored.stored);
+	@Override
+	protected void keyTyped(char c, int i) {
+		if ((getSetting() == SLOT || getSetting() == POS) && slotField.isFocused()) {
+			if (c == 13 || c == 27) {
+				slotField.setFocused(false);
+			} else {
+				FontHelper.addDigitsToString(slotField, c, i);
+				final String text = slotField.getText();
+				if (text.isEmpty() || text == "" || text == null) {
+					if (getSetting() == SLOT)
+						setTargetSlot("0");
+					else if (getSetting() == POS)
+						setPosSlot("0");
+				} else {
+					if (getSetting() == SLOT)
+						setTargetSlot(text);
+					else if (getSetting() == POS)
+						setPosSlot(text);
+				}
+
+			}
+		} else {
+			super.keyTyped(c, i);
+		}
+	}
+
+	public void setTargetSlot(String string) {
+		handler.targetSlot.setInt(Integer.parseInt(string));
+		SonarCore.network.sendToServer(new PacketByteBufServer(handler, entity.xCoord, entity.yCoord, entity.zCoord, 1));
+	}
+
+	public void setPosSlot(String string) {
+		handler.posSlot.setInt(Integer.parseInt(string));
+		SonarCore.network.sendToServer(new PacketByteBufServer(handler, entity.xCoord, entity.yCoord, entity.zCoord, 2));
+	}
+
+	public String getSettingsString() {
+		switch (handler.setting.getInt()) {
+		case 0:
+			return "Stack";
+		case 1:
+			return "Slot";
+		case 2:
+			return "Pos";
+		case 3:
+			return "Inventories";
+		default:
+			return "Inventories";
+		}
+	}
+
+	@Override
+	public List<StoredItemStack> getGridList() {
+		return handler.stacks;
+	}
+
+	@Override
+	public void onGridClicked(StoredItemStack selection, int pos) {
+		if (getSetting() == STACK) {
+			handler.current = selection.item;
+			handler.current.stackSize = 1;
+			Logistics.network.sendToServer(new PacketInventoryReader(tile.xCoord, tile.yCoord, tile.zCoord, handler.current));
+		}
+	}
+
+	@Override
+	public void renderStrings(int x, int y) {
+		FontHelper.textOffsetCentre(StatCollector.translateToLocal("tile.InventoryReader.name").split(" ")[0], 197, 8, 1);
+		FontHelper.textOffsetCentre(StatCollector.translateToLocal("tile.InventoryReader.name").split(" ")[1], 197, 18, 1);
+	}
+
+	@Override
+	public void renderSelection(StoredItemStack selection, int x, int y) {
+		ItemStack stack = selection.item;
+		stack.stackSize = (int) selection.stored;
+		RenderItem.getInstance().renderItemAndEffectIntoGUI(fontRendererObj, this.mc.getTextureManager(), stack, 13 + (x * 18), 32 + (y * 18));
+		RenderHelper.renderStoredItemStackOverlay(this.fontRendererObj, this.mc.getTextureManager(), stack, selection.stored, 13 + (x * 18), 32 + (y * 18), null);
+	}
+
+	@Override
+	public void renderToolTip(StoredItemStack selection, int x, int y) {
+		List list = selection.item.getTooltip(this.mc.thePlayer, this.mc.gameSettings.advancedItemTooltips);
+		list.add(1, "Stored: " + selection.stored);
 		for (int k = 0; k < list.size(); ++k) {
 			if (k == 0) {
-				list.set(k, stored.item.getRarity().rarityColor + (String) list.get(k));
+				list.set(k, selection.item.getRarity().rarityColor + (String) list.get(k));
 			} else {
 				list.set(k, EnumChatFormatting.GRAY + (String) list.get(k));
 			}
 		}
 
-		FontRenderer font = stored.item.getItem().getFontRenderer(stored.item);
+		FontRenderer font = selection.item.getItem().getFontRenderer(selection.item);
 		drawHoveringText(list, x, y, (font == null ? fontRendererObj : font));
-	}
-
-	public void handleMouseInput() {
-		super.handleMouseInput();
-		float lastScroll = currentScroll;
-		int i = Mouse.getEventDWheel();
-
-		if (i != 0 && this.needsScrollBars()) {
-			int j = stackListSize() + 1;
-
-			if (i > 0) {
-				i = 1;
-			}
-
-			if (i < 0) {
-				i = -1;
-			}
-
-			this.currentScroll = (float) ((double) this.currentScroll - (double) i / (double) j);
-
-			if (this.currentScroll < 0.0F) {
-				this.currentScroll = 0.0F;
-			}
-
-			if (this.currentScroll > 1.0F) {
-				this.currentScroll = 1.0F;
-			}
-		}
-
-	}
-
-	public void drawScreen(int x, int y, float var) {
-		super.drawScreen(x, y, var);
-		float lastScroll = currentScroll;
-		boolean flag = Mouse.isButtonDown(0);
-
-		if (!this.wasClicking && flag && x >= scrollerLeft && y >= scrollerStart && x < scrollerLeft + scrollerWidth && y < scrollerEnd) {
-			this.isScrolling = this.needsScrollBars();
-		}
-
-		if (!flag) {
-			this.isScrolling = false;
-		}
-
-		this.wasClicking = flag;
-
-		if (this.isScrolling) {
-			this.currentScroll = ((float) (y - scrollerStart) - 7.5F) / ((float) (scrollerEnd - scrollerStart) - 15.0F);
-
-			if (this.currentScroll < 0.0F) {
-				this.currentScroll = 0.0F;
-			}
-
-			if (this.currentScroll > 1.0F) {
-				this.currentScroll = 1.0F;
-			}
-
-		}
-
-	}
-
-	@Override
-	protected void drawGuiContainerBackgroundLayer(float var1, int var2, int var3) {
-		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-
-		Minecraft.getMinecraft().getTextureManager().bindTexture(this.getBackground());
-
-		drawTexturedModalRect(this.guiLeft, this.guiTop, 0, 0, this.xSize, this.ySize);
-		// int pos = getDataPosition();
-		// for (int i = 0; i < 11; i++) {
-		// drawTexturedModalRect(this.guiLeft + 7, this.guiTop + 29 + (12 * i),
-		// 0, positions != null && positions.contains(i) ? 190 : i == pos ? 178
-		// : 166, 154 + 72, 12);
-		// }
-		this.drawTexturedModalRect(scrollerLeft, scrollerStart + (int) ((float) (scrollerEnd - scrollerStart - 17) * this.currentScroll), 176 + 72, 0, 8, 15);
-
-	}
-
-	private boolean needsScrollBars() {
-		if (stackListSize() <= (12 * 7))
-			return false;
-
-		return true;
-
-	}
-
-	@SideOnly(Side.CLIENT)
-	public class NetworkButton extends SonarButtons.ImageButton {
-
-		public NetworkButton(int id, int x, int y) {
-			super(id, x, y, bground, 0, 202, 154 + 72, 11);
-		}
 	}
 
 	@Override
 	public ResourceLocation getBackground() {
-		return bground;
+		if (getSetting() == 0) {
+			return stackBGround;
+		}
+		return clearBGround;
 	}
-
-	public int stackListSize() {
-		return getStacks() == null ? 0 : getStacks().size();
-	}
-
-	public List<StoredItemStack> getStacks() {
-		return handler.stacks;
-	}
-
 }
