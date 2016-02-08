@@ -34,9 +34,9 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 
 	public ItemStack current;
 	// 0=Stack, 1=Slot (only accepts one input)
-	public SyncInt setting = new SyncInt(0);
-	public SyncInt targetSlot = new SyncInt(1);
-	public SyncInt posSlot = new SyncInt(2);
+	public SyncInt setting = new SyncInt(1);
+	public SyncInt targetSlot = new SyncInt(2);
+	public SyncInt posSlot = new SyncInt(3);
 
 	public InventoryReaderHandler(boolean isMultipart, TileEntity tile) {
 		super(isMultipart, tile);
@@ -89,8 +89,9 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 			}
 			break;
 		case 3:
-			if (stacks != null)
-				return InventoryInfo.createInfo(new BlockCoords(te));
+			if (stacks != null) {
+				return InventoryInfo.createInfo(stacks);
+			}
 			break;
 		}
 		return new StandardInfo((byte) -1, "ITEMREND", " ", "NO DATA");
@@ -254,7 +255,7 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 	@Override
 	public void writePacket(ByteBuf buf, int id) {
 		if (id == 0) {
-			setting.writeToBuf(buf);
+			//setting.writeToBuf(buf);
 		}
 		if (id == 1) {
 			targetSlot.writeToBuf(buf);
@@ -267,7 +268,13 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 	@Override
 	public void readPacket(ByteBuf buf, int id) {
 		if (id == 0) {
-			setting.readFromBuf(buf);
+			//setting.readFromBuf(buf);
+			//System.out.print(setting.getInt());
+			if(setting.getInt()==3){
+				setting.setInt(0);
+			}else{
+				setting.increaseBy(1);
+			}
 		}
 		if (id == 1) {
 			targetSlot.readFromBuf(buf);

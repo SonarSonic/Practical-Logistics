@@ -12,10 +12,11 @@ import net.minecraft.util.IIcon;
 import org.lwjgl.opengl.GL11;
 
 import sonar.core.fluid.StoredFluidStack;
+import sonar.core.utils.BlockCoords;
 import sonar.logistics.api.Info;
 import cpw.mods.fml.common.network.ByteBufUtils;
 
-public class FluidStackInfo extends Info {
+public class FluidStackInfo extends Info<FluidStackInfo> {
 
 	public StoredFluidStack stack;
 	public String rend = "FLUIDSTACK";
@@ -96,12 +97,13 @@ public class FluidStackInfo extends Info {
 
 			double divide = Math.max((0.5 + (maxX - minX)), (0.5 + (maxY - minY)));
 			double widthnew = (icon.getMinU() + (width * (icon.getMaxU() - icon.getMinU()) / divide));
-			double heightnew = (icon.getMinV() + (maxY * (icon.getMaxV() - icon.getMinV()) / divide));
-
-			tess.addVertexWithUV((minX + 0), (minY + maxY), 0, icon.getMinU(), heightnew);
-			tess.addVertexWithUV((minX + width), (minY + maxY), 0, widthnew, heightnew);
-			tess.addVertexWithUV((minX + width), (minY + 0), 0, widthnew, icon.getMinV());
-			tess.addVertexWithUV((minX + 0), (minY + 0), 0, icon.getMinU(), icon.getMinV());
+			double heightnew = (icon.getMinV() + ((maxY - minY) * (icon.getMaxV() - icon.getMinV()) / divide));
+			
+			double height = (maxY)/2;
+			tess.addVertexWithUV((minX + 0), height, 0, icon.getMinU(), heightnew);
+			tess.addVertexWithUV((minX + width), height, 0, widthnew, heightnew);
+			tess.addVertexWithUV((minX + width), minY, 0, widthnew, icon.getMinV());
+			tess.addVertexWithUV((minX + 0), minY, 0, icon.getMinU(), icon.getMinV());
 			tess.draw();
 
 		}
@@ -110,32 +112,59 @@ public class FluidStackInfo extends Info {
 		super.renderInfo(tess, tile, minX, minY, maxX, maxY, zOffset, scale);
 	}
 
-	@Override
-	public boolean isEqualType(Info info) {
-		if (info instanceof FluidStackInfo) {
-			FluidStackInfo stackInfo = (FluidStackInfo) info;
-			if (stackInfo.stack.stored != this.stack.stored) {
-				return false;
-			}
-			if (stackInfo.stack.capacity != this.stack.capacity) {
-				return false;
-			}
-			if (!stackInfo.stack.equalStack(stack.fluid)) {
-				return false;
-			}
-			return true;
-		}
-		return false;
-	}
-
-	@Override
-	public void emptyData() {
-
-	}
-
+	/*
+	 * @Override public boolean isEqualType(Info info) { if (info instanceof
+	 * FluidStackInfo) { FluidStackInfo stackInfo = (FluidStackInfo) info; if
+	 * (stackInfo.stack.stored != this.stack.stored) { return false; } if
+	 * (stackInfo.stack.capacity != this.stack.capacity) { return false; } if
+	 * (!stackInfo.stack.equalStack(stack.fluid)) { return false; } return true;
+	 * } return false; }
+	 * 
+	 * @Override public void emptyData() {
+	 * 
+	 * }
+	 */
 	@Override
 	public FluidStackInfo instance() {
 		return new FluidStackInfo();
+	}
+
+	@Override
+	public void writeUpdate(FluidStackInfo currentInfo, NBTTagCompound tag) {
+		if (!currentInfo.stack.equalStack(stack.fluid)) {
+			NBTTagCompound writeTag = new NBTTagCompound();
+			currentInfo.writeToNBT(writeTag);
+			tag.setTag("wT", writeTag);
+			this.stack = currentInfo.stack;
+		} else {
+			if (currentInfo.stack.capacity != stack.capacity) {
+				tag.setLong("c", currentInfo.stack.capacity);
+				stack.capacity = currentInfo.stack.capacity;
+			}
+			if (currentInfo.stack.stored != stack.stored) {
+				tag.setLong("s", currentInfo.stack.stored);
+				stack.stored = currentInfo.stack.stored;
+			}
+		}
+	}
+
+	@Override
+	public void readUpdate(NBTTagCompound tag) {
+		if (tag.hasKey("wT")) {
+			this.readFromNBT(tag.getCompoundTag("wT"));
+		} else {
+			if (tag.hasKey("c")) {
+				stack.capacity = tag.getLong("c");
+			}
+			if (tag.hasKey("s")) {
+				stack.stored = tag.getLong("s");
+			}
+		}
+	}
+
+	@Override
+	public boolean matches(FluidStackInfo currentInfo) {
+		return currentInfo.stack.equals(stack);
 	}
 
 }

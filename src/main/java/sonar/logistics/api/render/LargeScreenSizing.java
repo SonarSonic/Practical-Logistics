@@ -3,7 +3,7 @@ package sonar.logistics.api.render;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.nbt.NBTTagCompound;
 
-/**used to work out the Scaling of Large Display screens, still kind of w.i.p*/
+/** used to work out the Scaling of Large Display screens, still kind of w.i.p */
 public class LargeScreenSizing {
 
 	public int maxY = 0, minY = 0, maxH = 0, minH = 0;
@@ -25,7 +25,7 @@ public class LargeScreenSizing {
 	public static LargeScreenSizing readFromBuf(ByteBuf buf) {
 		return new LargeScreenSizing(buf.readInt(), buf.readInt(), buf.readInt(), buf.readInt());
 	}
-	
+
 	public void writeToNBT(NBTTagCompound tag) {
 		tag.setInteger("mxY", maxY);
 		tag.setInteger("mnY", minY);
@@ -35,5 +35,13 @@ public class LargeScreenSizing {
 
 	public static LargeScreenSizing readFromNBT(NBTTagCompound tag) {
 		return new LargeScreenSizing(tag.getInteger("mxY"), tag.getInteger("mnY"), tag.getInteger("mxH"), tag.getInteger("mnH"));
+	}
+
+	public boolean equals(Object obj) {
+		if (obj instanceof LargeScreenSizing) {
+			LargeScreenSizing target = (LargeScreenSizing) obj;
+			return target.maxY == this.maxY && target.minY == this.minY && target.maxH == this.maxH && target.minH == this.minH;
+		}
+		return false;
 	}
 }

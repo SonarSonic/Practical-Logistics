@@ -35,15 +35,24 @@ public abstract class Info<T extends Info> implements INBTObject, IBufObject {
 
 	public abstract void writeToNBT(NBTTagCompound buf);
 
-	public abstract boolean isEqualType(Info info);
+	public abstract void writeUpdate(T currentInfo, NBTTagCompound tag);
 
-	public abstract void emptyData();
+	public abstract void readUpdate(NBTTagCompound tag);
 
-	public boolean isDataEqualType(Info info) {
-		if (info == null) {
-			return false;
+	public abstract boolean matches(T currentInfo);
+
+	public boolean areTypesEqual(Info info) {
+		return info == null ? false : info.getName().equals(this.getName()) && getProviderID() == info.getProviderID();
+	}
+
+	public boolean equals(Object obj) {
+		if (obj instanceof Info<?>) {
+			T target = (T) obj;
+			if (areTypesEqual(target)) {
+				return matches(target);
+			}
 		}
-		return this.getData().equals(info.getData()) && this.getDisplayableData().equals(info.getDisplayableData());
+		return false;
 	}
 
 	public void renderInfo(Tessellator tess, TileEntity tile, float minX, float minY, float maxX, float maxY, float zOffset, float scale) {

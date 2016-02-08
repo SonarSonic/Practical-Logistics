@@ -70,12 +70,12 @@ public class FluidInfo extends StandardInfo {
 
 					tess.startDrawingQuads();
 
-					double divide = Math.max((0.5 + minX + (maxX - minX)), (0.5 + (maxY - minY)));
-					double widthnew = (icon.getMinU() + (width * (icon.getMaxU() - icon.getMinU()) / divide));
-					double heightnew = (icon.getMinV() + (maxY * (icon.getMaxV() - icon.getMinV()) / divide));
+					double divide = Math.max((0.5 +(maxX - minX)), (0.5+(maxY - minY)));
+					double widthnew = (icon.getMinU() + (width * (icon.getMaxU() - icon.getMinU())/divide));
+					double heightnew = (icon.getMinV() + (maxY * (icon.getMaxV() - icon.getMinV())/divide));
 
-					tess.addVertexWithUV((minX + 0), (minY + maxY), 0, icon.getMinU(), heightnew);
-					tess.addVertexWithUV((minX + width), (minY + maxY), 0, widthnew, heightnew);
+					tess.addVertexWithUV((minX + 0), maxY/2, 0, icon.getMinU(), heightnew);
+					tess.addVertexWithUV((minX + width), maxY/2, 0, widthnew, heightnew);
 					tess.addVertexWithUV((minX + width), (minY + 0), 0, widthnew, icon.getMinV());
 					tess.addVertexWithUV((minX + 0), (minY + 0), 0, icon.getMinU(), icon.getMinV());
 

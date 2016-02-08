@@ -22,6 +22,7 @@ import sonar.logistics.api.connecting.IInfoReader;
 import sonar.logistics.common.tileentity.TileEntityInventoryReader;
 import sonar.logistics.helpers.CableHelper;
 import sonar.logistics.helpers.InfoHelper;
+import sonar.logistics.info.types.ProgressInfo;
 import cpw.mods.fml.common.network.ByteBufUtils;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -29,6 +30,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 
 	public Info info;
+	public Info updateInfo;
 
 	public DisplayScreenHandler(boolean isMultipart, TileEntity tile) {
 		super(isMultipart, tile);
@@ -48,42 +50,60 @@ public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 			if (target == null) {
 				return;
 			} else {
-				Info lastInfo = info;
+				Info current = null;
+				boolean shouldUpdate = true;
 				if (target instanceof IInfoReader) {
 					IInfoReader infoReader = (IInfoReader) target;
 					if (infoReader.currentInfo() != null && infoReader.getSecondaryInfo() != null) {
-						this.info = InfoHelper.combineData(infoReader.currentInfo(), infoReader.getSecondaryInfo());
+						Info progress = InfoHelper.combineData(infoReader.currentInfo(), infoReader.getSecondaryInfo());
+						if (!progress.equals(info) || (info != null && info instanceof StandardInfo && progress instanceof StandardInfo && !((StandardInfo) progress).data.equals(((StandardInfo) info).data))) {
+							current = progress;
+						} else {
+							shouldUpdate = false;
+						}
 					} else if (infoReader.currentInfo() != null) {
-						this.info = infoReader.currentInfo();
-					} else if (this.info != null) {
-						this.info.emptyData();
+						if (!infoReader.currentInfo().equals(info) || (info != null && info instanceof StandardInfo && infoReader.currentInfo() instanceof StandardInfo && !((StandardInfo) infoReader.currentInfo()).data.equals(((StandardInfo) info).data))) {
+							current = infoReader.currentInfo();
+						} else {
+							shouldUpdate = false;
+						}
 					}
-				} else if (target instanceof TileEntityInventoryReader) {
-					TileEntityInventoryReader infoNode = (TileEntityInventoryReader) target;
-					if (infoNode.currentInfo() != null) {
-						this.info = infoNode.currentInfo();
-					} else if (this.info != null) {
-						this.info.emptyData();
-					}
+
 				} else if (target instanceof IInfoEmitter) {
 					IInfoEmitter infoNode = (IInfoEmitter) target;
 					if (infoNode.currentInfo() != null) {
-						this.info = infoNode.currentInfo();
-					} else if (this.info != null) {
-						this.info.emptyData();
+						if (!infoNode.currentInfo().equals(info) || (info != null && info instanceof StandardInfo && infoNode.currentInfo() instanceof StandardInfo && !((StandardInfo) infoNode.currentInfo()).data.equals(((StandardInfo) info).data))) {
+							current = infoNode.currentInfo();
+						} else {
+							shouldUpdate = false;
+						}
 					}
 				}
-
-				if (info != null) {
-					if (!info.isEqualType(lastInfo) || !info.isDataEqualType(lastInfo)) {
-						if (info instanceof StandardInfo && info.isEqualType(lastInfo)) {
+				updateInfo = current;
+				if (shouldUpdate) {
+					if (info == null) {
+						if (updateInfo != null) {
+							info = updateInfo;
 							SonarCore.sendPacketAround(packetTile, 64, 0);
+						}
+					} else {
+						if (updateInfo != null) {
+							if (updateInfo.areTypesEqual(info)) {
+								if (updateInfo instanceof StandardInfo) {
+									info = updateInfo;
+									SonarCore.sendPacketAround(packetTile, 64, 0);
+								} else {
+									SonarCore.sendPacketAround(packetTile, 64, 2);
+								}
+							} else {
+								info = updateInfo;
+								SonarCore.sendPacketAround(packetTile, 64, 0);
+							}
 						} else {
+							info = null;
 							SonarCore.sendPacketAround(packetTile, 64, 0);
 						}
 					}
-				} else {
-					SonarCore.sendPacketAround(packetTile, 64, 0);
 				}
 			}
 		}
@@ -123,6 +143,19 @@ public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 		if (id == 1) {
 			ByteBufUtils.writeUTF8String(buf, info.getData());
 		}
+		if (id == 2) {
+			NBTTagCompound tag = new NBTTagCompound();
+			if (updateInfo != null && updateInfo.areTypesEqual(info)) {
+				info.writeUpdate(updateInfo, tag);
+			}
+			if (!tag.hasNoTags()) {
+				buf.writeBoolean(true);
+				ByteBufUtils.writeTag(buf, tag);
+			} else {
+				buf.writeBoolean(false);
+			}
+
+		}
 	}
 
 	@Override
@@ -137,6 +170,11 @@ public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 		if (id == 1) {
 			StandardInfo standardInfo = (StandardInfo) info;
 			standardInfo.setData(ByteBufUtils.readUTF8String(buf));
+		}
+		if (id == 2) {
+			if (buf.readBoolean()) {
+				info.readUpdate(ByteBufUtils.readTag(buf));
+			}
 		}
 	}
 

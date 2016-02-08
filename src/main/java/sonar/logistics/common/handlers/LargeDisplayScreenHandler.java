@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import net.minecraft.block.Block;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
@@ -41,13 +42,26 @@ public class LargeDisplayScreenHandler extends DisplayScreenHandler implements I
 			List<BlockCoords> displays = DisplayRegistry.getScreens(registryID);
 			if (displays != null) {
 				if (BlockCoords.equalCoords(displays.get(0), new BlockCoords(te))) {
+					TileEntity target = te.getWorldObj().getTileEntity(te.xCoord, te.yCoord - 1, te.zCoord);
+					if (target != null && target instanceof ILargeDisplay) {
+						if (((ILargeDisplay) target).registryID() == registryID) {
+							List<BlockCoords> screens = (List<BlockCoords>) ((ArrayList<BlockCoords>) DisplayRegistry.getScreens(registryID)).clone();
+							int pos = 0;
+							for (BlockCoords coords : screens) {
+								if (BlockCoords.equalCoords(coords, new BlockCoords(te.xCoord, te.yCoord - 1, te.zCoord, te.getWorldObj().provider.dimensionId))) {
+									Collections.swap(DisplayRegistry.getScreens(registryID), 0, pos);
+									return;
+								}
+								pos++;
+							}
+						}
+					}
 					isHandler.setBoolean(true);
 					LargeScreenSizing lastSize = sizing;
 					sizing = DisplayHelper.getScreenSizing(te);
 
-					if (sizing == null && lastSize!=null || (lastSize == null) || !lastSize.equals(sizing)) {
-						SonarCore.sendPacketAround(te, 64, 2);
-						//resetSizing = false;
+					if (sizing == null && lastSize != null || (lastSize == null) || !lastSize.equals(sizing)) {
+						SonarCore.sendPacketAround(te, 64, 3);
 					}
 
 					connectedTile = getConnectedTile(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)));
@@ -61,7 +75,7 @@ public class LargeDisplayScreenHandler extends DisplayScreenHandler implements I
 				}
 			}
 			if (lastHandler != isHandler.getBoolean()) {
-				SonarCore.sendPacketAround(te, 64, 3);
+				SonarCore.sendPacketAround(te, 64, 4);
 			}
 		}
 
@@ -86,7 +100,7 @@ public class LargeDisplayScreenHandler extends DisplayScreenHandler implements I
 	@Override
 	public void writePacket(ByteBuf buf, int id) {
 		super.writePacket(buf, id);
-		if (id == 2) {
+		if (id == 3) {
 			if (sizing != null) {
 				buf.writeBoolean(true);
 				sizing.writeToBuf(buf);
@@ -94,7 +108,7 @@ public class LargeDisplayScreenHandler extends DisplayScreenHandler implements I
 				buf.writeBoolean(false);
 			}
 		}
-		if (id == 3) {
+		if (id == 4) {
 			isHandler.writeToBuf(buf);
 		}
 	}
@@ -102,14 +116,14 @@ public class LargeDisplayScreenHandler extends DisplayScreenHandler implements I
 	@Override
 	public void readPacket(ByteBuf buf, int id) {
 		super.readPacket(buf, id);
-		if (id == 2) {
+		if (id == 3) {
 			if (buf.readBoolean()) {
 				sizing = LargeScreenSizing.readFromBuf(buf);
 			} else {
 				sizing = null;
 			}
 		}
-		if (id == 3) {
+		if (id == 4) {
 			isHandler.readFromBuf(buf);
 		}
 	}

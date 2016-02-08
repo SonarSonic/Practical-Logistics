@@ -5,9 +5,10 @@ import java.util.List;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
-import sonar.calculator.mod.api.IFlux;
-import sonar.calculator.mod.api.IFluxPoint;
-import sonar.calculator.mod.api.ITeleport;
+import sonar.calculator.mod.api.CalculatorAPI;
+import sonar.calculator.mod.api.flux.IFlux;
+import sonar.calculator.mod.api.flux.IFluxPoint;
+import sonar.calculator.mod.api.machines.ITeleport;
 import sonar.calculator.mod.utils.FluxRegistry;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.StandardInfo;
@@ -28,15 +29,7 @@ public class CalculatorProvider extends TileProvider {
 	@Override
 	public boolean canProvideInfo(World world, int x, int y, int z, ForgeDirection dir) {
 		TileEntity target = world.getTileEntity(x, y, z);
-		if (target != null) {
-			if (target instanceof IFlux) {
-				return true;
-			}
-			if (target instanceof ITeleport) {
-				return true;
-			}
-		}
-		return false;
+		return target != null && (target instanceof IFlux || target instanceof ITeleport);
 	}
 
 	@Override
@@ -65,7 +58,7 @@ public class CalculatorProvider extends TileProvider {
 	}
 
 	public boolean isLoadable() {
-		return Loader.isModLoaded("Calculator");
+		return Loader.isModLoaded("Calculator") && CalculatorAPI.VERSION == "1.7.10 - 1.1";
 	}
 
 	@Override

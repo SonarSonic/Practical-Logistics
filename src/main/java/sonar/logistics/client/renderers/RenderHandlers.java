@@ -187,10 +187,15 @@ public class RenderHandlers {
 	public static class FluidReader extends InfoReader {
 		public FluidReader() {
 			super.texture = modelFolder + "fluidReader.png";
-
 		}
 	}
-
+	
+	public static class EnergyReader extends InfoReader {
+		public EnergyReader() {
+			super.texture = modelFolder + "energyReader.png";
+		}
+	}
+	
 	public static class DataReceiver extends TileEntitySpecialRenderer {
 		public ModelDataReceiver model = new ModelDataReceiver();
 		public String texture = modelFolder + "blockReceiver.png";

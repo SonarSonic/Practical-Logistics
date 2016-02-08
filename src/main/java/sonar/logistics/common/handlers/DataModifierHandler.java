@@ -39,13 +39,15 @@ public class DataModifierHandler extends TileHandler {
 		if (target == null) {
 			return;
 		} else {
-			Info lastInfo = info;
+			// Info lastInfo = info;
 			if (target instanceof IInfoEmitter) {
 				IInfoEmitter infoNode = (IInfoEmitter) target;
 				if (infoNode.currentInfo() != null) {
-					this.info = infoNode.currentInfo();
+					if (!infoNode.currentInfo().equals(info)) {
+						this.info = infoNode.currentInfo();
+					}
 				} else if (this.info != null) {
-					this.info.emptyData();
+					this.info = null;
 				}
 			}
 		}

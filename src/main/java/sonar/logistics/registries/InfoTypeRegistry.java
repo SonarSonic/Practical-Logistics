@@ -1,5 +1,6 @@
 package sonar.logistics.registries;
 
+import net.minecraft.nbt.NBTTagCompound;
 import sonar.core.utils.helpers.NBTRegistryHelper;
 import sonar.logistics.api.EntityInfo;
 import sonar.logistics.api.Info;
@@ -38,13 +39,13 @@ public class InfoTypeRegistry extends NBTRegistryHelper.Buf<Info> {
 	}
 
 	@Override
-	public boolean equalTypes(Info target, Info current) {
-		if (target == null && current != null) {
+	public boolean areTypesEqual(Info target, Info current) {
+		if (target == null && current == null) {
+			return true;
+		}
+		if (target == null || current == null) {
 			return false;
 		}
-		if (current == null) {
-			return false;
-		}
-		return (target.isEqualType(current) && target.isDataEqualType(current));
+		return target.areTypesEqual(current) && target.equals(current);
 	}
 }

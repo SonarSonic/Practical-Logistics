@@ -16,6 +16,7 @@ import sonar.logistics.common.tileentity.TileEntityDataEmitter;
 import sonar.logistics.common.tileentity.TileEntityDataModifier;
 import sonar.logistics.common.tileentity.TileEntityDataReceiver;
 import sonar.logistics.common.tileentity.TileEntityDisplayScreen;
+import sonar.logistics.common.tileentity.TileEntityEnergyReader;
 import sonar.logistics.common.tileentity.TileEntityEntityNode;
 import sonar.logistics.common.tileentity.TileEntityFluidReader;
 import sonar.logistics.common.tileentity.TileEntityHammer;
@@ -78,6 +79,10 @@ public class LogisticsClient extends LogisticsCommon {
 		TileEntitySpecialRenderer fluidReader = new RenderHandlers.FluidReader();
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityFluidReader.class, fluidReader);
 		MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(BlockRegistry.fluidReader), new RenderItemHandlers.Reader(fluidReader, new TileEntityFluidReader()));
+		
+		TileEntitySpecialRenderer energyReader = new RenderHandlers.EnergyReader();
+		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityEnergyReader.class, energyReader);
+		MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(BlockRegistry.energyReader), new RenderItemHandlers.Reader(energyReader, new TileEntityEnergyReader()));
 		
 		TileEntitySpecialRenderer dataReceiver = new RenderHandlers.DataReceiver();
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityDataReceiver.class, dataReceiver);

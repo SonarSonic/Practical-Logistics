@@ -202,7 +202,7 @@ public class RenderLargeDisplay extends RenderDisplayScreen {
 
 		} else {
 			float pixel = 1.0F / 16F;
-			info.renderInfo(tess, tile, -0.5F + pixel + (north ? -sizing.maxH : sizing.minH), -0.4400F - sizing.maxY, (1.0f - (pixel) * 9) + (north ? -sizing.minH : sizing.maxH), (pixel * 14) + sizing.minY + sizing.maxY, -0.204F, 40F);
+			info.renderInfo(tess, tile, -0.5F + pixel + (north ? -sizing.maxH : sizing.minH), -0.4400F - sizing.maxY, (1.0f - (pixel) * 9) + (north ? -sizing.minH : sizing.maxH), (pixel * 14) + sizing.minY, -0.204F, 40F);
 
 		}
 	}

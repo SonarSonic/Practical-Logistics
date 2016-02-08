@@ -80,7 +80,7 @@ public class GuiInfoReader extends GuiSonar {
 			if (getInfo().get(i) != null) {
 				Info info = getInfo().get(i);
 				if (info != null) {
-					if (info.isEqualType(getPrimaryInfo())) {
+					if (info.equals(getPrimaryInfo())) {
 						return i - start;
 					}
 				}
@@ -102,7 +102,7 @@ public class GuiInfoReader extends GuiSonar {
 			if (getInfo().get(i) != null) {
 				Info info = getInfo().get(i);
 				if (info != null) {
-					if (info.isEqualType(getSecondInfo())) {
+					if (info.equals(getSecondInfo())) {
 						return i - start;
 					}
 				}
@@ -141,7 +141,7 @@ public class GuiInfoReader extends GuiSonar {
 			for (int i = start; i < finish; i++) {
 				Info info = getInfo().get(i);
 				if (info != null) {
-					boolean isSelected = info.isEqualType(getPrimaryInfo());
+					boolean isSelected = info.equals(getPrimaryInfo());
 					if (!(info instanceof CategoryInfo)) {
 						int colour = isSelected ? Color.green.getRGB() : Color.lightGray.getRGB();
 						FontHelper.text(info.getSubCategory().substring(0, Math.min(16, info.getSubCategory().length())), 10, 31 + (12 * i) - (12 * start), colour);
@@ -256,7 +256,7 @@ public class GuiInfoReader extends GuiSonar {
 							return;
 						}
 						if (buttonID == 0) {
-							if (getPrimaryInfo() != null && info.isEqualType(getPrimaryInfo())) {
+							if (getPrimaryInfo() != null && info.equals(getPrimaryInfo())) {
 								Logistics.network.sendToServer(new PacketInfoBlock(xCoord, yCoord, zCoord, true));
 								if (handler.isMultipart.getBoolean()) {
 									handler.primaryInfo = null;
@@ -269,8 +269,8 @@ public class GuiInfoReader extends GuiSonar {
 							}
 
 						} else if (buttonID == 1) {
-							if (!info.isEqualType(getPrimaryInfo())) {
-								if (getSecondInfo() != null && info.isEqualType(getSecondInfo())) {
+							if (!info.equals(getPrimaryInfo())) {
+								if (getSecondInfo() != null && info.equals(getSecondInfo())) {
 									Logistics.network.sendToServer(new PacketInfoBlock(xCoord, yCoord, zCoord, false));
 									if (handler.isMultipart.getBoolean()) {
 										handler.secondaryInfo = null;

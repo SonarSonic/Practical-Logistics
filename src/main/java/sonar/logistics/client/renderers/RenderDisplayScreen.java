@@ -134,7 +134,7 @@ public class RenderDisplayScreen extends TileEntitySpecialRenderer {
 
 	public void renderInfo(Tessellator tess, TileEntity tile, ForgeDirection side, Info info) {
 		float pixel = 1.0F / 16F;
-		info.renderInfo(tess, tile, -0.5F + pixel, -0.2085F, (1.0f - (pixel) * 9), (pixel * 6), -0.207F, 120F);
+		info.renderInfo(tess, tile, -0.5F + pixel, -0.2085F, (1.0f - (pixel) * 9), (pixel * 5)+0.022f, -0.207F, 120F);
 
 	}
 

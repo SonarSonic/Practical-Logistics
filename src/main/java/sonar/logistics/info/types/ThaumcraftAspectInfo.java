@@ -14,7 +14,7 @@ import sonar.logistics.api.render.InfoRenderer;
 import thaumcraft.api.aspects.Aspect;
 import cpw.mods.fml.common.network.ByteBufUtils;
 
-public class ThaumcraftAspectInfo extends StandardInfo {
+public class ThaumcraftAspectInfo extends StandardInfo<ThaumcraftAspectInfo> {
 
 	public String tex;
 
@@ -57,11 +57,12 @@ public class ThaumcraftAspectInfo extends StandardInfo {
 	public void renderInfo(Tessellator tess, TileEntity tile, float minX, float minY, float maxX, float maxY, float zOffset, float scale) {
 		FontRenderer rend = Minecraft.getMinecraft().fontRenderer;
 
+		GL11.glTranslatef(minX + (maxX - minX) / 2, minY + (maxY - minY) / 2, 0.01f);
 		GL11.glTranslated(0, 0, zOffset);
 		float width = 1;
 		float height = 1;
-		double scaled = scale / 400;
-		GL11.glScaled(scaled, scaled, scaled);
+		// double scaled = scale / 400;
+		// GL11.glScaled(scaled, scaled, scaled);
 		if (tex != null) {
 			GL11.glTranslated(-0.7, -0.55, 0.0);
 			Aspect aspect = Aspect.getAspect(tex);
@@ -79,7 +80,7 @@ public class ThaumcraftAspectInfo extends StandardInfo {
 			GL11.glTranslated(0.7, 0.55, 0.0);
 		}
 		GL11.glTranslated(0.5, 0.00, 0.0);
-		GL11.glScaled(1.0 / scaled, 1.0 / scaled, 1.0 / scaled);
+		// GL11.glScaled(1.0 / scaled, 1.0 / scaled, 1.0 / scaled);
 		GL11.glTranslated(0, 0, -zOffset);
 		InfoRenderer.renderStandardInfo(this, rend, minX, minY, maxX, maxY, zOffset, scale);
 	}
@@ -87,5 +88,10 @@ public class ThaumcraftAspectInfo extends StandardInfo {
 	@Override
 	public ThaumcraftAspectInfo instance() {
 		return new ThaumcraftAspectInfo();
+	}
+
+	@Override
+	public boolean matches(ThaumcraftAspectInfo currentInfo) {
+		return tex.equals(currentInfo.tex) && super.matches(currentInfo);
 	}
 }

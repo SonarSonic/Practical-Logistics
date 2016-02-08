@@ -97,12 +97,12 @@ public class InfoHelper {
 			List<Info> info = new ArrayList();
 			provider.getHelperInfo(info, tileNode.getWorldObj(), tileNode.xCoord + dir.offsetX, tileNode.yCoord + dir.offsetY, tileNode.zCoord + dir.offsetZ, dir);
 			for (Info currentInfo : info) {
-				if (currentInfo.isEqualType(blockInfo)) {
+				if (currentInfo.equals(blockInfo)) {
 					return currentInfo;
 				}
 			}
 		}
-		blockInfo.emptyData();
+		//blockInfo.emptyData();
 		return blockInfo;
 	}
 
@@ -121,13 +121,13 @@ public class InfoHelper {
 			provider.getHelperInfo(info, entity);
 
 			for (Info currentInfo : info) {
-				if (currentInfo.isEqualType(blockInfo)) {
+				if (currentInfo.equals(blockInfo)) {
 					return currentInfo;
 				}
 			}
 		}
-		blockInfo.emptyData();
-		return blockInfo;
+		//blockInfo.emptyData();
+		return null;
 	}
 
 	public static StoredItemStack getStack(List<BlockCoords> connections, int slot) {
@@ -282,7 +282,6 @@ public class InfoHelper {
 			list.add(new StoredItemStack(stack));
 		}
 	}
-
 	public static Info combineData(Info primary, Info secondary) {
 		if (!(primary instanceof CategoryInfo) && !(secondary instanceof CategoryInfo)) {
 			if (primary.getDataType() == 0 && secondary.getDataType() == 0) {

@@ -6,7 +6,7 @@ import sonar.core.utils.BlockCoords;
 import sonar.logistics.api.Info;
 import cpw.mods.fml.common.network.ByteBufUtils;
 
-public class BlockCoordsInfo extends Info {
+public class BlockCoordsInfo extends Info<BlockCoordsInfo> {
 
 	public boolean emptyData;
 	public String name;
@@ -38,10 +38,12 @@ public class BlockCoordsInfo extends Info {
 	public String getSubCategory() {
 		return name;
 	}
+
 	@Override
 	public String getData() {
 		return coords.getRender();
 	}
+
 	@Override
 	public String getDisplayableData() {
 		return getData();
@@ -75,22 +77,39 @@ public class BlockCoordsInfo extends Info {
 	}
 
 	@Override
-	public boolean isEqualType(Info info) {
-		if (info != null && info instanceof BlockCoordsInfo) {
-			BlockCoordsInfo coordInfo = (BlockCoordsInfo) info;
-			return info.getCategory().equals(name) && BlockCoords.equalCoords(coordInfo.coords, coords);
-		}
-		return false;
-	}
-
-	@Override
-	public void emptyData() {
-
-	}
-
-	@Override
 	public BlockCoordsInfo instance() {
 		return new BlockCoordsInfo();
+	}
+
+	@Override
+	public void writeUpdate(BlockCoordsInfo currentInfo, NBTTagCompound tag) {
+		/*
+		if(!currentInfo.name.equals(name)){
+			tag.setString("n", name);
+			this.name=currentInfo.name;
+		}
+		if (!currentInfo.coords.equals(coords)) {
+			NBTTagCompound coordTag = new NBTTagCompound();
+			BlockCoords.writeToNBT(coordTag, coords);
+			tag.setTag("cT", coordTag);
+			this.coords = currentInfo.coords;
+		}
+	*/
+	}
+
+	@Override
+	public void readUpdate(NBTTagCompound tag) {
+		if (tag.hasKey("n")) {
+			this.name = tag.getString("n");
+		}
+		if (tag.hasKey("cT")) {
+			this.coords = BlockCoords.readFromNBT(tag.getCompoundTag("cT"));
+		}
+	}
+
+	@Override
+	public boolean matches(BlockCoordsInfo currentInfo) {
+		return currentInfo.name.equals(name) && currentInfo.coords.equals(coords);
 	}
 
 }

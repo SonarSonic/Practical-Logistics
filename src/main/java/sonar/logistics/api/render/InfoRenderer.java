@@ -9,12 +9,9 @@ import sonar.logistics.api.Info;
 public class InfoRenderer {
 
 	public static void renderStandardInfo(Info info, FontRenderer rend, float minX, float minY, float maxX, float maxY, float zOffset, float scale) {
-		GL11.glTranslatef(minX + (maxX - minX) / 2, minY + maxY / 2, 0.01f);
-		GL11.glTranslatef(0, 0, zOffset);
-		int sizing = Math.round(Math.min((maxX - minX), (maxY - minY) * 3));
-		// double itemScale = Math.max(20, sizing >= 2 ? (140 - sizing * 30.0F) : 120);
-		// GL11.glTranslatef(0.0f, (float) (scale >= 120 ? 0.07F : 0.14F + ((sizing-1)*0.2)), zOffset - 0.01F);
-		// GL11.glScaled(itemScale, itemScale, itemScale);
+		GL11.glTranslatef(minX + (maxX - minX) / 2, minY+(maxY-minY) / 2, 0.01f);
+		int sizing = Math.round(Math.min((maxX - minX), (maxY-minY)*3));
+		 GL11.glTranslatef(0.0f, (float) (scale >= 120 ? -0.1F : -0.2F + ((sizing-1)*-0.01)), zOffset);
 		double itemScale = sizing>=2 ? getScale(sizing) : 120;
 		GL11.glScaled(1.0f / itemScale, 1.0f / itemScale, 1.0f / itemScale);
 		String category = info.getSubCategory();

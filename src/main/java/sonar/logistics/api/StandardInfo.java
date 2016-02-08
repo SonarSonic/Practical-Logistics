@@ -6,10 +6,10 @@ import sonar.logistics.Logistics;
 import sonar.logistics.api.providers.TileProvider;
 import cpw.mods.fml.common.network.ByteBufUtils;
 
-public class StandardInfo extends Info {
+public class StandardInfo<T extends StandardInfo> extends Info<T> {
 
 	public boolean emptyData;
-	public String category = "ERROR", subCategory = "ERROR", data, suffix;
+	public String category = "ERROR", subCategory = "ERROR", data = "", suffix = "";
 	public int dataType;
 	public byte providerID = -1, catID = -1, subCatID = -1;
 
@@ -188,26 +188,78 @@ public class StandardInfo extends Info {
 	}
 
 	@Override
-	public boolean isEqualType(Info info) {
-		if (info != null && ((info.getName().equals("Fluid-Info") || info.getName().equals(this.getName())))) {
-			return info.getProviderID() == this.providerID && info.getCategory().equals(this.getCategory()) && info.getSubCategory().equals(getSubCategory());
-		}
-		return false;
-	}
-
-	@Override
-	public void emptyData() {
-		if (!this.emptyData) {
-			emptyData = true;
-		}
-	}
-
-	@Override
 	public StandardInfo instance() {
 		return new StandardInfo();
 	}
 
 	public void setData(String string) {
 		data = string;
+	}
+
+	@Override
+	public void writeUpdate(StandardInfo currentInfo, NBTTagCompound tag) {
+		if (currentInfo.providerID != this.providerID) {
+			providerID = currentInfo.providerID;
+			tag.setByte("id", providerID);
+		}
+		if (currentInfo.dataType != this.dataType) {
+			dataType = currentInfo.dataType;
+			tag.setInteger("dT", dataType);
+		}
+		if (currentInfo.catID == -1 && !currentInfo.category.equals(this.category)) {
+			category = currentInfo.category;
+			tag.setString("c", category);
+		} else if (currentInfo.catID != -1 && currentInfo.catID != this.catID) {
+			catID = currentInfo.catID;
+			tag.setByte("cI", catID);
+		}
+		if (currentInfo.subCatID == -1 && !currentInfo.subCategory.equals(this.subCategory)) {
+			subCategory = currentInfo.subCategory;
+			tag.setString("sC", subCategory);
+		} else if (currentInfo.subCatID != -1 && currentInfo.subCatID != this.subCatID) {
+			subCatID = currentInfo.subCatID;
+			tag.setByte("sCI", subCatID);
+		}
+		if (!currentInfo.data.equals(this.data)) {
+			data = currentInfo.data;
+			tag.setString("d", data);
+		}
+		if (currentInfo.suffix != null && !currentInfo.suffix.equals(this.suffix)) {
+			suffix = currentInfo.suffix;
+			tag.setString("s", suffix);
+		}
+	}
+
+	@Override
+	public void readUpdate(NBTTagCompound tag) {
+		if (tag.hasKey("id")) {
+			providerID = tag.getByte("id");
+		}
+		if (tag.hasKey("dT")) {
+			dataType = tag.getInteger("dT");
+		}
+		if (tag.hasKey("c")) {
+			category = tag.getString("c");
+		}
+		if (tag.hasKey("cI")) {
+			catID = tag.getByte("cI");
+		}
+		if (tag.hasKey("sC")) {
+			subCategory = tag.getString("sC");
+		}
+		if (tag.hasKey("sCI")) {
+			subCatID = tag.getByte("sCI");
+		}
+		if (tag.hasKey("d")) {
+			data = tag.getString("d");
+		}
+		if (tag.hasKey("s")) {
+			suffix = tag.getString("s");
+		}
+	}
+
+	@Override
+	public boolean matches(StandardInfo currentInfo) {
+		return currentInfo.getProviderID() == this.providerID && currentInfo.dataType == dataType && currentInfo.category.equals(category) && currentInfo.subCategory.equals(subCategory) && currentInfo.suffix.equals(suffix) && currentInfo.catID == catID && currentInfo.subCatID == subCatID;
 	}
 }

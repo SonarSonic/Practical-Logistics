@@ -17,7 +17,7 @@ public class ItemFilterRegistry extends NBTRegistryHelper.Buf<ItemFilter> {
 	public String registeryType() {
 		return "Item Filter";
 	}
-
+/*
 	@Override
 	public boolean equalTypes(ItemFilter target, ItemFilter current) {
 		if (target == null && current != null) {
@@ -27,5 +27,11 @@ public class ItemFilterRegistry extends NBTRegistryHelper.Buf<ItemFilter> {
 			return false;
 		}
 		return current.equalFilter(target);
+	}
+	*/
+
+	@Override
+	public boolean areTypesEqual(ItemFilter target, ItemFilter current) {
+		return target.equalFilter(current);
 	}
 }

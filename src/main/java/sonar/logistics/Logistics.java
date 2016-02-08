@@ -10,6 +10,7 @@ import org.apache.logging.log4j.Logger;
 import sonar.core.SonarCore;
 import sonar.core.integration.SonarAPI;
 import sonar.logistics.api.LogisticsAPI;
+import sonar.logistics.info.providers.EnergyProviderRegistry;
 import sonar.logistics.info.providers.EntityProviderRegistry;
 import sonar.logistics.info.providers.FluidProviderRegistry;
 import sonar.logistics.info.providers.InventoryProviderRegistry;
@@ -59,6 +60,7 @@ public class Logistics {
 	public static EntityProviderRegistry entityProviders = new EntityProviderRegistry();
 	public static InventoryProviderRegistry inventoryProviders = new InventoryProviderRegistry();
 	public static FluidProviderRegistry fluidProviders = new FluidProviderRegistry();
+	public static EnergyProviderRegistry energyProviders = new EnergyProviderRegistry();
 	
 	@Instance(modid)
 	public static Logistics instance;

@@ -2,10 +2,11 @@ package sonar.logistics.info.types;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.nbt.NBTTagCompound;
+import sonar.core.utils.BlockCoords;
 import sonar.logistics.api.Info;
 import cpw.mods.fml.common.network.ByteBufUtils;
 
-public class CategoryInfo extends Info {
+public class CategoryInfo extends Info<CategoryInfo> {
 
 	public String category;
 
@@ -68,22 +69,39 @@ public class CategoryInfo extends Info {
 		tag.setString("category", category);
 	}
 
-	@Override
-	public boolean isEqualType(Info info) {
-		if (info != null && info.getName() == this.getName()) {
-			return info.getCategory().equals(category);
-		}
-		return false;
-	}
-
-	@Override
-	public void emptyData() {
-
-	}
-
+	/*
+	 * @Override public boolean isEqualType(Info info) { if (info != null &&
+	 * info.getName() == this.getName()) { return
+	 * info.getCategory().equals(category); } return false; }
+	 * 
+	 * @Override public void emptyData() {
+	 * 
+	 * }
+	 */
 	@Override
 	public CategoryInfo instance() {
 		return new CategoryInfo();
+	}
+
+	@Override
+	public void writeUpdate(CategoryInfo currentInfo, NBTTagCompound tag) {
+		if (!currentInfo.category.equals(category)) {
+			tag.setString("c", category);
+			this.category = currentInfo.category;
+		}
+
+	}
+
+	@Override
+	public void readUpdate(NBTTagCompound tag) {
+		if (tag.hasKey("c")) {
+			this.category = tag.getString("c");
+		}
+	}
+
+	@Override
+	public boolean matches(CategoryInfo currentInfo) {
+		return currentInfo.category.equals(category);
 	}
 
 }

@@ -33,14 +33,7 @@ public class TileEntityDataReceiver extends TileEntityNode implements IChannelPr
 	public SyncIdentifiedCoords emitter = new SyncIdentifiedCoords(0);
 
 	@Override
-	public IdentifiedCoords getChannel() {
-		if (emitter.getCoords() != null) {
-			TileEntity tile = emitter.getCoords().coords.getTileEntity();
-			if (tile != null && tile instanceof TileEntityDataEmitter) {
-				TileEntityDataEmitter dataEmitter = (TileEntityDataEmitter) tile;
-				emitter.setCoords(new IdentifiedCoords(dataEmitter.clientName.getString(), emitter.getCoords().coords));
-			}
-		}
+	public IdentifiedCoords getChannel() {		
 		return emitter.getCoords();
 	}
 
@@ -62,6 +55,13 @@ public class TileEntityDataReceiver extends TileEntityNode implements IChannelPr
 		super.updateEntity();
 		if (isClient()) {
 			return;
+		}
+		if (emitter.getCoords() != null) {
+			TileEntity tile = emitter.getCoords().coords.getTileEntity();
+			if (tile != null && tile instanceof TileEntityDataEmitter) {
+				TileEntityDataEmitter dataEmitter = (TileEntityDataEmitter) tile;
+				emitter.setCoords(new IdentifiedCoords(dataEmitter.clientName.getString(), emitter.getCoords().coords));
+			}
 		}
 	}
 

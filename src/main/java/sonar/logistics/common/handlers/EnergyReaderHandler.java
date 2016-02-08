@@ -26,9 +26,9 @@ import sonar.logistics.helpers.CableHelper;
 import sonar.logistics.helpers.InfoHelper;
 import sonar.logistics.info.types.CategoryInfo;
 
-public class InfoReaderHandler extends TileHandler implements IWailaInfo {
+public class EnergyReaderHandler extends TileHandler implements IWailaInfo {
 
-	public InfoReaderHandler(boolean isMultipart, TileEntity tile) {
+	public EnergyReaderHandler(boolean isMultipart, TileEntity tile) {
 		super(isMultipart, tile);
 	}
 
@@ -73,7 +73,7 @@ public class InfoReaderHandler extends TileHandler implements IWailaInfo {
 			this.coords = new BlockCoords((TileEntityEntityNode) entityNodes.get(0));
 		} else {
 			coords = null;
-			//this.setData(te, null, true);
+			// this.setData(te, null, true);
 		}
 	}
 
@@ -205,7 +205,7 @@ public class InfoReaderHandler extends TileHandler implements IWailaInfo {
 						clientInfo.add(Logistics.infoTypes.readFromNBT(compound));
 					break;
 				case 1:
-					//clientInfo.get(slot).readUpdate(compound);
+					// clientInfo.get(slot).readUpdate(compound);
 					break;
 				case 2:
 					clientInfo.set(slot, null);

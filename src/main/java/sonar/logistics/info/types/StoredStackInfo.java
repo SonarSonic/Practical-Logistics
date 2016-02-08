@@ -15,7 +15,7 @@ import sonar.core.utils.helpers.FontHelper;
 import sonar.core.utils.helpers.RenderHelper;
 import sonar.logistics.api.Info;
 
-public class StoredStackInfo extends Info {
+public class StoredStackInfo extends Info<StoredStackInfo> {
 
 	public StoredItemStack stack;
 	public String rend = "ITEMREND";
@@ -83,7 +83,7 @@ public class StoredStackInfo extends Info {
 	public void renderInfo(Tessellator tess, TileEntity tile, float minX, float minY, float maxX, float maxY, float zOffset, float scale) {
 		if (stack != null && stack.item != null) {
 
-			GL11.glTranslatef(minX + (maxX - minX) / 2, minY + maxY / 2, 0.01f);
+			GL11.glTranslatef(minX + (maxX - minX) / 2, minY + (maxY - minY) / 2, 0.01f);
 			FontRenderer rend = Minecraft.getMinecraft().fontRenderer;
 			stack.item.stackSize = 1;
 
@@ -121,35 +121,59 @@ public class StoredStackInfo extends Info {
 
 	public double getXTranslate(float scale, double sizing) {
 		if (scale >= 120) {
-			return 0.07F;
+			return -0.07F;
 		}
-		return (0.13F + ((sizing - 1) * 0.17));
+		return (-0.08F + ((sizing - 1) * 0.17));
 
 	}
 
-	@Override
-	public boolean isEqualType(Info info) {
-		if (info instanceof StoredStackInfo) {
-			StoredStackInfo stackInfo = (StoredStackInfo) info;
-			if (stackInfo.stack.stored != this.stack.stored) {
-				return false;
-			}
-			if (!stackInfo.stack.equalStack(stack.item)) {
-				return false;
-			}
-			return true;
-		}
-		return false;
-	}
-
-	@Override
-	public void emptyData() {
-
-	}
-
+	/*
+	 * @Override public boolean isEqualType(Info info) { if (info instanceof
+	 * StoredStackInfo) { StoredStackInfo stackInfo = (StoredStackInfo) info; if
+	 * (stackInfo.stack.stored != this.stack.stored) { return false; } if
+	 * (!stackInfo.stack.equalStack(stack.item)) { return false; } return true;
+	 * } return false; }
+	 * 
+	 * @Override public void emptyData() {
+	 * 
+	 * }
+	 */
 	@Override
 	public StoredStackInfo instance() {
 		return new StoredStackInfo();
+	}
+
+	@Override
+	public void writeUpdate(StoredStackInfo currentInfo, NBTTagCompound tag) {
+		if (!currentInfo.stack.equalStack(stack.item)) {
+			NBTTagCompound writeTag = new NBTTagCompound();
+			currentInfo.writeToNBT(writeTag);
+			tag.setTag("wT", writeTag);
+			this.stack = currentInfo.stack;
+		} else {
+			if (currentInfo.stack.stored != stack.stored) {
+				tag.setLong("s", currentInfo.stack.stored);
+				stack.stored = currentInfo.stack.stored;
+			}
+		}
+
+	}
+
+	@Override
+	public void readUpdate(NBTTagCompound tag) {
+		if (tag.hasKey("wT")) {
+			this.readFromNBT(tag.getCompoundTag("wT"));
+		} else {
+			if (tag.hasKey("s")) {
+				stack.stored = tag.getLong("s");
+			}
+		}
+
+	}
+
+	@Override
+	public boolean matches(StoredStackInfo currentInfo) {
+		return currentInfo.stack.equals(stack);
 	}
 
 }
