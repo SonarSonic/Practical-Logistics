@@ -21,11 +21,14 @@ public class RFHandler extends EnergyHandler {
 
 	@Override
 	public boolean canProvideInfo(TileEntity tile, ForgeDirection dir) {
-		return tile instanceof IEnergyInfo || tile instanceof IEnergyReceiver || tile instanceof IEnergyProvider;
+		return tile != null && (tile instanceof IEnergyInfo || tile instanceof IEnergyReceiver || tile instanceof IEnergyProvider);
 	}
 
 	@Override
 	public void getEnergyInfo(List<StoredEnergyStack> energyList, TileEntity tile, ForgeDirection dir) {
+		if (tile == null) {
+			return;
+		}
 		boolean addedStorage = false;
 		if (tile instanceof IEnergyInfo) {
 			IEnergyInfo info = (IEnergyInfo) tile;
@@ -42,7 +45,7 @@ public class RFHandler extends EnergyHandler {
 				addedStorage = true;
 			}
 			int simulateAdd = receiver.receiveEnergy(dir, Integer.MAX_VALUE, true);
-			energyList.add(new StoredEnergyStack(StoredEnergyStack.output, 1, simulateAdd, simulateAdd));
+			energyList.add(new StoredEnergyStack(StoredEnergyStack.input, 1, simulateAdd, simulateAdd));
 		}
 		if (tile instanceof IEnergyProvider) {
 			IEnergyProvider provider = (IEnergyProvider) tile;
@@ -51,7 +54,7 @@ public class RFHandler extends EnergyHandler {
 				addedStorage = true;
 			}
 			int simulateRemove = provider.extractEnergy(dir, Integer.MAX_VALUE, true);
-			energyList.add(new StoredEnergyStack(StoredEnergyStack.input, 1, simulateRemove, simulateRemove));
+			//energyList.add(new StoredEnergyStack(StoredEnergyStack.output, 1, simulateRemove, simulateRemove));
 		}
 	}
 
@@ -59,8 +62,9 @@ public class RFHandler extends EnergyHandler {
 	public double addEnergy(double transfer, TileEntity tile, ForgeDirection dir) {
 		if (tile instanceof IEnergyReceiver) {
 			IEnergyReceiver receiver = (IEnergyReceiver) tile;
-			if (receiver.canConnectEnergy(dir)) {
-				return receiver.receiveEnergy(dir, transfer < Integer.MAX_VALUE ? (int) transfer : Integer.MAX_VALUE, false);
+			if (receiver.canConnectEnergy(dir.getOpposite())) {
+				int transferRF = transfer < Integer.MAX_VALUE ? (int) transfer : Integer.MAX_VALUE;
+				return receiver.receiveEnergy(dir.getOpposite(), transferRF, false);
 			}
 		}
 		return 0;
@@ -70,8 +74,8 @@ public class RFHandler extends EnergyHandler {
 	public double removeEnergy(double transfer, TileEntity tile, ForgeDirection dir) {
 		if (tile instanceof IEnergyProvider) {
 			IEnergyProvider receiver = (IEnergyProvider) tile;
-			if (receiver.canConnectEnergy(dir)) {
-				return receiver.extractEnergy(dir, transfer < Integer.MAX_VALUE ? (int) transfer : Integer.MAX_VALUE, false);
+			if (receiver.canConnectEnergy(dir.getOpposite())) {
+				return receiver.extractEnergy(dir.getOpposite(), transfer < Integer.MAX_VALUE ? (int) transfer : Integer.MAX_VALUE, false);
 			}
 		}
 		return 0;

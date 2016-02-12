@@ -1,5 +1,7 @@
 package sonar.logistics.common.tileentity;
 
+import io.netty.buffer.ByteBuf;
+
 import java.util.List;
 
 import net.minecraft.nbt.NBTTagCompound;
@@ -8,9 +10,9 @@ import sonar.core.common.tileentity.TileEntitySonar;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.network.sync.SyncInt;
 import sonar.core.network.sync.SyncString;
+import sonar.core.network.utils.IByteBufTile;
 import sonar.core.network.utils.ITextField;
 import sonar.core.utils.BlockCoords;
-import sonar.core.utils.IMachineButtons;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.connecting.IInfoEmitter;
@@ -19,7 +21,7 @@ import sonar.logistics.common.blocks.BlockRedstoneSignaller;
 import sonar.logistics.helpers.CableHelper;
 import sonar.logistics.registries.BlockRegistry;
 
-public class TileEntityRedstoneSignaller extends TileEntitySonar implements ILogicTile, IMachineButtons, ITextField {
+public class TileEntityRedstoneSignaller extends TileEntitySonar implements ILogicTile, IByteBufTile, ITextField {
 
 	public Info currentInfo;
 	public SyncInt integerEmitType = new SyncInt(0);
@@ -117,20 +119,6 @@ public class TileEntityRedstoneSignaller extends TileEntitySonar implements ILog
 	}
 
 	@Override
-	public void buttonPress(int buttonID, int value) {
-
-		switch (buttonID) {
-		case 0:
-			dataType.setInt(value);
-			break;
-		case 1:
-			integerEmitType.setInt(value);
-			break;
-		}
-
-	}
-
-	@Override
 	public void textTyped(String string, int id) {
 		if (id == 0) {
 			if (string == null || string.isEmpty()) {
@@ -152,5 +140,29 @@ public class TileEntityRedstoneSignaller extends TileEntitySonar implements ILog
 	@Override
 	public BlockCoords getCoords() {
 		return new BlockCoords(this);
+	}
+
+	@Override
+	public void writePacket(ByteBuf buf, int id) {
+		switch (id) {
+		case 0:
+			buf.writeInt(dataType.getInt());
+			break;
+		case 1:
+			buf.writeInt(integerEmitType.getInt());
+			break;
+		}	
+	}
+
+	@Override
+	public void readPacket(ByteBuf buf, int id) {
+		switch (id) {
+		case 0:
+			dataType.setInt(buf.readInt());
+			break;
+		case 1:
+			integerEmitType.setInt(buf.readInt());
+			break;
+		}
 	}
 }

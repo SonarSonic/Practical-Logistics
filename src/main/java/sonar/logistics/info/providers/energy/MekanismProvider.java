@@ -12,7 +12,7 @@ import cpw.mods.fml.common.Loader;
 
 public class MekanismProvider extends EnergyHandler {
 
-	public static String name = "RF-Provider";
+	public static String name = "Mekanism-Provider";
 
 	@Override
 	public String getName() {
@@ -59,6 +59,12 @@ public class MekanismProvider extends EnergyHandler {
 
 	@Override
 	public double removeEnergy(double transfer, TileEntity tile, ForgeDirection dir) {
+		if (tile instanceof IStrictEnergyStorage) {
+			IStrictEnergyStorage storage = (IStrictEnergyStorage) tile;
+			double maxRemove = Math.min(transfer / 10, storage.getEnergy());
+			storage.setEnergy(storage.getEnergy() - maxRemove);
+			return maxRemove;
+		}
 		return 0;
 	}
 

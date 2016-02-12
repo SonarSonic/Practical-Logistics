@@ -14,6 +14,7 @@ import sonar.logistics.client.gui.GuiChannelSelector;
 import sonar.logistics.client.gui.GuiClock;
 import sonar.logistics.client.gui.GuiDataModifier;
 import sonar.logistics.client.gui.GuiDataReceiver;
+import sonar.logistics.client.gui.GuiEnergyReader;
 import sonar.logistics.client.gui.GuiEntityNode;
 import sonar.logistics.client.gui.GuiFluidReader;
 import sonar.logistics.client.gui.GuiHammer;
@@ -33,6 +34,7 @@ import sonar.logistics.common.containers.ContainerInventoryReader;
 import sonar.logistics.common.containers.ContainerItemRouter;
 import sonar.logistics.common.handlers.ChannelSelectorHandler;
 import sonar.logistics.common.handlers.DataModifierHandler;
+import sonar.logistics.common.handlers.EnergyReaderHandler;
 import sonar.logistics.common.handlers.FluidReaderHandler;
 import sonar.logistics.common.handlers.InfoCreatorHandler;
 import sonar.logistics.common.handlers.InfoReaderHandler;
@@ -103,14 +105,12 @@ public class LogisticsCommon implements IGuiHandler {
 				if (entity instanceof TileEntityDataEmitter) {
 					return new ContainerEmptySync((TileEntityDataEmitter) entity);
 				}
-
 			case LogisticsGui.inventoryReader:
 				if (entity instanceof TileEntityInventoryReader || entity instanceof InventoryReaderPart) {
 					TileHandler handler = FMPHelper.getHandler(tile);
 					if (handler != null && handler instanceof InventoryReaderHandler)
 						return new ContainerInventoryReader((InventoryReaderHandler) handler, tile, player.inventory);
 				}
-
 			case LogisticsGui.redstoneSignaller:
 				if (entity instanceof TileEntityRedstoneSignaller) {
 					return new ContainerEmptySync((TileEntityRedstoneSignaller) entity);
@@ -157,6 +157,14 @@ public class LogisticsCommon implements IGuiHandler {
 				if (entity instanceof TileEntityClock) {
 					return new ContainerEmptySync((TileEntityClock) entity);
 				}
+			case LogisticsGui.energyReader:
+				// if (entity instanceof TileEntityInventoryReader || entity
+				// instanceof InventoryReaderPart) {
+				TileHandler handler = FMPHelper.getHandler(tile);
+				if (handler != null && handler instanceof EnergyReaderHandler) {
+					return new ContainerEmptySync(tile);
+				}
+				// }
 			}
 
 		}
@@ -213,7 +221,7 @@ public class LogisticsCommon implements IGuiHandler {
 				}
 			case LogisticsGui.entityNode:
 				if (entity instanceof TileEntityEntityNode) {
-					return new GuiEntityNode.EntityNode((TileEntityEntityNode) entity);
+					return new GuiEntityNode((TileEntityEntityNode) entity);
 				}
 			case LogisticsGui.fluidReader:
 				if (entity instanceof TileEntityFluidReader || entity instanceof FluidReaderPart) {
@@ -237,6 +245,13 @@ public class LogisticsCommon implements IGuiHandler {
 				if (entity instanceof TileEntityClock) {
 					return new GuiClock((TileEntityClock) entity);
 				}
+			case LogisticsGui.energyReader:
+				// if (entity instanceof TileEntityInventoryReader || entity
+				// instanceof InventoryReaderPart) {
+				TileHandler handler = FMPHelper.getHandler(tile);
+				if (handler != null && handler instanceof EnergyReaderHandler)
+					return new GuiEnergyReader(tile, (EnergyReaderHandler) handler, player.inventory);
+				// }
 			}
 
 		}

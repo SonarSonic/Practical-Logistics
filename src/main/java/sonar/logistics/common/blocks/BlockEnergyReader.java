@@ -29,8 +29,8 @@ public class BlockEnergyReader extends BlockDirectionalConnector {
 	@Override
 	public void openGui(World world, int x, int y, int z, EntityPlayer player) {
 		TileEntity target = world.getTileEntity(x, y, z);
-		if (!world.isRemote && target != null && target instanceof TileEntityFluidReader) {
-			TileEntityFluidReader node = (TileEntityFluidReader) target;
+		if (!world.isRemote && target != null && target instanceof TileEntityEnergyReader) {
+			TileEntityEnergyReader node = (TileEntityEnergyReader) target;
 			player.openGui(Logistics.instance, LogisticsGui.energyReader, world, x, y, z);
 		}
 	}

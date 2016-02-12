@@ -24,7 +24,6 @@ import sonar.core.inventory.GuiSonar;
 import sonar.core.inventory.SonarButtons;
 import sonar.core.inventory.StoredItemStack;
 import sonar.core.network.PacketByteBufServer;
-import sonar.core.network.PacketMachineButton;
 import sonar.core.network.PacketTextField;
 import sonar.core.utils.helpers.FontHelper;
 import sonar.core.utils.helpers.RenderHelper;

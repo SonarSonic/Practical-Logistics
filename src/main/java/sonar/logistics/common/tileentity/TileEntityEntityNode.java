@@ -1,5 +1,6 @@
 package sonar.logistics.common.tileentity;
 
+import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.passive.EntityAnimal;
@@ -7,8 +8,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.network.sync.SyncInt;
+import sonar.core.network.utils.IByteBufTile;
 import sonar.core.utils.BlockCoords;
-import sonar.core.utils.IMachineButtons;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.core.utils.helpers.SonarHelper;
 import sonar.logistics.api.Info;
@@ -17,9 +18,10 @@ import sonar.logistics.api.render.ICableRenderer;
 import sonar.logistics.helpers.CableHelper;
 import sonar.logistics.info.types.BlockCoordsInfo;
 
-public class TileEntityEntityNode extends TileEntityConnection implements ICableRenderer, IInfoEmitter, IMachineButtons {
+public class TileEntityEntityNode extends TileEntityConnection implements ICableRenderer, IInfoEmitter, IByteBufTile {
 
 	public SyncInt entityTarget = new SyncInt(0);
+	public SyncInt entityRange = new SyncInt(1, 10);
 	public float rotate = 0;
 
 	@Override
@@ -61,6 +63,7 @@ public class TileEntityEntityNode extends TileEntityConnection implements ICable
 		super.readData(nbt, type);
 		if (type == SyncType.SAVE || type == SyncType.SYNC) {
 			entityTarget.readFromNBT(nbt, type);
+			entityRange.readFromNBT(nbt, type);
 		}
 	}
 
@@ -68,15 +71,7 @@ public class TileEntityEntityNode extends TileEntityConnection implements ICable
 		super.writeData(nbt, type);
 		if (type == SyncType.SAVE || type == SyncType.SYNC) {
 			entityTarget.writeToNBT(nbt, type);
-		}
-	}
-
-	@Override
-	public void buttonPress(int buttonID, int value) {
-		switch (buttonID) {
-		case 0:
-			entityTarget.setInt(value);
-			break;
+			entityRange.writeToNBT(nbt, type);
 		}
 	}
 
@@ -84,13 +79,13 @@ public class TileEntityEntityNode extends TileEntityConnection implements ICable
 
 		switch (entityTarget.getInt()) {
 		case 1:
-			return SonarHelper.getNearestEntity(EntityPlayer.class, this, 10);
+			return SonarHelper.getNearestEntity(EntityPlayer.class, this, entityRange.getInt());
 		case 2:
-			return SonarHelper.getNearestEntity(EntityMob.class, this, 10);
+			return SonarHelper.getNearestEntity(EntityMob.class, this, entityRange.getInt());
 		case 3:
-			return SonarHelper.getNearestEntity(EntityAnimal.class, this, 10);
+			return SonarHelper.getNearestEntity(EntityAnimal.class, this, entityRange.getInt());
 		default:
-			return SonarHelper.getNearestEntity(Entity.class, this, 10);
+			return SonarHelper.getNearestEntity(Entity.class, this, entityRange.getInt());
 		}
 	}
 
@@ -111,6 +106,35 @@ public class TileEntityEntityNode extends TileEntityConnection implements ICable
 			if (dir != dir.UP) {
 				CableHelper.removeConnection(this, dir);
 			}
+		}
+	}
+
+	@Override
+	public void writePacket(ByteBuf buf, int id) {
+		switch (id) {
+		case 0:
+			buf.writeInt(entityTarget.getInt());
+			break;
+		case 1:
+			buf.writeInt(entityRange.getInt());
+			break;
+		}
+	}
+
+	@Override
+	public void readPacket(ByteBuf buf, int id) {
+		switch (id) {
+		case 0:
+			entityTarget.setInt(buf.readInt());
+			break;
+		case 1:
+			if (entityRange.getInt() != 64)
+				entityRange.increaseBy(1);
+			break;
+		case 2:
+			if (entityRange.getInt() != 1)
+				entityRange.decreaseBy(1);
+			break;
 		}
 	}
 }

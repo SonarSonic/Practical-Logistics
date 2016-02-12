@@ -49,7 +49,7 @@ public class Logistics {
 	public static LogisticsCommon proxy;
 
 	public static final String modid = "PracticalLogistics";
-	public static final String version = "0.1.0";
+	public static final String version = "0.1.1";
 
 	public static SimpleNetworkWrapper network;
 	public static Logger logger = (Logger) LogManager.getLogger(modid);
@@ -141,12 +141,14 @@ public class Logistics {
 		entityProviders.register();
 		inventoryProviders.register();
 		fluidProviders.register();
+		energyProviders.register();
 		logger.info("Registered " + infoTypes.getObjects().size() + " Info Types");
 		logger.info("Registered " + itemFilters.getObjects().size() + " Item Filters");
 		logger.info("Registered " + tileProviders.getObjects().size() + " Tile Providers");
 		logger.info("Registered " + entityProviders.getObjects().size() + " Entity Providers");
 		logger.info("Registered " + inventoryProviders.getObjects().size() + " Inventory Providers");
 		logger.info("Registered " + fluidProviders.getObjects().size() + " Fluid Providers");
+		logger.info("Registered " + energyProviders.getObjects().size() + " Energy Providers");
 
 		if (Loader.isModLoaded("MineTweaker3")) {
 			MineTweakerIntegration.integrate();

@@ -121,7 +121,7 @@ public class StoredStackInfo extends Info<StoredStackInfo> {
 
 	public double getXTranslate(float scale, double sizing) {
 		if (scale >= 120) {
-			return -0.07F;
+			return -0.02F;
 		}
 		return (-0.08F + ((sizing - 1) * 0.17));
 

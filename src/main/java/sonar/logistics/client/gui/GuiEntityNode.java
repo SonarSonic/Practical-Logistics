@@ -2,26 +2,27 @@ package sonar.logistics.client.gui;
 
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
-import net.minecraft.inventory.Container;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 
 import org.lwjgl.input.Keyboard;
 
 import sonar.core.SonarCore;
 import sonar.core.inventory.GuiSonar;
-import sonar.core.network.PacketMachineButton;
+import sonar.core.network.PacketByteBufServer;
 import sonar.core.utils.helpers.FontHelper;
 import sonar.logistics.common.containers.ContainerEmptySync;
 import sonar.logistics.common.tileentity.TileEntityEntityNode;
 
-public abstract class GuiEntityNode extends GuiSonar {
+public class GuiEntityNode extends GuiSonar {
 
 	public static final ResourceLocation bground = new ResourceLocation("PracticalLogistics:textures/gui/rename.png");
 	private GuiTextField nameField;
 
-	public GuiEntityNode(Container container, TileEntity entity) {
-		super(container, entity);
+	public TileEntityEntityNode entity;
+
+	public GuiEntityNode(TileEntityEntityNode entity) {
+		super(new ContainerEmptySync(entity), entity);
+		this.entity = entity;
 	}
 
 	@Override
@@ -33,7 +34,9 @@ public abstract class GuiEntityNode extends GuiSonar {
 		this.ySize = 52;
 		this.guiLeft = (this.width - this.xSize) / 2;
 		this.guiTop = (this.height - this.ySize) / 2;
-		this.buttonList.add(new GuiButton(0, guiLeft+ 20, guiTop+ 20, 126, 20, getEntityTypeString()));
+		this.buttonList.add(new GuiButton(0, guiLeft + 20, guiTop + 18, 126, 20, getEntityTypeString()));
+		this.buttonList.add(new GuiButton(1, guiLeft + 148, guiTop + 5, 20, 20, "+1"));
+		this.buttonList.add(new GuiButton(1, guiLeft + 148, guiTop + 27, 20, 20, "-1"));
 	}
 
 	public String getEntityTypeString() {
@@ -50,20 +53,26 @@ public abstract class GuiEntityNode extends GuiSonar {
 		}
 		return null;
 	}
-	
+
 	protected void actionPerformed(GuiButton button) {
 		if (button != null) {
 			if (button.id == 0) {
-				changeEntityType();
+				if (!(entity.entityTarget.getInt() > 2)) {
+					entity.entityTarget.increaseBy(1);
+				} else {
+					entity.entityTarget.setInt(0);
+				}
 			}
+			SonarCore.network.sendToServer(new PacketByteBufServer(entity, entity.xCoord, entity.yCoord, entity.zCoord, button.id));
 		}
 		reset();
 	}
-	
+
 	@Override
 	public void drawGuiContainerForegroundLayer(int x, int y) {
 		super.drawGuiContainerForegroundLayer(x, y);
 		FontHelper.textCentre(FontHelper.translate("tile.EntityNode.name"), xSize, 6, 0);
+		FontHelper.textCentre("Range: " + entity.entityRange.getInt(), xSize, 40, 0);
 	}
 
 	@Override
@@ -71,32 +80,11 @@ public abstract class GuiEntityNode extends GuiSonar {
 		return bground;
 	}
 
-	public abstract int getEntityType();
+	public int getEntityType() {
+		return entity.entityTarget.getInt();
+	}
 
-	public abstract void changeEntityType();
-
-	public static class EntityNode extends GuiEntityNode {
-
-		public TileEntityEntityNode entity;
-
-		public EntityNode(TileEntityEntityNode entity) {
-			super(new ContainerEmptySync(entity), entity);
-			this.entity = entity;
-		}
-		@Override
-		public int getEntityType() {
-			return entity.entityTarget.getInt();
-		}
-		@Override
-		public void changeEntityType() {
-			if (!(entity.entityTarget.getInt() > 2)) {
-				entity.entityTarget.increaseBy(1);
-			} else {
-				entity.entityTarget.setInt(0);
-			}
-			SonarCore.network.sendToServer(new PacketMachineButton(0, entity.entityTarget.getInt(), entity.xCoord, entity.yCoord, entity.zCoord));
-		
-		}
+	public void changeEntityType() {
 
 	}
 }

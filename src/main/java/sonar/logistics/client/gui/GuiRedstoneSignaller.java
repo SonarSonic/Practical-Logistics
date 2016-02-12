@@ -10,7 +10,7 @@ import org.lwjgl.input.Keyboard;
 
 import sonar.core.SonarCore;
 import sonar.core.inventory.GuiSonar;
-import sonar.core.network.PacketMachineButton;
+import sonar.core.network.PacketByteBufServer;
 import sonar.core.network.PacketTextField;
 import sonar.core.utils.helpers.FontHelper;
 import sonar.logistics.common.containers.ContainerEmptySync;
@@ -209,7 +209,8 @@ public abstract class GuiRedstoneSignaller extends GuiSonar {
 			} else {
 				entity.dataType.setInt(0);
 			}
-			SonarCore.network.sendToServer(new PacketMachineButton(0, entity.dataType.getInt(), entity.xCoord, entity.yCoord, entity.zCoord));
+
+			SonarCore.network.sendToServer(new PacketByteBufServer(entity, entity.xCoord, entity.yCoord, entity.zCoord, 0));
 		}
 
 		@Override
@@ -219,8 +220,7 @@ public abstract class GuiRedstoneSignaller extends GuiSonar {
 			} else {
 				entity.integerEmitType.setInt(0);
 			}
-			SonarCore.network.sendToServer(new PacketMachineButton(1, entity.integerEmitType.getInt(), entity.xCoord, entity.yCoord, entity.zCoord));
-
+			SonarCore.network.sendToServer(new PacketByteBufServer(entity, entity.xCoord, entity.yCoord, entity.zCoord, 1));
 		}
 
 		@Override

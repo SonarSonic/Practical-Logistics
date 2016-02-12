@@ -10,12 +10,13 @@ import sonar.core.utils.BlockCoords;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.connecting.IInfoEmitter;
 import sonar.logistics.api.connecting.IInfoReader;
+import sonar.logistics.common.handlers.EnergyReaderHandler;
 import sonar.logistics.common.handlers.InfoReaderHandler;
 import sonar.logistics.helpers.CableHelper;
 
-public class TileEntityEnergyReader extends TileEntityHandler implements IInfoEmitter, IInfoReader, ITileHandler {
+public class TileEntityEnergyReader extends TileEntityHandler implements IInfoEmitter, ITileHandler {
 
-	public InfoReaderHandler handler = new InfoReaderHandler(false, this);
+	public EnergyReaderHandler handler = new EnergyReaderHandler(false, this);
 
 	@Override
 	public TileHandler getTileHandler() {
@@ -26,19 +27,13 @@ public class TileEntityEnergyReader extends TileEntityHandler implements IInfoEm
 	public boolean canConnect(ForgeDirection dir) {
 		return handler.canConnect(this, dir);
 	}
-
-	@Override
-	public Info getSecondaryInfo() {
-		return handler.getSecondaryInfo(this);
-	}
-
 	@Override
 	public Info currentInfo() {
 		return handler.currentInfo(this);
 	}
 
 	public void sendAvailableData(EntityPlayer player) {
-		handler.sendAvailableData(this, player);
+		//handler.sendAvailableData(this, player);
 	}
 
 	public boolean maxRender() {

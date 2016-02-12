@@ -14,7 +14,6 @@ import org.lwjgl.opengl.GL11;
 import sonar.core.SonarCore;
 import sonar.core.inventory.GuiSonar;
 import sonar.core.network.PacketByteBufServer;
-import sonar.core.network.PacketMachineButton;
 import sonar.core.network.PacketTextField;
 import sonar.core.utils.helpers.FontHelper;
 import sonar.logistics.common.containers.ContainerEmptySync;
