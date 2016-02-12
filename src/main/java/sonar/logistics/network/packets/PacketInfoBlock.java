@@ -6,6 +6,8 @@ import net.minecraft.world.World;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.ITileHandler;
 import sonar.core.integration.fmp.handlers.TileHandler;
+import sonar.core.network.PacketTileEntity;
+import sonar.core.network.PacketTileEntityHandler;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.Info;
 import sonar.logistics.common.handlers.InfoReaderHandler;
@@ -13,36 +15,29 @@ import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 
-public class PacketInfoBlock implements IMessage {
+public class PacketInfoBlock extends PacketTileEntity {
 
-	public int xCoord, yCoord, zCoord;
 	public Info info;
 	public boolean primary, setNull;
 
 	public PacketInfoBlock() {
 	}
 
-	public PacketInfoBlock(int xCoord, int yCoord, int zCoord, boolean primary) {
-		this.xCoord = xCoord;
-		this.yCoord = yCoord;
-		this.zCoord = zCoord;
+	public PacketInfoBlock(int x, int y, int z, boolean primary) {
+		super(x, y, z);
 		this.primary = primary;
 		this.setNull = true;
 	}
 
-	public PacketInfoBlock(int xCoord, int yCoord, int zCoord, Info info, boolean primary) {
+	public PacketInfoBlock(int x, int y, int z, Info info, boolean primary) {
+		super(x, y, z);
 		this.info = info;
-		this.xCoord = xCoord;
-		this.yCoord = yCoord;
-		this.zCoord = zCoord;
 		this.primary = primary;
 	}
 
 	@Override
 	public void fromBytes(ByteBuf buf) {
-		this.xCoord = buf.readInt();
-		this.yCoord = buf.readInt();
-		this.zCoord = buf.readInt();
+		super.fromBytes(buf);
 		this.setNull = buf.readBoolean();
 		this.primary = buf.readBoolean();
 		if (setNull == false) {
@@ -52,32 +47,24 @@ public class PacketInfoBlock implements IMessage {
 
 	@Override
 	public void toBytes(ByteBuf buf) {
-		buf.writeInt(xCoord);
-		buf.writeInt(yCoord);
-		buf.writeInt(zCoord);
+		super.toBytes(buf);
 		buf.writeBoolean(setNull);
 		buf.writeBoolean(primary);
 		if (setNull == false) {
 			Logistics.infoTypes.writeToBuf(buf, info);
 		}
-
 	}
 
-	public static class Handler implements IMessageHandler<PacketInfoBlock, IMessage> {
+	public static class Handler extends PacketTileEntityHandler<PacketInfoBlock> {
 
 		@Override
-		public IMessage onMessage(PacketInfoBlock message, MessageContext ctx) {
-			World world = ctx.getServerHandler().playerEntity.worldObj;
-
-			TileEntity te = world.getTileEntity(message.xCoord, message.yCoord, message.zCoord);
-			if (te == null) {
-				return null;
-			}
+		public IMessage processMessage(PacketInfoBlock message, TileEntity te) {
 			Object target = FMPHelper.checkObject(te);
-			if(target!=null && target instanceof ITileHandler){
-				TileHandler handler = ((ITileHandler) target).getTileHandler();;
-				if(handler!=null && handler instanceof InfoReaderHandler){
-					InfoReaderHandler reader = (InfoReaderHandler) handler;					
+			if (target != null && target instanceof ITileHandler) {
+				TileHandler handler = ((ITileHandler) target).getTileHandler();
+				;
+				if (handler != null && handler instanceof InfoReaderHandler) {
+					InfoReaderHandler reader = (InfoReaderHandler) handler;
 					if (message.primary) {
 						reader.primaryInfo.setObject(message.info);
 					} else {

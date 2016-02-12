@@ -8,6 +8,8 @@ import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import sonar.core.network.PacketTileEntity;
+import sonar.core.network.PacketTileEntityHandler;
 import sonar.logistics.api.IdentifiedCoords;
 import sonar.logistics.common.tileentity.TileEntityDataReceiver;
 import cpw.mods.fml.common.network.ByteBufUtils;
@@ -15,26 +17,21 @@ import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 
-public class PacketDataEmitters implements IMessage {
+public class PacketDataEmitters extends PacketTileEntity {
 
-	public int xCoord, yCoord, zCoord;
 	public List<IdentifiedCoords> coords;
 
 	public PacketDataEmitters() {
 	}
 
-	public PacketDataEmitters(int xCoord, int yCoord, int zCoord, List<IdentifiedCoords> emitters) {
+	public PacketDataEmitters(int x, int y, int z, List<IdentifiedCoords> emitters) {
+		super(x, y, z);
 		this.coords = emitters;
-		this.xCoord = xCoord;
-		this.yCoord = yCoord;
-		this.zCoord = zCoord;
 	}
 
 	@Override
 	public void fromBytes(ByteBuf buf) {
-		this.xCoord = buf.readInt();
-		this.yCoord = buf.readInt();
-		this.zCoord = buf.readInt();
+		super.fromBytes(buf);
 		if (buf.readBoolean()) {
 			coords = new ArrayList();
 			int size = buf.readInt();
@@ -42,19 +39,11 @@ public class PacketDataEmitters implements IMessage {
 				coords.add(IdentifiedCoords.readFromNBT(ByteBufUtils.readTag(buf)));
 			}
 		}
-		TileEntity tile = Minecraft.getMinecraft().thePlayer.worldObj.getTileEntity(xCoord, yCoord, zCoord);
-		if (tile != null && tile instanceof TileEntityDataReceiver) {
-			TileEntityDataReceiver receiver = (TileEntityDataReceiver) tile;
-			receiver.emitters = this.coords;
-		}
-
 	}
 
 	@Override
 	public void toBytes(ByteBuf buf) {
-		buf.writeInt(xCoord);
-		buf.writeInt(yCoord);
-		buf.writeInt(zCoord);
+		super.toBytes(buf);
 		if (coords != null) {
 			buf.writeBoolean(true);
 			buf.writeInt(coords.size());
@@ -69,10 +58,15 @@ public class PacketDataEmitters implements IMessage {
 
 	}
 
-	public static class Handler implements IMessageHandler<PacketDataEmitters, IMessage> {
+	public static class Handler extends PacketTileEntityHandler<PacketDataEmitters> {
 
 		@Override
-		public IMessage onMessage(PacketDataEmitters message, MessageContext ctx) {
+		public IMessage processMessage(PacketDataEmitters message, TileEntity target) {
+			if (target != null && target instanceof TileEntityDataReceiver) {
+				TileEntityDataReceiver receiver = (TileEntityDataReceiver) target;
+				receiver.emitters = message.coords;
+			}
+
 			return null;
 		}
 	}

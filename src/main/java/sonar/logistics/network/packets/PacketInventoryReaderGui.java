@@ -6,6 +6,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.handlers.TileHandler;
+import sonar.core.network.PacketTileEntity;
 import sonar.logistics.api.Info;
 import sonar.logistics.common.containers.ContainerInventoryReader;
 import sonar.logistics.common.containers.ContainerItemRouter;
@@ -15,37 +16,29 @@ import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 
-public class PacketInventoryReaderGui implements IMessage {
+public class PacketInventoryReaderGui extends PacketTileEntity {
 
-	public int xCoord, yCoord, zCoord;
 	public Info info;
 	public boolean state;
 
 	public PacketInventoryReaderGui() {
 	}
 
-	public PacketInventoryReaderGui(int xCoord, int yCoord, int zCoord, boolean state) {
-		this.xCoord = xCoord;
-		this.yCoord = yCoord;
-		this.zCoord = zCoord;
+	public PacketInventoryReaderGui(int x, int y, int z, boolean state) {
+		super(x,y,z);
 		this.state = state;
 	}
 
 	@Override
 	public void fromBytes(ByteBuf buf) {
-		this.xCoord = buf.readInt();
-		this.yCoord = buf.readInt();
-		this.zCoord = buf.readInt();
+		super.fromBytes(buf);
 		this.state = buf.readBoolean();
 	}
 
 	@Override
 	public void toBytes(ByteBuf buf) {
-		buf.writeInt(xCoord);
-		buf.writeInt(yCoord);
-		buf.writeInt(zCoord);
+		super.toBytes(buf);
 		buf.writeBoolean(state);
-
 	}
 
 	public static class Handler implements IMessageHandler<PacketInventoryReaderGui, IMessage> {

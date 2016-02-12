@@ -10,6 +10,8 @@ import net.minecraft.tileentity.TileEntity;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.ITileHandler;
 import sonar.core.integration.fmp.handlers.TileHandler;
+import sonar.core.network.PacketTileEntity;
+import sonar.core.network.PacketTileEntityHandler;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.Info;
 import sonar.logistics.common.handlers.InfoReaderHandler;
@@ -18,26 +20,21 @@ import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 
-public class PacketProviders implements IMessage {
+public class PacketProviders extends PacketTileEntity {
 
-	public int xCoord, yCoord, zCoord;
 	public List<Info> info;
 
 	public PacketProviders() {
 	}
 
-	public PacketProviders(int xCoord, int yCoord, int zCoord, List<Info> info) {
+	public PacketProviders(int x, int y, int z, List<Info> info) {
+		super(x, y, z);
 		this.info = info;
-		this.xCoord = xCoord;
-		this.yCoord = yCoord;
-		this.zCoord = zCoord;
 	}
 
 	@Override
 	public void fromBytes(ByteBuf buf) {
-		this.xCoord = buf.readInt();
-		this.yCoord = buf.readInt();
-		this.zCoord = buf.readInt();
+		super.fromBytes(buf);
 		if (buf.readBoolean()) {
 			info = new ArrayList();
 			int size = buf.readInt();
@@ -45,37 +42,11 @@ public class PacketProviders implements IMessage {
 				info.add(Logistics.infoTypes.readFromBuf(buf));
 			}
 		}
-		TileEntity tile = Minecraft.getMinecraft().thePlayer.worldObj.getTileEntity(xCoord, yCoord, zCoord);
-		Object target = FMPHelper.checkObject(tile);
-		if (target != null && target instanceof ITileHandler) {
-			TileHandler handler = ((ITileHandler) target).getTileHandler();
-			if (handler != null && handler instanceof InfoReaderHandler) {
-				InfoReaderHandler reader = (InfoReaderHandler) handler;
-				if (info != null) {
-					List<Info> newInfo = new ArrayList();
-					Info lastInfo = null;
-					for (Info blockInfo : info) {
-						if (lastInfo == null || !lastInfo.getCategory().equals(blockInfo.getCategory())) {
-							newInfo.add(CategoryInfo.createInfo(blockInfo.getCategory()));
-						}
-						newInfo.add(blockInfo);
-						lastInfo = blockInfo;
-					}
-					reader.clientInfo = newInfo;
-				} else {
-					reader.clientInfo = null;
-				}
-			}
-
-		}
-
 	}
 
 	@Override
 	public void toBytes(ByteBuf buf) {
-		buf.writeInt(xCoord);
-		buf.writeInt(yCoord);
-		buf.writeInt(zCoord);
+		super.toBytes(buf);
 		if (info != null) {
 			buf.writeBoolean(true);
 			buf.writeInt(info.size());
@@ -88,10 +59,32 @@ public class PacketProviders implements IMessage {
 
 	}
 
-	public static class Handler implements IMessageHandler<PacketProviders, IMessage> {
+	public static class Handler extends PacketTileEntityHandler<PacketProviders> {
 
 		@Override
-		public IMessage onMessage(PacketProviders message, MessageContext ctx) {
+		public IMessage processMessage(PacketProviders message, TileEntity te) {
+			Object target = FMPHelper.checkObject(te);
+			if (target != null && target instanceof ITileHandler) {
+				TileHandler handler = ((ITileHandler) target).getTileHandler();
+				if (handler != null && handler instanceof InfoReaderHandler) {
+					InfoReaderHandler reader = (InfoReaderHandler) handler;
+					if (message.info != null) {
+						List<Info> newInfo = new ArrayList();
+						Info lastInfo = null;
+						for (Info blockInfo : message.info) {
+							if (lastInfo == null || !lastInfo.getCategory().equals(blockInfo.getCategory())) {
+								newInfo.add(CategoryInfo.createInfo(blockInfo.getCategory()));
+							}
+							newInfo.add(blockInfo);
+							lastInfo = blockInfo;
+						}
+						reader.clientInfo = newInfo;
+					} else {
+						reader.clientInfo = null;
+					}
+				}
+
+			}
 			return null;
 		}
 	}

@@ -7,54 +7,41 @@ import net.minecraft.world.World;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.ITileHandler;
 import sonar.core.integration.fmp.handlers.TileHandler;
+import sonar.core.network.PacketTileEntity;
+import sonar.core.network.PacketTileEntityHandler;
 import sonar.logistics.common.handlers.InventoryReaderHandler;
 import cpw.mods.fml.common.network.ByteBufUtils;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 
-public class PacketInventoryReader implements IMessage {
+public class PacketInventoryReader extends PacketTileEntity {
 
-	public int xCoord, yCoord, zCoord;
 	public ItemStack selected;
 
-	public PacketInventoryReader() {
-	}
+	public PacketInventoryReader() {}
 
-	public PacketInventoryReader(int xCoord, int yCoord, int zCoord, ItemStack selected) {
-		this.xCoord = xCoord;
-		this.yCoord = yCoord;
-		this.zCoord = zCoord;
+	public PacketInventoryReader(int x, int y, int z, ItemStack selected) {
+		super(x,y,z);
 		this.selected = selected;
 	}
 
-
 	@Override
 	public void fromBytes(ByteBuf buf) {
-		this.xCoord = buf.readInt();
-		this.yCoord = buf.readInt();
-		this.zCoord = buf.readInt();
+		super.fromBytes(buf);
 		this.selected = ByteBufUtils.readItemStack(buf);
 	}
 
 	@Override
 	public void toBytes(ByteBuf buf) {
-		buf.writeInt(xCoord);
-		buf.writeInt(yCoord);
-		buf.writeInt(zCoord);
+		super.toBytes(buf);
 		ByteBufUtils.writeItemStack(buf, selected);
 	}
 
-	public static class Handler implements IMessageHandler<PacketInventoryReader, IMessage> {
+	public static class Handler extends PacketTileEntityHandler<PacketInventoryReader> {
 
 		@Override
-		public IMessage onMessage(PacketInventoryReader message, MessageContext ctx) {
-			World world = ctx.getServerHandler().playerEntity.worldObj;
-
-			TileEntity te = world.getTileEntity(message.xCoord, message.yCoord, message.zCoord);
-			if (te == null) {
-				return null;
-			}
+		public IMessage processMessage(PacketInventoryReader message, TileEntity te) {
 			Object target = FMPHelper.checkObject(te);
 			if(target!=null && target instanceof ITileHandler){
 				TileHandler handler = ((ITileHandler) target).getTileHandler();;

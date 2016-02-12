@@ -8,64 +8,53 @@ import net.minecraftforge.fluids.FluidStack;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.ITileHandler;
 import sonar.core.integration.fmp.handlers.TileHandler;
+import sonar.core.network.PacketTileEntity;
+import sonar.core.network.PacketTileEntityHandler;
 import sonar.logistics.common.handlers.FluidReaderHandler;
 import cpw.mods.fml.common.network.ByteBufUtils;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 
-public class PacketFluidReader implements IMessage {
+public class PacketFluidReader extends PacketTileEntity {
 
-	public int xCoord, yCoord, zCoord;
 	public FluidStack selected;
 
 	public PacketFluidReader() {
 	}
 
-	public PacketFluidReader(int xCoord, int yCoord, int zCoord, FluidStack selected) {
-		this.xCoord = xCoord;
-		this.yCoord = yCoord;
-		this.zCoord = zCoord;
+	public PacketFluidReader(int x, int y, int z, FluidStack selected) {
+		super(x, y, z);
 		this.selected = selected;
 	}
 
 	@Override
 	public void fromBytes(ByteBuf buf) {
-		this.xCoord = buf.readInt();
-		this.yCoord = buf.readInt();
-		this.zCoord = buf.readInt();
+		super.fromBytes(buf);
 		this.selected = FluidStack.loadFluidStackFromNBT(ByteBufUtils.readTag(buf));
 	}
 
 	@Override
 	public void toBytes(ByteBuf buf) {
-		buf.writeInt(xCoord);
-		buf.writeInt(yCoord);
-		buf.writeInt(zCoord);
+		super.toBytes(buf);
 		NBTTagCompound tag = new NBTTagCompound();
 		selected.writeToNBT(tag);
 		ByteBufUtils.writeTag(buf, tag);
 	}
 
-	public static class Handler implements IMessageHandler<PacketFluidReader, IMessage> {
+	public static class Handler extends PacketTileEntityHandler<PacketFluidReader> {
 
 		@Override
-		public IMessage onMessage(PacketFluidReader message, MessageContext ctx) {
-			World world = ctx.getServerHandler().playerEntity.worldObj;
-
-			TileEntity te = world.getTileEntity(message.xCoord, message.yCoord, message.zCoord);
-			if (te == null) {
-				return null;
-			}
+		public IMessage processMessage(PacketFluidReader message, TileEntity te) {
 			Object target = FMPHelper.checkObject(te);
 			if (target != null && target instanceof ITileHandler) {
 				TileHandler handler = ((ITileHandler) target).getTileHandler();
-				;
 				if (handler != null && handler instanceof FluidReaderHandler) {
 					FluidReaderHandler reader = (FluidReaderHandler) handler;
 					reader.current = message.selected;
 				}
 			}
+
 			return null;
 		}
 	}
