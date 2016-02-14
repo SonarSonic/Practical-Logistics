@@ -7,8 +7,8 @@ import sonar.core.network.utils.ITextField;
 import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.api.Info;
+import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.connecting.IInfoEmitter;
-import sonar.logistics.helpers.CableHelper;
 import sonar.logistics.info.types.BlockCoordsInfo;
 import sonar.logistics.registries.EmitterRegistry;
 
@@ -89,14 +89,14 @@ public class TileEntityDataEmitter extends TileEntityNode implements IInfoEmitte
 	@Override
 	public void addConnections() {
 		if (!this.worldObj.isRemote) {
-			CableHelper.addConnection(this, ForgeDirection.getOrientation(this.getBlockMetadata()).getOpposite());
+			LogisticsAPI.getCableHelper().addConnection(this, ForgeDirection.getOrientation(this.getBlockMetadata()).getOpposite());
 		}
 	}
 
 	@Override
 	public void removeConnections() {
 		if (!this.worldObj.isRemote) {
-			CableHelper.removeConnection(this, ForgeDirection.getOrientation(this.getBlockMetadata()).getOpposite());
+			LogisticsAPI.getCableHelper().removeConnection(this, ForgeDirection.getOrientation(this.getBlockMetadata()).getOpposite());
 		}
 	}
 

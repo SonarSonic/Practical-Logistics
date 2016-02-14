@@ -3,7 +3,6 @@ package sonar.logistics.network.packets;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.World;
 import net.minecraftforge.fluids.FluidStack;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.ITileHandler;
@@ -13,8 +12,6 @@ import sonar.core.network.PacketTileEntityHandler;
 import sonar.logistics.common.handlers.FluidReaderHandler;
 import cpw.mods.fml.common.network.ByteBufUtils;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
-import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
-import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 
 public class PacketFluidReader extends PacketTileEntity {
 

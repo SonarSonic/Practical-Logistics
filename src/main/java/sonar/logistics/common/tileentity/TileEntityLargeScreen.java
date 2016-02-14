@@ -8,7 +8,6 @@ import sonar.logistics.api.Info;
 import sonar.logistics.api.connecting.IInfoTile;
 import sonar.logistics.api.connecting.ILargeDisplay;
 import sonar.logistics.common.handlers.LargeDisplayScreenHandler;
-import sonar.logistics.helpers.CableHelper;
 import sonar.logistics.helpers.DisplayHelper;
 
 public class TileEntityLargeScreen extends TileEntityHandler implements IInfoTile, ILargeDisplay {

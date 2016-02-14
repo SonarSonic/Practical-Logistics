@@ -4,13 +4,13 @@ package sonar.logistics.api.connecting;
 public interface IInfoEmitter extends IInfoTile {
 
 	/**
-	 * use CableHelper.addConnection for each side that can connect to cables,
+	 * use LogisticsAPI.getCableHelper().addConnection for each side that can connect to cables,
 	 * this should be called when the Tile Entity is validated
 	 */
 	public void addConnections();
 
 	/**
-	 * use CableHelper.removeConnection for each side that can connect to
+	 * use LogisticsAPI.getCableHelper().removeConnection for each side that can connect to
 	 * cables, this should be called when the Tile Entity is invalidated
 	 */
 	public void removeConnections();

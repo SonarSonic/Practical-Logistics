@@ -7,19 +7,22 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.ResourceLocation;
 
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
 
 import sonar.core.energy.StoredEnergyStack;
 import sonar.core.utils.BlockCoords;
-import sonar.core.utils.helpers.FontHelper;
 import sonar.core.utils.helpers.RenderHelper;
 import sonar.logistics.api.IdentifiedCoords;
 import sonar.logistics.api.Info;
+import sonar.logistics.api.render.InfoRenderer;
+import sonar.logistics.client.renderers.RenderHandlers;
 
 public class StoredEnergyInfo extends Info<StoredEnergyInfo> {
 
+	private static final ResourceLocation progress = new ResourceLocation(RenderHandlers.modelFolder + "progressBar.png");
 	public StoredEnergyStack stack;
 	public IdentifiedCoords coords;
 	public String rend = "ITEMREND";
@@ -90,44 +93,37 @@ public class StoredEnergyInfo extends Info<StoredEnergyInfo> {
 
 	@Override
 	public void renderInfo(Tessellator tess, TileEntity tile, float minX, float minY, float maxX, float maxY, float zOffset, float scale) {
-		/*
-		 * if (stack != null && stack.item != null) {
-		 * 
-		 * GL11.glTranslatef(minX + (maxX - minX) / 2, minY + (maxY - minY) / 2,
-		 * 0.01f); FontRenderer rend = Minecraft.getMinecraft().fontRenderer;
-		 * stack.item.stackSize = 1;
-		 * 
-		 * GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-		 * 
-		 * GL11.glDisable(GL12.GL_RESCALE_NORMAL);
-		 * GL11.glEnable(GL11.GL_CULL_FACE); tess.setColorOpaque_F(1.0f, 1.0f,
-		 * 1.0f); double sizing = Math.round(Math.min((maxX - minX), (maxY -
-		 * minY))); double itemScale = sizing >= 2 ? (2.5F + sizing - 1 * 1.0F)
-		 * : scale >= 120 ? 0.8F : 1.4F; GL11.glTranslated(0.0,
-		 * getXTranslate(scale, sizing), zOffset - 0.01);
-		 * 
-		 * GL11.glScaled(itemScale, itemScale, itemScale);
-		 * GL11.glTranslatef(0.0f, 0.0f, +0.25f);
-		 * RenderHelper.doRenderItem(stack.item, tile.getWorldObj(), false);
-		 * GL11.glDisable(GL11.GL_CULL_FACE);
-		 * GL11.glEnable(GL12.GL_RESCALE_NORMAL); GL11.glTranslatef(0.0f, 0.0f,
-		 * -0.242f); GL11.glScalef(1.0f / 40.0f, 1.0f / 40.0f, 1.0f / 40.0f);
-		 * 
-		 * String s1 = FontHelper.formatStackSize(stack.stored);
-		 * 
-		 * final float scaleFactor = 0.5F; final float inverseScaleFactor = 1.0f
-		 * / scaleFactor;
-		 * 
-		 * GL11.glScaled(scaleFactor, scaleFactor, scaleFactor);
-		 * 
-		 * final int X = (int) (((float) -8 + 15.0f - rend.getStringWidth(s1) *
-		 * scaleFactor) * inverseScaleFactor); final int Y = (int) (((float) -12
-		 * + 15.0f - 7.0f * scaleFactor) * inverseScaleFactor);
-		 * 
-		 * GL11.glDisable(GL11.GL_LIGHTING); rend.drawString(s1, X, Y,
-		 * 16777215); }
-		 */
-		super.renderInfo(tess, tile, minX, minY, maxX, maxY, zOffset, scale);
+		GL11.glTranslated(0, 0, zOffset + 0.002);
+		float width = stack.stored * (maxX - minX) / stack.capacity;
+		Minecraft.getMinecraft().renderEngine.bindTexture(progress);
+		GL11.glColor4f(1.0F, 0.0F, 1.0F, 1.0F);
+		RenderHelper.drawTexturedModalRect(minX, minY, maxY, width, (maxY - minY));	
+		GL11.glTranslated(0, 0, -zOffset - 0.002);	
+		FontRenderer rend = Minecraft.getMinecraft().fontRenderer;
+		GL11.glTranslatef(minX + (maxX - minX) / 2, minY + (maxY - minY) / 2, 0.01f);
+		int sizing = (int) Math.round(Math.min((maxX - minX), (maxY - minY) * 1.5));
+		GL11.glTranslatef(0.0f, (float) (scale >= 120 ? -0.1F : -0.31F + ((sizing - 1) * -0.04)), zOffset);
+		double itemScale = sizing >= 2 ? InfoRenderer.getScale(sizing) : 120;
+		GL11.glScaled(1.0f / itemScale, 1.0f / itemScale, 1.0f / itemScale);
+		String coordString = coords.block.getDisplayName();
+		rend.drawString(EnumChatFormatting.UNDERLINE + coordString, -rend.getStringWidth(coordString) / 2, -20, -1);
+		
+		String stored = "Stored: " + String.valueOf(stack.stored) + " RF";
+		String capacity = "Capacity: " + String.valueOf(stack.capacity) + " RF";		
+		rend.drawString(stored, -rend.getStringWidth(stored) / 2, -8, -1);
+		rend.drawString(capacity, -rend.getStringWidth(capacity) / 2, 4, -1);
+		if (stack.hasInput) {
+			String input = "Max Input: " + String.valueOf(stack.input) + " RF";
+			rend.drawString(input, -rend.getStringWidth(input) / 2, 16, -1);
+		}
+		if (stack.hasOutput) {
+			String output = "Max Output: " + String.valueOf(stack.output) + " RF";
+			rend.drawString(output, -rend.getStringWidth(output) / 2, 28, -1);
+		}
+		if (stack.hasUsage) {
+			String usage = "Usage: " + String.valueOf(stack.usage) + " RF";
+			rend.drawString(usage, -rend.getStringWidth(usage) / 2, 28, -1);
+		}
 	}
 
 	public double getXTranslate(float scale, double sizing) {
@@ -163,23 +159,23 @@ public class StoredEnergyInfo extends Info<StoredEnergyInfo> {
 		}
 		if (currentInfo.stack.capacity != stack.capacity) {
 			stack.capacity = currentInfo.stack.capacity;
-			tag.setDouble("c", stack.capacity);
+			tag.setLong("c", stack.capacity);
 		}
 		if (currentInfo.stack.input != stack.input) {
 			stack.input = currentInfo.stack.input;
-			tag.setDouble("i", stack.input);
+			tag.setLong("i", stack.input);
 		}
 		if (currentInfo.stack.output != stack.output) {
 			stack.output = currentInfo.stack.output;
-			tag.setDouble("o", stack.output);
+			tag.setLong("o", stack.output);
 		}
 		if (currentInfo.stack.stored != stack.stored) {
 			stack.stored = currentInfo.stack.stored;
-			tag.setDouble("s", stack.stored);
+			tag.setLong("s", stack.stored);
 		}
 		if (currentInfo.stack.usage != stack.usage) {
 			stack.usage = currentInfo.stack.usage;
-			tag.setDouble("u", stack.usage);
+			tag.setLong("u", stack.usage);
 		}
 		if (!currentInfo.coords.blockCoords.equals(coords.blockCoords)) {
 			coords.blockCoords = currentInfo.coords.blockCoords;
@@ -189,9 +185,9 @@ public class StoredEnergyInfo extends Info<StoredEnergyInfo> {
 			coords.block = currentInfo.coords.block;
 			coords.block.writeToNBT(tag);
 		}
-		if (!currentInfo.coords.suffix.equals(coords.suffix)) {
-			coords.suffix = currentInfo.coords.suffix;
-			tag.setString("suffix", coords.suffix);
+		if (!currentInfo.coords.coordString.equals(coords.coordString)) {
+			coords.coordString = currentInfo.coords.coordString;
+			tag.setString("suffix", coords.coordString);
 		}
 	}
 
@@ -231,7 +227,7 @@ public class StoredEnergyInfo extends Info<StoredEnergyInfo> {
 			coords.block = ItemStack.loadItemStackFromNBT(tag);
 		}
 		if (tag.hasKey("suffix")) {
-			coords.suffix = tag.getString("suffix");
+			coords.coordString = tag.getString("suffix");
 		}
 	}
 

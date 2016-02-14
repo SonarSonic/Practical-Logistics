@@ -1,6 +1,5 @@
 package sonar.logistics.registries;
 
-import net.minecraft.nbt.NBTTagCompound;
 import sonar.core.utils.helpers.NBTRegistryHelper;
 import sonar.logistics.api.EntityInfo;
 import sonar.logistics.api.Info;

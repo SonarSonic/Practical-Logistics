@@ -3,12 +3,11 @@ package sonar.logistics.client.gui;
 import java.awt.Color;
 import java.util.List;
 
+import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.util.StatCollector;
+
 import org.lwjgl.opengl.GL11;
 
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.Container;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.StatCollector;
 import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.FontHelper;
 import sonar.logistics.Logistics;
@@ -49,10 +48,10 @@ public class GuiDataReceiver extends GuiSelectionList<IdentifiedCoords> {
 
 	@Override
 	public void renderSelection(IdentifiedCoords selection, boolean isSelected, int pos) {
-		FontHelper.text(selection.suffix, 10, 31 + (12 * pos), isSelected ? Color.GREEN.getRGB() : Color.WHITE.getRGB());
+		FontHelper.text(selection.coordString, 10, 31 + (12 * pos), isSelected ? Color.GREEN.getRGB() : Color.WHITE.getRGB());
 		GL11.glPushMatrix();
 		GL11.glScaled(0.75, 0.75, 0.75);
-		FontHelper.text(selection.blockCoords.getRender(), 174, 43 + (16 * pos), isSelected ? Color.GREEN.getRGB() : Color.WHITE.getRGB());
+		FontHelper.text(selection.blockCoords.toString(), 174, 43 + (16 * pos), isSelected ? Color.GREEN.getRGB() : Color.WHITE.getRGB());
 		GL11.glPopMatrix();
 
 	}

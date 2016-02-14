@@ -4,13 +4,12 @@ import java.util.List;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import powercrystals.minefactoryreloaded.api.IDeepStorageUnit;
 import sonar.core.inventory.StoredItemStack;
-import sonar.logistics.api.providers.InventoryProvider;
+import sonar.logistics.api.providers.InventoryHandler;
 
-public class DSUInventoryProvider extends InventoryProvider {
+public class DSUInventoryProvider extends InventoryHandler {
 
 	public static String name = "DSU-Inventory";
 

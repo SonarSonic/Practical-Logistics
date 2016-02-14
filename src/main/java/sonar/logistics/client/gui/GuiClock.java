@@ -3,9 +3,6 @@ package sonar.logistics.client.gui;
 import java.text.SimpleDateFormat;
 
 import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.gui.GuiTextField;
-import net.minecraft.inventory.Container;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 
 import org.lwjgl.input.Keyboard;
@@ -14,11 +11,9 @@ import org.lwjgl.opengl.GL11;
 import sonar.core.SonarCore;
 import sonar.core.inventory.GuiSonar;
 import sonar.core.network.PacketByteBufServer;
-import sonar.core.network.PacketTextField;
 import sonar.core.utils.helpers.FontHelper;
 import sonar.logistics.common.containers.ContainerEmptySync;
 import sonar.logistics.common.tileentity.TileEntityClock;
-import sonar.logistics.common.tileentity.TileEntityRedstoneSignaller;
 
 public class GuiClock extends GuiSonar {
 

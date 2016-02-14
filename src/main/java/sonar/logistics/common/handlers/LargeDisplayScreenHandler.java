@@ -6,9 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import net.minecraft.block.Block;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.SonarCore;
@@ -17,9 +15,9 @@ import sonar.core.network.sync.SyncBoolean;
 import sonar.core.network.utils.IByteBufTile;
 import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
+import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.connecting.ILargeDisplay;
 import sonar.logistics.api.render.LargeScreenSizing;
-import sonar.logistics.helpers.CableHelper;
 import sonar.logistics.helpers.DisplayHelper;
 import sonar.logistics.registries.DisplayRegistry;
 
@@ -86,7 +84,7 @@ public class LargeDisplayScreenHandler extends DisplayScreenHandler implements I
 		if (displays != null) {
 			for (BlockCoords coords : displays) {
 				if (coords != null && coords.getTileEntity() != null) {
-					List<BlockCoords> connections = CableHelper.getConnections(coords.getTileEntity(), dir.getOpposite());
+					List<BlockCoords> connections = LogisticsAPI.getCableHelper().getConnections(coords.getTileEntity(), dir.getOpposite());
 					if (!connections.isEmpty()) {
 						return coords;
 					}

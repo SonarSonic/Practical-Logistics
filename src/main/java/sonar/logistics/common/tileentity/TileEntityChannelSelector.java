@@ -1,23 +1,18 @@
 package sonar.logistics.common.tileentity;
 
-import java.util.List;
-
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.common.tileentity.TileEntityHandler;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.handlers.TileHandler;
-import sonar.core.network.utils.ITextField;
 import sonar.core.utils.BlockCoords;
 import sonar.logistics.api.IdentifiedCoords;
 import sonar.logistics.api.Info;
+import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.connecting.IChannelProvider;
 import sonar.logistics.api.connecting.IInfoEmitter;
 import sonar.logistics.api.render.ICableRenderer;
 import sonar.logistics.common.handlers.ChannelSelectorHandler;
-import sonar.logistics.common.handlers.InfoCreatorHandler;
-import sonar.logistics.helpers.CableHelper;
 import sonar.logistics.info.types.BlockCoordsInfo;
-import sonar.logistics.registries.CableRegistry;
 
 public class TileEntityChannelSelector extends TileEntityHandler implements IInfoEmitter, ICableRenderer, IChannelProvider {
 
@@ -54,13 +49,13 @@ public class TileEntityChannelSelector extends TileEntityHandler implements IInf
 
 	@Override
 	public void addConnections() {
-		CableHelper.addConnection(this, ForgeDirection.getOrientation(FMPHelper.getMeta(this)));
+		LogisticsAPI.getCableHelper().addConnection(this, ForgeDirection.getOrientation(FMPHelper.getMeta(this)));
 
 	}
 
 	@Override
 	public void removeConnections() {
-		CableHelper.addConnection(this, ForgeDirection.getOrientation(FMPHelper.getMeta(this)));
+		LogisticsAPI.getCableHelper().addConnection(this, ForgeDirection.getOrientation(FMPHelper.getMeta(this)));
 	}
 
 	@Override

@@ -3,7 +3,6 @@ package sonar.logistics.client.gui;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
@@ -13,28 +12,16 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.StatCollector;
-
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.GL11;
-
 import sonar.core.SonarCore;
-import sonar.core.inventory.GuiSonar;
-import sonar.core.inventory.SonarButtons;
 import sonar.core.inventory.StoredItemStack;
 import sonar.core.network.PacketByteBufServer;
-import sonar.core.network.PacketTextField;
 import sonar.core.utils.helpers.FontHelper;
 import sonar.core.utils.helpers.RenderHelper;
 import sonar.logistics.Logistics;
 import sonar.logistics.common.containers.ContainerInventoryReader;
-import sonar.logistics.common.containers.ContainerItemRouter;
 import sonar.logistics.common.handlers.InventoryReaderHandler;
 import sonar.logistics.network.packets.PacketInventoryReader;
 import sonar.logistics.network.packets.PacketInventoryReaderGui;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 public class GuiInventoryReader extends GuiSelectionGrid<StoredItemStack> {
 

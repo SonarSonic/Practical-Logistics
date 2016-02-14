@@ -1,7 +1,10 @@
 package sonar.logistics.helpers;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -9,16 +12,19 @@ import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.SonarHelper;
+import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.connecting.IChannelProvider;
-import sonar.logistics.api.connecting.IInfoEmitter;
+import sonar.logistics.api.connecting.IConnectionNode;
 import sonar.logistics.api.connecting.IDataCable;
+import sonar.logistics.api.connecting.IInfoEmitter;
 import sonar.logistics.api.connecting.ILogicTile;
+import sonar.logistics.api.wrappers.CablingWrapper;
 import sonar.logistics.common.tileentity.TileEntityDataEmitter;
 import sonar.logistics.registries.CableRegistry;
 
-public class CableHelper {
+public class CableHelper extends CablingWrapper {
 
-	public static void addConnection(TileEntity connection, ForgeDirection side) {
+	public void addConnection(TileEntity connection, ForgeDirection side) {
 		Object adjacent = FMPHelper.getAdjacentTile(connection, side);
 		if (adjacent != null) {
 			if (adjacent instanceof IDataCable) {
@@ -30,7 +36,7 @@ public class CableHelper {
 		}
 	}
 
-	public static void removeConnection(TileEntity connection, ForgeDirection side) {
+	public void removeConnection(TileEntity connection, ForgeDirection side) {
 		Object adjacent = FMPHelper.getAdjacentTile(connection, side);
 		TileHandler handler = FMPHelper.getHandler(adjacent);
 		if (adjacent != null) {
@@ -43,7 +49,7 @@ public class CableHelper {
 		}
 	}
 
-	public static void addCable(IDataCable cable) {
+	public void addCable(IDataCable cable) {
 		Object cableTile = FMPHelper.getTile(cable.getCoords().getTileEntity());
 		if (cableTile != null) {
 			List adjacents = new ArrayList();
@@ -69,7 +75,7 @@ public class CableHelper {
 						}
 					}
 				} else {
-					
+
 				}
 			}
 			int cableID = -1;
@@ -104,11 +110,11 @@ public class CableHelper {
 		}
 	}
 
-	public static void removeCable(IDataCable cable) {
+	public void removeCable(IDataCable cable) {
 		CableRegistry.removeCable(cable.registryID(), cable);
 	}
 
-	public static List<BlockCoords> getConnections(TileEntity tile, ForgeDirection dir) {
+	public List<BlockCoords> getConnections(TileEntity tile, ForgeDirection dir) {
 		ArrayList<BlockCoords> connections = new ArrayList();
 		int registryID = -1;
 		boolean unlimited = false;
@@ -124,6 +130,7 @@ public class CableHelper {
 			} else if (adjacent instanceof IChannelProvider) {
 				addChannelConnections(connections, (IChannelProvider) adjacent, tile, true);
 			} else if (adjacent instanceof IInfoEmitter) {
+
 				IInfoEmitter connect = ((IInfoEmitter) adjacent);
 				connections.add(connect.getCoords());
 			}
@@ -148,22 +155,22 @@ public class CableHelper {
 		return connections;
 	}
 
-	public static void addChannelConnections(ArrayList<BlockCoords> connections, IChannelProvider receiver, TileEntity tile, boolean unlimited) {
-		TileEntity emitter = null;
+	private static void addChannelConnections(ArrayList<BlockCoords> connections, IChannelProvider receiver, TileEntity tile, boolean unlimited) {
+		TileEntity channel = null;
 		if (receiver.getChannel() != null && receiver.getChannel().blockCoords != null) {
 			TileEntity target = receiver.getChannel().blockCoords.getTileEntity();
 			if (target != null && target instanceof ILogicTile) {
 				ILogicTile dataemitter = (ILogicTile) target;
 				if (tile.xCoord != dataemitter.getCoords().getX() || tile.yCoord != dataemitter.getCoords().getY() || tile.zCoord != dataemitter.getCoords().getZ()) {
-					emitter = target;
+					channel = target;
 				}
 			}
 		}
-		if (emitter != null) {
-			if (!(emitter instanceof TileEntityDataEmitter)) {
-				connections.add(new BlockCoords(emitter));
+		if (channel != null) {
+			if (!(channel instanceof TileEntityDataEmitter)) {
+				connections.add(new BlockCoords(channel));
 			} else {
-				List<BlockCoords> emitterConnections = getConnections(emitter, ForgeDirection.getOrientation(emitter.getBlockMetadata()).getOpposite());
+				List<BlockCoords> emitterConnections = LogisticsAPI.getCableHelper().getConnections(channel, ForgeDirection.getOrientation(channel.getBlockMetadata()).getOpposite());
 				List<BlockCoords> toAdd = new ArrayList();
 				for (BlockCoords coords : emitterConnections) {
 					boolean hasCoords = false;
@@ -185,7 +192,22 @@ public class CableHelper {
 		}
 	}
 
-	public static int canRenderConnection(TileEntity te, ForgeDirection dir) {
+	public Map<BlockCoords, ForgeDirection> getTileConnections(List<BlockCoords> network) {
+		if (network == null) {
+			return Collections.EMPTY_MAP;
+		}
+		Map<BlockCoords, ForgeDirection> connections = new LinkedHashMap();
+		for (BlockCoords connect : network) {
+			TileEntity node = connect.getTileEntity();
+			if (node != null && node instanceof IConnectionNode) {
+				connections.putAll(((IConnectionNode) node).getConnections());
+			}
+		}
+		return connections;
+
+	}
+
+	public int canRenderConnection(TileEntity te, ForgeDirection dir) {
 		Object target = FMPHelper.getTile(te);
 		Object tile = SonarHelper.getAdjacentTileEntity(te, dir);
 		tile = FMPHelper.checkObject(tile);

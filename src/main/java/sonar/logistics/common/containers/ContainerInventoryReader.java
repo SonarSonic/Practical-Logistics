@@ -1,20 +1,12 @@
 package sonar.logistics.common.containers;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.ICrafting;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import sonar.core.SonarCore;
-import sonar.core.integration.fmp.FMPHelper;
-import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.inventory.ContainerSync;
-import sonar.core.inventory.StoredItemStack;
 import sonar.core.inventory.slots.SlotList;
-import sonar.core.network.PacketTileSync;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.common.handlers.InventoryReaderHandler;
 

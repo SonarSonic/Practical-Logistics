@@ -14,9 +14,8 @@ import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.api.Info;
+import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.StandardInfo;
-import sonar.logistics.helpers.CableHelper;
-import sonar.logistics.helpers.FluidHelper;
 import sonar.logistics.info.types.FluidStackInfo;
 
 public class FluidReaderHandler extends TileHandler {
@@ -36,7 +35,7 @@ public class FluidReaderHandler extends TileHandler {
 		if (te.getWorldObj().isRemote) {
 			return;
 		}
-		stacks = FluidHelper.getFluids(CableHelper.getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite()));
+		stacks = LogisticsAPI.getFluidHelper().getFluids(LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite()));
 	}
 
 	public boolean canConnect(TileEntity te, ForgeDirection dir) {

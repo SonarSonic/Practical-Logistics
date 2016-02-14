@@ -25,8 +25,8 @@ import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.core.utils.helpers.SonarHelper;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.ItemFilter;
+import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.common.tileentity.TileEntityBlockNode;
-import sonar.logistics.helpers.CableHelper;
 import sonar.logistics.info.filters.items.ItemStackFilter;
 import sonar.logistics.info.filters.items.OreDictionaryFilter;
 
@@ -168,7 +168,7 @@ public class ItemRouterHandler extends InventoryTileHandler implements ISidedInv
 		for (int i = 0; i < 6; i++) {
 			int config = sideConfigs[i].getInt();
 			if (config != 0) {
-				List<BlockCoords> connections = CableHelper.getConnections(te, ForgeDirection.getOrientation(i));
+				List<BlockCoords> connections = LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(i));
 				if (!connections.isEmpty()) {
 					this.coords[i] = connections;
 				}else{

@@ -8,14 +8,13 @@ import logisticspipes.api.ILPPipeTile;
 import logisticspipes.api.IRequestAPI;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.inventory.StoredItemStack;
-import sonar.logistics.api.providers.InventoryProvider;
-import sonar.logistics.helpers.InfoHelper;
+import sonar.logistics.api.LogisticsAPI;
+import sonar.logistics.api.providers.InventoryHandler;
 import cpw.mods.fml.common.Loader;
 
-public class LPInventoryProvider extends InventoryProvider {
+public class LPInventoryProvider extends InventoryHandler {
 
 	public static String name = "LP-Inventory";
 
@@ -42,7 +41,7 @@ public class LPInventoryProvider extends InventoryProvider {
 	public boolean getItems(List<StoredItemStack> storedStacks, TileEntity tile, ForgeDirection dir) {
 		List<ItemStack> items = getStackList(tile);
 		for (ItemStack stack : items) {
-			InfoHelper.addStackToList(storedStacks, stack);
+			LogisticsAPI.getItemHelper().addStackToList(storedStacks, stack);
 			return true;
 		}
 

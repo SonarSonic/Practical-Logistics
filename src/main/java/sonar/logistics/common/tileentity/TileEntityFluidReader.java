@@ -6,9 +6,9 @@ import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.utils.BlockCoords;
 import sonar.logistics.api.Info;
+import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.connecting.IInfoEmitter;
 import sonar.logistics.common.handlers.FluidReaderHandler;
-import sonar.logistics.helpers.CableHelper;
 
 public class TileEntityFluidReader extends TileEntityHandler implements IInfoEmitter {
 
@@ -40,12 +40,12 @@ public class TileEntityFluidReader extends TileEntityHandler implements IInfoEmi
 
 	@Override
 	public void addConnections() {
-		CableHelper.addConnection(this, ForgeDirection.getOrientation(FMPHelper.getMeta(this)));
+		LogisticsAPI.getCableHelper().addConnection(this, ForgeDirection.getOrientation(FMPHelper.getMeta(this)));
 	}
 
 	@Override
 	public void removeConnections() {
-		CableHelper.removeConnection(this, ForgeDirection.getOrientation(FMPHelper.getMeta(this)));
+		LogisticsAPI.getCableHelper().removeConnection(this, ForgeDirection.getOrientation(FMPHelper.getMeta(this)));
 	}
 
 }

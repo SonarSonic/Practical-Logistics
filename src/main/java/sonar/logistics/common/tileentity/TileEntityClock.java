@@ -3,23 +3,17 @@ package sonar.logistics.common.tileentity;
 import io.netty.buffer.ByteBuf;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
 
-import net.minecraft.block.Block;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.SonarCore;
 import sonar.core.integration.fmp.FMPHelper;
-import sonar.core.network.sync.SyncInt;
 import sonar.core.network.sync.SyncLong;
 import sonar.core.network.utils.IByteBufTile;
 import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
-import sonar.core.utils.helpers.SonarHelper;
 import sonar.logistics.api.Info;
-import sonar.logistics.api.StandardInfo;
-import sonar.logistics.helpers.CableHelper;
+import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.info.types.BlockCoordsInfo;
 import sonar.logistics.info.types.ProgressInfo;
 
@@ -114,12 +108,12 @@ public class TileEntityClock extends TileEntityConnection implements IByteBufTil
 
 	@Override
 	public void addConnections() {
-		CableHelper.addConnection(this, ForgeDirection.getOrientation(FMPHelper.getMeta(this)));
+		LogisticsAPI.getCableHelper().addConnection(this, ForgeDirection.getOrientation(FMPHelper.getMeta(this)));
 	}
 
 	@Override
 	public void removeConnections() {
-		CableHelper.removeConnection(this, ForgeDirection.getOrientation(FMPHelper.getMeta(this)));
+		LogisticsAPI.getCableHelper().removeConnection(this, ForgeDirection.getOrientation(FMPHelper.getMeta(this)));
 	}
 
 	public void readData(NBTTagCompound nbt, SyncType type) {

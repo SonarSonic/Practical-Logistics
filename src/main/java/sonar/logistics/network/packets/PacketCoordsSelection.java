@@ -3,19 +3,15 @@ package sonar.logistics.network.packets;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.World;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.network.PacketTileEntity;
 import sonar.core.network.PacketTileEntityHandler;
-import sonar.core.network.PacketTileSync;
 import sonar.logistics.api.IdentifiedCoords;
 import sonar.logistics.common.handlers.ChannelSelectorHandler;
 import sonar.logistics.common.tileentity.TileEntityDataReceiver;
 import cpw.mods.fml.common.network.ByteBufUtils;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
-import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
-import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 
 public class PacketCoordsSelection extends PacketTileEntity {
 

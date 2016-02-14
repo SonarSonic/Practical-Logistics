@@ -2,11 +2,9 @@ package sonar.logistics.common.blocks;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import sonar.core.common.block.SonarMaterials;
-import sonar.core.inventory.StoredItemStack;
 import sonar.logistics.Logistics;
 import sonar.logistics.common.tileentity.TileEntityInventoryReader;
 import sonar.logistics.network.LogisticsGui;

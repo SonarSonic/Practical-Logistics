@@ -3,14 +3,13 @@ package sonar.logistics.registries;
 import gnu.trove.map.hash.THashMap;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.utils.BlockCoords;
-import sonar.logistics.api.connecting.IInfoEmitter;
+import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.connecting.IDataCable;
-import sonar.logistics.helpers.CableHelper;
+import sonar.logistics.api.connecting.IInfoEmitter;
 
 public class CableRegistry {
 
@@ -144,7 +143,7 @@ public class CableRegistry {
 				Object target = FMPHelper.checkObject(oldCable.getTileEntity());
 				if (target != null && target instanceof IDataCable) {
 					IDataCable tile = (IDataCable) target;
-					CableHelper.addCable(tile);
+					LogisticsAPI.getCableHelper().addCable(tile);
 				}
 			}
 			for (BlockCoords coords : oldConnections) {

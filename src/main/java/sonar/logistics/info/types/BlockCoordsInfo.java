@@ -41,7 +41,7 @@ public class BlockCoordsInfo extends Info<BlockCoordsInfo> {
 
 	@Override
 	public String getData() {
-		return coords.getRender();
+		return coords.toString();
 	}
 
 	@Override
@@ -83,18 +83,17 @@ public class BlockCoordsInfo extends Info<BlockCoordsInfo> {
 
 	@Override
 	public void writeUpdate(BlockCoordsInfo currentInfo, NBTTagCompound tag) {
-		/*
-		if(!currentInfo.name.equals(name)){
+		if (!currentInfo.name.equals(name)) {
+			this.name = currentInfo.name;
 			tag.setString("n", name);
-			this.name=currentInfo.name;
 		}
 		if (!currentInfo.coords.equals(coords)) {
+			this.coords = currentInfo.coords;
 			NBTTagCompound coordTag = new NBTTagCompound();
 			BlockCoords.writeToNBT(coordTag, coords);
 			tag.setTag("cT", coordTag);
-			this.coords = currentInfo.coords;
 		}
-	*/
+
 	}
 
 	@Override

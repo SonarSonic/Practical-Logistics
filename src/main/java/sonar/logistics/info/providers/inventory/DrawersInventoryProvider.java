@@ -6,15 +6,15 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.inventory.StoredItemStack;
-import sonar.logistics.api.providers.InventoryProvider;
-import sonar.logistics.helpers.InfoHelper;
+import sonar.logistics.api.LogisticsAPI;
+import sonar.logistics.api.providers.InventoryHandler;
 
 import com.jaquadro.minecraft.storagedrawers.api.storage.IDrawer;
 import com.jaquadro.minecraft.storagedrawers.api.storage.IDrawerGroup;
 
 import cpw.mods.fml.common.Loader;
 
-public class DrawersInventoryProvider extends InventoryProvider {
+public class DrawersInventoryProvider extends InventoryHandler {
 
 	public static String name = "Storage Drawers";
 
@@ -55,7 +55,7 @@ public class DrawersInventoryProvider extends InventoryProvider {
 					IDrawer draw = drawers.getDrawer(i);
 					ItemStack item = draw.getStoredItemCopy();
 					if (item != null)
-						InfoHelper.addStackToList(storedStacks, item);
+						LogisticsAPI.getItemHelper().addStackToList(storedStacks, item);
 				}
 			}
 			return true;

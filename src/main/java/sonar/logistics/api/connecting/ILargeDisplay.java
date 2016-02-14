@@ -1,7 +1,5 @@
 package sonar.logistics.api.connecting;
 
-import net.minecraftforge.common.util.ForgeDirection;
-import sonar.logistics.api.render.ICableRenderer;
 
 /** implemented by LargeDisplays */
 public interface ILargeDisplay extends ILogicTile {

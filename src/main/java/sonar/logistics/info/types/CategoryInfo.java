@@ -2,7 +2,6 @@ package sonar.logistics.info.types;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.nbt.NBTTagCompound;
-import sonar.core.utils.BlockCoords;
 import sonar.logistics.api.Info;
 import cpw.mods.fml.common.network.ByteBufUtils;
 

@@ -5,9 +5,8 @@ import java.util.List;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.common.tileentity.TileEntitySonar;
 import sonar.core.utils.BlockCoords;
+import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.connecting.IDataCable;
-import sonar.logistics.helpers.CableHelper;
-import sonar.logistics.registries.CableRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -21,7 +20,7 @@ public class TileEntityMultiDataCable extends TileEntitySonar implements IDataCa
 	}
 
 	public int canRenderConnection(ForgeDirection dir) {
-		return CableHelper.canRenderConnection(this, dir);
+		return LogisticsAPI.getCableHelper().canRenderConnection(this, dir);
 	}
 
 	public boolean maxRender() {
@@ -31,11 +30,11 @@ public class TileEntityMultiDataCable extends TileEntitySonar implements IDataCa
 	public void onLoaded() {
 		super.onLoaded();
 		if (!this.worldObj.isRemote)
-			CableHelper.addCable(this);
+			LogisticsAPI.getCableHelper().addCable(this);
 	}
 
 	public void invalidate() {
-		CableHelper.removeCable(this);
+		LogisticsAPI.getCableHelper().removeCable(this);
 		super.invalidate();
 	}
 

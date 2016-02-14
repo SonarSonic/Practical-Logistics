@@ -4,37 +4,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumChatFormatting;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StatCollector;
 import net.minecraftforge.fluids.FluidStack;
 
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
 import sonar.core.fluid.StoredFluidStack;
-import sonar.core.inventory.GuiSonar;
-import sonar.core.inventory.SonarButtons;
-import sonar.core.inventory.StoredItemStack;
 import sonar.core.utils.helpers.FontHelper;
-import sonar.core.utils.helpers.RenderHelper;
 import sonar.logistics.Logistics;
 import sonar.logistics.common.containers.ContainerFluidReader;
-import sonar.logistics.common.containers.ContainerInventoryReader;
 import sonar.logistics.common.handlers.FluidReaderHandler;
-import sonar.logistics.common.handlers.InventoryReaderHandler;
 import sonar.logistics.network.packets.PacketFluidReader;
-import sonar.logistics.network.packets.PacketInventoryReader;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 public class GuiFluidReader extends GuiSelectionGrid<StoredFluidStack> {
 

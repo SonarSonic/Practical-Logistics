@@ -1,7 +1,5 @@
 package sonar.logistics.common.tileentity;
 
-import io.netty.buffer.ByteBuf;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,15 +12,14 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.SonarCore;
 import sonar.core.network.PacketTileSync;
-import sonar.core.network.utils.IByteBufTile;
 import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.api.IdentifiedCoords;
 import sonar.logistics.api.Info;
+import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.StandardInfo;
 import sonar.logistics.api.connecting.IChannelProvider;
 import sonar.logistics.api.connecting.IInfoEmitter;
-import sonar.logistics.helpers.CableHelper;
 import sonar.logistics.network.SyncIdentifiedCoords;
 import sonar.logistics.registries.BlockRegistry;
 import sonar.logistics.registries.EmitterRegistry;
@@ -42,7 +39,7 @@ public class TileEntityDataReceiver extends TileEntityNode implements IChannelPr
 	@Override
 	public Info currentInfo() {
 		if (emitter.getCoords() != null) {
-			return new StandardInfo((byte) -1, "DEFAULT", "Connected: ", emitter.getCoords().blockCoords.getRender());
+			return new StandardInfo((byte) -1, "DEFAULT", "Connected: ", emitter.getCoords().blockCoords.toString());
 		} else {
 			return new StandardInfo((byte) -1, "DEFAULT", "Connection: ", "NOT CONNECTED");
 		}
@@ -176,10 +173,10 @@ public class TileEntityDataReceiver extends TileEntityNode implements IChannelPr
 							this.lastemitters.set(i, current);
 							IdentifiedCoords.writeToNBT(compound, this.emitters.get(i));
 
-						} else if (!current.suffix.equals(last.suffix)) {
+						} else if (!current.coordString.equals(last.coordString)) {
 							compound.setByte("f", (byte) 1);
 							this.lastemitters.set(i, current);
-							compound.setString("Name", current.suffix);
+							compound.setString("Name", current.coordString);
 						}
 					} else {
 						compound.setByte("f", (byte) 0);
@@ -242,14 +239,14 @@ public class TileEntityDataReceiver extends TileEntityNode implements IChannelPr
 	@Override
 	public void addConnections() {
 		if (!this.worldObj.isRemote) {
-			CableHelper.addConnection(this, ForgeDirection.getOrientation(this.getBlockMetadata()));
+			LogisticsAPI.getCableHelper().addConnection(this, ForgeDirection.getOrientation(this.getBlockMetadata()));
 		}
 	}
 
 	@Override
 	public void removeConnections() {
 		if (!this.worldObj.isRemote) {
-			CableHelper.removeConnection(this, ForgeDirection.getOrientation(this.getBlockMetadata()));
+			LogisticsAPI.getCableHelper().removeConnection(this, ForgeDirection.getOrientation(this.getBlockMetadata()));
 		}
 	}
 

@@ -10,11 +10,11 @@ import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.utils.BlockCoords;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.Info;
+import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.connecting.IInfoEmitter;
 import sonar.logistics.api.connecting.IInfoReader;
 import sonar.logistics.client.renderers.RenderHandlers;
 import sonar.logistics.common.handlers.InfoReaderHandler;
-import sonar.logistics.helpers.CableHelper;
 import sonar.logistics.network.LogisticsGui;
 import sonar.logistics.registries.BlockRegistry;
 import codechicken.lib.vec.Cuboid6;
@@ -98,11 +98,11 @@ public class InfoReaderPart extends ConnectionPart implements IInfoEmitter, IInf
 
 	@Override
 	public void addConnections() {
-		CableHelper.addConnection(tile(), ForgeDirection.getOrientation(FMPHelper.getMeta(tile())));
+		LogisticsAPI.getCableHelper().addConnection(tile(), ForgeDirection.getOrientation(FMPHelper.getMeta(tile())));
 	}
 
 	@Override
 	public void removeConnections() {
-		CableHelper.removeConnection(tile(), ForgeDirection.getOrientation(FMPHelper.getMeta(tile())));
+		LogisticsAPI.getCableHelper().removeConnection(tile(), ForgeDirection.getOrientation(FMPHelper.getMeta(tile())));
 	}
 }

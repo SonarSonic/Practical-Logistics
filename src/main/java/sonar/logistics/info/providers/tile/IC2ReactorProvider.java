@@ -5,13 +5,13 @@ import ic2.api.reactor.IReactorChamber;
 
 import java.util.List;
 
-import cpw.mods.fml.common.Loader;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.StandardInfo;
 import sonar.logistics.api.providers.TileProvider;
+import cpw.mods.fml.common.Loader;
 
 public class IC2ReactorProvider extends TileProvider {
 

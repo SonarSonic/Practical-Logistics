@@ -16,13 +16,11 @@ import net.minecraft.tileentity.TileEntity;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
-import cpw.mods.fml.common.network.ByteBufUtils;
 import sonar.core.inventory.StoredItemStack;
-import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.FontHelper;
 import sonar.core.utils.helpers.RenderHelper;
 import sonar.logistics.api.Info;
-import sonar.logistics.common.tileentity.TileEntityInventoryReader;
+import cpw.mods.fml.common.network.ByteBufUtils;
 
 public class InventoryInfo extends Info<InventoryInfo> {
 

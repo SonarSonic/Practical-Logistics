@@ -18,10 +18,8 @@ import sonar.core.network.utils.IByteBufTile;
 import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.api.Info;
+import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.StandardInfo;
-import sonar.logistics.common.tileentity.TileEntityBlockNode;
-import sonar.logistics.common.tileentity.TileEntityEntityNode;
-import sonar.logistics.helpers.CableHelper;
 import sonar.logistics.helpers.InfoHelper;
 import sonar.logistics.info.types.InventoryInfo;
 import sonar.logistics.info.types.StoredStackInfo;
@@ -48,7 +46,7 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 		if (te.getWorldObj().isRemote) {
 			return;
 		}
-		stacks = InfoHelper.getInventories(CableHelper.getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite()));
+		stacks = LogisticsAPI.getItemHelper().getStackList(LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite()));
 	}
 
 	public boolean canConnect(TileEntity te, ForgeDirection dir) {
@@ -77,7 +75,7 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 			}
 			break;
 		case 1:
-			StoredItemStack stack = InfoHelper.getStack(CableHelper.getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite()), targetSlot.getInt());
+			StoredItemStack stack = InfoHelper.getStack(LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite()), targetSlot.getInt());
 			if (stack != null) {
 				return StoredStackInfo.createInfo(stack);
 			}
@@ -98,10 +96,10 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 	}
 
 	public StoredItemStack insertItem(TileEntity te, StoredItemStack stack) {
-		return InfoHelper.addItems(stack, CableHelper.getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite()));
+		return LogisticsAPI.getItemHelper().addItems(stack, LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite()));
 	}
 	public StoredItemStack extractItem(TileEntity te, StoredItemStack stack) {
-		return InfoHelper.extractItems(stack, CableHelper.getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite()));
+		return LogisticsAPI.getItemHelper().removeItems(stack, LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite()));
 	}
 	public void readData(NBTTagCompound nbt, SyncType type) {
 		super.readData(nbt, type);

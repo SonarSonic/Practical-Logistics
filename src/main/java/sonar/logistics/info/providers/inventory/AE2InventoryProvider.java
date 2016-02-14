@@ -3,10 +3,9 @@ package sonar.logistics.info.providers.inventory;
 import java.util.List;
 
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.inventory.StoredItemStack;
-import sonar.logistics.api.providers.InventoryProvider;
+import sonar.logistics.api.providers.InventoryHandler;
 import appeng.api.AEApi;
 import appeng.api.config.Actionable;
 import appeng.api.implementations.tiles.ITileStorageMonitorable;
@@ -16,10 +15,9 @@ import appeng.api.storage.IMEMonitor;
 import appeng.api.storage.IStorageMonitorable;
 import appeng.api.storage.data.IAEItemStack;
 import appeng.api.storage.data.IItemList;
-import appeng.util.item.AEItemStack;
 import cpw.mods.fml.common.Loader;
 
-public class AE2InventoryProvider extends InventoryProvider {
+public class AE2InventoryProvider extends InventoryHandler {
 
 	public static String name = "AE2-Inventory";
 
@@ -82,7 +80,6 @@ public class AE2InventoryProvider extends InventoryProvider {
 		IStorageMonitorable monitor = ((ITileStorageMonitorable) tile).getMonitorable(dir, new MachineSource(((IActionHost) tile)));
 		if (monitor != null) {
 			IMEMonitor<IAEItemStack> stacks = monitor.getItemInventory();
-			IItemList<IAEItemStack> items = stacks.getAvailableItems(AEApi.instance().storage().createItemList());
 			IAEItemStack stack = stacks.injectItems(AEApi.instance().storage().createItemStack(add.item).setStackSize(add.stored), Actionable.MODULATE, new MachineSource(((IActionHost) tile)));
 			if (stack==null || stack.getStackSize() == 0) {
 				return null;
@@ -97,7 +94,6 @@ public class AE2InventoryProvider extends InventoryProvider {
 		IStorageMonitorable monitor = ((ITileStorageMonitorable) tile).getMonitorable(dir, new MachineSource(((IActionHost) tile)));
 		if (monitor != null) {
 			IMEMonitor<IAEItemStack> stacks = monitor.getItemInventory();
-			IItemList<IAEItemStack> items = stacks.getAvailableItems(AEApi.instance().storage().createItemList());
 			IAEItemStack stack = stacks.extractItems(AEApi.instance().storage().createItemStack(remove.item).setStackSize(remove.stored), Actionable.MODULATE, new MachineSource(((IActionHost) tile)));
 			if (stack.getStackSize() == 0) {
 				return remove;

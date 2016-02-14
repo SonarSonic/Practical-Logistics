@@ -1,40 +1,17 @@
 package sonar.logistics.client.gui;
 
-import java.awt.Color;
 import java.util.List;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.renderer.entity.RenderItem;
-import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
-import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.StatCollector;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
 import sonar.core.inventory.GuiSonar;
-import sonar.core.inventory.SonarButtons;
-import sonar.core.inventory.StoredItemStack;
-import sonar.core.utils.BlockCoords;
-import sonar.core.utils.helpers.FontHelper;
-import sonar.core.utils.helpers.RenderHelper;
-import sonar.logistics.Logistics;
-import sonar.logistics.api.IdentifiedCoords;
-import sonar.logistics.common.containers.ContainerDataReceiver;
-import sonar.logistics.common.containers.ContainerInventoryReader;
-import sonar.logistics.common.handlers.InventoryReaderHandler;
-import sonar.logistics.common.tileentity.TileEntityDataReceiver;
-import sonar.logistics.network.packets.PacketCoordsSelection;
-import sonar.logistics.network.packets.PacketInventoryReader;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 public abstract class GuiSelectionGrid<T> extends GuiSonar {
 

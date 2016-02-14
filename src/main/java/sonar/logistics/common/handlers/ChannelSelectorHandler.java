@@ -2,8 +2,8 @@ package sonar.logistics.common.handlers;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
@@ -16,19 +16,13 @@ import sonar.core.SonarCore;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.network.PacketTileSync;
-import sonar.core.network.sync.SyncString;
 import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.core.utils.helpers.SonarHelper;
-import sonar.logistics.Logistics;
 import sonar.logistics.api.IdentifiedCoords;
-import sonar.logistics.api.Info;
-import sonar.logistics.api.StandardInfo;
-import sonar.logistics.api.connecting.IInfoEmitter;
-import sonar.logistics.common.tileentity.TileEntityBlockNode;
-import sonar.logistics.helpers.CableHelper;
+import sonar.logistics.api.LogisticsAPI;
+import sonar.logistics.api.connecting.IConnectionNode;
 import sonar.logistics.network.SyncIdentifiedCoords;
-import sonar.logistics.registries.EmitterRegistry;
 
 public class ChannelSelectorHandler extends TileHandler {
 
@@ -45,29 +39,35 @@ public class ChannelSelectorHandler extends TileHandler {
 		if (te.getWorldObj().isRemote) {
 			return;
 		}
-		List<BlockCoords> coords = CableHelper.getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite());
+		List<BlockCoords> network = LogisticsAPI.getCableHelper().getConnections( te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite());
 		channels = new ArrayList();
-		for (BlockCoords coord : coords) {
-			TileEntity target = coord.getTileEntity();
+		for (BlockCoords connect : network) {
+			TileEntity target = connect.getTileEntity();
 			if (target != null) {
 				String name = StatCollector.translateToLocal(target.getBlockType().getLocalizedName());
 				ItemStack stack = SonarHelper.createStackedBlock(target.getBlockType(), target.getBlockMetadata());
-				if (target instanceof TileEntityBlockNode) {
-					ForgeDirection dir = ForgeDirection.getOrientation(SonarHelper.invertMetadata(target.getBlockMetadata())).getOpposite();
-					Block block = target.getWorldObj().getBlock(target.xCoord + dir.offsetX, target.yCoord + dir.offsetY, target.zCoord + dir.offsetZ);
-					int meta = target.getWorldObj().getBlockMetadata(target.xCoord + dir.offsetX, target.yCoord + dir.offsetY, target.zCoord + dir.offsetZ);
-					if (!block.isAir(target.getWorldObj(), target.xCoord + dir.offsetX, target.yCoord + dir.offsetY, target.zCoord + dir.offsetZ)) {
-						stack = SonarHelper.createStackedBlock(block, meta);
+				if (target instanceof IConnectionNode) {
+					IConnectionNode node = (IConnectionNode) target;
+					Map<BlockCoords, ForgeDirection> connections = ((IConnectionNode) node).getConnections();
+					for (Map.Entry<BlockCoords, ForgeDirection> entry : connections.entrySet()) {
+						BlockCoords coords = entry.getKey();
+						int meta = coords.getWorld().getBlockMetadata(coords.getX(), coords.getY(), coords.getZ());
+						if (!coords.getWorld().isAirBlock(coords.getX(), coords.getY(), coords.getZ())) {
+							stack = SonarHelper.createStackedBlock(coords.getBlock(coords.getWorld()), meta);
+							channels.add(new IdentifiedCoords(coords.toString(), stack, connect));
+						}
 					}
+
+				} else {
+					channels.add(new IdentifiedCoords(name, stack, connect));
 				}
-				channels.add(new IdentifiedCoords(name, stack, coord));
 			}
 		}
 	}
 
 	public void sendAvailableData(TileEntity te, EntityPlayer player) {
 		if (player != null && player instanceof EntityPlayerMP) {
-		
+
 			NBTTagCompound syncData = new NBTTagCompound();
 			writeData(syncData, SyncType.SYNC);
 			SonarCore.network.sendTo(new PacketTileSync(te.xCoord, te.yCoord, te.zCoord, syncData, SyncType.SYNC), (EntityPlayerMP) player);
@@ -80,9 +80,9 @@ public class ChannelSelectorHandler extends TileHandler {
 		if (currentCoords == null) {
 			return null;
 		}
-		List<BlockCoords> coords = CableHelper.getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite());
+		List<BlockCoords> coords = LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite());
 		for (BlockCoords coord : coords) {
-			if (BlockCoords.equalCoords(coord, currentCoords.blockCoords)) {
+			if (coord.equals(currentCoords.blockCoords)) {
 				return currentCoords;
 			}
 		}
@@ -172,7 +172,7 @@ public class ChannelSelectorHandler extends TileHandler {
 				NBTTagCompound compound = new NBTTagCompound();
 				if (current != null) {
 					if (last != null) {
-						if (!BlockCoords.equalCoords(current.blockCoords, last.blockCoords) || !current.suffix.equals(last.suffix) || !current.block.isItemEqual(last.block)) {
+						if (!BlockCoords.equalCoords(current.blockCoords, last.blockCoords) || !current.coordString.equals(last.coordString) || !current.block.isItemEqual(last.block)) {
 							compound.setByte("f", (byte) 0);
 							this.lastChannels.set(i, current);
 							IdentifiedCoords.writeToNBT(compound, this.channels.get(i));
@@ -216,7 +216,7 @@ public class ChannelSelectorHandler extends TileHandler {
 	}
 
 	public int canRenderConnection(TileEntity te, ForgeDirection dir) {
-		return CableHelper.canRenderConnection(te, dir);
+		return LogisticsAPI.getCableHelper().canRenderConnection(te, dir);
 	}
 
 	public boolean canConnect(TileEntity te, ForgeDirection dir) {

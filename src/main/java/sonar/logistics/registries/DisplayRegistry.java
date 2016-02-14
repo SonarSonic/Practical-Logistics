@@ -9,7 +9,6 @@ import java.util.Map;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.utils.BlockCoords;
 import sonar.logistics.api.connecting.ILargeDisplay;
-import sonar.logistics.helpers.CableHelper;
 import sonar.logistics.helpers.DisplayHelper;
 
 public class DisplayRegistry {

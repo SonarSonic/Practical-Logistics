@@ -67,7 +67,7 @@ public class FluidInfo extends StandardInfo {
 				if (icon != null) {
 					renderNormal = false;
 					Minecraft.getMinecraft().renderEngine.bindTexture(TextureMap.locationBlocksTexture);
-
+					
 					tess.startDrawingQuads();
 
 					double divide = Math.max((0.5 +(maxX - minX)), (0.5+(maxY - minY)));

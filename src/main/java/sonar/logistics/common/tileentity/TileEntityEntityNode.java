@@ -1,24 +1,29 @@
 package sonar.logistics.common.tileentity;
 
 import io.netty.buffer.ByteBuf;
+
+import java.util.List;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.util.ForgeDirection;
+import scala.actors.threadpool.Arrays;
 import sonar.core.network.sync.SyncInt;
 import sonar.core.network.utils.IByteBufTile;
 import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.core.utils.helpers.SonarHelper;
 import sonar.logistics.api.Info;
+import sonar.logistics.api.LogisticsAPI;
+import sonar.logistics.api.connecting.IEntityNode;
 import sonar.logistics.api.connecting.IInfoEmitter;
 import sonar.logistics.api.render.ICableRenderer;
-import sonar.logistics.helpers.CableHelper;
 import sonar.logistics.info.types.BlockCoordsInfo;
 
-public class TileEntityEntityNode extends TileEntityConnection implements ICableRenderer, IInfoEmitter, IByteBufTile {
+public class TileEntityEntityNode extends TileEntityConnection implements ICableRenderer, IInfoEmitter, IByteBufTile, IEntityNode {
 
 	public SyncInt entityTarget = new SyncInt(0);
 	public SyncInt entityRange = new SyncInt(1, 10);
@@ -39,7 +44,7 @@ public class TileEntityEntityNode extends TileEntityConnection implements ICable
 		if (dir == dir.UP) {
 			return 0;
 		}
-		return CableHelper.canRenderConnection(this, dir);
+		return LogisticsAPI.getCableHelper().canRenderConnection(this, dir);
 	}
 
 	public void updateEntity() {
@@ -94,7 +99,7 @@ public class TileEntityEntityNode extends TileEntityConnection implements ICable
 		for (int i = 0; i < 6; i++) {
 			ForgeDirection dir = ForgeDirection.getOrientation(i);
 			if (dir != dir.UP) {
-				CableHelper.addConnection(this, dir);
+				LogisticsAPI.getCableHelper().addConnection(this, dir);
 			}
 		}
 	}
@@ -104,7 +109,7 @@ public class TileEntityEntityNode extends TileEntityConnection implements ICable
 		for (int i = 0; i < 6; i++) {
 			ForgeDirection dir = ForgeDirection.getOrientation(i);
 			if (dir != dir.UP) {
-				CableHelper.removeConnection(this, dir);
+				LogisticsAPI.getCableHelper().removeConnection(this, dir);
 			}
 		}
 	}
@@ -137,5 +142,10 @@ public class TileEntityEntityNode extends TileEntityConnection implements ICable
 				entityRange.decreaseBy(1);
 			break;
 		}
+	}
+
+	@Override
+	public List<Entity> getEntities() {
+		return Arrays.asList(new Object[]{getNearestEntity()});
 	}
 }

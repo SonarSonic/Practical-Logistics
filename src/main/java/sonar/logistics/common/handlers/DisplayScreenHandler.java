@@ -20,16 +20,13 @@ import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.Info;
+import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.StandardInfo;
 import sonar.logistics.api.connecting.IInfoEmitter;
 import sonar.logistics.api.connecting.IInfoReader;
-import sonar.logistics.common.tileentity.TileEntityInventoryReader;
-import sonar.logistics.helpers.CableHelper;
 import sonar.logistics.helpers.InfoHelper;
 import sonar.logistics.info.types.InventoryInfo;
-import sonar.logistics.info.types.ProgressInfo;
 import sonar.logistics.info.types.StoredStackInfo;
-import sonar.logistics.network.LogisticsGui;
 import sonar.logistics.registries.DisplayRegistry;
 import cpw.mods.fml.common.network.ByteBufUtils;
 import cpw.mods.fml.relauncher.Side;
@@ -52,7 +49,7 @@ public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 	}
 
 	public void updateData(TileEntity te, TileEntity packetTile, ForgeDirection dir) {
-		List<BlockCoords> connections = CableHelper.getConnections(te, dir.getOpposite());
+		List<BlockCoords> connections = LogisticsAPI.getCableHelper().getConnections(te, dir.getOpposite());
 		if (!connections.isEmpty() && connections.get(0) != null) {
 			Object target = FMPHelper.getTile(connections.get(0).getTileEntity());
 			if (target == null) {
@@ -138,7 +135,7 @@ public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 
 			}
 		}
-		List<BlockCoords> connections = CableHelper.getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite());
+		List<BlockCoords> connections = LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite());
 		if (!connections.isEmpty() && connections.get(0) != null) {
 			TileEntity readerTile = connections.get(0).getTileEntity();
 			TileHandler target = FMPHelper.getHandler(readerTile);
@@ -212,6 +209,10 @@ public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 
 				}
 			}
+			if (target instanceof FluidReaderHandler) {
+				FluidReaderHandler handler = (FluidReaderHandler) target;
+				
+			}
 		}
 	}
 
@@ -244,11 +245,6 @@ public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 
 	public void spawnStoredItemStack(StoredItemStack stack, World world, int x, int y, int z, ForgeDirection side) {
 		EntityItem dropStack = new EntityItem(world, x + 0.5, (double) y + 0.5, z + 0.5, stack.getFullStack());
-		/*
-		 * if (side == ForgeDirection.NORTH || side == ForgeDirection.SOUTH) {
-		 * dropStack.motionX = (-side.offsetX * 0.1); } else { dropStack.motionZ
-		 * = (-side.offsetZ * 0.1); }
-		 */
 		dropStack.motionX = 0;
 		dropStack.motionY = 0;
 		dropStack.motionZ = 0;
@@ -293,7 +289,7 @@ public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 		if (id == 0) {
 			if (info != null) {
 				buf.writeBoolean(true);
-				InfoHelper.writeInfo(buf, info);
+				Logistics.infoTypes.writeToBuf(buf, info);
 			} else {
 				buf.writeBoolean(false);
 			}

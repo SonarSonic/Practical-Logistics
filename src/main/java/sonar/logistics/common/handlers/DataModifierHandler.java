@@ -12,9 +12,9 @@ import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.Info;
+import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.StandardInfo;
 import sonar.logistics.api.connecting.IInfoEmitter;
-import sonar.logistics.helpers.CableHelper;
 
 public class DataModifierHandler extends TileHandler {
 
@@ -31,7 +31,7 @@ public class DataModifierHandler extends TileHandler {
 		if (te.getWorldObj().isRemote) {
 			return;
 		}
-		List<BlockCoords> connections = CableHelper.getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite());
+		List<BlockCoords> connections = LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite());
 		if (connections.isEmpty() || connections.get(0) == null) {
 			return;
 		}
@@ -83,7 +83,7 @@ public class DataModifierHandler extends TileHandler {
 	}
 
 	public int canRenderConnection(ForgeDirection dir, TileEntity te) {
-		return CableHelper.canRenderConnection(te, dir);
+		return LogisticsAPI.getCableHelper().canRenderConnection(te, dir);
 	}
 
 	public boolean canConnect(ForgeDirection dir) {

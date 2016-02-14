@@ -4,12 +4,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import sonar.core.SonarCore;
 import sonar.core.inventory.ContainerSync;
-import sonar.core.network.PacketTileSync;
-import sonar.core.utils.helpers.NBTHelper;
 import sonar.logistics.common.handlers.InfoReaderHandler;
 import sonar.logistics.common.tileentity.TileEntityInfoReader;
 

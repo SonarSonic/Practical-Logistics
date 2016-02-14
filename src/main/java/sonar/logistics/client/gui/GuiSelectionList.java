@@ -1,15 +1,12 @@
 package sonar.logistics.client.gui;
 
-import java.awt.Color;
 import java.util.List;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
-import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.StatCollector;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -17,13 +14,6 @@ import org.lwjgl.opengl.GL11;
 
 import sonar.core.inventory.GuiSonar;
 import sonar.core.inventory.SonarButtons;
-import sonar.core.utils.BlockCoords;
-import sonar.core.utils.helpers.FontHelper;
-import sonar.logistics.Logistics;
-import sonar.logistics.api.IdentifiedCoords;
-import sonar.logistics.common.containers.ContainerDataReceiver;
-import sonar.logistics.common.tileentity.TileEntityDataReceiver;
-import sonar.logistics.network.packets.PacketCoordsSelection;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -31,7 +21,7 @@ public abstract class GuiSelectionList<T> extends GuiSonar {
 
 	public static final ResourceLocation bground = new ResourceLocation("PracticalLogistics:textures/gui/listSelection.png");
 
-	private float currentScroll;
+	public float currentScroll;
 	private boolean isScrolling;
 	private boolean wasClicking;
 	public int scrollerLeft, scrollerStart, scrollerEnd, scrollerWidth;
@@ -71,7 +61,7 @@ public abstract class GuiSelectionList<T> extends GuiSonar {
 		scrollerWidth = 10;
 		int offsetTop = 29;
 		if (getViewableSize() == 7) {
-			offsetTop=offsetTop+2;
+			offsetTop = offsetTop + 2;
 		}
 		for (int i = 0; i < getViewableSize(); i++) {
 			this.buttonList.add(new SelectionButton(i, guiLeft + 7, guiTop + offsetTop + (i * getSelectionHeight())));
@@ -199,12 +189,16 @@ public abstract class GuiSelectionList<T> extends GuiSonar {
 		int pos = getDataPosition();
 		int offsetTop = 29;
 		if (getViewableSize() == 7) {
-			offsetTop=offsetTop+2;
+			offsetTop = offsetTop + 2;
 		}
 		for (int i = 0; i < getViewableSize(); i++) {
-			drawTexturedModalRect(this.guiLeft + 7, this.guiTop + offsetTop + (getSelectionHeight() * i), 0, i == pos ? 166 + getSelectionHeight() : 166, 154 + 72, getSelectionHeight());
+			drawSelectionBackground(offsetTop, i, pos);
 		}
 
+	}
+
+	public void drawSelectionBackground(int offsetTop, int i, int pos) {
+		drawTexturedModalRect(this.guiLeft + 7, this.guiTop + offsetTop + (getSelectionHeight() * i), 0, i == pos ? 166 + getSelectionHeight() : 166, 154 + 72, getSelectionHeight());
 	}
 
 	public int getViewableSize() {

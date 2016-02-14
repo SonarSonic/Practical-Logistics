@@ -1,12 +1,10 @@
 package sonar.logistics.api.providers;
 
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.energy.StoredEnergyStack;
 import sonar.core.utils.IRegistryObject;
 import sonar.logistics.Logistics;
-import sonar.logistics.api.Info;
 
 /**
  * used for providing information on Block/TileEntity for the Info Reader to

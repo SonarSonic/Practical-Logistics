@@ -11,11 +11,11 @@ import sonar.core.network.utils.ITextField;
 import sonar.core.utils.BlockCoords;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.Info;
+import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.connecting.IInfoEmitter;
 import sonar.logistics.api.render.ICableRenderer;
 import sonar.logistics.client.renderers.RenderHandlers;
 import sonar.logistics.common.handlers.DataModifierHandler;
-import sonar.logistics.helpers.CableHelper;
 import sonar.logistics.network.LogisticsGui;
 import sonar.logistics.registries.BlockRegistry;
 import codechicken.lib.vec.Cuboid6;
@@ -97,7 +97,7 @@ public class DataModifierPart extends ConnectionPart implements IInfoEmitter, IC
 		for (int i = 0; i < 6; i++) {
 			ForgeDirection dir = ForgeDirection.getOrientation(i);
 			if (dir != ForgeDirection.getOrientation(FMPHelper.getMeta(tile())).getOpposite()) {
-				CableHelper.addConnection(tile(), dir);
+				LogisticsAPI.getCableHelper().addConnection(tile(), dir);
 			}
 		}
 	}
@@ -107,7 +107,7 @@ public class DataModifierPart extends ConnectionPart implements IInfoEmitter, IC
 		for (int i = 0; i < 6; i++) {
 			ForgeDirection dir = ForgeDirection.getOrientation(i);
 			if (dir != ForgeDirection.getOrientation(FMPHelper.getMeta(tile())).getOpposite()) {
-				CableHelper.removeConnection(tile(), dir);
+				LogisticsAPI.getCableHelper().removeConnection(tile(), dir);
 			}
 		}
 	}

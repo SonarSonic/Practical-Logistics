@@ -2,7 +2,6 @@ package sonar.logistics.api.providers;
 
 import java.util.List;
 
-import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.inventory.StoredItemStack;
@@ -13,7 +12,7 @@ import sonar.logistics.Logistics;
  * used for providing information on Inventories for the Inventory Reader to
  * read, the Provider must be registered in the PractialLogisticsAPI to be used
  */
-public abstract class InventoryProvider implements IRegistryObject {
+public abstract class InventoryHandler implements IRegistryObject {
 
 	public byte getID() {
 		return Logistics.inventoryProviders.getObjectID(getName());

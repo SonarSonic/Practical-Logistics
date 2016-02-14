@@ -9,8 +9,8 @@ import sonar.core.network.sync.SyncString;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.Info;
+import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.StandardInfo;
-import sonar.logistics.helpers.CableHelper;
 
 public class InfoCreatorHandler extends TileHandler {
 
@@ -59,7 +59,7 @@ public class InfoCreatorHandler extends TileHandler {
 
 	public int canRenderConnection(TileEntity te, ForgeDirection dir) {
 		if (dir == ForgeDirection.getOrientation(FMPHelper.getMeta(te))) {
-			return CableHelper.canRenderConnection(te, dir);
+			return LogisticsAPI.getCableHelper().canRenderConnection(te, dir);
 		} else {
 			return 0;
 		}

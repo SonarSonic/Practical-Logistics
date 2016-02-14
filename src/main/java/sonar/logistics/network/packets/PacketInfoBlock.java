@@ -2,18 +2,16 @@ package sonar.logistics.network.packets;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.World;
 import sonar.core.integration.fmp.FMPHelper;
-import sonar.core.integration.fmp.ITileHandler;
 import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.network.PacketTileEntity;
 import sonar.core.network.PacketTileEntityHandler;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.Info;
+import sonar.logistics.common.handlers.EnergyReaderHandler;
 import sonar.logistics.common.handlers.InfoReaderHandler;
+import sonar.logistics.info.types.StoredEnergyInfo;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
-import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
-import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 
 public class PacketInfoBlock extends PacketTileEntity {
 
@@ -59,19 +57,21 @@ public class PacketInfoBlock extends PacketTileEntity {
 
 		@Override
 		public IMessage processMessage(PacketInfoBlock message, TileEntity te) {
-			Object target = FMPHelper.checkObject(te);
-			if (target != null && target instanceof ITileHandler) {
-				TileHandler handler = ((ITileHandler) target).getTileHandler();
-				;
-				if (handler != null && handler instanceof InfoReaderHandler) {
+			TileHandler handler = FMPHelper.getHandler(te);
+			if (handler != null) {
+				if (handler instanceof InfoReaderHandler) {
 					InfoReaderHandler reader = (InfoReaderHandler) handler;
 					if (message.primary) {
 						reader.primaryInfo.setObject(message.info);
 					} else {
 						reader.secondaryInfo.setObject(message.info);
 					}
+				} else if(handler instanceof EnergyReaderHandler){
+					EnergyReaderHandler reader = (EnergyReaderHandler) handler;
+					reader.primaryInfo.setObject((StoredEnergyInfo) message.info);
 				}
 			}
+
 			return null;
 		}
 	}

@@ -3,15 +3,15 @@ package sonar.logistics.info.providers.fluids;
 import java.util.List;
 
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidHandler;
 import net.minecraftforge.fluids.IFluidTank;
 import sonar.core.fluid.StoredFluidStack;
-import sonar.logistics.api.providers.FluidProvider;
+import sonar.logistics.api.providers.FluidHandler;
 
-public class TankProvider extends FluidProvider {
+public class TankProvider extends FluidHandler {
 
 	public static String name = "Tank-Inventory";
 
@@ -21,21 +21,13 @@ public class TankProvider extends FluidProvider {
 	}
 
 	@Override
-	public boolean canProvideFluids(World world, int x, int y, int z, ForgeDirection dir) {
-		TileEntity tile = world.getTileEntity(x, y, z);
-		return tile != null && (tile instanceof IFluidTank || tile instanceof IFluidHandler);
+	public boolean canHandleFluids(TileEntity tile, ForgeDirection dir) {
+		return (tile instanceof IFluidTank || tile instanceof IFluidHandler);
 	}
 
 	@Override
-	public void getFluids(List<StoredFluidStack> fluids, World world, int x, int y, int z, ForgeDirection dir) {
-		TileEntity tile = world.getTileEntity(x, y, z);
-		if (tile instanceof IFluidTank) {
-			IFluidTank tank = (IFluidTank) tile;
-			FluidTankInfo info = tank.getInfo();
-			if (info != null && info.fluid != null) {
-				fluids.add(new StoredFluidStack(info.fluid, info.capacity));
-			}
-		} else if (tile instanceof IFluidHandler) {
+	public void getFluids(List<StoredFluidStack> fluids, TileEntity tile, ForgeDirection dir) {
+		if (tile instanceof IFluidHandler) {
 			IFluidHandler handler = (IFluidHandler) tile;
 			FluidTankInfo[] tankInfo = handler.getTankInfo(dir);
 			if (tankInfo != null) {
@@ -48,5 +40,35 @@ public class TankProvider extends FluidProvider {
 			}
 		}
 
+	}
+
+	@Override
+	public StoredFluidStack addStack(StoredFluidStack add, TileEntity tile, ForgeDirection dir) {
+		if (tile instanceof IFluidHandler) {
+			IFluidHandler handler = (IFluidHandler) tile;
+			if (handler.canFill(dir, add.fluid.getFluid())) {
+				int used = handler.fill(dir, add.getFullStack(), true);
+				add.stored -= used;
+				if (add.stored == 0) {
+					return null;
+				}
+			}
+		}
+		return add;
+	}
+
+	@Override
+	public StoredFluidStack removeStack(StoredFluidStack remove, TileEntity tile, ForgeDirection dir) {
+		if (tile instanceof IFluidHandler) {
+			IFluidHandler handler = (IFluidHandler) tile;
+			if (handler.canDrain(dir, remove.fluid.getFluid())) {
+				FluidStack used = handler.drain(dir, remove.getFullStack(), true);
+				remove.stored -= used.amount;
+				if (remove.stored == 0) {
+					return null;
+				}
+			}
+		}
+		return remove;
 	}
 }

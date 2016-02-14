@@ -1,41 +1,25 @@
 package sonar.logistics.common.handlers;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
-import net.minecraftforge.fluids.FluidStack;
-import sonar.core.SonarCore;
 import sonar.core.energy.StoredEnergyStack;
-import sonar.core.fluid.StoredFluidStack;
-import sonar.core.integration.IWailaInfo;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.handlers.TileHandler;
-import sonar.core.network.PacketTileSync;
 import sonar.core.network.sync.SyncGeneric;
 import sonar.core.utils.BlockCoords;
-import sonar.core.utils.helpers.SonarHelper;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
+import sonar.core.utils.helpers.SonarHelper;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.Info;
+import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.StandardInfo;
 import sonar.logistics.api.providers.EnergyHandler;
 import sonar.logistics.common.tileentity.TileEntityBlockNode;
-import sonar.logistics.common.tileentity.TileEntityEntityNode;
-import sonar.logistics.helpers.CableHelper;
-import sonar.logistics.helpers.EnergyHelper;
-import sonar.logistics.helpers.FluidHelper;
-import sonar.logistics.helpers.InfoHelper;
-import sonar.logistics.info.types.CategoryInfo;
-import sonar.logistics.info.types.FluidStackInfo;
-import sonar.logistics.info.types.ProgressInfo;
 import sonar.logistics.info.types.StoredEnergyInfo;
 
 public class EnergyReaderHandler extends TileHandler {
@@ -43,6 +27,8 @@ public class EnergyReaderHandler extends TileHandler {
 	public BlockCoords coords;
 	public List<StoredEnergyInfo> stacks;
 	public List<StoredEnergyInfo> lastStacks;
+
+	public SyncGeneric<StoredEnergyInfo> primaryInfo = new SyncGeneric(Logistics.infoTypes, 0);
 
 	public EnergyReaderHandler(boolean isMultipart, TileEntity tile) {
 		super(isMultipart, tile);
@@ -53,8 +39,8 @@ public class EnergyReaderHandler extends TileHandler {
 		if (te.getWorldObj().isRemote) {
 			return;
 		}
-		List<BlockCoords> coords = CableHelper.getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite());
-		stacks = EnergyHelper.getEnergy(coords);
+		List<BlockCoords> coords = LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite());
+		stacks = LogisticsAPI.getEnergyHelper().getEnergyList(coords);
 		List<StoredEnergyStack> energyList = new ArrayList();
 		List<EnergyHandler> handlers = Logistics.energyProviders.getObjects();
 
@@ -92,28 +78,22 @@ public class EnergyReaderHandler extends TileHandler {
 	}
 
 	public Info currentInfo(TileEntity te) {
-		if (stacks != null && !stacks.isEmpty() && stacks.get(0) != null) {
-			StoredEnergyInfo energy = stacks.get(0);
-			return new ProgressInfo((long) energy.stack.stored, (long) energy.stack.capacity, (long) energy.stack.stored + " RF");
+		if (stacks != null) {
+			for (StoredEnergyInfo stack : stacks) {
+				if (stack != null && primaryInfo.getObject()!=null && stack.coords.equals(primaryInfo.getObject().coords)) {
+					return stack;
+				}
+			}
 		}
-		/*
-		 * if (current != null && current.getFluid() != null) { if (stacks !=
-		 * null) { for (StoredFluidStack stack : stacks) { if (stack != null &&
-		 * stack.fluid.isFluidEqual(current)) { return
-		 * FluidStackInfo.createInfo(stack); } } } return
-		 * FluidStackInfo.createInfo(new StoredFluidStack(current, 0, 0));
-		 * 
-		 * }
-		 */
 		return new StandardInfo((byte) -1, "ITEMREND", " ", "NO DATA");
 	}
 
 	public void readData(NBTTagCompound nbt, SyncType type) {
 		super.readData(nbt, type);
 
-		// if (nbt.hasKey("FluidName")) {
-		// this.current = FluidStack.loadFluidStackFromNBT(nbt);
-		// }
+		if (type == SyncType.SAVE || type == SyncType.SYNC)
+			this.primaryInfo.readFromNBT(nbt, type);
+
 		if (type == SyncType.SAVE) {
 			if (nbt.hasKey("coords")) {
 				if (nbt.getCompoundTag("coords").getBoolean("hasCoords")) {
@@ -171,9 +151,9 @@ public class EnergyReaderHandler extends TileHandler {
 
 	public void writeData(NBTTagCompound nbt, SyncType type) {
 		super.writeData(nbt, type);
-		// if (current != null) {
-		// current.writeToNBT(nbt);
-		// }
+		if (type == SyncType.SAVE || type == SyncType.SYNC)
+			this.primaryInfo.writeToNBT(nbt, type);
+
 		if (type == SyncType.SAVE) {
 			NBTTagCompound coordTag = new NBTTagCompound();
 			if (coords != null) {
@@ -223,7 +203,6 @@ public class EnergyReaderHandler extends TileHandler {
 							// this.stacks.get(i));
 						}
 					} else {
-						System.out.print("full update");
 						compound.setByte("f", (byte) 0);
 						this.lastStacks.add(i, current);
 						Logistics.infoTypes.writeToNBT(compound, this.stacks.get(i));

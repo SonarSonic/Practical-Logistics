@@ -19,10 +19,11 @@ import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.Info;
+import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.StandardInfo;
+import sonar.logistics.api.connecting.IConnectionNode;
 import sonar.logistics.common.tileentity.TileEntityBlockNode;
 import sonar.logistics.common.tileentity.TileEntityEntityNode;
-import sonar.logistics.helpers.CableHelper;
 import sonar.logistics.helpers.InfoHelper;
 import sonar.logistics.info.types.CategoryInfo;
 
@@ -49,14 +50,14 @@ public class InfoReaderHandler extends TileHandler implements IWailaInfo {
 
 	public void updateData(TileEntity te, ForgeDirection dir) {
 
-		List<BlockCoords> connections = CableHelper.getConnections(te, dir.getOpposite());
-		List<TileEntityBlockNode> nodes = new ArrayList();
+		List<BlockCoords> connections = LogisticsAPI.getCableHelper().getConnections(te, dir.getOpposite());
+		List<IConnectionNode> nodes = new ArrayList();
 		List<TileEntityEntityNode> entityNodes = new ArrayList();
 
 		for (BlockCoords connect : connections) {
 			Object tile = connect.getTileEntity();
-			if (tile instanceof TileEntityBlockNode) {
-				nodes.add((TileEntityBlockNode) tile);
+			if (tile instanceof IConnectionNode) {
+				nodes.add((IConnectionNode) tile);
 			}
 			if (tile instanceof TileEntityEntityNode) {
 				entityNodes.add((TileEntityEntityNode) tile);
@@ -64,8 +65,8 @@ public class InfoReaderHandler extends TileHandler implements IWailaInfo {
 		}
 
 		if (!nodes.isEmpty()) {
-			this.setData(te, InfoHelper.getLatestTileInfo(primaryInfo.getObject(), (TileEntityBlockNode) nodes.get(0)), true);
-			this.setData(te, InfoHelper.getLatestTileInfo(secondaryInfo.getObject(), (TileEntityBlockNode) nodes.get(0)), false);
+			this.setData(te, InfoHelper.getLatestTileInfo(primaryInfo.getObject(), nodes.get(0)), true);
+			this.setData(te, InfoHelper.getLatestTileInfo(secondaryInfo.getObject(), (IConnectionNode) nodes.get(0)), false);
 			this.coords = new BlockCoords((TileEntityBlockNode) nodes.get(0));
 		} else if (!entityNodes.isEmpty()) {
 			this.setData(te, InfoHelper.getLatestEntityInfo(primaryInfo.getObject(), (TileEntityEntityNode) entityNodes.get(0)), true);
@@ -73,7 +74,7 @@ public class InfoReaderHandler extends TileHandler implements IWailaInfo {
 			this.coords = new BlockCoords((TileEntityEntityNode) entityNodes.get(0));
 		} else {
 			coords = null;
-			//this.setData(te, null, true);
+			// this.setData(te, null, true);
 		}
 	}
 
@@ -140,15 +141,7 @@ public class InfoReaderHandler extends TileHandler implements IWailaInfo {
 			this.lastInfo = clientInfo;
 			List<Info> info = new ArrayList();
 			if (this.coords != null) {
-				TileEntity tile = this.coords.getTileEntity();
-
-				if (tile != null && tile instanceof TileEntityBlockNode) {
-					info = InfoHelper.getTileInfo((TileEntityBlockNode) tile);
-				} else if (tile != null && tile instanceof TileEntityEntityNode) {
-					info = InfoHelper.getEntityInfo((TileEntityEntityNode) tile);
-				} else {
-					info = new ArrayList();
-				}
+				info = InfoHelper.getInfo(coords);
 			}
 			List<Info> newInfo = new ArrayList();
 			Info lastInfo = null;
@@ -204,7 +197,7 @@ public class InfoReaderHandler extends TileHandler implements IWailaInfo {
 						clientInfo.add(Logistics.infoTypes.readFromNBT(compound));
 					break;
 				case 1:
-					//clientInfo.get(slot).readUpdate(compound);
+					// clientInfo.get(slot).readUpdate(compound);
 					break;
 				case 2:
 					clientInfo.set(slot, null);

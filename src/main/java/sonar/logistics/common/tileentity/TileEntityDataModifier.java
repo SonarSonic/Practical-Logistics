@@ -7,10 +7,10 @@ import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.network.utils.ITextField;
 import sonar.core.utils.BlockCoords;
 import sonar.logistics.api.Info;
+import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.connecting.IInfoEmitter;
 import sonar.logistics.api.render.ICableRenderer;
 import sonar.logistics.common.handlers.DataModifierHandler;
-import sonar.logistics.helpers.CableHelper;
 
 public class TileEntityDataModifier extends TileEntityHandler implements IInfoEmitter, ICableRenderer, ITextField {
 
@@ -56,7 +56,7 @@ public class TileEntityDataModifier extends TileEntityHandler implements IInfoEm
 		for (int i = 0; i < 6; i++) {
 			ForgeDirection dir = ForgeDirection.getOrientation(i);
 			if (dir != ForgeDirection.getOrientation(FMPHelper.getMeta(this)).getOpposite()) {
-				CableHelper.addConnection(this, dir);
+				LogisticsAPI.getCableHelper().addConnection(this, dir);
 			}
 		}
 	}
@@ -66,7 +66,7 @@ public class TileEntityDataModifier extends TileEntityHandler implements IInfoEm
 		for (int i = 0; i < 6; i++) {
 			ForgeDirection dir = ForgeDirection.getOrientation(i);
 			if (dir != ForgeDirection.getOrientation(FMPHelper.getMeta(this)).getOpposite()) {
-				CableHelper.removeConnection(this, dir);
+				LogisticsAPI.getCableHelper().removeConnection(this, dir);
 			}
 		}
 	}

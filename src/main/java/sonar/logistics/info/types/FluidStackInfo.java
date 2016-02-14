@@ -12,7 +12,6 @@ import net.minecraft.util.IIcon;
 import org.lwjgl.opengl.GL11;
 
 import sonar.core.fluid.StoredFluidStack;
-import sonar.core.utils.BlockCoords;
 import sonar.logistics.api.Info;
 import cpw.mods.fml.common.network.ByteBufUtils;
 
@@ -87,12 +86,10 @@ public class FluidStackInfo extends Info<FluidStackInfo> {
 		FontRenderer rend = Minecraft.getMinecraft().fontRenderer;
 		GL11.glTranslated(0, 0, zOffset);
 		float width = stack.stored * (maxX - minX) / stack.capacity;
-		boolean renderNormal = true;
 		IIcon icon = stack.fluid.getFluid().getIcon();
 		if (icon != null) {
-			renderNormal = false;
 			Minecraft.getMinecraft().renderEngine.bindTexture(TextureMap.locationBlocksTexture);
-
+			
 			tess.startDrawingQuads();
 
 			double divide = Math.max((0.5 + (maxX - minX)), (0.5 + (maxY - minY)));
@@ -105,7 +102,7 @@ public class FluidStackInfo extends Info<FluidStackInfo> {
 			tess.addVertexWithUV((minX + width), minY, 0, widthnew, icon.getMinV());
 			tess.addVertexWithUV((minX + 0), minY, 0, icon.getMinU(), icon.getMinV());
 			tess.draw();
-
+	
 		}
 
 		GL11.glTranslated(0, 0, -zOffset);

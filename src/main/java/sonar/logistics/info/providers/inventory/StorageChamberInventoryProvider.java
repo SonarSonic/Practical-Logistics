@@ -2,19 +2,15 @@ package sonar.logistics.info.providers.inventory;
 
 import java.util.List;
 
-import appeng.api.AEApi;
-import appeng.api.config.Actionable;
-import appeng.api.networking.security.BaseActionSource;
-import appeng.api.storage.data.IAEItemStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.calculator.mod.common.tileentity.machines.TileEntityStorageChamber;
 import sonar.core.inventory.StoredItemStack;
-import sonar.logistics.api.providers.InventoryProvider;
+import sonar.logistics.api.providers.InventoryHandler;
 import cpw.mods.fml.common.Loader;
 
-public class StorageChamberInventoryProvider extends InventoryProvider {
+public class StorageChamberInventoryProvider extends InventoryHandler {
 
 	public static String name = "Storage Chamber";
 

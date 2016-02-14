@@ -4,33 +4,38 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.fluid.StoredFluidStack;
 import sonar.core.utils.BlockCoords;
-import sonar.core.utils.helpers.SonarHelper;
 import sonar.logistics.Logistics;
-import sonar.logistics.api.providers.FluidProvider;
-import sonar.logistics.common.tileentity.TileEntityBlockNode;
+import sonar.logistics.api.LogisticsAPI;
+import sonar.logistics.api.connecting.IConnectionNode;
+import sonar.logistics.api.providers.FluidHandler;
+import sonar.logistics.api.wrappers.FluidWrapper;
 
-public class FluidHelper {
+public class FluidHelper extends FluidWrapper {
 
-	public static List<StoredFluidStack> getFluids(List<BlockCoords> coords) {
+	public List<StoredFluidStack> getFluids(List<BlockCoords> coords) {
 		List<StoredFluidStack> fluidList = new ArrayList();
-		List<FluidProvider> providers = Logistics.fluidProviders.getObjects();
+		List<FluidHandler> providers = Logistics.fluidProviders.getObjects();
 
-		for (FluidProvider provider : providers) {
+		for (FluidHandler provider : providers) {
 			for (BlockCoords coord : coords) {
 				TileEntity target = coord.getTileEntity();
-				if (target != null && target instanceof TileEntityBlockNode) {
-					TileEntityBlockNode node = (TileEntityBlockNode) target;
-					ForgeDirection dir = ForgeDirection.getOrientation(SonarHelper.invertMetadata(node.getBlockMetadata())).getOpposite();
-					if (provider.canProvideFluids(node.getWorldObj(), node.xCoord + dir.offsetX, node.yCoord + dir.offsetY, node.zCoord + dir.offsetZ, dir)) {
-						List<StoredFluidStack> info = new ArrayList();
-						provider.getFluids(info, node.getWorldObj(), node.xCoord + dir.offsetX, node.yCoord + dir.offsetY, node.zCoord + dir.offsetZ, dir);
-						for (StoredFluidStack fluid : info) {
-							addFluidToList(fluidList, fluid);
+				if (target != null && target instanceof IConnectionNode) {
+					IConnectionNode node = (IConnectionNode) target;
+					Map<BlockCoords, ForgeDirection> connections = node.getConnections();
+					for (Map.Entry<BlockCoords, ForgeDirection> entry : connections.entrySet()) {
+						TileEntity fluidTile = entry.getKey().getTileEntity(target.getWorldObj());
+						if (provider.canHandleFluids(fluidTile, entry.getValue())) {
+							List<StoredFluidStack> info = new ArrayList();
+							provider.getFluids(info, fluidTile, entry.getValue());
+							for (StoredFluidStack fluid : info) {
+								addFluidToList(fluidList, fluid);
+							}
 						}
 					}
 				}
@@ -48,18 +53,48 @@ public class FluidHelper {
 		return fluidList;
 	}
 
-	public static void addFluidToList(List<StoredFluidStack> list, StoredFluidStack stack) {
-		boolean added = false;
+	public void addFluidToList(List<StoredFluidStack> list, StoredFluidStack stack) {
 		int pos = 0;
 		for (StoredFluidStack storedTank : list) {
 			if (storedTank.equalStack(stack.fluid)) {
 				list.get(pos).add(stack);
-				added = true;
+				return;
 			}
 			pos++;
 		}
-		if (!added) {
-			list.add(stack);
+		list.add(stack);
+
+	}
+
+	public StoredFluidStack addItems(StoredFluidStack add, List<BlockCoords> network) {
+		Map<BlockCoords, ForgeDirection> connections = LogisticsAPI.getCableHelper().getTileConnections(network);
+		for (Map.Entry<BlockCoords, ForgeDirection> entry : connections.entrySet()) {
+			TileEntity tile = entry.getKey().getTileEntity();
+			for (FluidHandler provider : Logistics.fluidProviders.getObjects()) {
+				if (provider.canHandleFluids(tile, entry.getValue())) {
+					add = provider.addStack(add, tile, entry.getValue());
+					if (add == null) {
+						return null;
+					}
+				}
+			}
 		}
+		return add;
+	}
+
+	public  StoredFluidStack extractItems(StoredFluidStack remove, List<BlockCoords> network) {
+		Map<BlockCoords, ForgeDirection> connections = LogisticsAPI.getCableHelper().getTileConnections(network);
+		for (Map.Entry<BlockCoords, ForgeDirection> entry : connections.entrySet()) {
+			TileEntity tile = entry.getKey().getTileEntity();
+			for (FluidHandler provider : Logistics.fluidProviders.getObjects()) {
+				if (provider.canHandleFluids(tile, entry.getValue())) {
+					remove = provider.removeStack(remove, tile, entry.getValue());
+					if (remove == null) {
+						return null;
+					}
+				}
+			}
+		}
+		return remove;
 	}
 }

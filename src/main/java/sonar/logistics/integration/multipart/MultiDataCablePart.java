@@ -9,11 +9,11 @@ import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.SonarTilePart;
 import sonar.core.utils.BlockCoords;
+import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.connecting.IDataCable;
 import sonar.logistics.api.connecting.IInfoEmitter;
 import sonar.logistics.api.connecting.ILogicTile;
 import sonar.logistics.client.renderers.RenderHandlers;
-import sonar.logistics.helpers.CableHelper;
 import sonar.logistics.registries.BlockRegistry;
 import codechicken.lib.vec.Cuboid6;
 import codechicken.multipart.NormallyOccludedPart;
@@ -103,7 +103,7 @@ public class MultiDataCablePart extends SonarTilePart implements IDataCable {
 		if (this.isBlocked(dir)) {
 			return 0;
 		}
-		return CableHelper.canRenderConnection(tile(), dir);
+		return LogisticsAPI.getCableHelper().canRenderConnection(tile(), dir);
 	}
 
 	@Override
@@ -114,13 +114,13 @@ public class MultiDataCablePart extends SonarTilePart implements IDataCable {
 	@Override
 	public void onWorldJoin() {
 		super.onWorldJoin();
-		CableHelper.addCable(this);
+		LogisticsAPI.getCableHelper().addCable(this);
 	}
 
 	@Override
 	public void onWorldSeparate() {
 		super.onWorldSeparate();
-		CableHelper.removeCable(this);
+		LogisticsAPI.getCableHelper().removeCable(this);
 	}
 
 	public void onPartChanged(TMultiPart part) {
@@ -138,8 +138,8 @@ public class MultiDataCablePart extends SonarTilePart implements IDataCable {
 		for (ILogicTile tile : adjacents) {
 			if (tile instanceof IDataCable) {
 				IDataCable cable = (IDataCable) tile;
-				CableHelper.removeCable(cable);
-				CableHelper.addCable(cable);
+				LogisticsAPI.getCableHelper().removeCable(cable);
+				LogisticsAPI.getCableHelper().addCable(cable);
 			}
 			if (tile instanceof IInfoEmitter) {
 				IInfoEmitter emitter = (IInfoEmitter) tile;
@@ -148,8 +148,8 @@ public class MultiDataCablePart extends SonarTilePart implements IDataCable {
 			}
 		}
 
-		CableHelper.removeCable(this);
-		CableHelper.addCable(this);
+		LogisticsAPI.getCableHelper().removeCable(this);
+		LogisticsAPI.getCableHelper().addCable(this);
 	}
 
 	@Override

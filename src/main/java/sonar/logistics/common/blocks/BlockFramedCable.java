@@ -12,10 +12,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.common.block.SonarMaterials;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.ITileHandler;
-import sonar.logistics.Logistics;
 import sonar.logistics.common.tileentity.TileEntityDataCable;
-import sonar.logistics.common.tileentity.TileEntityInfoCreator;
-import sonar.logistics.network.LogisticsGui;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 

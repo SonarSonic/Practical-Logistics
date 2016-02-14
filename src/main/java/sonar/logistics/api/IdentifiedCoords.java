@@ -1,24 +1,21 @@
 package sonar.logistics.api;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import io.netty.buffer.ByteBuf;
-import net.minecraft.block.Block;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
 import sonar.core.utils.BlockCoords;
-import sonar.core.utils.helpers.SonarHelper;
 import cpw.mods.fml.common.network.ByteBufUtils;
 
 public class IdentifiedCoords {
-	public String suffix;
+	public String coordString = "";
 	public ItemStack block;
 	public BlockCoords blockCoords;
 
 	public IdentifiedCoords(String name, ItemStack block, BlockCoords coords) {
-		this.suffix = name;
+		if (name == null)
+			coordString = "";
+		else
+			this.coordString = name;
 		this.block = block;
 		this.blockCoords = coords;
 	}
@@ -34,7 +31,7 @@ public class IdentifiedCoords {
 	public static void writeToNBT(NBTTagCompound tag, IdentifiedCoords coords) {
 		if (coords != null) {
 			tag.setBoolean("b", true);
-			tag.setString("clientName", coords.suffix);
+			tag.setString("clientName", coords.coordString);
 			if (coords.block != null) {
 				NBTTagCompound block = new NBTTagCompound();
 				coords.block.writeToNBT(block);
@@ -64,7 +61,7 @@ public class IdentifiedCoords {
 	public static void writeCoords(ByteBuf buf, IdentifiedCoords coords) {
 		if (coords != null) {
 			buf.writeBoolean(true);
-			ByteBufUtils.writeUTF8String(buf, coords.suffix);
+			ByteBufUtils.writeUTF8String(buf, coords.coordString);
 			if (coords.block != null) {
 				buf.writeBoolean(true);
 				ByteBufUtils.writeItemStack(buf, coords.block);
@@ -81,7 +78,7 @@ public class IdentifiedCoords {
 	public boolean equals(Object obj) {
 		if (obj != null && obj instanceof IdentifiedCoords) {
 			IdentifiedCoords coords = (IdentifiedCoords) obj;
-			return suffix.equals(coords.suffix);
+			return coordString.equals(coords.coordString) && coords.blockCoords.equals(blockCoords);
 		}
 		return false;
 	}

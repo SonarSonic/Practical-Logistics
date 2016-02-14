@@ -15,10 +15,10 @@ import sonar.core.network.utils.ITextField;
 import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.api.Info;
+import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.connecting.IInfoEmitter;
 import sonar.logistics.api.connecting.ILogicTile;
 import sonar.logistics.common.blocks.BlockRedstoneSignaller;
-import sonar.logistics.helpers.CableHelper;
 import sonar.logistics.registries.BlockRegistry;
 
 public class TileEntityRedstoneSignaller extends TileEntitySonar implements ILogicTile, IByteBufTile, ITextField {
@@ -67,7 +67,7 @@ public class TileEntityRedstoneSignaller extends TileEntitySonar implements ILog
 				block.updateSignallerState(canEmit, worldObj, xCoord, yCoord, zCoord);
 			}
 			boolean setNull = true;
-			List<BlockCoords> connections = CableHelper.getConnections(this, ForgeDirection.getOrientation(this.getBlockMetadata()).getOpposite());
+			List<BlockCoords> connections = LogisticsAPI.getCableHelper().getConnections(this, ForgeDirection.getOrientation(this.getBlockMetadata()).getOpposite());
 			if (!connections.isEmpty()) {
 				Object object = FMPHelper.getTile(connections.get(0).getTileEntity());
 				if (object != null) {

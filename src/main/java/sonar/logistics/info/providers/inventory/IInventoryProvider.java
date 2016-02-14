@@ -9,10 +9,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.inventory.StoredItemStack;
-import sonar.logistics.api.providers.InventoryProvider;
-import sonar.logistics.helpers.InfoHelper;
+import sonar.logistics.api.LogisticsAPI;
+import sonar.logistics.api.providers.InventoryHandler;
 
-public class IInventoryProvider extends InventoryProvider {
+public class IInventoryProvider extends InventoryHandler {
 
 	public static String name = "Standard Inventory";
 
@@ -40,7 +40,7 @@ public class IInventoryProvider extends InventoryProvider {
 	@Override
 	public boolean getItems(List<StoredItemStack> storedStacks, TileEntity tile, ForgeDirection dir) {
 		if (tile instanceof IInventory) {
-			InfoHelper.addInventoryToList(storedStacks, (IInventory) tile);
+			LogisticsAPI.getItemHelper().addInventoryToList(storedStacks, (IInventory) tile);
 			return true;
 		}
 		return false;

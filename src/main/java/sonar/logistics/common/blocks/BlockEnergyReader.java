@@ -7,7 +7,6 @@ import net.minecraft.world.World;
 import sonar.core.common.block.SonarMaterials;
 import sonar.logistics.Logistics;
 import sonar.logistics.common.tileentity.TileEntityEnergyReader;
-import sonar.logistics.common.tileentity.TileEntityFluidReader;
 import sonar.logistics.network.LogisticsGui;
 
 public class BlockEnergyReader extends BlockDirectionalConnector {
