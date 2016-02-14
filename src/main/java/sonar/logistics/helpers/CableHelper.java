@@ -150,8 +150,8 @@ public class CableHelper {
 
 	public static void addChannelConnections(ArrayList<BlockCoords> connections, IChannelProvider receiver, TileEntity tile, boolean unlimited) {
 		TileEntity emitter = null;
-		if (receiver.getChannel() != null && receiver.getChannel().coords != null) {
-			TileEntity target = receiver.getChannel().coords.getTileEntity();
+		if (receiver.getChannel() != null && receiver.getChannel().blockCoords != null) {
+			TileEntity target = receiver.getChannel().blockCoords.getTileEntity();
 			if (target != null && target instanceof ILogicTile) {
 				ILogicTile dataemitter = (ILogicTile) target;
 				if (tile.xCoord != dataemitter.getCoords().getX() || tile.yCoord != dataemitter.getCoords().getY() || tile.zCoord != dataemitter.getCoords().getZ()) {

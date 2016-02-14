@@ -102,7 +102,7 @@ public class InfoHelper {
 				}
 			}
 		}
-		//blockInfo.emptyData();
+		// blockInfo.emptyData();
 		return blockInfo;
 	}
 
@@ -126,7 +126,7 @@ public class InfoHelper {
 				}
 			}
 		}
-		//blockInfo.emptyData();
+		// blockInfo.emptyData();
 		return null;
 	}
 
@@ -157,8 +157,8 @@ public class InfoHelper {
 		}
 		boolean specialProvider = false;
 		for (InventoryProvider provider : Logistics.inventoryProviders.getObjects()) {
-			if (provider.canProvideItems(node.getWorldObj(), node.xCoord + dir.offsetX, node.yCoord + dir.offsetY, node.zCoord + dir.offsetZ, dir)) {
-				return provider.getStack(slot, node.getWorldObj(), node.xCoord + dir.offsetX, node.yCoord + dir.offsetY, node.zCoord + dir.offsetZ, dir);
+			if (provider.canHandleItems(tile, dir)) {
+				return provider.getStack(slot, tile, dir);
 			}
 		}
 		if (!specialProvider && tile instanceof IInventory) {
@@ -236,8 +236,10 @@ public class InfoHelper {
 		}
 		boolean specialProvider = false;
 		for (InventoryProvider provider : Logistics.inventoryProviders.getObjects()) {
-			if (provider.canProvideItems(node.getWorldObj(), node.xCoord + dir.offsetX, node.yCoord + dir.offsetY, node.zCoord + dir.offsetZ, dir)) {
-				specialProvider = provider.getItems(storedStacks, node.getWorldObj(), node.xCoord + dir.offsetX, node.yCoord + dir.offsetY, node.zCoord + dir.offsetZ, dir);
+			if (!specialProvider) {
+				if (provider.canHandleItems(tile, dir)) {
+					specialProvider = provider.getItems(storedStacks, tile, dir);
+				}
 			}
 		}
 		if (!specialProvider && tile instanceof IInventory) {
@@ -282,6 +284,68 @@ public class InfoHelper {
 			list.add(new StoredItemStack(stack));
 		}
 	}
+
+	public static StoredItemStack addItems(StoredItemStack stack, List<BlockCoords> connections) {
+		if (connections == null) {
+			return stack;
+		}
+		for (BlockCoords connect : connections) {
+			TileEntity node = connect.getTileEntity();
+			if (node != null) {
+				if (node instanceof TileEntityBlockNode) {
+					System.out.print("add");
+					ForgeDirection dir = ForgeDirection.getOrientation(SonarHelper.invertMetadata(node.getBlockMetadata())).getOpposite();
+					TileEntity tile = node.getWorldObj().getTileEntity(node.xCoord + dir.offsetX, node.yCoord + dir.offsetY, node.zCoord + dir.offsetZ);
+					if (tile == null) {
+						return stack;
+					}
+					boolean specialProvider = false;
+					for (InventoryProvider provider : Logistics.inventoryProviders.getObjects()) {
+						if (!specialProvider) {
+							if (provider.canHandleItems(tile, dir)) {
+								stack = provider.addStack(stack, tile, dir);
+								if (stack == null) {
+									return null;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		return stack;
+	}
+
+	public static StoredItemStack extractItems(StoredItemStack stack, List<BlockCoords> connections) {
+		if (connections == null) {
+			return null;
+		}
+		for (BlockCoords connect : connections) {
+			TileEntity node = connect.getTileEntity();
+			if (node != null) {
+				if (node instanceof TileEntityBlockNode) {
+					ForgeDirection dir = ForgeDirection.getOrientation(SonarHelper.invertMetadata(node.getBlockMetadata())).getOpposite();
+					TileEntity tile = node.getWorldObj().getTileEntity(node.xCoord + dir.offsetX, node.yCoord + dir.offsetY, node.zCoord + dir.offsetZ);
+					if (tile == null) {
+						return null;
+					}
+					boolean specialProvider = false;
+					for (InventoryProvider provider : Logistics.inventoryProviders.getObjects()) {
+						if (!specialProvider) {
+							if (provider.canHandleItems(tile, dir)) {
+								stack = provider.removeStack(stack, tile, dir);
+								if (stack == null) {
+									return null;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		return stack;
+	}
+
 	public static Info combineData(Info primary, Info secondary) {
 		if (!(primary instanceof CategoryInfo) && !(secondary instanceof CategoryInfo)) {
 			if (primary.getDataType() == 0 && secondary.getDataType() == 0) {

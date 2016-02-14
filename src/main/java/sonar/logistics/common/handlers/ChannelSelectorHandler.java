@@ -6,6 +6,7 @@ import java.util.List;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
@@ -44,20 +45,29 @@ public class ChannelSelectorHandler extends TileHandler {
 		if (te.getWorldObj().isRemote) {
 			return;
 		}
+		List<BlockCoords> coords = CableHelper.getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite());
+		channels = new ArrayList();
+		for (BlockCoords coord : coords) {
+			TileEntity target = coord.getTileEntity();
+			if (target != null) {
+				String name = StatCollector.translateToLocal(target.getBlockType().getLocalizedName());
+				ItemStack stack = SonarHelper.createStackedBlock(target.getBlockType(), target.getBlockMetadata());
+				if (target instanceof TileEntityBlockNode) {
+					ForgeDirection dir = ForgeDirection.getOrientation(SonarHelper.invertMetadata(target.getBlockMetadata())).getOpposite();
+					Block block = target.getWorldObj().getBlock(target.xCoord + dir.offsetX, target.yCoord + dir.offsetY, target.zCoord + dir.offsetZ);
+					int meta = target.getWorldObj().getBlockMetadata(target.xCoord + dir.offsetX, target.yCoord + dir.offsetY, target.zCoord + dir.offsetZ);
+					if (!block.isAir(target.getWorldObj(), target.xCoord + dir.offsetX, target.yCoord + dir.offsetY, target.zCoord + dir.offsetZ)) {
+						stack = SonarHelper.createStackedBlock(block, meta);
+					}
+				}
+				channels.add(new IdentifiedCoords(name, stack, coord));
+			}
+		}
 	}
 
 	public void sendAvailableData(TileEntity te, EntityPlayer player) {
 		if (player != null && player instanceof EntityPlayerMP) {
-			List<BlockCoords> coords = CableHelper.getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite());
-			channels = new ArrayList();
-			for (BlockCoords coord : coords) {
-				TileEntity target = coord.getTileEntity();
-				if (target != null) {
-					String name = StatCollector.translateToLocal(target.getBlockType().getLocalizedName());
-
-					channels.add(new IdentifiedCoords(name, coord));
-				}
-			}
+		
 			NBTTagCompound syncData = new NBTTagCompound();
 			writeData(syncData, SyncType.SYNC);
 			SonarCore.network.sendTo(new PacketTileSync(te.xCoord, te.yCoord, te.zCoord, syncData, SyncType.SYNC), (EntityPlayerMP) player);
@@ -72,7 +82,7 @@ public class ChannelSelectorHandler extends TileHandler {
 		}
 		List<BlockCoords> coords = CableHelper.getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite());
 		for (BlockCoords coord : coords) {
-			if (BlockCoords.equalCoords(coord, currentCoords.coords)) {
+			if (BlockCoords.equalCoords(coord, currentCoords.blockCoords)) {
 				return currentCoords;
 			}
 		}
@@ -105,14 +115,6 @@ public class ChannelSelectorHandler extends TileHandler {
 						channels.set(slot, IdentifiedCoords.readFromNBT(compound));
 					else
 						channels.add(slot, IdentifiedCoords.readFromNBT(compound));
-					break;
-				case 1:
-					String name = compound.getString("Name");
-					if (name != null) {
-						channels.set(slot, new IdentifiedCoords(name, channels.get(slot).coords));
-					} else {
-						channels.set(slot, null);
-					}
 					break;
 				case 2:
 					if (set)
@@ -170,15 +172,10 @@ public class ChannelSelectorHandler extends TileHandler {
 				NBTTagCompound compound = new NBTTagCompound();
 				if (current != null) {
 					if (last != null) {
-						if (!BlockCoords.equalCoords(current.coords, last.coords)) {
+						if (!BlockCoords.equalCoords(current.blockCoords, last.blockCoords) || !current.suffix.equals(last.suffix) || !current.block.isItemEqual(last.block)) {
 							compound.setByte("f", (byte) 0);
 							this.lastChannels.set(i, current);
 							IdentifiedCoords.writeToNBT(compound, this.channels.get(i));
-
-						} else if (!current.name.equals(last.name)) {
-							compound.setByte("f", (byte) 1);
-							this.lastChannels.set(i, current);
-							compound.setString("Name", current.name);
 						}
 					} else {
 						compound.setByte("f", (byte) 0);

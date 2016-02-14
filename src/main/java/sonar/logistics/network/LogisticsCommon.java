@@ -9,6 +9,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.handlers.TileHandler;
+import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.Logistics;
 import sonar.logistics.client.gui.GuiChannelSelector;
 import sonar.logistics.client.gui.GuiClock;
@@ -24,7 +25,6 @@ import sonar.logistics.client.gui.GuiInventoryReader;
 import sonar.logistics.client.gui.GuiItemRouter;
 import sonar.logistics.client.gui.GuiRedstoneSignaller;
 import sonar.logistics.client.gui.GuiRenameEmitter;
-import sonar.logistics.common.containers.ContainerChannelSelector;
 import sonar.logistics.common.containers.ContainerDataReceiver;
 import sonar.logistics.common.containers.ContainerEmptySync;
 import sonar.logistics.common.containers.ContainerFluidReader;
@@ -151,7 +151,7 @@ public class LogisticsCommon implements IGuiHandler {
 				if (entity instanceof TileEntityChannelSelector) {
 					TileHandler handler = FMPHelper.getHandler(tile);
 					if (handler != null && handler instanceof ChannelSelectorHandler)
-						return new ContainerChannelSelector(tile, (ChannelSelectorHandler) handler, player.inventory);
+						return new ContainerEmptySync((ChannelSelectorHandler) handler, tile).setTypes(new SyncType[] { SyncType.SPECIAL });
 				}
 			case LogisticsGui.clock:
 				if (entity instanceof TileEntityClock) {
@@ -162,7 +162,7 @@ public class LogisticsCommon implements IGuiHandler {
 				// instanceof InventoryReaderPart) {
 				TileHandler handler = FMPHelper.getHandler(tile);
 				if (handler != null && handler instanceof EnergyReaderHandler) {
-					return new ContainerEmptySync(tile);
+					return new ContainerEmptySync((EnergyReaderHandler) handler, tile).setTypes(new SyncType[] { SyncType.SPECIAL });
 				}
 				// }
 			}

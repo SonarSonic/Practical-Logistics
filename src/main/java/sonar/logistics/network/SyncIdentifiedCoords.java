@@ -30,7 +30,7 @@ public class SyncIdentifiedCoords implements ISyncPart {
 		if (last == null) {
 			return false;
 		}
-		return BlockCoords.equalCoords(c.coords, last.coords) && c.name.equals(last.name);
+		return BlockCoords.equalCoords(c.blockCoords, last.blockCoords) && c.suffix.equals(last.suffix);
 	}
 
 	public void writeToBuf(ByteBuf buf) {

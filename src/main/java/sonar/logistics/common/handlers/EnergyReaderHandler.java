@@ -36,12 +36,13 @@ import sonar.logistics.helpers.InfoHelper;
 import sonar.logistics.info.types.CategoryInfo;
 import sonar.logistics.info.types.FluidStackInfo;
 import sonar.logistics.info.types.ProgressInfo;
+import sonar.logistics.info.types.StoredEnergyInfo;
 
 public class EnergyReaderHandler extends TileHandler {
 
 	public BlockCoords coords;
-	public List<StoredEnergyStack> stacks;
-	public List<StoredEnergyStack> lastStacks;
+	public List<StoredEnergyInfo> stacks;
+	public List<StoredEnergyInfo> lastStacks;
 
 	public EnergyReaderHandler(boolean isMultipart, TileEntity tile) {
 		super(isMultipart, tile);
@@ -69,8 +70,8 @@ public class EnergyReaderHandler extends TileHandler {
 
 						// if (energyTile != null &&
 						// handler.canProvideInfo(energyTile, dir)) {
-						//handler.removeEnergy(10000000, energyTile, dir);
-						//handler.addEnergy(10000001, energyTile, dir);
+						// handler.removeEnergy(10000000, energyTile, dir);
+						// handler.addEnergy(10000001, energyTile, dir);
 						completed = true;
 
 						// }
@@ -92,8 +93,8 @@ public class EnergyReaderHandler extends TileHandler {
 
 	public Info currentInfo(TileEntity te) {
 		if (stacks != null && !stacks.isEmpty() && stacks.get(0) != null) {
-			StoredEnergyStack energy = stacks.get(0);
-			return new ProgressInfo((long) energy.stored, (long) energy.capacity, (long) energy.stored + " RF");
+			StoredEnergyInfo energy = stacks.get(0);
+			return new ProgressInfo((long) energy.stack.stored, (long) energy.stack.capacity, (long) energy.stack.stored + " RF");
 		}
 		/*
 		 * if (current != null && current.getFluid() != null) { if (stacks !=
@@ -139,9 +140,12 @@ public class EnergyReaderHandler extends TileHandler {
 				switch (compound.getByte("f")) {
 				case 0:
 					if (set)
-						stacks.set(slot, StoredEnergyStack.readFromNBT(compound));
+						stacks.set(slot, (StoredEnergyInfo) Logistics.infoTypes.readFromNBT(compound));
 					else
-						stacks.add(slot, StoredEnergyStack.readFromNBT(compound));
+						stacks.add(slot, (StoredEnergyInfo) Logistics.infoTypes.readFromNBT(compound));
+					break;
+				case 1:
+					stacks.get(slot).readUpdate(compound);
 					break;
 				case 2:
 					if (set)
@@ -159,7 +163,7 @@ public class EnergyReaderHandler extends TileHandler {
 			this.stacks = new ArrayList();
 			for (int i = 0; i < list.tagCount(); i++) {
 				NBTTagCompound compound = list.getCompoundTagAt(i);
-				this.stacks.add(StoredEnergyStack.readFromNBT(compound));
+				this.stacks.add((StoredEnergyInfo) Logistics.infoTypes.readFromNBT(compound));
 
 			}
 		}
@@ -196,8 +200,8 @@ public class EnergyReaderHandler extends TileHandler {
 			NBTTagList list = new NBTTagList();
 			int size = Math.max(this.stacks.size(), this.lastStacks.size());
 			for (int i = 0; i < size; ++i) {
-				StoredEnergyStack current = null;
-				StoredEnergyStack last = null;
+				StoredEnergyInfo current = null;
+				StoredEnergyInfo last = null;
 				if (i < this.stacks.size()) {
 					current = this.stacks.get(i);
 				}
@@ -207,15 +211,22 @@ public class EnergyReaderHandler extends TileHandler {
 				NBTTagCompound compound = new NBTTagCompound();
 				if (current != null) {
 					if (last != null) {
-						if (!last.equalEnergyType(current) || current.stored != last.stored || current.capacity != last.capacity) {
-							compound.setByte("f", (byte) 0);
+						if (!last.equals(current)) {
 							this.lastStacks.set(i, current);
-							StoredEnergyStack.writeToNBT(compound, this.stacks.get(i));
+							NBTTagCompound updateTag = compound;
+							last.writeUpdate(current, updateTag);
+							if (!updateTag.hasNoTags()) {
+								compound.setByte("f", (byte) 1);
+								compound = updateTag;
+							}
+							// StoredEnergyStack.writeToNBT(compound,
+							// this.stacks.get(i));
 						}
 					} else {
+						System.out.print("full update");
 						compound.setByte("f", (byte) 0);
 						this.lastStacks.add(i, current);
-						StoredEnergyStack.writeToNBT(compound, this.stacks.get(i));
+						Logistics.infoTypes.writeToNBT(compound, this.stacks.get(i));
 					}
 				} else if (last != null) {
 					this.lastStacks.set(i, null);
@@ -240,7 +251,7 @@ public class EnergyReaderHandler extends TileHandler {
 			for (int i = 0; i < this.stacks.size(); i++) {
 				if (this.stacks.get(i) != null) {
 					NBTTagCompound compound = new NBTTagCompound();
-					StoredEnergyStack.writeToNBT(compound, this.stacks.get(i));
+					Logistics.infoTypes.writeToNBT(compound, this.stacks.get(i));
 					list.appendTag(compound);
 				}
 			}

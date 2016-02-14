@@ -7,6 +7,7 @@ import java.util.List;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
@@ -23,6 +24,7 @@ import sonar.logistics.api.connecting.IChannelProvider;
 import sonar.logistics.api.connecting.IInfoEmitter;
 import sonar.logistics.helpers.CableHelper;
 import sonar.logistics.network.SyncIdentifiedCoords;
+import sonar.logistics.registries.BlockRegistry;
 import sonar.logistics.registries.EmitterRegistry;
 
 public class TileEntityDataReceiver extends TileEntityNode implements IChannelProvider, IInfoEmitter {
@@ -40,7 +42,7 @@ public class TileEntityDataReceiver extends TileEntityNode implements IChannelPr
 	@Override
 	public Info currentInfo() {
 		if (emitter.getCoords() != null) {
-			return new StandardInfo((byte) -1, "DEFAULT", "Connected: ", emitter.getCoords().coords.getRender());
+			return new StandardInfo((byte) -1, "DEFAULT", "Connected: ", emitter.getCoords().blockCoords.getRender());
 		} else {
 			return new StandardInfo((byte) -1, "DEFAULT", "Connection: ", "NOT CONNECTED");
 		}
@@ -57,10 +59,10 @@ public class TileEntityDataReceiver extends TileEntityNode implements IChannelPr
 			return;
 		}
 		if (emitter.getCoords() != null) {
-			TileEntity tile = emitter.getCoords().coords.getTileEntity();
+			TileEntity tile = emitter.getCoords().blockCoords.getTileEntity();
 			if (tile != null && tile instanceof TileEntityDataEmitter) {
 				TileEntityDataEmitter dataEmitter = (TileEntityDataEmitter) tile;
-				emitter.setCoords(new IdentifiedCoords(dataEmitter.clientName.getString(), emitter.getCoords().coords));
+				emitter.setCoords(new IdentifiedCoords(dataEmitter.clientName.getString(), new ItemStack(BlockRegistry.dataEmitter), emitter.getCoords().blockCoords));
 			}
 		}
 	}
@@ -109,7 +111,7 @@ public class TileEntityDataReceiver extends TileEntityNode implements IChannelPr
 				case 1:
 					String name = compound.getString("Name");
 					if (name != null) {
-						emitters.set(slot, new IdentifiedCoords(name, emitters.get(slot).coords));
+						emitters.set(slot, new IdentifiedCoords(name, new ItemStack(BlockRegistry.dataEmitter), emitters.get(slot).blockCoords));
 					} else {
 						emitters.set(slot, null);
 					}
@@ -169,15 +171,15 @@ public class TileEntityDataReceiver extends TileEntityNode implements IChannelPr
 				NBTTagCompound compound = new NBTTagCompound();
 				if (current != null) {
 					if (last != null) {
-						if (!BlockCoords.equalCoords(current.coords, last.coords)) {
+						if (!BlockCoords.equalCoords(current.blockCoords, last.blockCoords)) {
 							compound.setByte("f", (byte) 0);
 							this.lastemitters.set(i, current);
 							IdentifiedCoords.writeToNBT(compound, this.emitters.get(i));
 
-						} else if (!current.name.equals(last.name)) {
+						} else if (!current.suffix.equals(last.suffix)) {
 							compound.setByte("f", (byte) 1);
 							this.lastemitters.set(i, current);
-							compound.setString("Name", current.name);
+							compound.setString("Name", current.suffix);
 						}
 					} else {
 						compound.setByte("f", (byte) 0);

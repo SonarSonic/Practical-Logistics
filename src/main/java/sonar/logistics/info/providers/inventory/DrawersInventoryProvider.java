@@ -4,7 +4,6 @@ import java.util.List;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.inventory.StoredItemStack;
 import sonar.logistics.api.providers.InventoryProvider;
@@ -25,14 +24,12 @@ public class DrawersInventoryProvider extends InventoryProvider {
 	}
 
 	@Override
-	public boolean canProvideItems(World world, int x, int y, int z, ForgeDirection dir) {
-		TileEntity tile = world.getTileEntity(x, y, z);
-		return tile != null && tile instanceof IDrawerGroup;
+	public boolean canHandleItems(TileEntity tile, ForgeDirection dir) {
+		return tile instanceof IDrawerGroup;
 	}
 
 	@Override
-	public StoredItemStack getStack(int slot, World world, int x, int y, int z, ForgeDirection dir) {
-		TileEntity tile = world.getTileEntity(x, y, z);
+	public StoredItemStack getStack(int slot, TileEntity tile, ForgeDirection dir) {
 		if (tile instanceof IDrawerGroup) {
 			IDrawerGroup drawers = (IDrawerGroup) tile;
 			if (slot < drawers.getDrawerCount()) {
@@ -50,8 +47,7 @@ public class DrawersInventoryProvider extends InventoryProvider {
 	}
 
 	@Override
-	public boolean getItems(List<StoredItemStack> storedStacks, World world, int x, int y, int z, ForgeDirection dir) {
-		TileEntity tile = world.getTileEntity(x, y, z);
+	public boolean getItems(List<StoredItemStack> storedStacks, TileEntity tile, ForgeDirection dir) {
 		if (tile instanceof IDrawerGroup) {
 			IDrawerGroup drawers = (IDrawerGroup) tile;
 			for (int i = 0; i < drawers.getDrawerCount(); i++) {
@@ -69,6 +65,16 @@ public class DrawersInventoryProvider extends InventoryProvider {
 
 	public boolean isLoadable() {
 		return Loader.isModLoaded("StorageDrawers");
+	}
+
+	@Override
+	public StoredItemStack addStack(StoredItemStack add, TileEntity tile, ForgeDirection dir) {
+		return add;
+	}
+
+	@Override
+	public StoredItemStack removeStack(StoredItemStack remove, TileEntity tile, ForgeDirection dir) {
+		return remove;
 	}
 
 }

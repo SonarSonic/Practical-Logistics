@@ -2,6 +2,7 @@ package sonar.logistics.info.providers.inventory;
 
 import java.util.List;
 
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -19,37 +20,86 @@ public class DSUInventoryProvider extends InventoryProvider {
 	}
 
 	@Override
-	public boolean canProvideItems(World world, int x, int y, int z, ForgeDirection dir) {
-		TileEntity tile = world.getTileEntity(x, y, z);
-		return tile != null && tile instanceof IDeepStorageUnit;
+	public boolean canHandleItems(TileEntity tile, ForgeDirection dir) {
+		return tile instanceof IDeepStorageUnit;
 	}
 
 	@Override
-	public StoredItemStack getStack(int slot, World world, int x, int y, int z, ForgeDirection dir) {
+	public StoredItemStack getStack(int slot, TileEntity tile, ForgeDirection dir) {
 		if (!(slot > 0)) {
-			return getStoredItem(world, x, y, z);
+			return getStoredItem(tile);
 		}
 		return null;
 	}
 
 	@Override
-	public boolean getItems(List<StoredItemStack> storedStacks, World world, int x, int y, int z, ForgeDirection dir) {
-		StoredItemStack stack = getStoredItem(world, x, y, z);
-		if (stack != null)
+	public boolean getItems(List<StoredItemStack> storedStacks, TileEntity tile, ForgeDirection dir) {
+		StoredItemStack stack = getStoredItem(tile);
+		if (stack != null) {
 			storedStacks.add(stack);
+			return true;
+		}
 		return false;
 
 	}
 
-	public StoredItemStack getStoredItem(World world, int x, int y, int z) {
-		TileEntity tile = world.getTileEntity(x, y, z);
-		if (tile instanceof IDeepStorageUnit) {
-			IDeepStorageUnit inv = (IDeepStorageUnit) tile;
-			if (inv.getStoredItemType() != null) {
-				return new StoredItemStack(inv.getStoredItemType());
+	public StoredItemStack getStoredItem(TileEntity tile) {
+		IDeepStorageUnit inv = (IDeepStorageUnit) tile;
+		if (inv.getStoredItemType() != null) {
+			return new StoredItemStack(inv.getStoredItemType());
+		}
+
+		return null;
+	}
+
+	@Override
+	public StoredItemStack addStack(StoredItemStack add, TileEntity tile, ForgeDirection dir) {
+		IDeepStorageUnit inv = (IDeepStorageUnit) tile;
+		ItemStack stack = inv.getStoredItemType();
+		if (stack != null) {
+			if (add.equalStack(stack)) {
+				long max = inv.getMaxStoredCount();
+				long storedItems = stack.stackSize;
+				if (max == storedItems) {
+					return add;
+				}
+
+				storedItems += add.getStackSize();
+				if (storedItems > max) {
+					long remove = storedItems - max;
+					inv.setStoredItemCount((int) max);
+					return new StoredItemStack(add.getItemStack(), remove);
+				} else {
+					inv.setStoredItemCount(stack.stackSize + (int) add.getStackSize());
+					return null;
+				}
+			}
+		} else {
+			//if (add.getTagCompound() != null) {
+			//	return add;
+			//}
+			inv.setStoredItemType(add.getItemStack(), (int) add.getStackSize());
+			return null;
+		}
+		return add;
+	}
+
+	@Override
+	public StoredItemStack removeStack(StoredItemStack remove, TileEntity tile, ForgeDirection dir) {
+		IDeepStorageUnit inv = (IDeepStorageUnit) tile;
+		ItemStack stack = inv.getStoredItemType();
+		if (remove.equalStack(stack)) {
+			if (remove.getStackSize() >= stack.stackSize) {
+				stack = stack.copy();
+				inv.setStoredItemCount(0);
+				remove.stored-=stack.stackSize;
+				return remove;
+			} else {
+				inv.setStoredItemCount(stack.stackSize - (int) remove.getStackSize());
+				return null;
 			}
 		}
-		return null;
+		return remove;
 	}
 
 }

@@ -116,7 +116,7 @@ public class TileEntityEntityNode extends TileEntityConnection implements ICable
 			buf.writeInt(entityTarget.getInt());
 			break;
 		case 1:
-			buf.writeInt(entityRange.getInt());
+			//buf.writeInt(entityRange.getInt());
 			break;
 		}
 	}
@@ -128,6 +128,7 @@ public class TileEntityEntityNode extends TileEntityConnection implements ICable
 			entityTarget.setInt(buf.readInt());
 			break;
 		case 1:
+			
 			if (entityRange.getInt() != 64)
 				entityRange.increaseBy(1);
 			break;

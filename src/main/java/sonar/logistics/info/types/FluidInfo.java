@@ -58,7 +58,7 @@ public class FluidInfo extends StandardInfo {
 	@Override
 	public void renderInfo(Tessellator tess, TileEntity tile, float minX, float minY, float maxX, float maxY, float zOffset, float scale) {
 		FontRenderer rend = Minecraft.getMinecraft().fontRenderer;
-		GL11.glTranslated(0, 0, zOffset);
+		GL11.glTranslated(0, 0, zOffset+0.002);
 		float width = (maxX - minX);
 		boolean renderNormal = true;
 		if (fluidID != -1) {

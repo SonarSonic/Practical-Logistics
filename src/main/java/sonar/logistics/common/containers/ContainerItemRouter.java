@@ -66,28 +66,6 @@ public class ContainerItemRouter extends ContainerSync {
 	}
 
 	@Override
-	public void detectAndSendChanges() {
-		super.detectAndSendChanges();
-		if (sync != null) {
-			if (crafters != null) {
-				NBTTagCompound tag = new NBTTagCompound();
-				TileHandler handler = FMPHelper.getHandler(tile);
-				handler.writeData(tag, SyncType.SPECIAL);
-				if (tag.hasNoTags()) {
-					return;
-				}
-				for (Object o : crafters) {
-					if (o != null && o instanceof EntityPlayerMP) {
-						SonarCore.network.sendTo(new PacketTileSync(tile.xCoord, tile.yCoord, tile.zCoord, tag, SyncType.SPECIAL), (EntityPlayerMP) o);
-					}
-				}
-
-			}
-
-		}
-	}
-
-	@Override
 	public boolean canInteractWith(EntityPlayer player) {
 		return true;
 	}
@@ -171,4 +149,7 @@ public class ContainerItemRouter extends ContainerSync {
 		return super.slotClick(slotID, buttonID, flag, player);
 	}
 
+	public SyncType[] getSyncTypes() {
+		return new SyncType[] { SyncType.SPECIAL };
+	}
 }

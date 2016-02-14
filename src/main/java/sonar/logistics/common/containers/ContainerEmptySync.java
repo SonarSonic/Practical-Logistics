@@ -6,14 +6,26 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import sonar.core.inventory.ContainerSync;
 import sonar.core.network.utils.ISyncTile;
+import sonar.core.utils.helpers.NBTHelper.SyncType;
 
 public class ContainerEmptySync extends ContainerSync {
+	SyncType[] types = new SyncType[] { SyncType.SYNC };
 
 	public ContainerEmptySync(ISyncTile sync, TileEntity entity) {
 		super(sync, entity);
 	}
+
 	public ContainerEmptySync(TileEntity entity) {
 		super(entity);
+	}
+
+	public ContainerEmptySync setTypes(SyncType[] types) {
+		this.types = types;
+		return this;
+	}
+
+	public boolean syncInventory() {
+		return false;
 	}
 
 	@Override
@@ -25,5 +37,9 @@ public class ContainerEmptySync extends ContainerSync {
 		ItemStack itemstack = null;
 		Slot slot = (Slot) this.inventorySlots.get(slotID);
 		return itemstack;
+	}
+
+	public SyncType[] getSyncTypes() {
+		return types;
 	}
 }

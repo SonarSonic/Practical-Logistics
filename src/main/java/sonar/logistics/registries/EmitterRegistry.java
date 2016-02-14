@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import sonar.core.utils.BlockCoords;
 import sonar.logistics.api.IdentifiedCoords;
@@ -32,7 +33,7 @@ public class EmitterRegistry {
 				if (tile != null && tile instanceof TileEntityDataEmitter) {
 					TileEntityDataEmitter dataEmitter = (TileEntityDataEmitter) tile;
 					if (tile.getWorldObj() != null && !tile.isInvalid()) {
-						emitterList.add(new IdentifiedCoords(dataEmitter.clientName.getString(), coords));
+						emitterList.add(new IdentifiedCoords(dataEmitter.clientName.getString(), new ItemStack(BlockRegistry.dataEmitter), coords));
 					}
 				}
 			}

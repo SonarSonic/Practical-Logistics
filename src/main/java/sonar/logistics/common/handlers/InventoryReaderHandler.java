@@ -97,6 +97,12 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 		return new StandardInfo((byte) -1, "ITEMREND", " ", "NO DATA");
 	}
 
+	public StoredItemStack insertItem(TileEntity te, StoredItemStack stack) {
+		return InfoHelper.addItems(stack, CableHelper.getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite()));
+	}
+	public StoredItemStack extractItem(TileEntity te, StoredItemStack stack) {
+		return InfoHelper.extractItems(stack, CableHelper.getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite()));
+	}
 	public void readData(NBTTagCompound nbt, SyncType type) {
 		super.readData(nbt, type);
 		setting.readFromNBT(nbt, type);
@@ -255,7 +261,7 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 	@Override
 	public void writePacket(ByteBuf buf, int id) {
 		if (id == 0) {
-			//setting.writeToBuf(buf);
+			// setting.writeToBuf(buf);
 		}
 		if (id == 1) {
 			targetSlot.writeToBuf(buf);
@@ -268,11 +274,11 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 	@Override
 	public void readPacket(ByteBuf buf, int id) {
 		if (id == 0) {
-			//setting.readFromBuf(buf);
-			//System.out.print(setting.getInt());
-			if(setting.getInt()==3){
+			// setting.readFromBuf(buf);
+			// System.out.print(setting.getInt());
+			if (setting.getInt() == 3) {
 				setting.setInt(0);
-			}else{
+			} else {
 				setting.increaseBy(1);
 			}
 		}
@@ -283,4 +289,5 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 			posSlot.readFromBuf(buf);
 		}
 	}
+
 }

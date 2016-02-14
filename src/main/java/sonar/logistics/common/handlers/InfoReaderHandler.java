@@ -184,7 +184,6 @@ public class InfoReaderHandler extends TileHandler implements IWailaInfo {
 			}
 		}
 		if (type == SyncType.SPECIAL) {
-
 			if (nbt.hasKey("null")) {
 				this.clientInfo = new ArrayList();
 				return;

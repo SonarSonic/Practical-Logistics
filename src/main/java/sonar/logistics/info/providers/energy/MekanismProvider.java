@@ -1,7 +1,5 @@
 package sonar.logistics.info.providers.energy;
 
-import java.util.List;
-
 import mekanism.api.energy.IStrictEnergyAcceptor;
 import mekanism.api.energy.IStrictEnergyStorage;
 import net.minecraft.tileentity.TileEntity;
@@ -25,25 +23,12 @@ public class MekanismProvider extends EnergyHandler {
 	}
 
 	@Override
-	public void getEnergyInfo(List<StoredEnergyStack> energyList, TileEntity tile, ForgeDirection dir) {
+	public void getEnergyInfo(StoredEnergyStack energyStack, TileEntity tile, ForgeDirection dir) {
 		if (tile instanceof IStrictEnergyStorage) {
 			IStrictEnergyStorage storage = (IStrictEnergyStorage) tile;
-			energyList.add(new StoredEnergyStack(StoredEnergyStack.storage, 10, storage.getEnergy(), storage.getMaxEnergy()));
+			energyStack.setStorageValues((long) (storage.getEnergy() / 10), (long) (storage.getMaxEnergy() / 10));
 		}
 
-	}
-
-	@Override
-	public String getSuffix(byte type) {
-		switch (type) {
-		case StoredEnergyStack.storage:
-			return "RF";
-		case StoredEnergyStack.input:
-		case StoredEnergyStack.output:
-		case StoredEnergyStack.usage:
-			return "RF/T";
-		}
-		return "";
 	}
 
 	@Override

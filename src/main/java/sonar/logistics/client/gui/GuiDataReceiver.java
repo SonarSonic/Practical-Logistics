@@ -38,7 +38,7 @@ public class GuiDataReceiver extends GuiSelectionList<IdentifiedCoords> {
 
 	@Override
 	public boolean isEqualSelection(IdentifiedCoords selection, IdentifiedCoords current) {
-		return BlockCoords.equalCoords(selection.coords, current.coords);
+		return BlockCoords.equalCoords(selection.blockCoords, current.blockCoords);
 	}
 
 	@Override
@@ -49,10 +49,10 @@ public class GuiDataReceiver extends GuiSelectionList<IdentifiedCoords> {
 
 	@Override
 	public void renderSelection(IdentifiedCoords selection, boolean isSelected, int pos) {
-		FontHelper.text(selection.name, 10, 31 + (12 * pos), isSelected ? Color.GREEN.getRGB() : Color.WHITE.getRGB());
+		FontHelper.text(selection.suffix, 10, 31 + (12 * pos), isSelected ? Color.GREEN.getRGB() : Color.WHITE.getRGB());
 		GL11.glPushMatrix();
 		GL11.glScaled(0.75, 0.75, 0.75);
-		FontHelper.text(selection.coords.getRender(), 174, 43 + (16 * pos), isSelected ? Color.GREEN.getRGB() : Color.WHITE.getRGB());
+		FontHelper.text(selection.blockCoords.getRender(), 174, 43 + (16 * pos), isSelected ? Color.GREEN.getRGB() : Color.WHITE.getRGB());
 		GL11.glPopMatrix();
 
 	}

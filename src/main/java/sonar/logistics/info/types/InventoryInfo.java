@@ -26,7 +26,6 @@ import sonar.logistics.common.tileentity.TileEntityInventoryReader;
 
 public class InventoryInfo extends Info<InventoryInfo> {
 
-	// public StoredItemStack stack;
 	public List<StoredItemStack> stacks = new ArrayList();
 	public String rend = "ITEMINV";
 
@@ -190,16 +189,6 @@ public class InventoryInfo extends Info<InventoryInfo> {
 
 	}
 
-	/*
-	 * @Override public boolean isEqualType(Info info) { if (info instanceof
-	 * InventoryInfo) { InventoryInfo stackInfo = (InventoryInfo) info; //If
-	 * (BlockCoords.equalCoords(stackInfo.reader, reader)) { // return false;
-	 * //} //return true; } return false; }
-	 * 
-	 * @Override public void emptyData() {
-	 * 
-	 * }
-	 */
 	@Override
 	public InventoryInfo instance() {
 		return new InventoryInfo();

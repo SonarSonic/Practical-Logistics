@@ -5,6 +5,7 @@ import sonar.logistics.api.providers.InventoryProvider;
 import sonar.logistics.info.providers.inventory.AE2InventoryProvider;
 import sonar.logistics.info.providers.inventory.DSUInventoryProvider;
 import sonar.logistics.info.providers.inventory.DrawersInventoryProvider;
+import sonar.logistics.info.providers.inventory.IInventoryProvider;
 import sonar.logistics.info.providers.inventory.LPInventoryProvider;
 import sonar.logistics.info.providers.inventory.StorageChamberInventoryProvider;
 import cpw.mods.fml.common.Loader;
@@ -19,6 +20,7 @@ public class InventoryProviderRegistry extends RegistryHelper<InventoryProvider>
 		registerObject(new LPInventoryProvider());
 		registerObject(new DrawersInventoryProvider());
 		registerObject(new StorageChamberInventoryProvider());
+		registerObject(new IInventoryProvider());
 	}
 
 	@Override

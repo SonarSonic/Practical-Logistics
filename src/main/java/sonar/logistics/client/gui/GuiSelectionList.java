@@ -29,7 +29,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 
 public abstract class GuiSelectionList<T> extends GuiSonar {
 
-	public static final ResourceLocation bground = new ResourceLocation("PracticalLogistics:textures/gui/dataReceiver.png");
+	public static final ResourceLocation bground = new ResourceLocation("PracticalLogistics:textures/gui/listSelection.png");
 
 	private float currentScroll;
 	private boolean isScrolling;
@@ -69,8 +69,12 @@ public abstract class GuiSelectionList<T> extends GuiSonar {
 		scrollerStart = this.guiTop + 29;
 		scrollerEnd = scrollerStart + 134;
 		scrollerWidth = 10;
-		for (int i = 0; i < 11; i++) {
-			this.buttonList.add(new SelectionButton(10 + i, guiLeft + 7, guiTop + 29 + (i * 12)));
+		int offsetTop = 29;
+		if (getViewableSize() == 7) {
+			offsetTop=offsetTop+2;
+		}
+		for (int i = 0; i < getViewableSize(); i++) {
+			this.buttonList.add(new SelectionButton(i, guiLeft + 7, guiTop + offsetTop + (i * getSelectionHeight())));
 		}
 	}
 
@@ -82,7 +86,7 @@ public abstract class GuiSelectionList<T> extends GuiSonar {
 			return -1;
 		}
 		int start = (int) (getSelectionSize() * this.currentScroll);
-		int finish = Math.min(start + 11, getSelectionSize());
+		int finish = Math.min(start + getViewableSize(), getSelectionSize());
 		for (int i = start; i < finish; i++) {
 			if (getSelectionList().get(i) != null) {
 				T info = getSelectionList().get(i);
@@ -100,7 +104,7 @@ public abstract class GuiSelectionList<T> extends GuiSonar {
 		this.renderStrings(x, y);
 		if (getSelectionList() != null) {
 			int start = (int) (getSelectionSize() * this.currentScroll);
-			int finish = Math.min(start + 11, getSelectionSize());
+			int finish = Math.min(start + this.getViewableSize(), getSelectionSize());
 			int pos = this.getDataPosition();
 			for (int i = start; i < finish; i++) {
 				T selection = getSelectionList().get(i);
@@ -169,10 +173,10 @@ public abstract class GuiSelectionList<T> extends GuiSonar {
 
 	protected void actionPerformed(GuiButton button) {
 		if (button != null) {
-			if (button.id >= 10) {
+			if (button.id < getViewableSize()) {
 				if (getSelectionList() != null) {
 					int start = (int) (getSelectionSize() * this.currentScroll);
-					int network = start + button.id - 10;
+					int network = start + button.id;
 					if (network < getSelectionSize()) {
 						if (getSelectionList().get(network) != null) {
 							sendPacket(getSelectionList().get(network));
@@ -193,14 +197,26 @@ public abstract class GuiSelectionList<T> extends GuiSonar {
 		drawTexturedModalRect(scrollerLeft, scrollerStart + (int) ((float) (scrollerEnd - scrollerStart - 17) * this.currentScroll), 176 + 72, 0, 8, 15);
 
 		int pos = getDataPosition();
-		for (int i = 0; i < 11; i++) {
-			drawTexturedModalRect(this.guiLeft + 7, this.guiTop + 29 + (12 * i), 0, i == pos ? 178 : 166, 154 + 72, 12);
+		int offsetTop = 29;
+		if (getViewableSize() == 7) {
+			offsetTop=offsetTop+2;
+		}
+		for (int i = 0; i < getViewableSize(); i++) {
+			drawTexturedModalRect(this.guiLeft + 7, this.guiTop + offsetTop + (getSelectionHeight() * i), 0, i == pos ? 166 + getSelectionHeight() : 166, 154 + 72, getSelectionHeight());
 		}
 
 	}
 
+	public int getViewableSize() {
+		return 11;
+	}
+
+	public int getSelectionHeight() {
+		return 12;
+	}
+
 	private boolean needsScrollBars() {
-		if (getSelectionSize() <= 11)
+		if (getSelectionSize() <= getViewableSize())
 			return false;
 
 		return true;
@@ -211,7 +227,7 @@ public abstract class GuiSelectionList<T> extends GuiSonar {
 	public class SelectionButton extends SonarButtons.ImageButton {
 
 		public SelectionButton(int id, int x, int y) {
-			super(id, x, y, getBackground(), 0, 202, 154 + 72, 11);
+			super(id, x, y, getBackground(), 0, 202, 154 + 72, getSelectionHeight());
 		}
 	}
 

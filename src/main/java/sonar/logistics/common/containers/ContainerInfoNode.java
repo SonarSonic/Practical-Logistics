@@ -21,15 +21,11 @@ public class ContainerInfoNode extends ContainerSync {
 
 	@Override
 	public void detectAndSendChanges() {
-		// super.detectAndSendChanges();
+		super.detectAndSendChanges();
 		if (sync != null) {
 			if (crafters != null) {
-				NBTTagCompound syncData = new NBTTagCompound();
-				sync.writeData(syncData, NBTHelper.SyncType.SYNC);
 				for (Object o : crafters) {
 					if (o != null && o instanceof EntityPlayerMP) {
-						if (!syncData.hasNoTags())
-							SonarCore.network.sendTo(new PacketTileSync(tile.xCoord, tile.yCoord, tile.zCoord, syncData), (EntityPlayerMP) o);
 						if (tile instanceof TileEntityInfoReader) {
 							((TileEntityInfoReader) tile).sendAvailableData((EntityPlayerMP) o);
 						}
@@ -39,6 +35,10 @@ public class ContainerInfoNode extends ContainerSync {
 			}
 
 		}
+	}
+
+	public boolean syncInventory() {
+		return false;
 	}
 
 	@Override

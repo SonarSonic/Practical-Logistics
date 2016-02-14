@@ -3,9 +3,6 @@ package sonar.logistics.info.providers.energy;
 import ic2.api.energy.tile.IEnergySink;
 import ic2.api.energy.tile.IEnergySource;
 import ic2.api.tile.IEnergyStorage;
-
-import java.util.List;
-
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.energy.StoredEnergyStack;
@@ -27,34 +24,20 @@ public class EUProvider extends EnergyHandler {
 	}
 
 	@Override
-	public void getEnergyInfo(List<StoredEnergyStack> energyList, TileEntity tile, ForgeDirection dir) {
-		boolean addedStorage = false;
+	public void getEnergyInfo(StoredEnergyStack energyStack, TileEntity tile, ForgeDirection dir) {
+		if (tile instanceof IEnergyStorage) {
+			IEnergyStorage storage = (IEnergyStorage) tile;
+			energyStack.setStorageValues(storage.getStored() * 4, storage.getCapacity() * 4);
+			energyStack.setMaxOutput((long)(storage.getOutputEnergyUnitsPerTick() * 4));
+		}
 		if (tile instanceof IEnergySink) {
 			IEnergySink sink = (IEnergySink) tile;
-			energyList.add(new StoredEnergyStack(StoredEnergyStack.input, 4, sink.getDemandedEnergy(), sink.getDemandedEnergy()));
+			energyStack.setMaxInput((long)(sink.getDemandedEnergy() * 4));
 		}
 		if (tile instanceof IEnergySource) {
 			IEnergySource source = (IEnergySource) tile;
-			energyList.add(new StoredEnergyStack(StoredEnergyStack.output, 4, source.getOfferedEnergy(), source.getOfferedEnergy()));
+			energyStack.setMaxOutput((long)(source.getOfferedEnergy() * 4));
 		}
-		if (tile instanceof IEnergyStorage) {
-			IEnergyStorage storage = (IEnergyStorage) tile;
-			energyList.add(new StoredEnergyStack(StoredEnergyStack.storage, 4, storage.getStored(), storage.getCapacity()));
-			energyList.add(new StoredEnergyStack(StoredEnergyStack.storage, 4, storage.getOutputEnergyUnitsPerTick(), storage.getOutputEnergyUnitsPerTick()));
-		}
-	}
-
-	@Override
-	public String getSuffix(byte type) {
-		switch (type) {
-		case StoredEnergyStack.storage:
-			return "EU";
-		case StoredEnergyStack.input:
-		case StoredEnergyStack.output:
-		case StoredEnergyStack.usage:
-			return "EU/T";
-		}
-		return "";
 	}
 
 	@Override

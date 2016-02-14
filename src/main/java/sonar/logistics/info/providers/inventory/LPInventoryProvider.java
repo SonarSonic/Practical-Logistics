@@ -25,14 +25,13 @@ public class LPInventoryProvider extends InventoryProvider {
 	}
 
 	@Override
-	public boolean canProvideItems(World world, int x, int y, int z, ForgeDirection dir) {
-		TileEntity tile = world.getTileEntity(x, y, z);
+	public boolean canHandleItems(TileEntity tile, ForgeDirection dir) {
 		return tile != null && tile instanceof ILPPipeTile;
 	}
 
 	@Override
-	public StoredItemStack getStack(int slot, World world, int x, int y, int z, ForgeDirection dir) {
-		List<ItemStack> items = getStackList(world, x, y, z);
+	public StoredItemStack getStack(int slot, TileEntity tile, ForgeDirection dir) {
+		List<ItemStack> items = getStackList(tile);
 		if (slot < items.size()) {
 			return new StoredItemStack(items.get(slot));
 		}
@@ -40,18 +39,18 @@ public class LPInventoryProvider extends InventoryProvider {
 	}
 
 	@Override
-	public boolean getItems(List<StoredItemStack> storedStacks, World world, int x, int y, int z, ForgeDirection dir) {
-		List<ItemStack> items = getStackList(world, x, y, z);
+	public boolean getItems(List<StoredItemStack> storedStacks, TileEntity tile, ForgeDirection dir) {
+		List<ItemStack> items = getStackList(tile);
 		for (ItemStack stack : items) {
 			InfoHelper.addStackToList(storedStacks, stack);
+			return true;
 		}
 
 		return false;
 
 	}
 
-	public List<ItemStack> getStackList(World world, int x, int y, int z) {
-		TileEntity tile = world.getTileEntity(x, y, z);
+	public List<ItemStack> getStackList(TileEntity tile) {
 		if (tile instanceof ILPPipeTile) {
 			ILPPipe pipe = ((ILPPipeTile) tile).getLPPipe();
 			if (pipe instanceof IRequestAPI) {
@@ -65,6 +64,16 @@ public class LPInventoryProvider extends InventoryProvider {
 
 	public boolean isLoadable() {
 		return Loader.isModLoaded("LogisticsPipes");
+	}
+
+	@Override
+	public StoredItemStack addStack(StoredItemStack add, TileEntity tile, ForgeDirection dir) {
+		return add;
+	}
+
+	@Override
+	public StoredItemStack removeStack(StoredItemStack remove, TileEntity tile, ForgeDirection dir) {
+		return remove;
 	}
 
 }

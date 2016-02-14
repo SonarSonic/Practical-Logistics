@@ -21,14 +21,11 @@ public class ContainerDataReceiver extends ContainerSync {
 		if (tile instanceof TileEntityDataReceiver) {
 			if (sync != null) {
 				if (crafters != null) {
-					//NBTTagCompound syncData = new NBTTagCompound();
-					//sync.writeData(syncData, NBTHelper.SyncType.SYNC);
 					for (Object o : crafters) {
 						if (o != null && o instanceof EntityPlayerMP) {
 							((TileEntityDataReceiver) tile).sendAvailableData(tile, (EntityPlayerMP) o);
 						}
 					}
-
 				}
 			}
 		}

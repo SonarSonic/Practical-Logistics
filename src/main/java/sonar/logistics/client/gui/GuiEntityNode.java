@@ -36,7 +36,7 @@ public class GuiEntityNode extends GuiSonar {
 		this.guiTop = (this.height - this.ySize) / 2;
 		this.buttonList.add(new GuiButton(0, guiLeft + 20, guiTop + 18, 126, 20, getEntityTypeString()));
 		this.buttonList.add(new GuiButton(1, guiLeft + 148, guiTop + 5, 20, 20, "+1"));
-		this.buttonList.add(new GuiButton(1, guiLeft + 148, guiTop + 27, 20, 20, "-1"));
+		this.buttonList.add(new GuiButton(2, guiLeft + 148, guiTop + 27, 20, 20, "-1"));
 	}
 
 	public String getEntityTypeString() {

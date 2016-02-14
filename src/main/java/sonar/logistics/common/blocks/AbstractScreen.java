@@ -6,13 +6,18 @@ import java.util.List;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.common.block.SonarMaterials;
+import sonar.core.integration.fmp.FMPHelper;
+import sonar.core.integration.fmp.handlers.TileHandler;
+import sonar.logistics.common.handlers.DisplayScreenHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -26,7 +31,6 @@ public abstract class AbstractScreen extends BlockContainer {
 		this.setBlockBounds(0.5F - height, 0.0F, 0.5F - height, 0.5F + height, width, 0.5F + height);
 	}
 
-	
 	public abstract float height();
 
 	public abstract float width();
@@ -43,7 +47,7 @@ public abstract class AbstractScreen extends BlockContainer {
 
 		int l = world.getBlockMetadata(x, y, z);
 		float f = 0.27125F;
-		float f1 = 1-height();
+		float f1 = 1 - height();
 		float f2 = 0.0F;
 		float f3 = width();
 		float f4 = 0.080F;
@@ -151,5 +155,21 @@ public abstract class AbstractScreen extends BlockContainer {
 
 	public boolean hasSpecialCollisionBox() {
 		return true;
+	}
+
+	@Override
+	public final boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float hitx, float hity, float hitz) {
+		if (player != null) {
+			TileHandler target = FMPHelper.getHandler(world.getTileEntity(x, y, z));
+			if (target != null && target instanceof DisplayScreenHandler) {
+				DisplayScreenHandler handler = (DisplayScreenHandler) target;
+				
+				if (!world.isRemote)
+					handler.screenClicked(world, player, x, y, z, ForgeDirection.getOrientation(side), hitx, hity, hitz);
+				return true;
+			}
+		}
+
+		return false;
 	}
 }

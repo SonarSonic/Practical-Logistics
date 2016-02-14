@@ -4,21 +4,20 @@ import sonar.logistics.Logistics;
 
 public class EntityInfo extends StandardInfo {
 
-	@Override
-	public String getName() {
-		return "Entity";
-	}
-
 	public EntityInfo() {
-
 	}
-	
+
 	public EntityInfo(byte providerID, int category, int subCategory, Object data) {
 		super(providerID, category, subCategory, data);
 	}
 
 	public EntityInfo(byte providerID, String category, String subCategory, Object data) {
 		super(providerID, category, subCategory, data);
+	}
+
+	@Override
+	public String getName() {
+		return "Entity";
 	}
 
 	@Override

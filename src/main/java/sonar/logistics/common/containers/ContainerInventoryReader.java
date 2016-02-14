@@ -12,6 +12,7 @@ import sonar.core.SonarCore;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.inventory.ContainerSync;
+import sonar.core.inventory.StoredItemStack;
 import sonar.core.inventory.slots.SlotList;
 import sonar.core.network.PacketTileSync;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
@@ -21,10 +22,12 @@ public class ContainerInventoryReader extends ContainerSync {
 
 	private static final int INV_START = 1, INV_END = INV_START + 26, HOTBAR_START = INV_END + 1, HOTBAR_END = HOTBAR_START + 8;
 	public boolean stackMode = false;
+	InventoryReaderHandler handler;
 
 	public ContainerInventoryReader(InventoryReaderHandler handler, TileEntity entity, InventoryPlayer inventoryPlayer) {
 		super(handler, entity);
 		addSlots(handler, inventoryPlayer, handler.setting.getInt() == 0);
+		this.handler = handler;
 	}
 
 	public void addSlots(InventoryReaderHandler handler, InventoryPlayer inventoryPlayer, boolean hasStack) {
@@ -42,41 +45,6 @@ public class ContainerInventoryReader extends ContainerSync {
 		}
 		if (hasStack)
 			addSlotToContainer(new SlotList(handler, 0, 103, 9));
-	}
-
-	@Override
-	public void detectAndSendChanges() {
-		for (int i = 0; i < this.inventorySlots.size(); ++i) {
-			ItemStack itemstack = ((Slot) this.inventorySlots.get(i)).getStack();
-			ItemStack itemstack1 = (ItemStack) this.inventoryItemStacks.get(i);
-
-			if (!ItemStack.areItemStacksEqual(itemstack1, itemstack)) {
-				itemstack1 = itemstack == null ? null : itemstack.copy();
-				this.inventoryItemStacks.set(i, itemstack1);
-
-				for (int j = 0; j < this.crafters.size(); ++j) {
-					((ICrafting) this.crafters.get(j)).sendSlotContents(this, i, itemstack1);
-				}
-			}
-		}
-		if (sync != null) {
-			if (crafters != null) {
-				NBTTagCompound tag = new NBTTagCompound();
-				TileHandler handler = FMPHelper.getHandler(tile);
-				handler.writeData(tag, SyncType.SPECIAL);
-				if (tag.hasNoTags()) {
-					return;
-				}
-				for (Object o : crafters) {
-					if (o != null && o instanceof EntityPlayerMP) {
-						SonarCore.network.sendTo(new PacketTileSync(tile.xCoord, tile.yCoord, tile.zCoord, tag, SyncType.SPECIAL), (EntityPlayerMP) o);
-
-					}
-				}
-
-			}
-
-		}
 	}
 
 	@Override
@@ -122,16 +90,24 @@ public class ContainerInventoryReader extends ContainerSync {
 	}
 
 	public ItemStack slotClick(int slotID, int buttonID, int flag, EntityPlayer player) {
-		Slot targetSlot = slotID < 0 ? null : (Slot) this.inventorySlots.get(slotID);
-		if ((targetSlot instanceof SlotList)) {
-			if (buttonID == 2) {
-				targetSlot.putStack(null);
-			} else {
-				targetSlot.putStack(player.inventory.getItemStack() == null ? null : player.inventory.getItemStack().copy());
+		if (slotID < this.inventorySlots.size()) {
+			Slot targetSlot = slotID < 0 ? null : (Slot) this.inventorySlots.get(slotID);
+			if ((targetSlot instanceof SlotList)) {
+				if (buttonID == 2) {
+					targetSlot.putStack(null);
+				} else {
+					targetSlot.putStack(player.inventory.getItemStack() == null ? null : player.inventory.getItemStack().copy());
+				}
+				return player.inventory.getItemStack();
 			}
-			return player.inventory.getItemStack();
+
+			return super.slotClick(slotID, buttonID, flag, player);
 		}
-		return super.slotClick(slotID, buttonID, flag, player);
+		return null;
+	}
+
+	public SyncType[] getSyncTypes() {
+		return new SyncType[] { SyncType.SPECIAL };
 	}
 
 }

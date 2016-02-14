@@ -1,7 +1,5 @@
 package sonar.logistics.api.providers;
 
-import java.util.List;
-
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -25,15 +23,13 @@ public abstract class EnergyHandler implements IRegistryObject {
 
 	public abstract boolean canProvideInfo(TileEntity tile, ForgeDirection dir);
 
-	public abstract void getEnergyInfo(List<StoredEnergyStack> infoList, TileEntity tile, ForgeDirection dir);
+	public abstract void getEnergyInfo(StoredEnergyStack energyStack, TileEntity tile, ForgeDirection dir);
 
 	/** returns how much was successfully added */
 	public abstract double addEnergy(double transfer, TileEntity tile, ForgeDirection dir);
 
 	/** returns how much was successfully removed */
 	public abstract double removeEnergy(double transfer, TileEntity tile, ForgeDirection dir);
-
-	public abstract String getSuffix(byte type);
 
 	/**
 	 * used when the provider is loaded normally used to check if relevant mods

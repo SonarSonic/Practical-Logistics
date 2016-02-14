@@ -8,7 +8,11 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.common.block.SonarMaterials;
+import sonar.core.integration.fmp.FMPHelper;
+import sonar.core.integration.fmp.handlers.TileHandler;
+import sonar.logistics.common.handlers.DisplayScreenHandler;
 import sonar.logistics.common.tileentity.TileEntityHolographicDisplay;
 
 public class BlockHolographicDisplay extends BaseNode {
@@ -22,6 +26,21 @@ public class BlockHolographicDisplay extends BaseNode {
 	@Override
 	public TileEntity createNewTileEntity(World world, int i) {
 		return new TileEntityHolographicDisplay();
+	}
+
+	@Override
+	public boolean operateBlock(World world, int x, int y, int z, EntityPlayer player, int side, float hitx, float hity, float hitz) {
+		if (player != null) {
+			TileHandler target = FMPHelper.getHandler(world.getTileEntity(x, y, z));
+			if (target != null && target instanceof DisplayScreenHandler) {
+				DisplayScreenHandler handler = (DisplayScreenHandler) target;
+				if (!world.isRemote)
+					handler.screenClicked(world, player, x, y, z, ForgeDirection.getOrientation(side), hitx, hity, hitz);
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	@Override
