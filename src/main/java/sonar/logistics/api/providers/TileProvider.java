@@ -5,15 +5,14 @@ import java.util.List;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.utils.IRegistryObject;
-import sonar.logistics.Logistics;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.LogisticsAPI;
 
 /** used for providing information on Block/TileEntity for the Info Reader to read, the Provider must be registered in the {@link LogisticsAPI} to be used */
 public abstract class TileProvider implements IRegistryObject {
 
-	public byte getID(){
-		return Logistics.tileProviders.getObjectID(getName());		
+	public int getID(){
+		return LogisticsAPI.getRegistry().getTileProviderID(getName());
 	}
 	
 	/** the name the info helper will be registered too */
@@ -40,9 +39,9 @@ public abstract class TileProvider implements IRegistryObject {
 	 */
 	public abstract void getHelperInfo(List<Info> infoList, World world, int x, int y, int z, ForgeDirection dir);
 
-	public abstract String getCategory(byte id);
+	public abstract String getCategory(int id);
 	
-	public abstract String getSubCategory(byte id);
+	public abstract String getSubCategory(int id);
 	
 	/** used when the provider is loaded normally used to check if relevant mods are loaded for APIs to work */
 	public boolean isLoadable() {

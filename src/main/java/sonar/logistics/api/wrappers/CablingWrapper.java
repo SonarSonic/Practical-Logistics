@@ -6,7 +6,6 @@ import java.util.Map;
 
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
-import net.minecraftforge.fluids.FluidTank;
 import sonar.core.utils.BlockCoords;
 import sonar.logistics.api.connecting.IDataCable;
 

@@ -24,7 +24,6 @@ import sonar.logistics.api.StandardInfo;
 import sonar.logistics.api.connecting.IConnectionNode;
 import sonar.logistics.common.tileentity.TileEntityBlockNode;
 import sonar.logistics.common.tileentity.TileEntityEntityNode;
-import sonar.logistics.helpers.InfoHelper;
 import sonar.logistics.info.types.CategoryInfo;
 
 public class InfoReaderHandler extends TileHandler implements IWailaInfo {

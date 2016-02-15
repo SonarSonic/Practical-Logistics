@@ -30,7 +30,7 @@ public class NormalEntityProvider extends EntityProvider {
 
 	@Override
 	public void getHelperInfo(List<Info> infoList, Entity entity) {
-		byte id = this.getID();
+		int id = this.getID();
 		if (entity instanceof EntityLivingBase) {
 			EntityLivingBase living = (EntityLivingBase) entity;
 			if (!(entity instanceof EntityPlayer)) {
@@ -57,12 +57,12 @@ public class NormalEntityProvider extends EntityProvider {
 	}
 
 	@Override
-	public String getCategory(byte id) {
+	public String getCategory(int id) {
 		return categories[id];
 	}
 
 	@Override
-	public String getSubCategory(byte id) {
+	public String getSubCategory(int id) {
 		return subcategories[id];
 	}
 

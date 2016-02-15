@@ -11,7 +11,7 @@ import org.lwjgl.opengl.GL11;
 
 import sonar.core.utils.helpers.RenderHelper;
 import sonar.logistics.api.Info;
-import sonar.logistics.api.render.InfoRenderer;
+import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.client.renderers.RenderHandlers;
 import cpw.mods.fml.common.network.ByteBufUtils;
 
@@ -45,7 +45,7 @@ public class ProgressInfo extends Info<ProgressInfo> {
 	}
 
 	@Override
-	public byte getProviderID() {
+	public int getProviderID() {
 		return -1;
 	}
 
@@ -111,7 +111,7 @@ public class ProgressInfo extends Info<ProgressInfo> {
 		float width = stored * (maxX - minX) / max;
 		Minecraft.getMinecraft().renderEngine.bindTexture(progress);
 		RenderHelper.drawTexturedModalRect(minX, minY, maxY, width, (maxY - minY));
-		InfoRenderer.renderCenteredString(data, minX, minY, maxX, maxY, scale);
+		LogisticsAPI.getInfoRenderer().renderCenteredString(data, minX, minY, maxX, maxY, scale);
 		/*
 		 * GL11.glTranslatef(minX + (maxX - minX) / 2, minY + (maxY - minY) / 2,
 		 * 0.01f); int sizing = Math.round(Math.min((maxX - minX), (maxY - minY)

@@ -32,7 +32,7 @@ public class FluidStackInfo extends Info<FluidStackInfo> {
 	}
 
 	@Override
-	public byte getProviderID() {
+	public int getProviderID() {
 		return -1;
 	}
 
@@ -108,19 +108,7 @@ public class FluidStackInfo extends Info<FluidStackInfo> {
 		GL11.glTranslated(0, 0, -zOffset);
 		super.renderInfo(tess, tile, minX, minY, maxX, maxY, zOffset, scale);
 	}
-
-	/*
-	 * @Override public boolean isEqualType(Info info) { if (info instanceof
-	 * FluidStackInfo) { FluidStackInfo stackInfo = (FluidStackInfo) info; if
-	 * (stackInfo.stack.stored != this.stack.stored) { return false; } if
-	 * (stackInfo.stack.capacity != this.stack.capacity) { return false; } if
-	 * (!stackInfo.stack.equalStack(stack.fluid)) { return false; } return true;
-	 * } return false; }
-	 * 
-	 * @Override public void emptyData() {
-	 * 
-	 * }
-	 */
+	
 	@Override
 	public FluidStackInfo instance() {
 		return new FluidStackInfo();

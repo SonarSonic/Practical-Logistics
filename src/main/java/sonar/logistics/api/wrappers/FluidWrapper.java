@@ -4,8 +4,8 @@ import java.util.Collections;
 import java.util.List;
 
 import sonar.core.fluid.StoredFluidStack;
-import sonar.logistics.api.providers.FluidHandler;
 import sonar.core.utils.BlockCoords;
+import sonar.logistics.api.providers.FluidHandler;
 
 public class FluidWrapper {
 

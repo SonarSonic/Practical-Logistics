@@ -82,8 +82,9 @@ public class FluidHelper extends FluidWrapper {
 		return add;
 	}
 
-	public  StoredFluidStack removeFluids(StoredFluidStack remove, List<BlockCoords> network) {
+	public  StoredFluidStack removeFluids(StoredFluidStack remove, List<BlockCoords> network) {	
 		Map<BlockCoords, ForgeDirection> connections = LogisticsAPI.getCableHelper().getTileConnections(network);
+		System.out.print("hi");
 		for (Map.Entry<BlockCoords, ForgeDirection> entry : connections.entrySet()) {
 			TileEntity tile = entry.getKey().getTileEntity();
 			for (FluidHandler provider : Logistics.fluidProviders.getObjects()) {

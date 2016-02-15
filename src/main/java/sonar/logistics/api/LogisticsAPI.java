@@ -6,6 +6,7 @@ import sonar.logistics.api.wrappers.FluidWrapper;
 import sonar.logistics.api.wrappers.InfoWrapper;
 import sonar.logistics.api.wrappers.ItemWrapper;
 import sonar.logistics.api.wrappers.RegistryWrapper;
+import sonar.logistics.api.wrappers.RenderWrapper;
 import cpw.mods.fml.common.Loader;
 
 /**Use this for all your interaction with the mod.
@@ -20,6 +21,7 @@ public class LogisticsAPI {
 	private static FluidWrapper fluids = new FluidWrapper();
 	private static ItemWrapper items = new ItemWrapper();
 	private static InfoWrapper info = new InfoWrapper();
+	private static RenderWrapper renderer = new RenderWrapper();
 
 	public static void init() {
 		if (Loader.isModLoaded("PracticalLogistics")) {
@@ -29,7 +31,8 @@ public class LogisticsAPI {
 				energy = (EnergyWrapper) Class.forName("sonar.logistics.helpers.EnergyHelper").newInstance();
 				fluids = (FluidWrapper) Class.forName("sonar.logistics.helpers.FluidHelper").newInstance();
 				items = (ItemWrapper) Class.forName("sonar.logistics.helpers.ItemHelper").newInstance();
-				info = (InfoWrapper) Class.forName("sonar.logistics.helpers.ItemHelper").newInstance();
+				info = (InfoWrapper) Class.forName("sonar.logistics.helpers.InfoHelper").newInstance();
+				renderer = (RenderWrapper) Class.forName("sonar.logistics.helpers.InfoRenderer").newInstance();
 			} catch (Exception exception) {
 				System.err.println("Practical Logistics API : FAILED TO INITILISE API" + exception.getMessage());
 			}
@@ -53,5 +56,8 @@ public class LogisticsAPI {
 	}
 	public static InfoWrapper getInfoHelper() {
 		return info;
+	}
+	public static RenderWrapper getInfoRenderer() {
+		return renderer;
 	}
 }

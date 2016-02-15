@@ -1,4 +1,4 @@
-package sonar.logistics.api.render;
+package sonar.logistics.helpers;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -6,10 +6,11 @@ import net.minecraft.client.gui.FontRenderer;
 import org.lwjgl.opengl.GL11;
 
 import sonar.logistics.api.Info;
+import sonar.logistics.api.wrappers.RenderWrapper;
 
-public class InfoRenderer {
+public class InfoRenderer extends RenderWrapper {
 
-	public static void renderStandardInfo(Info info, FontRenderer rend, float minX, float minY, float maxX, float maxY, float zOffset, float scale) {
+	public void renderStandardInfo(Info info, FontRenderer rend, float minX, float minY, float maxX, float maxY, float zOffset, float scale) {
 		GL11.glTranslatef(minX + (maxX - minX) / 2, minY + (maxY - minY) / 2, 0.01f);
 		int sizing = Math.round(Math.min((maxX - minX), (maxY - minY) * 3));
 		GL11.glTranslatef(0.0f, (float) (scale >= 120 ? -0.1F : -0.2F + ((sizing - 1) * -0.01)), zOffset);
@@ -25,7 +26,7 @@ public class InfoRenderer {
 		}
 	}
 
-	public static void renderCenteredString(String string, float minX, float minY, float maxX, float maxY, float scale) {
+	public void renderCenteredString(String string, float minX, float minY, float maxX, float maxY, float scale) {
 		FontRenderer rend = Minecraft.getMinecraft().fontRenderer;
 		GL11.glTranslatef(minX + (maxX - minX) / 2, minY + (maxY - minY) / 2, 0.01f);
 		int sizing = Math.round(Math.min((maxX - minX), (maxY - minY) * 3));
@@ -36,7 +37,7 @@ public class InfoRenderer {
 	}
 	
 
-	public static double getScale(int sizing) {
+	public double getScale(int sizing) {
 		switch (sizing) {
 		case 0 & 1:
 			return 120;

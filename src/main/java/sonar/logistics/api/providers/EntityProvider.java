@@ -4,7 +4,6 @@ import java.util.List;
 
 import net.minecraft.entity.Entity;
 import sonar.core.utils.IRegistryObject;
-import sonar.logistics.Logistics;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.LogisticsAPI;
 
@@ -14,8 +13,8 @@ import sonar.logistics.api.LogisticsAPI;
  */
 public abstract class EntityProvider implements IRegistryObject {
 
-	public byte getID() {
-		return Logistics.entityProviders.getObjectID(getName());
+	public int getID() {
+		return LogisticsAPI.getRegistry().getEntityProviderID(getName());
 	}
 
 	/** the name the info helper will be registered too */
@@ -37,9 +36,9 @@ public abstract class EntityProvider implements IRegistryObject {
 	 */
 	public abstract void getHelperInfo(List<Info> infoList, Entity entity);
 
-	public abstract String getCategory(byte id);
+	public abstract String getCategory(int id);
 
-	public abstract String getSubCategory(byte id);
+	public abstract String getSubCategory(int id);
 
 	/**
 	 * used when the provider is loaded normally used to check if relevant mods

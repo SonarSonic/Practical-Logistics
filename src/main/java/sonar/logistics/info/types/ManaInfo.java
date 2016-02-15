@@ -10,7 +10,7 @@ import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 
 import sonar.core.utils.helpers.RenderHelper;
-import sonar.logistics.api.render.InfoRenderer;
+import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.client.renderers.RenderHandlers;
 import sonar.logistics.info.providers.tile.ManaProvider;
 
@@ -36,8 +36,8 @@ public class ManaInfo extends ProgressInfo {
 	}
 
 	@Override
-	public byte getProviderID() {
-		return (byte) providerID;
+	public int getProviderID() {
+		return providerID;
 	}
 
 	@Override
@@ -69,27 +69,27 @@ public class ManaInfo extends ProgressInfo {
 	public void readFromBuf(ByteBuf buf) {
 		this.stored = buf.readLong();
 		this.max = buf.readLong();
-		this.providerID = buf.readByte();
+		this.providerID = buf.readInt();
 	}
 
 	@Override
 	public void writeToBuf(ByteBuf buf) {
 		buf.writeLong(stored);
 		buf.writeLong(max);
-		buf.writeByte(providerID);
+		buf.writeInt(providerID);
 
 	}
 
 	public void readFromNBT(NBTTagCompound tag) {
 		this.stored = tag.getLong("stored");
 		this.max = tag.getLong("max");
-		this.providerID = tag.getByte("ID");
+		this.providerID = tag.getInteger("ID");
 	}
 
 	public void writeToNBT(NBTTagCompound tag) {
 		tag.setLong("stored", stored);
 		tag.setLong("max", max);
-		tag.setByte("ID", (byte) providerID);
+		tag.setInteger("ID", (byte) providerID);
 	}
 
 	@Override
@@ -98,15 +98,7 @@ public class ManaInfo extends ProgressInfo {
 		float width = stored * (maxX - minX) / max;
 		Minecraft.getMinecraft().renderEngine.bindTexture(progress);
 		RenderHelper.drawTexturedModalRect(minX, minY, maxY, width, (maxY - minY));
-		InfoRenderer.renderCenteredString(getSubCategory(), minX, minY, maxX, maxY, scale);
-		/*
-		GL11.glTranslatef(minX + (maxX - minX) / 2, minY + (maxY - minY) / 2, 0.01f);
-		int sizing = Math.round(Math.min((maxX - minX), (maxY - minY) * 3));
-		GL11.glTranslatef(0.0f, (float) (scale >= 120 ? -0.08F : -0.2F + ((sizing - 1) * -0.01)), 0);
-		double itemScale = sizing >= 2 ? InfoRenderer.getScale(sizing) : 120;
-		GL11.glScaled(1.0f / itemScale, 1.0f / itemScale, 1.0f / itemScale);
-		rend.drawString(this.getSubCategory(), -rend.getStringWidth(this.getSubCategory()) / 2, -4, -1);
-		*/
+		LogisticsAPI.getInfoRenderer().renderCenteredString(getSubCategory(), minX, minY, maxX, maxY, scale);
 	}
 
 	@Override

@@ -26,7 +26,7 @@ public class PlayerProvider extends EntityProvider {
 
 	@Override
 	public void getHelperInfo(List<Info> infoList, Entity entity) {
-		byte id = this.getID();
+		int id = this.getID();
 		if (entity instanceof EntityPlayer) {
 			EntityPlayer player = (EntityPlayer) entity;
 			infoList.add(new EntityInfo(id, 0, 0, player.getGameProfile().getName()));
@@ -51,12 +51,12 @@ public class PlayerProvider extends EntityProvider {
 	}
 
 	@Override
-	public String getCategory(byte id) {
+	public String getCategory(int id) {
 		return categories[id];
 	}
 
 	@Override
-	public String getSubCategory(byte id) {
+	public String getSubCategory(int id) {
 		return subcategories[id];
 	}
 

@@ -23,6 +23,7 @@ tile.ItemRouter.name=Item Router
 tile.MultiCable.name=Channelled Cable
 tile.ChannelSelector.name=Channel Selector
 tile.Clock.name=Clock
+tile.EnergyReader.name=Energy Reader
 
 //items
 item.EnergyScreenItem.name=Energy Screen

@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -103,36 +102,36 @@ public class ItemHelper extends ItemWrapper {
 		list.add(new StoredItemStack(stack));
 	}
 
-	public StoredItemStack addItems(StoredItemStack stack, List<BlockCoords> network) {
+	public StoredItemStack addItems(StoredItemStack add, List<BlockCoords> network) {
 		Map<BlockCoords, ForgeDirection> connections = LogisticsAPI.getCableHelper().getTileConnections(network);
 		for (Map.Entry<BlockCoords, ForgeDirection> entry : connections.entrySet()) {
 			TileEntity tile = entry.getKey().getTileEntity();
 			for (InventoryHandler provider : Logistics.inventoryProviders.getObjects()) {
 				if (provider.canHandleItems(tile, entry.getValue())) {
-					stack = provider.addStack(stack, tile, entry.getValue());
-					if (stack == null) {
+					add = provider.addStack(add, tile, entry.getValue());
+					if (add == null) {
 						return null;
 					}
 				}
 			}
 		}
-		return stack;
+		return add;
 	}
 
-	public StoredItemStack extractItems(StoredItemStack stack, List<BlockCoords> network) {
+	public StoredItemStack removeItems(StoredItemStack remove, List<BlockCoords> network) {
 		Map<BlockCoords, ForgeDirection> connections = LogisticsAPI.getCableHelper().getTileConnections(network);
 		for (Map.Entry<BlockCoords, ForgeDirection> entry : connections.entrySet()) {
 			TileEntity tile = entry.getKey().getTileEntity();
 			for (InventoryHandler provider : Logistics.inventoryProviders.getObjects()) {
 				if (provider.canHandleItems(tile, entry.getValue())) {
-					stack = provider.removeStack(stack, tile, entry.getValue());
-					if (stack == null) {
+					remove = provider.removeStack(remove, tile, entry.getValue());
+					if (remove == null) {
 						return null;
 					}
 				}
 			}
 		}
-		return stack;
+		return remove;
 	}
 
 	public StoredItemStack getStack(List<BlockCoords> connections, int slot) {

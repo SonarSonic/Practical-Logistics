@@ -34,7 +34,7 @@ public class CalculatorProvider extends TileProvider {
 
 	@Override
 	public void getHelperInfo(List<Info> infoList, World world, int x, int y, int z, ForgeDirection dir) {
-		byte id = this.getID();
+		int id = this.getID();
 		TileEntity target = world.getTileEntity(x, y, z);
 		if (target != null) {
 			if (target instanceof IFlux) {
@@ -62,12 +62,12 @@ public class CalculatorProvider extends TileProvider {
 	}
 
 	@Override
-	public String getCategory(byte id) {
+	public String getCategory(int id) {
 		return categories[id];
 	}
 
 	@Override
-	public String getSubCategory(byte id) {
+	public String getSubCategory(int id) {
 		return subcategories[id];
 	}
 }

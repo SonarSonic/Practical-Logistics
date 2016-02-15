@@ -22,7 +22,7 @@ public class TankProvider extends FluidHandler {
 
 	@Override
 	public boolean canHandleFluids(TileEntity tile, ForgeDirection dir) {
-		return (tile instanceof IFluidTank || tile instanceof IFluidHandler);
+		return (tile instanceof IFluidHandler);
 	}
 
 	@Override
@@ -63,9 +63,11 @@ public class TankProvider extends FluidHandler {
 			IFluidHandler handler = (IFluidHandler) tile;
 			if (handler.canDrain(dir, remove.fluid.getFluid())) {
 				FluidStack used = handler.drain(dir, remove.getFullStack(), true);
-				remove.stored -= used.amount;
-				if (remove.stored == 0) {
-					return null;
+				if (used != null) {
+					remove.stored -= used.amount;
+					if (remove.stored == 0) {
+						return null;
+					}
 				}
 			}
 		}

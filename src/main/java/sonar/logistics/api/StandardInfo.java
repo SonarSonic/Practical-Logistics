@@ -2,7 +2,6 @@ package sonar.logistics.api;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.nbt.NBTTagCompound;
-import sonar.logistics.Logistics;
 import sonar.logistics.api.providers.TileProvider;
 import cpw.mods.fml.common.network.ByteBufUtils;
 
@@ -11,22 +10,22 @@ public class StandardInfo<T extends StandardInfo> extends Info<T> {
 	public boolean emptyData;
 	public String category = "ERROR", subCategory = "ERROR", data = "", suffix = "";
 	public int dataType;
-	public byte providerID = -1, catID = -1, subCatID = -1;
+	public int providerID = -1, catID = -1, subCatID = -1;
 
 	public StandardInfo() {
 
 	}
 
 	public StandardInfo(int providerID, int category, int subCategory, Object data) {
-		this.providerID = (byte) providerID;
-		this.catID = (byte) category;
-		this.subCatID = (byte) subCategory;
+		this.providerID = providerID;
+		this.catID = category;
+		this.subCatID = subCategory;
 		this.data = data.toString();
 		this.dataType = data instanceof Long || data instanceof Integer || data instanceof Short ? 0 : 1;
 	}
 
 	public StandardInfo(int providerID, String category, String subCategory, Object data) {
-		this.providerID = (byte) providerID;
+		this.providerID = providerID;
 		this.category = category;
 		this.subCategory = subCategory;
 		this.data = data.toString();
@@ -44,13 +43,13 @@ public class StandardInfo<T extends StandardInfo> extends Info<T> {
 	}
 
 	@Override
-	public byte getProviderID() {
+	public int getProviderID() {
 		return providerID;
 	}
 
 	@Override
 	public String getCategory() {
-		TileProvider provider = Logistics.tileProviders.getRegisteredObject(providerID);
+		TileProvider provider = LogisticsAPI.getRegistry().getTileProvider(providerID);
 		if (providerID != -1 && provider == null) {
 			return "UNLOADED MOD";
 		}
@@ -59,7 +58,7 @@ public class StandardInfo<T extends StandardInfo> extends Info<T> {
 
 	@Override
 	public String getSubCategory() {
-		TileProvider provider = Logistics.tileProviders.getRegisteredObject(providerID);
+		TileProvider provider = LogisticsAPI.getRegistry().getTileProvider(providerID);
 		if (providerID != -1 && provider == null) {
 			return "ERROR";
 		}
@@ -87,15 +86,15 @@ public class StandardInfo<T extends StandardInfo> extends Info<T> {
 
 	@Override
 	public void readFromBuf(ByteBuf buf) {
-		this.providerID = buf.readByte();
+		this.providerID = buf.readInt();
 
 		if (buf.readBoolean()) {
-			this.catID = buf.readByte();
+			this.catID = buf.readInt();
 		} else {
 			this.category = ByteBufUtils.readUTF8String(buf);
 		}
 		if (buf.readBoolean()) {
-			this.subCatID = buf.readByte();
+			this.subCatID = buf.readInt();
 		} else {
 			this.subCategory = ByteBufUtils.readUTF8String(buf);
 		}
@@ -111,18 +110,18 @@ public class StandardInfo<T extends StandardInfo> extends Info<T> {
 
 	@Override
 	public void writeToBuf(ByteBuf buf) {
-		buf.writeByte(providerID);
+		buf.writeInt(providerID);
 
 		if (catID != -1) {
 			buf.writeBoolean(true);
-			buf.writeByte(catID);
+			buf.writeInt(catID);
 		} else {
 			buf.writeBoolean(false);
 			ByteBufUtils.writeUTF8String(buf, category);
 		}
 		if (subCatID != -1) {
 			buf.writeBoolean(true);
-			buf.writeByte(subCatID);
+			buf.writeInt(subCatID);
 		} else {
 			buf.writeBoolean(false);
 			ByteBufUtils.writeUTF8String(buf, subCategory);
@@ -140,14 +139,14 @@ public class StandardInfo<T extends StandardInfo> extends Info<T> {
 	}
 
 	public void readFromNBT(NBTTagCompound tag) {
-		this.providerID = tag.getByte("prov");
+		this.providerID = tag.getInteger("prov");
 		if (tag.getBoolean("BcatID")) {
-			this.catID = tag.getByte("catID");
+			this.catID = tag.getInteger("catID");
 		} else {
 			this.category = tag.getString("category");
 		}
 		if (tag.getBoolean("BsubCatID")) {
-			this.subCatID = tag.getByte("subCatID");
+			this.subCatID = tag.getInteger("subCatID");
 		} else {
 			this.subCategory = tag.getString("subCategory");
 		}
@@ -161,17 +160,17 @@ public class StandardInfo<T extends StandardInfo> extends Info<T> {
 	}
 
 	public void writeToNBT(NBTTagCompound tag) {
-		tag.setByte("prov", providerID);
+		tag.setInteger("prov", providerID);
 		if (catID != -1) {
 			tag.setBoolean("BcatID", true);
-			tag.setByte("catID", catID);
+			tag.setInteger("catID", catID);
 		} else {
 			tag.setBoolean("BcatID", false);
 			tag.setString("category", category);
 		}
 		if (subCatID != -1) {
 			tag.setBoolean("BsubCatID", true);
-			tag.setByte("subCatID", subCatID);
+			tag.setInteger("subCatID", subCatID);
 		} else {
 			tag.setBoolean("BsubCatID", false);
 			tag.setString("subCategory", subCategory);
@@ -200,7 +199,7 @@ public class StandardInfo<T extends StandardInfo> extends Info<T> {
 	public void writeUpdate(StandardInfo currentInfo, NBTTagCompound tag) {
 		if (currentInfo.providerID != this.providerID) {
 			providerID = currentInfo.providerID;
-			tag.setByte("id", providerID);
+			tag.setInteger("id", providerID);
 		}
 		if (currentInfo.dataType != this.dataType) {
 			dataType = currentInfo.dataType;
@@ -211,14 +210,15 @@ public class StandardInfo<T extends StandardInfo> extends Info<T> {
 			tag.setString("c", category);
 		} else if (currentInfo.catID != -1 && currentInfo.catID != this.catID) {
 			catID = currentInfo.catID;
-			tag.setByte("cI", catID);
+			tag.setInteger("cI", catID);
 		}
 		if (currentInfo.subCatID == -1 && !currentInfo.subCategory.equals(this.subCategory)) {
 			subCategory = currentInfo.subCategory;
 			tag.setString("sC", subCategory);
+			
 		} else if (currentInfo.subCatID != -1 && currentInfo.subCatID != this.subCatID) {
 			subCatID = currentInfo.subCatID;
-			tag.setByte("sCI", subCatID);
+			tag.setInteger("sCI", subCatID);
 		}
 		if (!currentInfo.data.equals(this.data)) {
 			data = currentInfo.data;
@@ -233,7 +233,7 @@ public class StandardInfo<T extends StandardInfo> extends Info<T> {
 	@Override
 	public void readUpdate(NBTTagCompound tag) {
 		if (tag.hasKey("id")) {
-			providerID = tag.getByte("id");
+			providerID = tag.getInteger("id");
 		}
 		if (tag.hasKey("dT")) {
 			dataType = tag.getInteger("dT");
@@ -242,13 +242,13 @@ public class StandardInfo<T extends StandardInfo> extends Info<T> {
 			category = tag.getString("c");
 		}
 		if (tag.hasKey("cI")) {
-			catID = tag.getByte("cI");
+			catID = tag.getInteger("cI");
 		}
 		if (tag.hasKey("sC")) {
 			subCategory = tag.getString("sC");
 		}
 		if (tag.hasKey("sCI")) {
-			subCatID = tag.getByte("sCI");
+			subCatID = tag.getInteger("sCI");
 		}
 		if (tag.hasKey("d")) {
 			data = tag.getString("d");

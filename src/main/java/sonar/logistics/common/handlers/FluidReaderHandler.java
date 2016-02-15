@@ -3,14 +3,19 @@ package sonar.logistics.common.handlers;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.IFluidContainerItem;
 import sonar.core.fluid.StoredFluidStack;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.handlers.TileHandler;
+import sonar.core.inventory.StoredItemStack;
 import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.api.Info;
@@ -36,6 +41,69 @@ public class FluidReaderHandler extends TileHandler {
 			return;
 		}
 		stacks = LogisticsAPI.getFluidHelper().getFluids(LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite()));
+	}
+
+	public void extractFluid(EntityPlayer player, TileEntity te) {
+		ItemStack heldItem = player.getHeldItem();
+		if (heldItem == null) {
+			return;
+		}
+		if (FluidContainerRegistry.isContainer(heldItem)) {
+			if (FluidContainerRegistry.isFilledContainer(heldItem)) {
+				FluidStack stack = FluidContainerRegistry.getFluidForFilledItem(heldItem);
+				int extractSize = FluidContainerRegistry.getContainerCapacity(heldItem) - stack.amount;
+				stack.amount=extractSize;
+				StoredFluidStack storedStack = new StoredFluidStack(stack);
+				if (extractSize != 0) {
+					StoredFluidStack remainder = LogisticsAPI.getFluidHelper().removeFluids(storedStack, LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite()));
+					// StoredItemStack storedStack = null;
+					if (remainder == null || remainder.stored == 0) {
+						FluidStack fillStack =stack.copy();
+						fillStack.amount=extractSize;
+						FluidContainerRegistry.fillFluidContainer(fillStack, heldItem);
+					} else {
+						FluidStack fillStack =stack.copy();
+						fillStack.amount=(int) (extractSize-remainder.stored);
+						FluidContainerRegistry.fillFluidContainer(fillStack, heldItem);
+					}
+				}
+			}else{
+				//fill with available fluid
+			}
+		}
+		if(heldItem.getItem() instanceof IFluidContainerItem){
+			IFluidContainerItem container = (IFluidContainerItem) heldItem.getItem();
+			if(container.getFluid(heldItem)!=null){
+				FluidStack stack = container.getFluid(heldItem);
+				int extractSize = container.getCapacity(heldItem)- stack.amount;
+				stack.amount=extractSize;
+				StoredFluidStack storedStack = new StoredFluidStack(stack);
+				if (extractSize != 0) {
+					StoredFluidStack remainder = LogisticsAPI.getFluidHelper().removeFluids(storedStack, LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite()));
+				
+					FluidStack fillStack = stack.copy();
+					if (remainder == null || remainder.stored == 0) {
+						fillStack.amount=extractSize;
+					} else {						
+						fillStack.amount=(int) (extractSize-remainder.stored);
+					}
+					container.fill(heldItem, fillStack, true);
+				}
+			}
+		}
+	}
+
+	public void insertItem(EntityPlayer player, TileEntity te, ItemStack add) {
+		StoredItemStack stack = LogisticsAPI.getItemHelper().addItems(new StoredItemStack(add), LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite()));
+
+		if (stack == null || stack.stored == 0) {
+			add = null;
+		} else {
+			add.stackSize = (int) stack.stored;
+		}
+		if (!ItemStack.areItemStacksEqual(add, player.getHeldItem())) {
+			player.inventory.setInventorySlotContents(player.inventory.currentItem, add);
+		}
 	}
 
 	public boolean canConnect(TileEntity te, ForgeDirection dir) {

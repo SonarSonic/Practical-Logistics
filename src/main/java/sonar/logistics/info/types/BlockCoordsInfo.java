@@ -25,7 +25,7 @@ public class BlockCoordsInfo extends Info<BlockCoordsInfo> {
 	}
 
 	@Override
-	public byte getProviderID() {
+	public int getProviderID() {
 		return -1;
 	}
 

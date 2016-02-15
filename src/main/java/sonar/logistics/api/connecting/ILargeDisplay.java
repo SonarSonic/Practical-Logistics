@@ -1,6 +1,5 @@
 package sonar.logistics.api.connecting;
 
-
 /** implemented by LargeDisplays */
 public interface ILargeDisplay extends ILogicTile {
 	/**

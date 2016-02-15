@@ -4,7 +4,6 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.energy.StoredEnergyStack;
 import sonar.core.utils.IRegistryObject;
-import sonar.logistics.Logistics;
 import sonar.logistics.api.LogisticsAPI;
 
 /**
@@ -13,8 +12,8 @@ import sonar.logistics.api.LogisticsAPI;
  */
 public abstract class EnergyHandler implements IRegistryObject {
 
-	public byte getID() {
-		return Logistics.energyProviders.getObjectID(getName());
+	public int getID() {
+		return LogisticsAPI.getRegistry().getEntityProviderID(getName());
 	}
 
 	/** the name the info helper will be registered too */

@@ -39,7 +39,7 @@ public class InventoryInfo extends Info<InventoryInfo> {
 	}
 
 	@Override
-	public byte getProviderID() {
+	public int getProviderID() {
 		return -1;
 	}
 

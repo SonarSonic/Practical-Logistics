@@ -1,17 +1,16 @@
 package sonar.logistics.api;
 
-import sonar.logistics.Logistics;
+import sonar.logistics.api.providers.EntityProvider;
 
 public class EntityInfo extends StandardInfo {
 
-	public EntityInfo() {
-	}
+	public EntityInfo() {}
 
-	public EntityInfo(byte providerID, int category, int subCategory, Object data) {
+	public EntityInfo(int providerID, int category, int subCategory, Object data) {
 		super(providerID, category, subCategory, data);
 	}
 
-	public EntityInfo(byte providerID, String category, String subCategory, Object data) {
+	public EntityInfo(int providerID, String category, String subCategory, Object data) {
 		super(providerID, category, subCategory, data);
 	}
 
@@ -22,12 +21,14 @@ public class EntityInfo extends StandardInfo {
 
 	@Override
 	public String getCategory() {
-		return (catID == -1 || providerID == -1) ? category : Logistics.entityProviders.getRegisteredObject(providerID).getCategory(catID);
+		EntityProvider provider = LogisticsAPI.getRegistry().getEntityProvider(providerID);
+		return (provider==null || catID==-1) ? category : provider.getCategory(catID);
 	}
 
 	@Override
 	public String getSubCategory() {
-		return (subCatID == -1 || providerID == -1) ? subCategory : Logistics.entityProviders.getRegisteredObject(providerID).getSubCategory(subCatID);
+		EntityProvider provider = LogisticsAPI.getRegistry().getEntityProvider(providerID);
+		return (provider==null || subCatID==-1) ? subCategory : provider.getSubCategory(subCatID);
 	}
 
 	@Override

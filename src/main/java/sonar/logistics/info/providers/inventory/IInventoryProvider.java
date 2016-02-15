@@ -61,7 +61,7 @@ public class IInventoryProvider extends InventoryHandler {
 		for (int i = 0; i < invSize; i++) {
 			int slot = slots != null ? slots[i] : i;
 			ItemStack stack = inv.getStackInSlot(slot);
-			if (!(tile instanceof ISidedInventory) || ((ISidedInventory) tile).canInsertItem(slot, stack, dir.ordinal())) {
+			if (!(tile instanceof ISidedInventory) || ((ISidedInventory) tile).canInsertItem(slot, add.item, dir.ordinal())) {
 				if (stack != null) {
 					if (add.equalStack(stack) && stack.stackSize < inv.getInventoryStackLimit()) {
 						long used = (long) Math.min(add.stored, inv.getInventoryStackLimit() - stack.stackSize);

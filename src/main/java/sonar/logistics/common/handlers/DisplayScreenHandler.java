@@ -24,7 +24,6 @@ import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.StandardInfo;
 import sonar.logistics.api.connecting.IInfoEmitter;
 import sonar.logistics.api.connecting.IInfoReader;
-import sonar.logistics.helpers.InfoHelper;
 import sonar.logistics.info.types.InventoryInfo;
 import sonar.logistics.info.types.StoredStackInfo;
 import sonar.logistics.registries.DisplayRegistry;
@@ -149,9 +148,9 @@ public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 					if (screenInfo instanceof StoredStackInfo) {
 						StoredStackInfo storedInfo = (StoredStackInfo) screenInfo;
 						if (player.getHeldItem() != null && storedInfo.stack.equalStack(player.getHeldItem())) {
-							insertItem(player, player.getHeldItem().copy(), handler, readerTile);
+							handler.insertItem(player, readerTile, player.getHeldItem().copy());
 						} else {
-							StoredItemStack extract = extractItem(storedInfo.stack, handler, readerTile);
+							StoredItemStack extract = handler.extractItem( readerTile, storedInfo.stack);
 							if (extract != null) {
 								spawnStoredItemStack(extract, world, x, y, z, side);
 							}
@@ -159,8 +158,7 @@ public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 					} else if (screenInfo instanceof InventoryInfo) {
 						InventoryInfo invInfo = (InventoryInfo) screenInfo;
 						if (player.getHeldItem() != null) {
-							insertItem(player, player.getHeldItem().copy(), handler, readerTile);
-
+							handler.insertItem(player, readerTile, player.getHeldItem().copy());
 						} else if (teHandler instanceof LargeDisplayScreenHandler) {
 							LargeDisplayScreenHandler largeScreen = (LargeDisplayScreenHandler) teHandler;
 							if (largeScreen.sizing != null) {
@@ -198,7 +196,7 @@ public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 									slot = ((ySlot * hSlots) + hSlot) + (ySlot * 2) - largeScreen.sizing.maxH * 2;
 								}
 								if (slot != -1 && slot < invInfo.stacks.size()) {
-									StoredItemStack extract = extractItem(invInfo.stacks.get(slot), handler, readerTile);
+									StoredItemStack extract = handler.extractItem(readerTile, invInfo.stacks.get(slot));
 									if (extract != null) {
 										spawnStoredItemStack(extract, world, x, y, z, side);
 									}
@@ -211,37 +209,13 @@ public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 			}
 			if (target instanceof FluidReaderHandler) {
 				FluidReaderHandler handler = (FluidReaderHandler) target;
-				
+				if(player.getHeldItem()!=null){
+					handler.extractFluid(player, readerTile);
+				}
 			}
 		}
 	}
 
-	public void insertItem(EntityPlayer player, ItemStack remove, InventoryReaderHandler handler, TileEntity reader) {
-		StoredItemStack stack = handler.insertItem(reader, new StoredItemStack(remove));
-		if (stack == null || stack.stored == 0) {
-			remove = null;
-		} else {
-			remove.stackSize = (int) stack.stored;
-		}
-		if (!ItemStack.areItemStacksEqual(remove, player.getHeldItem())) {
-			player.inventory.setInventorySlotContents(player.inventory.currentItem, remove);
-		}
-	}
-
-	public StoredItemStack extractItem(StoredItemStack stack, InventoryReaderHandler handler, TileEntity reader) {
-		if (stack == null || stack.stored == 0) {
-			return null;
-		}
-		int extractSize = (int) Math.min(stack.getItemStack().getMaxStackSize(), stack.stored);
-		StoredItemStack remainder = handler.extractItem(reader, new StoredItemStack(stack.getItemStack(), extractSize));
-		StoredItemStack storedStack = null;
-		if (remainder == null || remainder.stored == 0) {
-			storedStack = new StoredItemStack(stack.getItemStack(), extractSize);
-		} else {
-			storedStack = new StoredItemStack(stack.getItemStack(), extractSize - remainder.stored);
-		}
-		return storedStack;
-	}
 
 	public void spawnStoredItemStack(StoredItemStack stack, World world, int x, int y, int z, ForgeDirection side) {
 		EntityItem dropStack = new EntityItem(world, x + 0.5, (double) y + 0.5, z + 0.5, stack.getFullStack());

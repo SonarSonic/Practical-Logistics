@@ -5,6 +5,7 @@ import io.netty.buffer.ByteBuf;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -20,7 +21,6 @@ import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.StandardInfo;
-import sonar.logistics.helpers.ItemHelper;
 import sonar.logistics.info.types.InventoryInfo;
 import sonar.logistics.info.types.StoredStackInfo;
 
@@ -94,12 +94,32 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 		}
 		return new StandardInfo((byte) -1, "ITEMREND", " ", "NO DATA");
 	}
-
-	public StoredItemStack insertItem(TileEntity te, StoredItemStack stack) {
-		return LogisticsAPI.getItemHelper().addItems(stack, LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite()));
-	}
 	public StoredItemStack extractItem(TileEntity te, StoredItemStack stack) {
-		return LogisticsAPI.getItemHelper().removeItems(stack, LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite()));
+		if (stack == null || stack.stored == 0) {
+			return null;
+		}
+		int extractSize = (int) Math.min(stack.getItemStack().getMaxStackSize(), stack.stored);
+		StoredItemStack remainder = LogisticsAPI.getItemHelper().removeItems(stack, LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite()));
+		StoredItemStack storedStack = null;
+		if (remainder == null || remainder.stored == 0) {
+			storedStack = new StoredItemStack(stack.getItemStack(), extractSize);
+		} else {
+			storedStack = new StoredItemStack(stack.getItemStack(), extractSize - remainder.stored);
+		}
+		return storedStack;
+	}
+
+	public void insertItem(EntityPlayer player, TileEntity te, ItemStack add) {
+		StoredItemStack stack = LogisticsAPI.getItemHelper().addItems(new StoredItemStack(add), LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite()));
+		
+		if (stack == null || stack.stored == 0) {
+			add = null;
+		} else {
+			add.stackSize = (int) stack.stored;
+		}
+		if (!ItemStack.areItemStacksEqual(add, player.getHeldItem())) {
+			player.inventory.setInventorySlotContents(player.inventory.currentItem, add);
+		}
 	}
 	public void readData(NBTTagCompound nbt, SyncType type) {
 		super.readData(nbt, type);

@@ -29,7 +29,7 @@ public class BlockProvider extends TileProvider {
 
 	@Override
 	public void getHelperInfo(List<Info> infoList, World world, int x, int y, int z, ForgeDirection dir) {
-		byte id = this.getID();
+		int id = this.getID();
 		Block target = world.getBlock(x, y, z);
 		int meta = world.getBlockMetadata(x, y, z);
 		infoList.add(new StandardInfo(id, 0, 0, meta));
@@ -59,12 +59,12 @@ public class BlockProvider extends TileProvider {
 	}
 
 	@Override
-	public String getCategory(byte id) {
+	public String getCategory(int id) {
 		return categories[id];
 	}
 
 	@Override
-	public String getSubCategory(byte id) {
+	public String getSubCategory(int id) {
 		return subcategories[id];
 	}
 

@@ -21,7 +21,7 @@ public class CategoryInfo extends Info<CategoryInfo> {
 	}
 
 	@Override
-	public byte getProviderID() {
+	public int getProviderID() {
 		return -1;
 	}
 
@@ -68,15 +68,6 @@ public class CategoryInfo extends Info<CategoryInfo> {
 		tag.setString("category", category);
 	}
 
-	/*
-	 * @Override public boolean isEqualType(Info info) { if (info != null &&
-	 * info.getName() == this.getName()) { return
-	 * info.getCategory().equals(category); } return false; }
-	 * 
-	 * @Override public void emptyData() {
-	 * 
-	 * }
-	 */
 	@Override
 	public CategoryInfo instance() {
 		return new CategoryInfo();
@@ -88,7 +79,6 @@ public class CategoryInfo extends Info<CategoryInfo> {
 			tag.setString("c", category);
 			this.category = currentInfo.category;
 		}
-
 	}
 
 	@Override

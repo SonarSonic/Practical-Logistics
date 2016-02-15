@@ -17,7 +17,7 @@ import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.RenderHelper;
 import sonar.logistics.api.IdentifiedCoords;
 import sonar.logistics.api.Info;
-import sonar.logistics.api.render.InfoRenderer;
+import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.client.renderers.RenderHandlers;
 
 public class StoredEnergyInfo extends Info<StoredEnergyInfo> {
@@ -40,7 +40,7 @@ public class StoredEnergyInfo extends Info<StoredEnergyInfo> {
 	}
 
 	@Override
-	public byte getProviderID() {
+	public int getProviderID() {
 		return -1;
 	}
 
@@ -103,7 +103,7 @@ public class StoredEnergyInfo extends Info<StoredEnergyInfo> {
 		GL11.glTranslatef(minX + (maxX - minX) / 2, minY + (maxY - minY) / 2, 0.01f);
 		int sizing = (int) Math.round(Math.min((maxX - minX), (maxY - minY) * 1.5));
 		GL11.glTranslatef(0.0f, (float) (scale >= 120 ? -0.1F : -0.31F + ((sizing - 1) * -0.04)), zOffset);
-		double itemScale = sizing >= 2 ? InfoRenderer.getScale(sizing) : 120;
+		double itemScale = sizing >= 2 ? LogisticsAPI.getInfoRenderer().getScale(sizing) : 120;
 		GL11.glScaled(1.0f / itemScale, 1.0f / itemScale, 1.0f / itemScale);
 		String coordString = coords.block.getDisplayName();
 		rend.drawString(EnumChatFormatting.UNDERLINE + coordString, -rend.getStringWidth(coordString) / 2, -20, -1);

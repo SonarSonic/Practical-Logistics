@@ -195,6 +195,7 @@ public class CableHelper extends CablingWrapper {
 		Map<BlockCoords, ForgeDirection> connections = new LinkedHashMap();
 		for (BlockCoords connect : network) {
 			TileEntity node = connect.getTileEntity();
+			System.out.print("null net");
 			if (node != null && node instanceof IConnectionNode) {
 				connections.putAll(((IConnectionNode) node).getConnections());
 			}

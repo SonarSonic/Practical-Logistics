@@ -32,7 +32,7 @@ public class StoredStackInfo extends Info<StoredStackInfo> {
 	}
 
 	@Override
-	public byte getProviderID() {
+	public int getProviderID() {
 		return -1;
 	}
 

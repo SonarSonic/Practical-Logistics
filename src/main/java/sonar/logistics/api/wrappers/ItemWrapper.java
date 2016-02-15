@@ -5,7 +5,6 @@ import java.util.List;
 
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
-import sonar.core.fluid.StoredFluidStack;
 import sonar.core.inventory.StoredItemStack;
 import sonar.core.utils.BlockCoords;
 import sonar.logistics.api.connecting.IConnectionNode;

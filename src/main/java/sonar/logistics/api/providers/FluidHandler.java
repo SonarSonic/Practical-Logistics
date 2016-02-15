@@ -6,14 +6,13 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.fluid.StoredFluidStack;
 import sonar.core.utils.IRegistryObject;
-import sonar.logistics.Logistics;
-import sonar.logistics.api.LogisticsAPI;;
+import sonar.logistics.api.LogisticsAPI;
 
 /** used for providing information on Fluids stored in Block/TileEntities for the Fluid Reader to read, the Provider must be registered in the {@link LogisticsAPI} to be used */
 public abstract class FluidHandler implements IRegistryObject {
 
-	public byte getID(){
-		return Logistics.fluidProviders.getObjectID(getName());		
+	public int getID(){
+		return LogisticsAPI.getRegistry().getFluidHandlerID(getName());
 	}
 	
 	/** the name the info helper will be registered too */

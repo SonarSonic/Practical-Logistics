@@ -20,7 +20,7 @@ public class FluidInfo extends StandardInfo {
 
 	public FluidInfo() {}
 
-	public FluidInfo(byte providerID, String category, String subCategory, Object data, int fluidID) {
+	public FluidInfo(int providerID, String category, String subCategory, Object data, int fluidID) {
 		super(providerID, category, subCategory, data);
 		this.fluidID = fluidID;
 	}

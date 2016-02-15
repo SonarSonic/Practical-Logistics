@@ -6,13 +6,12 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import sonar.core.utils.IBufObject;
 import sonar.core.utils.INBTObject;
-import sonar.logistics.Logistics;
 
 /** used for filtering Item Router */
 public abstract class ItemFilter<T extends ItemFilter> implements INBTObject, IBufObject {
 
-	public byte getID() {
-		return Logistics.itemFilters.getObjectID(getName());
+	public int getID() {
+		return LogisticsAPI.getRegistry().getItemFilterID(getName());
 	}
 
 	/** the name the info helper will be registered too */
