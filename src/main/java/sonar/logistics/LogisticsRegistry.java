@@ -22,11 +22,11 @@ public class LogisticsRegistry extends RegistryWrapper {
 		Logistics.entityProviders.registerObject(provider);
 	}
 
-	public void registerInventoryProvider(InventoryHandler provider) {
+	public void registerInventoryHandler(InventoryHandler provider) {
 		Logistics.inventoryProviders.registerObject(provider);
 	}
 
-	public void registerFluidProvider(FluidHandler provider) {
+	public void registerFluidHandler(FluidHandler provider) {
 		Logistics.fluidProviders.registerObject(provider);
 	}
 

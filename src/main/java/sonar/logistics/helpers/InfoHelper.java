@@ -7,12 +7,8 @@ import java.util.List;
 import java.util.Map;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
-import sonar.core.inventory.StoredItemStack;
 import sonar.core.utils.BlockCoords;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.Info;
@@ -20,30 +16,30 @@ import sonar.logistics.api.StandardInfo;
 import sonar.logistics.api.connecting.IConnectionNode;
 import sonar.logistics.api.connecting.IEntityNode;
 import sonar.logistics.api.providers.EntityProvider;
-import sonar.logistics.api.providers.InventoryHandler;
 import sonar.logistics.api.providers.TileProvider;
+import sonar.logistics.api.wrappers.InfoWrapper;
 import sonar.logistics.info.types.CategoryInfo;
 import sonar.logistics.info.types.FluidInfo;
 import sonar.logistics.info.types.ProgressInfo;
 
-public class InfoHelper {
+public class InfoHelper extends InfoWrapper {
 
-	public static List<Info> getInfo(BlockCoords coords) {
+	public List<Info> getInfoList(BlockCoords coords) {
 		List<Info> infoList = new ArrayList();
 		TileEntity tile = coords.getTileEntity();
 		if (tile == null) {
 			return infoList;
 		}
 		if (tile instanceof IConnectionNode) {
-			infoList = InfoHelper.getTileInfo((IConnectionNode) tile);
+			infoList = getTileInfo((IConnectionNode) tile);
 		} else if (tile instanceof IEntityNode) {
-			infoList = InfoHelper.getEntityInfo((IEntityNode) tile);
+			infoList = getEntityInfo((IEntityNode) tile);
 		}
 		return infoList;
 
 	}
 
-	public static List<Info> getTileInfo(IConnectionNode tileNode) {
+	public List<Info> getTileInfo(IConnectionNode tileNode) {
 		List<TileProvider> providers = Logistics.tileProviders.getObjects();
 		List<Info> providerInfo = new ArrayList();
 
@@ -72,7 +68,7 @@ public class InfoHelper {
 		return providerInfo;
 	}
 
-	public static List<Info> getEntityInfo(IEntityNode tileNode) {
+	public List<Info> getEntityInfo(IEntityNode tileNode) {
 		List<EntityProvider> providers = Logistics.entityProviders.getObjects();
 		List<Info> providerInfo = new ArrayList();
 
@@ -101,7 +97,7 @@ public class InfoHelper {
 		return providerInfo;
 	}
 
-	public static Info getLatestTileInfo(Info tileInfo, IConnectionNode tileNode) {
+	public Info getLatestTileInfo(Info tileInfo, IConnectionNode tileNode) {
 		if (tileNode == null || tileInfo == null) {
 			return null;
 		}
@@ -127,7 +123,7 @@ public class InfoHelper {
 		return null;
 	}
 
-	public static Info getLatestEntityInfo(Info entityInfo, IEntityNode entityNode) {
+	public Info getLatestEntityInfo(Info entityInfo, IEntityNode entityNode) {
 		if (entityInfo == null) {
 			return null;
 		}
@@ -150,61 +146,7 @@ public class InfoHelper {
 		return null;
 	}
 
-	public static StoredItemStack getStack(List<BlockCoords> connections, int slot) {
-		if (connections == null) {
-			return null;
-		}
-		for (BlockCoords connect : connections) {
-			Object tile = connect.getTileEntity();
-			if (tile != null) {
-				if (tile instanceof IConnectionNode) {
-					return getTileStack((IConnectionNode) tile, slot);
-				}
-				if (tile instanceof IEntityNode) {
-					return getEntityStack((IEntityNode) tile, slot);
-				}
-			}
-		}
-
-		return null;
-	}
-
-	public static StoredItemStack getTileStack(IConnectionNode node, int slot) {
-		Map<BlockCoords, ForgeDirection> connections = node.getConnections();
-		for (InventoryHandler provider : Logistics.inventoryProviders.getObjects()) {
-			for (Map.Entry<BlockCoords, ForgeDirection> entry : connections.entrySet()) {
-				TileEntity tile = entry.getKey().getTileEntity();
-				if (tile != null && provider.canHandleItems(tile, entry.getValue())) {
-					return provider.getStack(slot, tile, entry.getValue());
-				}
-
-			}
-		}
-		return null;
-	}
-
-	public static StoredItemStack getEntityStack(IEntityNode node, int slot) {
-		List<StoredItemStack> storedStacks = new ArrayList();
-		List<Entity> entityList = node.getEntities();
-		for (Entity entity : entityList) {
-			if (entity instanceof EntityPlayer) {
-				EntityPlayer player = (EntityPlayer) entity;
-				IInventory inv = (IInventory) player.inventory;
-				if (slot < inv.getSizeInventory()) {
-					ItemStack stack = inv.getStackInSlot(slot);
-					if (stack == null) {
-						return null;
-					} else {
-						return new StoredItemStack(stack);
-					}
-				}
-			}
-		}
-
-		return null;
-	}
-
-	public static Info combineData(Info primary, Info secondary) {
+	public Info combineData(Info primary, Info secondary) {
 		if (!(primary instanceof CategoryInfo) && !(secondary instanceof CategoryInfo)) {
 			if (primary.getDataType() == 0 && secondary.getDataType() == 0) {
 				long stored = Long.parseLong(secondary.getData());

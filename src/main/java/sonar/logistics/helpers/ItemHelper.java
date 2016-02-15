@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -19,15 +20,16 @@ import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.connecting.IConnectionNode;
 import sonar.logistics.api.connecting.IEntityNode;
 import sonar.logistics.api.providers.InventoryHandler;
+import sonar.logistics.api.wrappers.ItemWrapper;
 
-public class ItemHelper {
+public class ItemHelper extends ItemWrapper {
 
-	public List<StoredItemStack> getStackList(List<BlockCoords> connections) {
+	public List<StoredItemStack> getStackList(List<BlockCoords> network) {
 		List<StoredItemStack> storedStacks = new ArrayList();
-		if (connections == null) {
+		if (network == null) {
 			return storedStacks;
 		}
-		for (BlockCoords connect : connections) {
+		for (BlockCoords connect : network) {
 			Object tile = connect.getTileEntity();
 			if (tile != null) {
 				if (tile instanceof IConnectionNode) {
@@ -131,6 +133,59 @@ public class ItemHelper {
 			}
 		}
 		return stack;
+	}
+
+	public StoredItemStack getStack(List<BlockCoords> connections, int slot) {
+		if (connections == null) {
+			return null;
+		}
+		for (BlockCoords connect : connections) {
+			Object tile = connect.getTileEntity();
+			if (tile != null) {
+				if (tile instanceof IConnectionNode) {
+					return getTileStack((IConnectionNode) tile, slot);
+				}
+				if (tile instanceof IEntityNode) {
+					return getEntityStack((IEntityNode) tile, slot);
+				}
+			}
+		}
+	
+		return null;
+	}
+	public StoredItemStack getEntityStack(IEntityNode node, int slot) {
+		List<StoredItemStack> storedStacks = new ArrayList();
+		List<Entity> entityList = node.getEntities();
+		for (Entity entity : entityList) {
+			if (entity instanceof EntityPlayer) {
+				EntityPlayer player = (EntityPlayer) entity;
+				IInventory inv = (IInventory) player.inventory;
+				if (slot < inv.getSizeInventory()) {
+					ItemStack stack = inv.getStackInSlot(slot);
+					if (stack == null) {
+						return null;
+					} else {
+						return new StoredItemStack(stack);
+					}
+				}
+			}
+		}
+	
+		return null;
+	}
+
+	public StoredItemStack getTileStack(IConnectionNode node, int slot) {
+		Map<BlockCoords, ForgeDirection> connections = node.getConnections();
+		for (InventoryHandler provider : Logistics.inventoryProviders.getObjects()) {
+			for (Map.Entry<BlockCoords, ForgeDirection> entry : connections.entrySet()) {
+				TileEntity tile = entry.getKey().getTileEntity();
+				if (tile != null && provider.canHandleItems(tile, entry.getValue())) {
+					return provider.getStack(slot, tile, entry.getValue());
+				}
+	
+			}
+		}
+		return null;
 	}
 
 }

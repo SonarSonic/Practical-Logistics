@@ -18,12 +18,12 @@ import sonar.logistics.api.wrappers.FluidWrapper;
 
 public class FluidHelper extends FluidWrapper {
 
-	public List<StoredFluidStack> getFluids(List<BlockCoords> coords) {
+	public List<StoredFluidStack> getFluids(List<BlockCoords> network) {
 		List<StoredFluidStack> fluidList = new ArrayList();
 		List<FluidHandler> providers = Logistics.fluidProviders.getObjects();
 
 		for (FluidHandler provider : providers) {
-			for (BlockCoords coord : coords) {
+			for (BlockCoords coord : network) {
 				TileEntity target = coord.getTileEntity();
 				if (target != null && target instanceof IConnectionNode) {
 					IConnectionNode node = (IConnectionNode) target;
@@ -66,7 +66,7 @@ public class FluidHelper extends FluidWrapper {
 
 	}
 
-	public StoredFluidStack addItems(StoredFluidStack add, List<BlockCoords> network) {
+	public StoredFluidStack addFluids(StoredFluidStack add, List<BlockCoords> network) {
 		Map<BlockCoords, ForgeDirection> connections = LogisticsAPI.getCableHelper().getTileConnections(network);
 		for (Map.Entry<BlockCoords, ForgeDirection> entry : connections.entrySet()) {
 			TileEntity tile = entry.getKey().getTileEntity();
@@ -82,7 +82,7 @@ public class FluidHelper extends FluidWrapper {
 		return add;
 	}
 
-	public  StoredFluidStack extractItems(StoredFluidStack remove, List<BlockCoords> network) {
+	public  StoredFluidStack removeFluids(StoredFluidStack remove, List<BlockCoords> network) {
 		Map<BlockCoords, ForgeDirection> connections = LogisticsAPI.getCableHelper().getTileConnections(network);
 		for (Map.Entry<BlockCoords, ForgeDirection> entry : connections.entrySet()) {
 			TileEntity tile = entry.getKey().getTileEntity();

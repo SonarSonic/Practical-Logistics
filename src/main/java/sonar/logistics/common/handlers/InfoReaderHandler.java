@@ -65,12 +65,12 @@ public class InfoReaderHandler extends TileHandler implements IWailaInfo {
 		}
 
 		if (!nodes.isEmpty()) {
-			this.setData(te, InfoHelper.getLatestTileInfo(primaryInfo.getObject(), nodes.get(0)), true);
-			this.setData(te, InfoHelper.getLatestTileInfo(secondaryInfo.getObject(), (IConnectionNode) nodes.get(0)), false);
+			this.setData(te, LogisticsAPI.getInfoHelper().getLatestTileInfo(primaryInfo.getObject(), nodes.get(0)), true);
+			this.setData(te, LogisticsAPI.getInfoHelper().getLatestTileInfo(secondaryInfo.getObject(), (IConnectionNode) nodes.get(0)), false);
 			this.coords = new BlockCoords((TileEntityBlockNode) nodes.get(0));
 		} else if (!entityNodes.isEmpty()) {
-			this.setData(te, InfoHelper.getLatestEntityInfo(primaryInfo.getObject(), (TileEntityEntityNode) entityNodes.get(0)), true);
-			this.setData(te, InfoHelper.getLatestEntityInfo(secondaryInfo.getObject(), (TileEntityEntityNode) entityNodes.get(0)), false);
+			this.setData(te, LogisticsAPI.getInfoHelper().getLatestEntityInfo(primaryInfo.getObject(), (TileEntityEntityNode) entityNodes.get(0)), true);
+			this.setData(te, LogisticsAPI.getInfoHelper().getLatestEntityInfo(secondaryInfo.getObject(), (TileEntityEntityNode) entityNodes.get(0)), false);
 			this.coords = new BlockCoords((TileEntityEntityNode) entityNodes.get(0));
 		} else {
 			coords = null;
@@ -141,7 +141,7 @@ public class InfoReaderHandler extends TileHandler implements IWailaInfo {
 			this.lastInfo = clientInfo;
 			List<Info> info = new ArrayList();
 			if (this.coords != null) {
-				info = InfoHelper.getInfo(coords);
+				info = LogisticsAPI.getInfoHelper().getInfoList(coords);
 			}
 			List<Info> newInfo = new ArrayList();
 			Info lastInfo = null;

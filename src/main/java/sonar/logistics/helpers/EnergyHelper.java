@@ -18,10 +18,10 @@ import sonar.logistics.info.types.StoredEnergyInfo;
 
 public class EnergyHelper extends EnergyWrapper {
 
-	public List<StoredEnergyInfo> getEnergyList(List<BlockCoords> coords) {
+	public List<StoredEnergyInfo> getEnergyList(List<BlockCoords> network) {
 		List<StoredEnergyInfo> energyList = new ArrayList();
 		List<EnergyHandler> handlers = Logistics.energyProviders.getObjects();
-		for (BlockCoords coord : coords) {
+		for (BlockCoords coord : network) {
 			TileEntity target = coord.getTileEntity();
 			if (target != null && target instanceof IConnectionNode) {
 				IConnectionNode node = (IConnectionNode) target;

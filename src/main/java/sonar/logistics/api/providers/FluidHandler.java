@@ -7,8 +7,9 @@ import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.fluid.StoredFluidStack;
 import sonar.core.utils.IRegistryObject;
 import sonar.logistics.Logistics;
+import sonar.logistics.api.LogisticsAPI;;
 
-/** used for providing information on Fluids stored in Block/TileEntities for the Fluid Reader to read, the Provider must be registered in the PractialLogisticsAPI to be used */
+/** used for providing information on Fluids stored in Block/TileEntities for the Fluid Reader to read, the Provider must be registered in the {@link LogisticsAPI} to be used */
 public abstract class FluidHandler implements IRegistryObject {
 
 	public byte getID(){

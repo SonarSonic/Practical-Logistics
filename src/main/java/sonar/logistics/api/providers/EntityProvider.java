@@ -6,10 +6,11 @@ import net.minecraft.entity.Entity;
 import sonar.core.utils.IRegistryObject;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.Info;
+import sonar.logistics.api.LogisticsAPI;
 
 /**
  * used for providing information on Entities for the Info Reader to read, the
- * Provider must be registered in the PractialLogisticsAPI to be used
+ * Provider must be registered in the {@link LogisticsAPI} to be used
  */
 public abstract class EntityProvider implements IRegistryObject {
 

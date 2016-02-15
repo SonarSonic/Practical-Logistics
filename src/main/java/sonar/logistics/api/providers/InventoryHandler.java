@@ -7,10 +7,11 @@ import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.inventory.StoredItemStack;
 import sonar.core.utils.IRegistryObject;
 import sonar.logistics.Logistics;
+import sonar.logistics.api.LogisticsAPI;
 
 /**
  * used for providing information on Inventories for the Inventory Reader to
- * read, the Provider must be registered in the PractialLogisticsAPI to be used
+ * read, the Provider must be registered in the {@link LogisticsAPI} to be used
  */
 public abstract class InventoryHandler implements IRegistryObject {
 

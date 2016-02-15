@@ -60,7 +60,7 @@ public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 			if (target instanceof IInfoReader) {
 				IInfoReader infoReader = (IInfoReader) target;
 				if (infoReader.currentInfo() != null && infoReader.getSecondaryInfo() != null) {
-					Info progress = InfoHelper.combineData(infoReader.currentInfo(), infoReader.getSecondaryInfo());
+					Info progress = LogisticsAPI.getInfoHelper().combineData(infoReader.currentInfo(), infoReader.getSecondaryInfo());
 					if (!progress.equals(info) || (info != null && info instanceof StandardInfo && progress instanceof StandardInfo && !((StandardInfo) progress).data.equals(((StandardInfo) info).data))) {
 						current = progress;
 					} else {

@@ -20,7 +20,7 @@ import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.StandardInfo;
-import sonar.logistics.helpers.InfoHelper;
+import sonar.logistics.helpers.ItemHelper;
 import sonar.logistics.info.types.InventoryInfo;
 import sonar.logistics.info.types.StoredStackInfo;
 
@@ -75,7 +75,7 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 			}
 			break;
 		case 1:
-			StoredItemStack stack = InfoHelper.getStack(LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite()), targetSlot.getInt());
+			StoredItemStack stack = LogisticsAPI.getItemHelper().getStack(LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite()), targetSlot.getInt());
 			if (stack != null) {
 				return StoredStackInfo.createInfo(stack);
 			}

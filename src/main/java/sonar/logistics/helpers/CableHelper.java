@@ -65,17 +65,13 @@ public class CableHelper extends CablingWrapper {
 						}
 						if (adjacent instanceof IDataCable) {
 							IDataCable adjTile = (IDataCable) adjacent;
-							if (adjTile.unlimitedChannels() == cable.unlimitedChannels() && adjTile.registryID() != -2) {
-								if (!adjTile.isBlocked(dir.getOpposite())) {
-									adjacents.add(adjacent);
-									ids.add(adjTile.registryID());
-								} else {
-								}
+							if (adjTile.unlimitedChannels() == cable.unlimitedChannels() && adjTile.registryID() != -2 && !adjTile.isBlocked(dir.getOpposite())) {
+								adjacents.add(adjacent);
+								ids.add(adjTile.registryID());
+
 							}
 						}
 					}
-				} else {
-
 				}
 			}
 			int cableID = -1;
