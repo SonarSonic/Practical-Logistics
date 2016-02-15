@@ -23,6 +23,8 @@ tile.FluidReader.name=流体読込器
 tile.ItemRouter.name=アイテムルーター
 tile.MultiCable.name=チャンネルケーブル
 tile.ChannelSelector.name=チャンネルセレクタ
+tile.Clock.name=クロック
+tile.EnergyReader.name=エネルギー読込器
 
 //items
 item.EnergyScreenItem.name=エネルギー用スクリーン
