@@ -6,7 +6,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.handlers.TileHandler;
-import sonar.core.network.PacketTileEntity;
+import sonar.core.network.PacketCoords;
 import sonar.logistics.api.Info;
 import sonar.logistics.common.containers.ContainerInventoryReader;
 import sonar.logistics.common.handlers.InventoryReaderHandler;
@@ -14,7 +14,7 @@ import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 
-public class PacketInventoryReaderGui extends PacketTileEntity {
+public class PacketInventoryReaderGui extends PacketCoords {
 
 	public Info info;
 	public boolean state;

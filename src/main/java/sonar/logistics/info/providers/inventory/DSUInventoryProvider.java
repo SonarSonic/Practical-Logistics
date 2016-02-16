@@ -7,6 +7,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import powercrystals.minefactoryreloaded.api.IDeepStorageUnit;
 import sonar.core.inventory.StoredItemStack;
+import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.providers.InventoryHandler;
 
 public class DSUInventoryProvider extends InventoryHandler {
@@ -35,7 +36,7 @@ public class DSUInventoryProvider extends InventoryHandler {
 	public boolean getItems(List<StoredItemStack> storedStacks, TileEntity tile, ForgeDirection dir) {
 		StoredItemStack stack = getStoredItem(tile);
 		if (stack != null) {
-			storedStacks.add(stack);
+			LogisticsAPI.getItemHelper().addStackToList(storedStacks, stack);
 			return true;
 		}
 		return false;

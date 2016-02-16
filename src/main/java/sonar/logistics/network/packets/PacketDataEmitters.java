@@ -7,14 +7,14 @@ import java.util.List;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import sonar.core.network.PacketTileEntity;
+import sonar.core.network.PacketCoords;
 import sonar.core.network.PacketTileEntityHandler;
 import sonar.logistics.api.IdentifiedCoords;
 import sonar.logistics.common.tileentity.TileEntityDataReceiver;
 import cpw.mods.fml.common.network.ByteBufUtils;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 
-public class PacketDataEmitters extends PacketTileEntity {
+public class PacketDataEmitters extends PacketCoords {
 
 	public List<IdentifiedCoords> coords;
 

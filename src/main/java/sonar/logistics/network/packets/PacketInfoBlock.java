@@ -4,7 +4,7 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.tileentity.TileEntity;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.handlers.TileHandler;
-import sonar.core.network.PacketTileEntity;
+import sonar.core.network.PacketCoords;
 import sonar.core.network.PacketTileEntityHandler;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.Info;
@@ -13,7 +13,7 @@ import sonar.logistics.common.handlers.InfoReaderHandler;
 import sonar.logistics.info.types.StoredEnergyInfo;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 
-public class PacketInfoBlock extends PacketTileEntity {
+public class PacketInfoBlock extends PacketCoords {
 
 	public Info info;
 	public boolean primary, setNull;

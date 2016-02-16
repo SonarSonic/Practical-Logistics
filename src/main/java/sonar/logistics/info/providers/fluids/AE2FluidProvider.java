@@ -32,7 +32,7 @@ public class AE2FluidProvider extends FluidHandler {
 	}
 
 	@Override
-	public void getFluids(List<StoredFluidStack> fluids, TileEntity tile, ForgeDirection dir) {
+	public boolean getFluids(List<StoredFluidStack> fluids, TileEntity tile, ForgeDirection dir) {
 		if (tile instanceof ITileStorageMonitorable && tile instanceof IActionHost) {
 			IStorageMonitorable monitor = ((ITileStorageMonitorable) tile).getMonitorable(dir, new MachineSource(((IActionHost) tile)));
 			if (monitor != null) {
@@ -44,8 +44,9 @@ public class AE2FluidProvider extends FluidHandler {
 					}
 				}
 			}
-
+			return true;
 		}
+		return false;
 	}
 
 	@Override

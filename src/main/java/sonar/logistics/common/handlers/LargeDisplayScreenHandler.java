@@ -75,6 +75,12 @@ public class LargeDisplayScreenHandler extends DisplayScreenHandler implements I
 			if (lastHandler != isHandler.getBoolean()) {
 				SonarCore.sendPacketAround(te, 64, 4);
 			}
+
+			if (updateTicks == updateTime){
+				updateTicks = 0;
+				SonarCore.sendPacketAround(te, 64, 0);
+			}else
+				updateTicks++;
 		}
 
 	}

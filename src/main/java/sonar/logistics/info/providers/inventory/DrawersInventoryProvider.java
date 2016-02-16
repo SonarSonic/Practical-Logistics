@@ -11,6 +11,11 @@ import sonar.logistics.api.providers.InventoryHandler;
 
 import com.jaquadro.minecraft.storagedrawers.api.storage.IDrawer;
 import com.jaquadro.minecraft.storagedrawers.api.storage.IDrawerGroup;
+import com.jaquadro.minecraft.storagedrawers.api.storage.IFractionalDrawer;
+import com.jaquadro.minecraft.storagedrawers.api.storage.IPriorityGroup;
+import com.jaquadro.minecraft.storagedrawers.api.storage.attribute.ILockable;
+import com.jaquadro.minecraft.storagedrawers.api.storage.attribute.IVoidable;
+import com.jaquadro.minecraft.storagedrawers.api.storage.attribute.LockAttribute;
 
 import cpw.mods.fml.common.Loader;
 
@@ -55,7 +60,7 @@ public class DrawersInventoryProvider extends InventoryHandler {
 					IDrawer draw = drawers.getDrawer(i);
 					ItemStack item = draw.getStoredItemCopy();
 					if (item != null)
-						LogisticsAPI.getItemHelper().addStackToList(storedStacks, item);
+						LogisticsAPI.getItemHelper().addStackToList(storedStacks, new StoredItemStack(item, draw.getStoredItemCount()));
 				}
 			}
 			return true;
@@ -67,14 +72,22 @@ public class DrawersInventoryProvider extends InventoryHandler {
 		return Loader.isModLoaded("StorageDrawers");
 	}
 
+	/**
+	 * taken from DrawerMEInventory class in StorageDrawers <a href=
+	 * "https://github.com/jaquadro/StorageDrawers/blob/master/src/com/jaquadro/minecraft/storagedrawers/integration/ae2/DrawerMEInventory.java"
+	 * >Storage Drawers GitHub</a>
+	 */
 	@Override
 	public StoredItemStack addStack(StoredItemStack add, TileEntity tile, ForgeDirection dir) {
 		return add;
+	}
+
+	private long injectItemsIntoDrawer(IDrawer drawer, long itemCount) {
+		return itemCount;
 	}
 
 	@Override
 	public StoredItemStack removeStack(StoredItemStack remove, TileEntity tile, ForgeDirection dir) {
 		return remove;
 	}
-
 }

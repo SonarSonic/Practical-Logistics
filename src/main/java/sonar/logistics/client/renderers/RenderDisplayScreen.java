@@ -57,7 +57,7 @@ public class RenderDisplayScreen extends TileEntitySpecialRenderer {
 
 		GL11.glTranslatef((float) x + 0.5F, (float) y + 0.75F * f1, (float) z + 0.5F);
 		GL11.glRotatef(-f3, 0.0F, 1.0F, 0.0F);
-		GL11.glTranslatef(0.0F, -0.3125F, -0.459F);
+		GL11.glTranslatef(0.0F, -0.3325F, -0.459F);
 		this.modelSign.signStick.showModel = false;
 		GL11.glPushMatrix();
 		GL11.glScalef(f1, -f1, -f1);
@@ -75,6 +75,7 @@ public class RenderDisplayScreen extends TileEntitySpecialRenderer {
 			ForgeDirection d = ForgeDirection.getOrientation(RenderHelper.setMetaData(entity));
 			float move = -0.21F;
 			GL11.glTranslated(d.offsetX * move, d.offsetY * move, d.offsetZ * move);
+
 			this.tesrRenderScreen(tess, entity, d);
 			GL11.glPopMatrix();
 		}
@@ -134,7 +135,8 @@ public class RenderDisplayScreen extends TileEntitySpecialRenderer {
 
 	public void renderInfo(Tessellator tess, TileEntity tile, ForgeDirection side, Info info) {
 		float pixel = 1.0F / 16F;
-		info.renderInfo(tess, tile, -0.5F + pixel, -0.2085F, (1.0f - (pixel) * 9), (pixel * 5)+0.022f, -0.207F, 120F);
+		//GL11.glTranslatef(0.0F, -0.03F, 0F);
+		info.renderInfo(tess, tile, -0.5F + pixel-0.001f, -pixel*3-0.001f, (1.0f - (pixel) * 9)+0.001f, (pixel * 5)+0.061f, -0.207F, 120F);
 
 	}
 

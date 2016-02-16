@@ -8,6 +8,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import sonar.core.common.block.SonarMachineBlock;
 import sonar.core.common.tileentity.TileEntitySonar;
+import sonar.core.utils.BlockInteraction;
 import sonar.core.utils.helpers.FontHelper;
 import sonar.logistics.common.tileentity.TileEntityBlockNode;
 import sonar.logistics.common.tileentity.TileEntityNode;
@@ -15,15 +16,7 @@ import sonar.logistics.common.tileentity.TileEntityNode;
 public abstract class BaseNode extends SonarMachineBlock {
 
 	protected BaseNode(Material material) {
-		super(material, true);
-	}
-
-	protected BaseNode(Material material, boolean bool) {
-		super(material, bool);
-	}
-
-	protected BaseNode(Material material, boolean bool, boolean bool2) {
-		super(material, bool, bool2);
+		super(material);
 	}
 
 	@Override
@@ -48,7 +41,7 @@ public abstract class BaseNode extends SonarMachineBlock {
 	}
 
 	@Override
-	public boolean operateBlock(World world, int x, int y, int z, EntityPlayer player, int side, float hitx, float hity, float hitz) {
+	public boolean operateBlock(World world, int x, int y, int z, EntityPlayer player, int side, float hitx, float hity, float hitz, BlockInteraction interact) {
 		if (!hasGui()) {
 			return false;
 		}
@@ -68,7 +61,6 @@ public abstract class BaseNode extends SonarMachineBlock {
 					openGui(world, x, y, z, player);
 				}
 				return true;
-
 			}
 
 		}

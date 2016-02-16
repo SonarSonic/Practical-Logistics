@@ -5,6 +5,7 @@ import java.util.List;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
+import net.minecraft.client.particle.EffectRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -14,18 +15,21 @@ import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
+import sonar.core.common.block.SonarMachineBlock;
 import sonar.core.common.block.SonarMaterials;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.handlers.TileHandler;
+import sonar.core.utils.BlockInteraction;
 import sonar.logistics.common.handlers.DisplayScreenHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 /** basically a fabrication of the BlockSign code */
-public abstract class AbstractScreen extends BlockContainer {
+public abstract class AbstractScreen extends SonarMachineBlock {
 
 	public AbstractScreen() {
 		super(SonarMaterials.machine);
+		this.disableOrientation();
 		float height = height();
 		float width = width();
 		this.setBlockBounds(0.5F - height, 0.0F, 0.5F - height, 0.5F + height, width, 0.5F + height);
@@ -36,6 +40,34 @@ public abstract class AbstractScreen extends BlockContainer {
 	public abstract float width();
 
 	public abstract TileEntity createNewTileEntity(World world, int i);
+
+	@Override
+	public final boolean operateBlock(World world, int x, int y, int z, EntityPlayer player, int side, float hitx, float hity, float hitz, BlockInteraction interact) {
+		if (player != null) {
+			TileHandler target = FMPHelper.getHandler(world.getTileEntity(x, y, z));
+			if (target != null && target instanceof DisplayScreenHandler) {
+				DisplayScreenHandler handler = (DisplayScreenHandler) target;
+
+				if (!world.isRemote) {
+					handler.screenClicked(world, player, x, y, z, ForgeDirection.getOrientation(side), hitx, hity, hitz, interact);
+				} else {
+					world.playSound(x, y, z, "dig.stone", 1.0F, 1.0F, true);
+				}
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	@Override
+	public boolean allowLeftClick() {
+		return true;
+	}
+
+	public boolean isClickableSide(World world, int x, int y, int z, int side) {
+		return side == world.getBlockMetadata(x, y, z);
+	}
 
 	@SideOnly(Side.CLIENT)
 	public IIcon getIcon(int side, int meta) {
@@ -116,16 +148,13 @@ public abstract class AbstractScreen extends BlockContainer {
 		return getItemDropped(0, null, 0);
 	}
 
-	public int getRenderType() {
-		return -1;
+	public boolean hasSpecialRenderer() {
+		return true;
 	}
 
-	public boolean renderAsNormalBlock() {
-		return false;
-	}
-
-	public boolean isOpaqueCube() {
-		return false;
+	@Override
+	public boolean dropStandard(World world, int x, int y, int z) {
+		return true;
 	}
 
 	public List<AxisAlignedBB> getCollisionBoxes(World world, int x, int y, int z, List<AxisAlignedBB> list) {
@@ -157,19 +186,10 @@ public abstract class AbstractScreen extends BlockContainer {
 		return true;
 	}
 
-	@Override
-	public final boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float hitx, float hity, float hitz) {
-		if (player != null) {
-			TileHandler target = FMPHelper.getHandler(world.getTileEntity(x, y, z));
-			if (target != null && target instanceof DisplayScreenHandler) {
-				DisplayScreenHandler handler = (DisplayScreenHandler) target;
-				
-				if (!world.isRemote)
-					handler.screenClicked(world, player, x, y, z, ForgeDirection.getOrientation(side), hitx, hity, hitz);
-				return true;
-			}
-		}
-
-		return false;
+	@SideOnly(Side.CLIENT)
+	public boolean addDestroyEffects(World world, int x, int y, int z, int meta, EffectRenderer effectRenderer) {
+		effectRenderer.addBlockHitEffects(x, y, z, meta);
+		effectRenderer.addBlockHitEffects(x, y, z, ForgeDirection.OPPOSITES[meta]);
+		return true;
 	}
 }

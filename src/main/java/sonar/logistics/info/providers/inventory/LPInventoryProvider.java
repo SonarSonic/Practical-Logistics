@@ -41,7 +41,7 @@ public class LPInventoryProvider extends InventoryHandler {
 	public boolean getItems(List<StoredItemStack> storedStacks, TileEntity tile, ForgeDirection dir) {
 		List<ItemStack> items = getStackList(tile);
 		for (ItemStack stack : items) {
-			LogisticsAPI.getItemHelper().addStackToList(storedStacks, stack);
+			LogisticsAPI.getItemHelper().addStackToList(storedStacks, new StoredItemStack(stack));
 			return true;
 		}
 

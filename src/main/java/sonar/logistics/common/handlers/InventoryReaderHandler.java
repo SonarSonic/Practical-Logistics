@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -46,7 +47,11 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 		if (te.getWorldObj().isRemote) {
 			return;
 		}
-		stacks = LogisticsAPI.getItemHelper().getStackList(LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite()));
+		stacks = LogisticsAPI.getItemHelper().getStackList(getNetwork(te));
+	}
+
+	public List<BlockCoords> getNetwork(TileEntity te) {
+		return LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite());
 	}
 
 	public boolean canConnect(TileEntity te, ForgeDirection dir) {
@@ -94,33 +99,90 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 		}
 		return new StandardInfo((byte) -1, "ITEMREND", " ", "NO DATA");
 	}
-	public StoredItemStack extractItem(TileEntity te, StoredItemStack stack) {
+
+	public StoredItemStack extractItem(TileEntity te, StoredItemStack stack, int max) {
 		if (stack == null || stack.stored == 0) {
 			return null;
 		}
-		int extractSize = (int) Math.min(stack.getItemStack().getMaxStackSize(), stack.stored);
-		StoredItemStack remainder = LogisticsAPI.getItemHelper().removeItems(stack, LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite()));
+		int extractSize = (int) Math.min(stack.getItemStack().getMaxStackSize(), Math.min(stack.stored, max));
+		StoredItemStack remainder = LogisticsAPI.getItemHelper().removeItems(stack.setStackSize(extractSize), LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite()));
 		StoredItemStack storedStack = null;
 		if (remainder == null || remainder.stored == 0) {
 			storedStack = new StoredItemStack(stack.getItemStack(), extractSize);
 		} else {
 			storedStack = new StoredItemStack(stack.getItemStack(), extractSize - remainder.stored);
 		}
+
 		return storedStack;
 	}
 
-	public void insertItem(EntityPlayer player, TileEntity te, ItemStack add) {
+	public void insertItem(EntityPlayer player, TileEntity te, int slot) {
+		ItemStack add = player.inventory.getStackInSlot(slot);
+		if (add == null) {
+			return;
+		}
 		StoredItemStack stack = LogisticsAPI.getItemHelper().addItems(new StoredItemStack(add), LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite()));
-		
+
 		if (stack == null || stack.stored == 0) {
 			add = null;
 		} else {
 			add.stackSize = (int) stack.stored;
 		}
-		if (!ItemStack.areItemStacksEqual(add, player.getHeldItem())) {
-			player.inventory.setInventorySlotContents(player.inventory.currentItem, add);
+		if (!ItemStack.areItemStacksEqual(add, player.inventory.getStackInSlot(slot))) {
+			player.inventory.setInventorySlotContents(slot, add);
 		}
 	}
+
+	public void insertInventory(EntityPlayer player, TileEntity te, int slotID) {
+		ItemStack add = player.inventory.getStackInSlot(slotID);
+		if (add == null) {
+			return;
+		}
+		StoredItemStack stack = new StoredItemStack(add).setStackSize(0);
+		IInventory inv = player.inventory;
+		List<Integer> slots = new ArrayList();
+		for (int i = 0; i < inv.getSizeInventory(); i++) {
+			ItemStack item = inv.getStackInSlot(i);
+			if (stack.equalStack(item)) {
+				stack.add(item);
+				slots.add(i);
+			}
+		}
+
+		StoredItemStack remainder = LogisticsAPI.getItemHelper().addItems(stack.copy(), LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite()));
+		long insertSize = 0;
+		if (remainder == null || remainder.stored == 0) {
+			insertSize = stack.getStackSize();
+		} else {
+			insertSize = stack.getStackSize() - remainder.stored;
+		}
+		if (insertSize == 0) {
+			return;
+		}
+		for (Integer slot : slots) {
+			ItemStack item = inv.getStackInSlot(slot);
+			int oldSize = item.stackSize;
+			if (stack.equalStack(item)) {
+
+				if (remainder == null || remainder.stored == 0) {
+					item.stackSize = 0;
+				} else {
+					item.stackSize = (int) Math.min(insertSize, item.getMaxStackSize());
+				}
+				insertSize -= oldSize - item.stackSize;
+				if (item.stackSize != 0) {
+					player.inventory.setInventorySlotContents(slot, item);
+				} else {
+					player.inventory.setInventorySlotContents(slot, null);
+				}
+				if (insertSize == 0) {
+					return;
+				}
+			}
+		}
+
+	}
+
 	public void readData(NBTTagCompound nbt, SyncType type) {
 		super.readData(nbt, type);
 		setting.readFromNBT(nbt, type);

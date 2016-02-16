@@ -8,6 +8,7 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import sonar.core.common.block.SonarMachineBlock;
 import sonar.core.common.block.SonarMaterials;
+import sonar.core.utils.BlockInteraction;
 import sonar.logistics.Logistics;
 import sonar.logistics.common.tileentity.TileEntityHammer;
 import sonar.logistics.network.LogisticsGui;
@@ -25,7 +26,7 @@ public class BlockHammer extends SonarMachineBlock {
 	}
 
 	@Override
-	public boolean operateBlock(World world, int x, int y, int z, EntityPlayer player, int side, float hitx, float hity, float hitz) {
+	public boolean operateBlock(World world, int x, int y, int z, EntityPlayer player, int side, float hitx, float hity, float hitz, BlockInteraction interact) {
 		if (player != null) {
 			player.openGui(Logistics.instance, LogisticsGui.hammer, world, x, y, z);
 			return true;

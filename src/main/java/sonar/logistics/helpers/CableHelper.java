@@ -126,7 +126,6 @@ public class CableHelper extends CablingWrapper {
 			} else if (adjacent instanceof IChannelProvider) {
 				addChannelConnections(connections, (IChannelProvider) adjacent, tile, true);
 			} else if (adjacent instanceof IInfoEmitter) {
-
 				IInfoEmitter connect = ((IInfoEmitter) adjacent);
 				connections.add(connect.getCoords());
 			}
@@ -135,11 +134,8 @@ public class CableHelper extends CablingWrapper {
 			TileEntity target = coord.getTileEntity();
 			if (target != null) {
 				if (target instanceof TileEntityDataEmitter) {
-
 				} else if (target instanceof IChannelProvider) {
-					List<BlockCoords> channels = new ArrayList();
 					addChannelConnections(connections, (IChannelProvider) target, tile, unlimited);
-					connections.addAll(connections);
 				} else if (target instanceof ILogicTile) {
 					connections.add(coord);
 				}
@@ -195,7 +191,6 @@ public class CableHelper extends CablingWrapper {
 		Map<BlockCoords, ForgeDirection> connections = new LinkedHashMap();
 		for (BlockCoords connect : network) {
 			TileEntity node = connect.getTileEntity();
-			System.out.print("null net");
 			if (node != null && node instanceof IConnectionNode) {
 				connections.putAll(((IConnectionNode) node).getConnections());
 			}

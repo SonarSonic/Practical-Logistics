@@ -61,6 +61,8 @@ public class ItemHelper extends ItemWrapper {
 				if (tile != null && provider.canHandleItems(tile, entry.getValue())) {
 					if (!specialProvider) {
 						specialProvider = provider.getItems(storedStacks, tile, entry.getValue());
+					} else {
+						continue;
 					}
 				}
 			}
@@ -90,7 +92,22 @@ public class ItemHelper extends ItemWrapper {
 		}
 	}
 
-	public void addStackToList(List<StoredItemStack> list, ItemStack stack) {
+	public void addStackToList(List<StoredItemStack> list, StoredItemStack stack) {
+		if (stack == null || list == null) {
+			return;
+		}
+		int pos = 0;
+		for (StoredItemStack storedStack : list) {
+			if (storedStack.equalStack(stack.item)) {
+				list.get(pos).add(stack);
+				return;
+			}
+			pos++;
+		}
+		list.add(stack);
+	}
+
+	private void addStackToList(List<StoredItemStack> list, ItemStack stack) {
 		int pos = 0;
 		for (StoredItemStack storedStack : list) {
 			if (storedStack.equalStack(stack)) {
@@ -149,9 +166,10 @@ public class ItemHelper extends ItemWrapper {
 				}
 			}
 		}
-	
+
 		return null;
 	}
+
 	public StoredItemStack getEntityStack(IEntityNode node, int slot) {
 		List<StoredItemStack> storedStacks = new ArrayList();
 		List<Entity> entityList = node.getEntities();
@@ -169,7 +187,7 @@ public class ItemHelper extends ItemWrapper {
 				}
 			}
 		}
-	
+
 		return null;
 	}
 
@@ -181,7 +199,7 @@ public class ItemHelper extends ItemWrapper {
 				if (tile != null && provider.canHandleItems(tile, entry.getValue())) {
 					return provider.getStack(slot, tile, entry.getValue());
 				}
-	
+
 			}
 		}
 		return null;

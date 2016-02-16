@@ -1,6 +1,7 @@
 package sonar.logistics.registries;
 
 import net.minecraft.block.Block;
+import net.minecraft.tileentity.TileEntity;
 import sonar.core.common.block.SonarBlockTip;
 import sonar.logistics.Logistics;
 import sonar.logistics.common.blocks.BlockChannelSelector;
@@ -56,7 +57,7 @@ public class BlockRegistry extends Logistics {
 		hammer = new BlockHammer().setBlockName("Hammer").setHardness(1.0F).setCreativeTab(Logistics.creativeTab).setResistance(20.0F).setBlockTextureName(modid + ":" + "hammer_break");
 		GameRegistry.registerBlock(hammer, SonarBlockTip.class, "Hammer");
 		GameRegistry.registerTileEntity(TileEntityHammer.class, "Hammer");
-
+		
 		hammer_air = new BlockHammerAir().setBlockName("Hammer_Air").setHardness(1.0F).setResistance(20.0F).setBlockTextureName(modid + ":" + "hammer_break");
 		GameRegistry.registerBlock(hammer_air, SonarBlockTip.class, "Hammer_Air");
 

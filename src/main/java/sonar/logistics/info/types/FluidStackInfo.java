@@ -48,12 +48,13 @@ public class FluidStackInfo extends Info<FluidStackInfo> {
 
 	@Override
 	public String getDisplayableData() {
+
 		return getData() + " mb";
 	}
 
 	@Override
 	public String getData() {
-		return (stack != null ? String.valueOf(stack.stored) : String.valueOf(0));
+		return (stack != null && stack.capacity != 0 ? String.valueOf(stack.stored) : String.valueOf(0));
 	}
 
 	@Override
@@ -89,26 +90,25 @@ public class FluidStackInfo extends Info<FluidStackInfo> {
 		IIcon icon = stack.fluid.getFluid().getIcon();
 		if (icon != null) {
 			Minecraft.getMinecraft().renderEngine.bindTexture(TextureMap.locationBlocksTexture);
-			
-			tess.startDrawingQuads();
 
+			tess.startDrawingQuads();
 			double divide = Math.max((0.5 + (maxX - minX)), (0.5 + (maxY - minY)));
 			double widthnew = (icon.getMinU() + (width * (icon.getMaxU() - icon.getMinU()) / divide));
 			double heightnew = (icon.getMinV() + ((maxY - minY) * (icon.getMaxV() - icon.getMinV()) / divide));
-			
-			double height = (maxY)/2;
+
+			double height = (maxY) / 2;
 			tess.addVertexWithUV((minX + 0), height, 0, icon.getMinU(), heightnew);
 			tess.addVertexWithUV((minX + width), height, 0, widthnew, heightnew);
 			tess.addVertexWithUV((minX + width), minY, 0, widthnew, icon.getMinV());
 			tess.addVertexWithUV((minX + 0), minY, 0, icon.getMinU(), icon.getMinV());
 			tess.draw();
-	
+
 		}
 
 		GL11.glTranslated(0, 0, -zOffset);
 		super.renderInfo(tess, tile, minX, minY, maxX, maxY, zOffset, scale);
 	}
-	
+
 	@Override
 	public FluidStackInfo instance() {
 		return new FluidStackInfo();
@@ -122,14 +122,15 @@ public class FluidStackInfo extends Info<FluidStackInfo> {
 			tag.setTag("wT", writeTag);
 			this.stack = currentInfo.stack;
 		} else {
+			if (currentInfo.stack.stored != stack.stored) {
+				stack.stored = currentInfo.stack.stored;
+				tag.setLong("s", stack.stored);
+			}
 			if (currentInfo.stack.capacity != stack.capacity) {
 				tag.setLong("c", currentInfo.stack.capacity);
 				stack.capacity = currentInfo.stack.capacity;
 			}
-			if (currentInfo.stack.stored != stack.stored) {
-				tag.setLong("s", currentInfo.stack.stored);
-				stack.stored = currentInfo.stack.stored;
-			}
+
 		}
 	}
 
@@ -138,11 +139,11 @@ public class FluidStackInfo extends Info<FluidStackInfo> {
 		if (tag.hasKey("wT")) {
 			this.readFromNBT(tag.getCompoundTag("wT"));
 		} else {
-			if (tag.hasKey("c")) {
-				stack.capacity = tag.getLong("c");
-			}
 			if (tag.hasKey("s")) {
 				stack.stored = tag.getLong("s");
+			}
+			if (tag.hasKey("c")) {
+				stack.capacity = tag.getLong("c");
 			}
 		}
 	}

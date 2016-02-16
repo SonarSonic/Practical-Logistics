@@ -26,7 +26,7 @@ public abstract class FluidHandler implements IRegistryObject {
 	public abstract boolean canHandleFluids(TileEntity tile, ForgeDirection dir);
 
 	/**only called if canProvideFluids is true*/
-	public abstract void getFluids(List<StoredFluidStack> fluids, TileEntity tile, ForgeDirection dir);	
+	public abstract boolean getFluids(List<StoredFluidStack> fluids, TileEntity tile, ForgeDirection dir);	
 
 	/**returns what wasn't added*/
 	public abstract StoredFluidStack addStack(StoredFluidStack add, TileEntity tile, ForgeDirection dir);

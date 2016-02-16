@@ -26,20 +26,21 @@ public class TankProvider extends FluidHandler {
 	}
 
 	@Override
-	public void getFluids(List<StoredFluidStack> fluids, TileEntity tile, ForgeDirection dir) {
+	public boolean getFluids(List<StoredFluidStack> fluids, TileEntity tile, ForgeDirection dir) {
 		if (tile instanceof IFluidHandler) {
 			IFluidHandler handler = (IFluidHandler) tile;
 			FluidTankInfo[] tankInfo = handler.getTankInfo(dir);
 			if (tankInfo != null) {
 				int tankNumber = 0;
 				for (FluidTankInfo info : tankInfo) {
-					if (info != null && info.fluid != null) {
+					if (info != null && info.fluid != null && info.fluid.amount != 0) {
 						fluids.add(new StoredFluidStack(info.fluid, info.capacity));
 					}
 				}
 			}
+			return true;
 		}
-
+		return false;
 	}
 
 	@Override

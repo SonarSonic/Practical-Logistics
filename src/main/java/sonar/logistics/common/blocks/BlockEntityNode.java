@@ -12,7 +12,8 @@ import sonar.logistics.network.LogisticsGui;
 public class BlockEntityNode extends BaseNode {
 
 	public BlockEntityNode() {
-		super(SonarMaterials.machine, false);
+		super(SonarMaterials.machine);
+		this.disableOrientation();
 	}
 
 	public boolean hasSpecialRenderer() {

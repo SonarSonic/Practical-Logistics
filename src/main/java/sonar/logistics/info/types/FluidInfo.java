@@ -18,7 +18,8 @@ public class FluidInfo extends StandardInfo {
 
 	public int fluidID = -1;
 
-	public FluidInfo() {}
+	public FluidInfo() {
+	}
 
 	public FluidInfo(int providerID, String category, String subCategory, Object data, int fluidID) {
 		super(providerID, category, subCategory, data);
@@ -58,7 +59,7 @@ public class FluidInfo extends StandardInfo {
 	@Override
 	public void renderInfo(Tessellator tess, TileEntity tile, float minX, float minY, float maxX, float maxY, float zOffset, float scale) {
 		FontRenderer rend = Minecraft.getMinecraft().fontRenderer;
-		GL11.glTranslated(0, 0, zOffset+0.002);
+		GL11.glTranslated(0, 0, zOffset + 0.002);
 		float width = (maxX - minX);
 		boolean renderNormal = true;
 		if (fluidID != -1) {
@@ -67,15 +68,15 @@ public class FluidInfo extends StandardInfo {
 				if (icon != null) {
 					renderNormal = false;
 					Minecraft.getMinecraft().renderEngine.bindTexture(TextureMap.locationBlocksTexture);
-					
+
 					tess.startDrawingQuads();
 
-					double divide = Math.max((0.5 +(maxX - minX)), (0.5+(maxY - minY)));
-					double widthnew = (icon.getMinU() + (width * (icon.getMaxU() - icon.getMinU())/divide));
-					double heightnew = (icon.getMinV() + (maxY * (icon.getMaxV() - icon.getMinV())/divide));
+					double divide = Math.max((0.5 + (maxX - minX)), (0.5 + (maxY - minY)));
+					double widthnew = (icon.getMinU() + (width * (icon.getMaxU() - icon.getMinU()) / divide));
+					double heightnew = (icon.getMinV() + (maxY * (icon.getMaxV() - icon.getMinV()) / divide));
 
-					tess.addVertexWithUV((minX + 0), maxY/2, 0, icon.getMinU(), heightnew);
-					tess.addVertexWithUV((minX + width), maxY/2, 0, widthnew, heightnew);
+					tess.addVertexWithUV((minX + 0), maxY / 2, 0, icon.getMinU(), heightnew);
+					tess.addVertexWithUV((minX + width), maxY / 2, 0, widthnew, heightnew);
 					tess.addVertexWithUV((minX + width), (minY + 0), 0, widthnew, icon.getMinV());
 					tess.addVertexWithUV((minX + 0), (minY + 0), 0, icon.getMinU(), icon.getMinV());
 

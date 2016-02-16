@@ -5,7 +5,9 @@ import java.util.List;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.inventory.StoredItemStack;
+import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.providers.InventoryHandler;
+import sonar.logistics.integration.AE2Helper;
 import appeng.api.AEApi;
 import appeng.api.config.Actionable;
 import appeng.api.implementations.tiles.ITileStorageMonitorable;
@@ -40,11 +42,10 @@ public class AE2InventoryProvider extends InventoryHandler {
 		int current = 0;
 		for (IAEItemStack item : items) {
 			if (current == slot) {
-				return new StoredItemStack(item.getItemStack(), item.getStackSize());
+				return AE2Helper.convertAEItemStack(item);
 			}
 			current++;
 		}
-
 		return null;
 	}
 
@@ -55,7 +56,7 @@ public class AE2InventoryProvider extends InventoryHandler {
 			return false;
 		}
 		for (IAEItemStack item : items) {
-			storedStacks.add(new StoredItemStack(item.getItemStack(), item.getStackSize()));
+			LogisticsAPI.getItemHelper().addStackToList(storedStacks, AE2Helper.convertAEItemStack(item));
 		}
 		return true;
 	}
@@ -67,7 +68,6 @@ public class AE2InventoryProvider extends InventoryHandler {
 			IItemList<IAEItemStack> items = stacks.getAvailableItems(AEApi.instance().storage().createItemList());
 			return items;
 		}
-
 		return null;
 	}
 
@@ -80,25 +80,25 @@ public class AE2InventoryProvider extends InventoryHandler {
 		IStorageMonitorable monitor = ((ITileStorageMonitorable) tile).getMonitorable(dir, new MachineSource(((IActionHost) tile)));
 		if (monitor != null) {
 			IMEMonitor<IAEItemStack> stacks = monitor.getItemInventory();
-			IAEItemStack stack = stacks.injectItems(AEApi.instance().storage().createItemStack(add.item).setStackSize(add.stored), Actionable.MODULATE, new MachineSource(((IActionHost) tile)));
-			if (stack==null || stack.getStackSize() == 0) {
+			IAEItemStack stack = stacks.injectItems(AE2Helper.convertStoredItemStack(add), Actionable.MODULATE, new MachineSource(((IActionHost) tile)));
+			if (stack == null || stack.getStackSize() == 0) {
 				return null;
 			}
-			return new StoredItemStack(stack.getItemStack(), stack.getStackSize());
+			return AE2Helper.convertAEItemStack(stack);
 		}
 		return add;
 	}
 
 	@Override
-	public StoredItemStack removeStack(StoredItemStack remove, TileEntity tile, ForgeDirection dir) {		
+	public StoredItemStack removeStack(StoredItemStack remove, TileEntity tile, ForgeDirection dir) {
 		IStorageMonitorable monitor = ((ITileStorageMonitorable) tile).getMonitorable(dir, new MachineSource(((IActionHost) tile)));
 		if (monitor != null) {
 			IMEMonitor<IAEItemStack> stacks = monitor.getItemInventory();
 			IAEItemStack stack = stacks.extractItems(AEApi.instance().storage().createItemStack(remove.item).setStackSize(remove.stored), Actionable.MODULATE, new MachineSource(((IActionHost) tile)));
-			if (stack.getStackSize() == 0) {
+			if (stack == null || stack.getStackSize() == 0) {
 				return remove;
 			}
-			return new StoredItemStack(stack.getItemStack(), remove.stored-stack.getStackSize());
+			return new StoredItemStack(stack.getItemStack(), remove.stored - stack.getStackSize());
 		}
 		return remove;
 	}

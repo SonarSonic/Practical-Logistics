@@ -7,13 +7,13 @@ import net.minecraftforge.fluids.FluidStack;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.ITileHandler;
 import sonar.core.integration.fmp.handlers.TileHandler;
-import sonar.core.network.PacketTileEntity;
+import sonar.core.network.PacketCoords;
 import sonar.core.network.PacketTileEntityHandler;
 import sonar.logistics.common.handlers.FluidReaderHandler;
 import cpw.mods.fml.common.network.ByteBufUtils;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 
-public class PacketFluidReader extends PacketTileEntity {
+public class PacketFluidReader extends PacketCoords {
 
 	public FluidStack selected;
 

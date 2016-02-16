@@ -6,13 +6,13 @@ import net.minecraft.tileentity.TileEntity;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.ITileHandler;
 import sonar.core.integration.fmp.handlers.TileHandler;
-import sonar.core.network.PacketTileEntity;
+import sonar.core.network.PacketCoords;
 import sonar.core.network.PacketTileEntityHandler;
 import sonar.logistics.common.handlers.InventoryReaderHandler;
 import cpw.mods.fml.common.network.ByteBufUtils;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 
-public class PacketInventoryReader extends PacketTileEntity {
+public class PacketInventoryReader extends PacketCoords {
 
 	public ItemStack selected;
 

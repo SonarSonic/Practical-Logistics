@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.network.play.server.S2FPacketSetSlot;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.FluidContainerRegistry;
@@ -43,66 +45,37 @@ public class FluidReaderHandler extends TileHandler {
 		stacks = LogisticsAPI.getFluidHelper().getFluids(LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite()));
 	}
 
-	public void extractFluid(EntityPlayer player, TileEntity te) {
+	public void fillItemStack(EntityPlayer player, TileEntity te, StoredFluidStack storedStack) {
 		ItemStack heldItem = player.getHeldItem();
-		if (heldItem == null) {
+		if (heldItem == null || storedStack == null) {
 			return;
 		}
-		if (FluidContainerRegistry.isContainer(heldItem)) {
-			if (FluidContainerRegistry.isFilledContainer(heldItem)) {
-				FluidStack stack = FluidContainerRegistry.getFluidForFilledItem(heldItem);
-				int extractSize = FluidContainerRegistry.getContainerCapacity(heldItem) - stack.amount;
-				stack.amount=extractSize;
-				StoredFluidStack storedStack = new StoredFluidStack(stack);
-				if (extractSize != 0) {
-					StoredFluidStack remainder = LogisticsAPI.getFluidHelper().removeFluids(storedStack, LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite()));
-					// StoredItemStack storedStack = null;
-					if (remainder == null || remainder.stored == 0) {
-						FluidStack fillStack =stack.copy();
-						fillStack.amount=extractSize;
-						FluidContainerRegistry.fillFluidContainer(fillStack, heldItem);
-					} else {
-						FluidStack fillStack =stack.copy();
-						fillStack.amount=(int) (extractSize-remainder.stored);
-						FluidContainerRegistry.fillFluidContainer(fillStack, heldItem);
-					}
-				}
-			}else{
-				//fill with available fluid
-			}
-		}
-		if(heldItem.getItem() instanceof IFluidContainerItem){
-			IFluidContainerItem container = (IFluidContainerItem) heldItem.getItem();
-			if(container.getFluid(heldItem)!=null){
-				FluidStack stack = container.getFluid(heldItem);
-				int extractSize = container.getCapacity(heldItem)- stack.amount;
-				stack.amount=extractSize;
-				StoredFluidStack storedStack = new StoredFluidStack(stack);
-				if (extractSize != 0) {
-					StoredFluidStack remainder = LogisticsAPI.getFluidHelper().removeFluids(storedStack, LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite()));
-				
-					FluidStack fillStack = stack.copy();
-					if (remainder == null || remainder.stored == 0) {
-						fillStack.amount=extractSize;
-					} else {						
-						fillStack.amount=(int) (extractSize-remainder.stored);
-					}
-					container.fill(heldItem, fillStack, true);
+		if (heldItem.stackSize == 1) {
+			player.inventory.setInventorySlotContents(player.inventory.currentItem, LogisticsAPI.getFluidHelper().fillFluidItemStack(heldItem, storedStack, LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite())));
+		} else {
+			int slot = player.inventory.getFirstEmptyStack();
+			if (slot != -1) {
+				ItemStack insert = heldItem.copy();
+				insert.stackSize = 1;
+				ItemStack toAdd = LogisticsAPI.getFluidHelper().fillFluidItemStack(insert, storedStack, LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite()));
+
+				if (!ItemStack.areItemStacksEqual(insert, toAdd) || !ItemStack.areItemStackTagsEqual(heldItem, toAdd)) {
+					player.inventory.decrStackSize(player.inventory.currentItem, 1);
+					player.inventory.setInventorySlotContents(slot, toAdd);
+					((EntityPlayerMP) player).playerNetServerHandler.sendPacket(new S2FPacketSetSlot(player.openContainer.windowId, slot, toAdd));
 				}
 			}
 		}
 	}
 
-	public void insertItem(EntityPlayer player, TileEntity te, ItemStack add) {
-		StoredItemStack stack = LogisticsAPI.getItemHelper().addItems(new StoredItemStack(add), LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite()));
-
-		if (stack == null || stack.stored == 0) {
-			add = null;
-		} else {
-			add.stackSize = (int) stack.stored;
+	public void emptyFluid(EntityPlayer player, TileEntity te, ItemStack add) {
+		ItemStack heldItem = player.getHeldItem();
+		if (heldItem == null) {
+			return;
 		}
-		if (!ItemStack.areItemStacksEqual(add, player.getHeldItem())) {
-			player.inventory.setInventorySlotContents(player.inventory.currentItem, add);
+		ItemStack empty = LogisticsAPI.getFluidHelper().drainFluidItemStack(heldItem, LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite()));
+		if (!player.capabilities.isCreativeMode) {
+			player.inventory.setInventorySlotContents(player.inventory.currentItem, empty);
 		}
 	}
 

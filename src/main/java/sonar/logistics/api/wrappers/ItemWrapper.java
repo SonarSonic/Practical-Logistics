@@ -50,7 +50,7 @@ public class ItemWrapper {
 	 * @param list {@link StoredItemStack} list to add to
 	 * @param stack {@link StoredItemStack} to combine
 	 */
-	public void addStackToList(List<StoredItemStack> list, ItemStack stack) {
+	public void addStackToList(List<StoredItemStack> list, StoredItemStack stack) {
 	}
 	
 	/**used for adding Items to the network

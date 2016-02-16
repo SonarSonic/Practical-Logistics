@@ -5,7 +5,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.handlers.TileHandler;
-import sonar.core.network.PacketTileEntity;
+import sonar.core.network.PacketCoords;
 import sonar.core.network.PacketTileEntityHandler;
 import sonar.logistics.api.IdentifiedCoords;
 import sonar.logistics.common.handlers.ChannelSelectorHandler;
@@ -13,7 +13,7 @@ import sonar.logistics.common.tileentity.TileEntityDataReceiver;
 import cpw.mods.fml.common.network.ByteBufUtils;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 
-public class PacketCoordsSelection extends PacketTileEntity {
+public class PacketCoordsSelection extends PacketCoords {
 
 	public IdentifiedCoords coords;
 

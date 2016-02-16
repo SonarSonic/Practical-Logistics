@@ -8,6 +8,7 @@ import net.minecraft.tileentity.TileEntity;
 import sonar.core.inventory.ContainerSync;
 import sonar.core.inventory.slots.SlotList;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
+import sonar.logistics.common.containers.slots.NetworkSlot;
 import sonar.logistics.common.handlers.InventoryReaderHandler;
 
 public class ContainerInventoryReader extends ContainerSync {
@@ -35,6 +36,11 @@ public class ContainerInventoryReader extends ContainerSync {
 		for (int i = 0; i < 9; ++i) {
 			this.addSlotToContainer(new Slot(inventoryPlayer, i, 41 + i * 18, 232));
 		}
+		for (int i = 0; i < 7; ++i) {
+			for (int j = 0; j < 12; ++j) {
+				this.addSlotToContainer(new NetworkSlot(handler, tile, j + i * 12, 13 + j * 18, 32 + i * 18));
+			}
+		}
 		if (hasStack)
 			addSlotToContainer(new SlotList(handler, 0, 103, 9));
 	}
@@ -48,11 +54,27 @@ public class ContainerInventoryReader extends ContainerSync {
 		ItemStack itemstack = null;
 		Slot slot = (Slot) this.inventorySlots.get(id);
 		if (slot != null && slot.getHasStack()) {
-			ItemStack itemstack1 = slot.getStack();
+			ItemStack itemstack1 = null;
+			if (slot instanceof NetworkSlot) {
+				itemstack1 = ((NetworkSlot) slot).getStoredStack().getFullStack();
+			} else {
+				itemstack1 = slot.getStack();
+			}
 			itemstack = itemstack1.copy();
-			if (stackMode && id < 36) {
-				((Slot) this.inventorySlots.get(36)).putStack(itemstack1.copy());
+			if (id < 36) {
+				// ((Slot)
+				// this.inventorySlots.get(36)).putStack(itemstack1.copy());
+				// handler.insertItem(player, tile, slot.getSlotIndex());
 
+				if (!tile.getWorldObj().isRemote) {
+					return null;
+				}
+				if (!this.mergeItemStack(itemstack1, 37, 121, false)) {
+					return null;
+				}
+				if (slot instanceof NetworkSlot) {
+					return ((NetworkSlot) slot).getStoredStack().getFullStack();
+				}
 			} else if (id < 27) {
 				if (!this.mergeItemStack(itemstack1, 27, 36, false)) {
 					return null;

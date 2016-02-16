@@ -2,10 +2,13 @@ package sonar.logistics.common.handlers;
 
 import io.netty.buffer.ByteBuf;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -17,6 +20,7 @@ import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.inventory.StoredItemStack;
 import sonar.core.network.utils.IByteBufTile;
 import sonar.core.utils.BlockCoords;
+import sonar.core.utils.BlockInteraction;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.Info;
@@ -24,6 +28,7 @@ import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.StandardInfo;
 import sonar.logistics.api.connecting.IInfoEmitter;
 import sonar.logistics.api.connecting.IInfoReader;
+import sonar.logistics.info.types.FluidStackInfo;
 import sonar.logistics.info.types.InventoryInfo;
 import sonar.logistics.info.types.StoredStackInfo;
 import sonar.logistics.registries.DisplayRegistry;
@@ -36,15 +41,28 @@ public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 	public Info info;
 	public Info updateInfo;
 
+	public int updateTicks, updateTime = 20;
+
+	private long lastClickTime;
+	private UUID lastClickUUID;
+
 	public DisplayScreenHandler(boolean isMultipart, TileEntity tile) {
 		super(isMultipart, tile);
 	}
 
 	@Override
 	public void update(TileEntity te) {
-		if (!te.getWorldObj().isRemote) {
-			this.updateData(te, te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)));
+		if (te.getWorldObj().isRemote) {
+			return;
 		}
+		this.updateData(te, te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)));
+
+		System.out.print("packet");
+		if (updateTicks == updateTime){
+			updateTicks = 0;
+			SonarCore.sendPacketAround(te, 64, 0);
+		}else
+			updateTicks++;
 	}
 
 	public void updateData(TileEntity te, TileEntity packetTile, ForgeDirection dir) {
@@ -113,7 +131,14 @@ public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 		}
 	}
 
-	public void screenClicked(World world, EntityPlayer player, int x, int y, int z, ForgeDirection side, float hitx, float hity, float hitz) {
+	public void screenClicked(World world, EntityPlayer player, int x, int y, int z, ForgeDirection side, float hitx, float hity, float hitz, BlockInteraction interact) {
+		boolean doubleClick = false;
+		if (world.getTotalWorldTime() - lastClickTime < 10 && player.getPersistentID().equals(lastClickUUID)) {
+			doubleClick = true;
+		}
+		lastClickTime = world.getTotalWorldTime();
+		lastClickUUID = player.getPersistentID();
+
 		TileEntity te = world.getTileEntity(x, y, z);
 		TileHandler teHandler = FMPHelper.getHandler(te);
 		BlockCoords handlerCoords = null;
@@ -144,21 +169,37 @@ public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 			}
 			if (target instanceof InventoryReaderHandler) {
 				InventoryReaderHandler handler = (InventoryReaderHandler) target;
-				if (side == ForgeDirection.getOrientation(FMPHelper.getMeta(te)) && screenInfo != null) {
+				if (side == ForgeDirection.getOrientation(FMPHelper.getMeta(te))) {
 					if (screenInfo instanceof StoredStackInfo) {
 						StoredStackInfo storedInfo = (StoredStackInfo) screenInfo;
-						if (player.getHeldItem() != null && storedInfo.stack.equalStack(player.getHeldItem())) {
-							handler.insertItem(player, readerTile, player.getHeldItem().copy());
-						} else {
-							StoredItemStack extract = handler.extractItem( readerTile, storedInfo.stack);
+						if (interact == BlockInteraction.RIGHT) {
+							if (player.getHeldItem() != null && storedInfo.stack.equalStack(player.getHeldItem())) {
+								if (!doubleClick) {
+									handler.insertItem(player, readerTile, player.inventory.currentItem);
+								} else {
+									handler.insertInventory(player, readerTile, player.inventory.currentItem);
+								}
+
+							}
+						} else if (interact != BlockInteraction.SHIFT_RIGHT) {
+							StoredItemStack extract = handler.extractItem(readerTile, storedInfo.stack, interact == BlockInteraction.LEFT ? 1 : 64);
 							if (extract != null) {
 								spawnStoredItemStack(extract, world, x, y, z, side);
 							}
 						}
 					} else if (screenInfo instanceof InventoryInfo) {
 						InventoryInfo invInfo = (InventoryInfo) screenInfo;
-						if (player.getHeldItem() != null) {
-							handler.insertItem(player, readerTile, player.getHeldItem().copy());
+						if (interact == BlockInteraction.RIGHT || interact == BlockInteraction.SHIFT_RIGHT) {
+							if (interact == BlockInteraction.RIGHT) {
+								if (player.getHeldItem() != null) {
+									if (!doubleClick) {
+										handler.insertItem(player, readerTile, player.inventory.currentItem);
+									} else {
+										handler.insertInventory(player, readerTile, player.inventory.currentItem);
+									}
+								}
+							} else if (interact == BlockInteraction.SHIFT_RIGHT) {
+							}
 						} else if (teHandler instanceof LargeDisplayScreenHandler) {
 							LargeDisplayScreenHandler largeScreen = (LargeDisplayScreenHandler) teHandler;
 							if (largeScreen.sizing != null) {
@@ -196,12 +237,19 @@ public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 									slot = ((ySlot * hSlots) + hSlot) + (ySlot * 2) - largeScreen.sizing.maxH * 2;
 								}
 								if (slot != -1 && slot < invInfo.stacks.size()) {
-									StoredItemStack extract = handler.extractItem(readerTile, invInfo.stacks.get(slot));
+									StoredItemStack extract = handler.extractItem(readerTile, invInfo.stacks.get(slot), interact == BlockInteraction.LEFT ? 1 : 64);
 									if (extract != null) {
 										spawnStoredItemStack(extract, world, x, y, z, side);
 									}
 								}
+
 							}
+						}
+					} else if (player.getHeldItem() != null) {
+						if (!doubleClick) {
+							handler.insertItem(player, readerTile, player.inventory.currentItem);
+						} else {
+							handler.insertInventory(player, readerTile, player.inventory.currentItem);
 						}
 					}
 
@@ -209,13 +257,17 @@ public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 			}
 			if (target instanceof FluidReaderHandler) {
 				FluidReaderHandler handler = (FluidReaderHandler) target;
-				if(player.getHeldItem()!=null){
-					handler.extractFluid(player, readerTile);
+				if (screenInfo instanceof FluidStackInfo) {
+					FluidStackInfo info = (FluidStackInfo) screenInfo;
+					if (interact == BlockInteraction.RIGHT) {
+						handler.emptyFluid(player, readerTile, player.getHeldItem());
+					} else if (interact == BlockInteraction.LEFT) {
+						handler.fillItemStack(player, readerTile, info.stack);
+					}
 				}
 			}
 		}
 	}
-
 
 	public void spawnStoredItemStack(StoredItemStack stack, World world, int x, int y, int z, ForgeDirection side) {
 		EntityItem dropStack = new EntityItem(world, x + 0.5, (double) y + 0.5, z + 0.5, stack.getFullStack());
@@ -251,11 +303,6 @@ public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 			currenttip.add("Current Data: " + info.getDisplayableData());
 		}
 		return currenttip;
-	}
-
-	@Override
-	public void removed(World world, int x, int y, int z, int meta) {
-
 	}
 
 	@Override

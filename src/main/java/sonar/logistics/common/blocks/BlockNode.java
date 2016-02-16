@@ -13,7 +13,8 @@ import sonar.core.utils.helpers.SonarHelper;
 public class BlockNode extends BaseNode {
 
 	public BlockNode(){
-		super(SonarMaterials.machine,false);
+		super(SonarMaterials.machine);
+		this.disableOrientation();
 		float f = 0.0625F;
 		this.setBlockBounds(0.0F+f, 0.0F, 0.0F+f, 1F-f, 0.4F, 1F-f);
 	}

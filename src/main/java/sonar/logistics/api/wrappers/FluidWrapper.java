@@ -3,6 +3,7 @@ package sonar.logistics.api.wrappers;
 import java.util.Collections;
 import java.util.List;
 
+import net.minecraft.item.ItemStack;
 import sonar.core.fluid.StoredFluidStack;
 import sonar.core.utils.BlockCoords;
 import sonar.logistics.api.providers.FluidHandler;
@@ -37,5 +38,13 @@ public class FluidWrapper {
 	 */
 	public StoredFluidStack removeFluids(StoredFluidStack remove, List<BlockCoords> network) {
 		return remove;
+	}
+
+	public ItemStack fillFluidItemStack(ItemStack container, StoredFluidStack fill, List<BlockCoords> network){
+		return container;
+	}
+	
+	public ItemStack drainFluidItemStack(ItemStack container, List<BlockCoords> network) {
+		return container;
 	}
 }

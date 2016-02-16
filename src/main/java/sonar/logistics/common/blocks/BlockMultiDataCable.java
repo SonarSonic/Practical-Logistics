@@ -10,6 +10,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.common.block.SonarMachineBlock;
 import sonar.core.common.block.SonarMaterials;
+import sonar.core.utils.BlockInteraction;
 import sonar.logistics.common.tileentity.TileEntityMultiDataCable;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -17,7 +18,8 @@ import cpw.mods.fml.relauncher.SideOnly;
 public class BlockMultiDataCable extends SonarMachineBlock {
 
 	public BlockMultiDataCable() {
-		super(SonarMaterials.machine, false);
+		super(SonarMaterials.machine);
+		this.disableOrientation();
 		this.setBlockBounds((float) 0.0625 * 3, (float) 0.0625 * 3, (float) 0.0625 * 3, (float) (1 - (0.0625 * 3)), (float) (1 - (0.0625 * 3)), (float) (1 - (0.0625 * 3)));
 	}
 
@@ -27,7 +29,7 @@ public class BlockMultiDataCable extends SonarMachineBlock {
 	}
 
 	@Override
-	public boolean operateBlock(World world, int x, int y, int z, EntityPlayer player, int side, float hitx, float hity, float hitz) {
+	public boolean operateBlock(World world, int x, int y, int z, EntityPlayer player, int side, float hitx, float hity, float hitz, BlockInteraction interact) {
 		return false;
 	}
 
