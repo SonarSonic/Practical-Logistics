@@ -18,6 +18,7 @@ import sonar.core.utils.helpers.RenderHelper;
 import sonar.logistics.api.IdentifiedCoords;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.LogisticsAPI;
+import sonar.logistics.api.render.ScreenType;
 import sonar.logistics.client.renderers.RenderHandlers;
 
 public class StoredEnergyInfo extends Info<StoredEnergyInfo> {
@@ -92,7 +93,7 @@ public class StoredEnergyInfo extends Info<StoredEnergyInfo> {
 	}
 
 	@Override
-	public void renderInfo(Tessellator tess, TileEntity tile, float minX, float minY, float maxX, float maxY, float zOffset, float scale) {
+	public void renderInfo(Tessellator tess, TileEntity tile, float minX, float minY, float maxX, float maxY, float zOffset, ScreenType type) {
 		GL11.glTranslated(0, 0, zOffset + 0.002);
 		float width = stack.stored * (maxX - minX) / stack.capacity;
 		Minecraft.getMinecraft().renderEngine.bindTexture(progress);
@@ -102,7 +103,7 @@ public class StoredEnergyInfo extends Info<StoredEnergyInfo> {
 		FontRenderer rend = Minecraft.getMinecraft().fontRenderer;
 		GL11.glTranslatef(minX + (maxX - minX) / 2, minY + (maxY - minY) / 2, 0.01f);
 		int sizing = (int) Math.round(Math.min((maxX - minX), (maxY - minY) * 1.5));
-		GL11.glTranslatef(0.0f, (float) (scale >= 120 ? -0.1F : -0.31F + ((sizing - 1) * -0.04)), zOffset);
+		GL11.glTranslatef(0.0f, (float) (type.isNormalSize() ? -0.1F : -0.31F + ((sizing - 1) * -0.04)), zOffset);
 		double itemScale = sizing >= 2 ? LogisticsAPI.getInfoRenderer().getScale(sizing) : 120;
 		GL11.glScaled(1.0f / itemScale, 1.0f / itemScale, 1.0f / itemScale);
 		String coordString = coords.block.getDisplayName();

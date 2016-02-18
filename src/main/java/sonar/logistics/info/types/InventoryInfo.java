@@ -20,6 +20,7 @@ import sonar.core.inventory.StoredItemStack;
 import sonar.core.utils.helpers.FontHelper;
 import sonar.core.utils.helpers.RenderHelper;
 import sonar.logistics.api.Info;
+import sonar.logistics.api.render.ScreenType;
 import cpw.mods.fml.common.network.ByteBufUtils;
 
 public class InventoryInfo extends Info<InventoryInfo> {
@@ -107,16 +108,15 @@ public class InventoryInfo extends Info<InventoryInfo> {
 	}
 
 	@Override
-	public void renderInfo(Tessellator tess, TileEntity tile, float minX, float minY, float maxX, float maxY, float zOffset, float scale) {
+	public void renderInfo(Tessellator tess, TileEntity tile, float minX, float minY, float maxX, float maxY, float zOffset, ScreenType type) {
 
 		if (stacks != null) {
 			int xSlots = Math.round(maxX - minX) * 2;
 			int ySlots = (int) (Math.round(maxY - minY) * 2);
-			if (scale == 120) {
+			if (type.isNormalSize()) {
 				xSlots = 2;
 				ySlots = 1;
 			}
-
 			int currentSlot = 0;
 
 			if (stacks != null) {
@@ -145,7 +145,7 @@ public class InventoryInfo extends Info<InventoryInfo> {
 								GL11.glEnable(GL11.GL_CULL_FACE);
 								tess.setColorOpaque_F(1.0f, 1.0f, 1.0f);
 								double sizing = Math.round(Math.min((maxX - minX), (maxY - minY)));
-								double itemScale = sizing >= 2 ? (2.5F + sizing - 1 * 1.0F) : scale >= 120 ? 0.8F : 1.4F;
+								double itemScale = sizing >= 2 ? (2.5F + sizing - 1 * 1.0F) : type.isNormalSize() ? 0.8F : 1.4F;
 
 								GL11.glTranslatef(xLevel * spacing, yLevel * spacing, 0);
 								RenderHelper.doRenderItem(stack.item, tile.getWorldObj(), false);

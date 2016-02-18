@@ -13,6 +13,7 @@ import org.lwjgl.opengl.GL11;
 
 import sonar.core.fluid.StoredFluidStack;
 import sonar.logistics.api.Info;
+import sonar.logistics.api.render.ScreenType;
 import cpw.mods.fml.common.network.ByteBufUtils;
 
 public class FluidStackInfo extends Info<FluidStackInfo> {
@@ -83,7 +84,7 @@ public class FluidStackInfo extends Info<FluidStackInfo> {
 	}
 
 	@Override
-	public void renderInfo(Tessellator tess, TileEntity tile, float minX, float minY, float maxX, float maxY, float zOffset, float scale) {
+	public void renderInfo(Tessellator tess, TileEntity tile, float minX, float minY, float maxX, float maxY, float zOffset, ScreenType type) {
 		FontRenderer rend = Minecraft.getMinecraft().fontRenderer;
 		GL11.glTranslated(0, 0, zOffset);
 		float width = stack.stored * (maxX - minX) / stack.capacity;
@@ -106,7 +107,7 @@ public class FluidStackInfo extends Info<FluidStackInfo> {
 		}
 
 		GL11.glTranslated(0, 0, -zOffset);
-		super.renderInfo(tess, tile, minX, minY, maxX, maxY, zOffset, scale);
+		super.renderInfo(tess, tile, minX, minY, maxX, maxY, zOffset, type);
 	}
 
 	@Override

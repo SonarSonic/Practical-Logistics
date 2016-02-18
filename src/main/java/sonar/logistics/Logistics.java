@@ -23,6 +23,7 @@ import sonar.logistics.registries.CableRegistry;
 import sonar.logistics.registries.CraftingRegistry;
 import sonar.logistics.registries.EmitterRegistry;
 import sonar.logistics.registries.EventRegistry;
+import sonar.logistics.registries.InfoInteractionRegistry;
 import sonar.logistics.registries.InfoTypeRegistry;
 import sonar.logistics.registries.ItemFilterRegistry;
 import sonar.logistics.registries.ItemRegistry;
@@ -55,6 +56,7 @@ public class Logistics {
 	public static Logger logger = (Logger) LogManager.getLogger(modid);
 
 	public static InfoTypeRegistry infoTypes = new InfoTypeRegistry();
+	public static InfoInteractionRegistry infoInteraction = new InfoInteractionRegistry();
 	public static ItemFilterRegistry itemFilters = new ItemFilterRegistry();
 	public static TileProviderRegistry tileProviders = new TileProviderRegistry();
 	public static EntityProviderRegistry entityProviders = new EntityProviderRegistry();
@@ -136,6 +138,7 @@ public class Logistics {
 	@EventHandler
 	public void postLoad(FMLPostInitializationEvent evt) {
 		infoTypes.register();
+		infoInteraction.register();
 		itemFilters.register();
 		tileProviders.register();
 		entityProviders.register();
@@ -143,6 +146,7 @@ public class Logistics {
 		fluidProviders.register();
 		energyProviders.register();
 		logger.info("Registered " + infoTypes.getObjects().size() + " Info Types");
+		logger.info("Registered " + infoInteraction.getObjects().size() + " Info Interactions");
 		logger.info("Registered " + itemFilters.getObjects().size() + " Item Filters");
 		logger.info("Registered " + tileProviders.getObjects().size() + " Tile Providers");
 		logger.info("Registered " + entityProviders.getObjects().size() + " Entity Providers");

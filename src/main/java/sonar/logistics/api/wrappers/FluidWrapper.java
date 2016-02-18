@@ -5,6 +5,7 @@ import java.util.List;
 
 import net.minecraft.item.ItemStack;
 import sonar.core.fluid.StoredFluidStack;
+import sonar.core.utils.ActionType;
 import sonar.core.utils.BlockCoords;
 import sonar.logistics.api.providers.FluidHandler;
 
@@ -28,7 +29,7 @@ public class FluidWrapper {
 	 * @param network current coordinates of the network
 	 * @return remaining {@link StoredFluidStack} (what wasn't added), can be null
 	 */
-	public StoredFluidStack addFluids(StoredFluidStack add, List<BlockCoords> network) {
+	public StoredFluidStack addFluids(StoredFluidStack add, List<BlockCoords> network, ActionType action) {
 		return add;
 	}
 	/**used for removing Fluids from the network
@@ -36,15 +37,15 @@ public class FluidWrapper {
 	 * @param network current coordinates of the network
 	 * @return remaining {@link StoredFluidStack} (what wasn't removed), can be null
 	 */
-	public StoredFluidStack removeFluids(StoredFluidStack remove, List<BlockCoords> network) {
+	public StoredFluidStack removeFluids(StoredFluidStack remove, List<BlockCoords> network, ActionType action) {
 		return remove;
 	}
 
-	public ItemStack fillFluidItemStack(ItemStack container, StoredFluidStack fill, List<BlockCoords> network){
+	public ItemStack fillFluidItemStack(ItemStack container, StoredFluidStack fill, List<BlockCoords> network, ActionType action){
 		return container;
 	}
 	
-	public ItemStack drainFluidItemStack(ItemStack container, List<BlockCoords> network) {
+	public ItemStack drainFluidItemStack(ItemStack container, List<BlockCoords> network, ActionType action) {
 		return container;
 	}
 }

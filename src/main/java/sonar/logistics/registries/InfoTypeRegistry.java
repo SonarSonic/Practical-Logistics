@@ -7,6 +7,7 @@ import sonar.logistics.api.StandardInfo;
 import sonar.logistics.info.types.BlockCoordsInfo;
 import sonar.logistics.info.types.CategoryInfo;
 import sonar.logistics.info.types.FluidInfo;
+import sonar.logistics.info.types.FluidInventoryInfo;
 import sonar.logistics.info.types.FluidStackInfo;
 import sonar.logistics.info.types.InventoryInfo;
 import sonar.logistics.info.types.ManaInfo;
@@ -31,6 +32,7 @@ public class InfoTypeRegistry extends NBTRegistryHelper.Buf<Info> {
 		registerObject(new FluidStackInfo());
 		registerObject(new InventoryInfo());
 		registerObject(new StoredEnergyInfo());
+		registerObject(new FluidInventoryInfo());
 
 	}
 

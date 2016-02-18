@@ -3,6 +3,7 @@ package sonar.logistics.api.wrappers;
 import net.minecraft.client.gui.FontRenderer;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.StandardInfo;
+import sonar.logistics.api.render.ScreenType;
 
 public class RenderWrapper {
 
@@ -14,9 +15,9 @@ public class RenderWrapper {
 	 * @param maxX screen finish X
 	 * @param maxY screen finish Y
 	 * @param zOffset screen offset
-	 * @param scale screen scaling
+	 * @param type screen scaling
 	 */
-	public void renderStandardInfo(Info info, FontRenderer rend, float minX, float minY, float maxX, float maxY, float zOffset, float scale) {}
+	public void renderStandardInfo(Info info, FontRenderer rend, float minX, float minY, float maxX, float maxY, float zOffset, ScreenType type) {}
 
 	/**renders a string in the centre of the screen
 	 * @param string {@link String} to render
@@ -25,10 +26,18 @@ public class RenderWrapper {
 	 * @param maxX screen finish X
 	 * @param maxY screen finish Y
 	 * @param zOffset screen offset
-	 * @param scale screen scaling
+	 * @param type screen scaling
 	 */
-	public void renderCenteredString(String string, float minX, float minY, float maxX, float maxY, float scale) {}
+	public void renderCenteredString(String string, float minX, float minY, float maxX, float maxY, ScreenType type) {}
 
+	/**gets the appropriate scaling for the given {@link ScreenType}
+	 * @param type the {@link ScreenType}
+	 * @return float value for scale
+	 */
+	public float getScaling(ScreenType type) {
+		return 120F;
+	}
+	
 	/**get the screen scaling for a given size 
 	 * @param sizing screen size
 	 * @return scale

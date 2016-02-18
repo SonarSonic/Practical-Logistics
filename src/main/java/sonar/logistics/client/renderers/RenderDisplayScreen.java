@@ -15,6 +15,7 @@ import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.utils.helpers.RenderHelper;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.connecting.IInfoTile;
+import sonar.logistics.api.render.ScreenType;
 import sonar.logistics.integration.multipart.DisplayScreenPart;
 import codechicken.multipart.TileMultipart;
 import cpw.mods.fml.relauncher.Side;
@@ -136,7 +137,7 @@ public class RenderDisplayScreen extends TileEntitySpecialRenderer {
 	public void renderInfo(Tessellator tess, TileEntity tile, ForgeDirection side, Info info) {
 		float pixel = 1.0F / 16F;
 		//GL11.glTranslatef(0.0F, -0.03F, 0F);
-		info.renderInfo(tess, tile, -0.5F + pixel-0.001f, -pixel*3-0.001f, (1.0f - (pixel) * 9)+0.001f, (pixel * 5)+0.061f, -0.207F, 120F);
+		info.renderInfo(tess, tile, -0.5F + pixel-0.001f, -pixel*3-0.001f, (1.0f - (pixel) * 9)+0.001f, (pixel * 5)+0.061f, -0.207F, ScreenType.NORMAL);
 
 	}
 

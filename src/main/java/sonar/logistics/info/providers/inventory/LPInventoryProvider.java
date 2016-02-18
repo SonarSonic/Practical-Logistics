@@ -6,10 +6,12 @@ import java.util.List;
 import logisticspipes.api.ILPPipe;
 import logisticspipes.api.ILPPipeTile;
 import logisticspipes.api.IRequestAPI;
+import logisticspipes.api.IRequestAPI.SimulationResult;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.inventory.StoredItemStack;
+import sonar.core.utils.ActionType;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.providers.InventoryHandler;
 import cpw.mods.fml.common.Loader;
@@ -25,7 +27,7 @@ public class LPInventoryProvider extends InventoryHandler {
 
 	@Override
 	public boolean canHandleItems(TileEntity tile, ForgeDirection dir) {
-		return tile != null && tile instanceof ILPPipeTile;
+		return tile instanceof ILPPipeTile;
 	}
 
 	@Override
@@ -66,13 +68,39 @@ public class LPInventoryProvider extends InventoryHandler {
 	}
 
 	@Override
-	public StoredItemStack addStack(StoredItemStack add, TileEntity tile, ForgeDirection dir) {
+	public StoredItemStack addStack(StoredItemStack add, TileEntity tile, ForgeDirection dir, ActionType action) {
 		return add;
 	}
 
 	@Override
-	public StoredItemStack removeStack(StoredItemStack remove, TileEntity tile, ForgeDirection dir) {
+	public StoredItemStack removeStack(StoredItemStack remove, TileEntity tile, ForgeDirection dir, ActionType action) {
+		if (tile instanceof ILPPipeTile) {
+			ILPPipe pipe = ((ILPPipeTile) tile).getLPPipe();
+			if (pipe instanceof IRequestAPI) {
+				IRequestAPI request = (IRequestAPI) pipe;
+				if (!action.shouldSimulate()) {
+					List<ItemStack> missing = request.performRequest(remove.getFullStack());
+					if (missing == null) {
+						return null;
+					}
+					long removed = remove.stored;
+					for (ItemStack stack : missing) {
+						removed -= stack.stackSize;
+					}
+					remove.setStackSize(removed);
+				} else {
+					SimulationResult result = request.simulateRequest(remove.getFullStack());
+					if (result.missing == null) {
+						return null;
+					}
+					long removed = remove.stored;
+					for (ItemStack stack : result.missing) {
+						removed -= stack.stackSize;
+					}
+					remove.setStackSize(removed);
+				}
+			}
+		}
 		return remove;
 	}
-
 }

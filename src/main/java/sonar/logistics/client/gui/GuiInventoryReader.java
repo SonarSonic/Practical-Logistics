@@ -234,6 +234,7 @@ public class GuiInventoryReader extends GuiSelectionGrid<StoredItemStack> {
 
 	@Override
 	public void renderToolTip(StoredItemStack selection, int x, int y) {
+		
 		List list = selection.item.getTooltip(this.mc.thePlayer, this.mc.gameSettings.advancedItemTooltips);
 		list.add(1, "Stored: " + selection.stored);
 		for (int k = 0; k < list.size(); ++k) {
@@ -246,6 +247,7 @@ public class GuiInventoryReader extends GuiSelectionGrid<StoredItemStack> {
 
 		FontRenderer font = selection.item.getItem().getFontRenderer(selection.item);
 		drawHoveringText(list, x, y, (font == null ? fontRendererObj : font));
+		
 	}
 
 	@Override

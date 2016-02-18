@@ -3,31 +3,38 @@ package sonar.logistics.info.types;
 import io.netty.buffer.ByteBuf;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.IIcon;
+import net.minecraftforge.fluids.FluidRegistry;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
+import scala.actors.threadpool.Arrays;
 import sonar.core.fluid.StoredFluidStack;
 import sonar.core.utils.helpers.FontHelper;
 import sonar.core.utils.helpers.RenderHelper;
 import sonar.logistics.api.Info;
+import sonar.logistics.api.LogisticsAPI;
+import sonar.logistics.api.render.ScreenType;
 import cpw.mods.fml.common.network.ByteBufUtils;
 
 public class FluidInventoryInfo extends Info<FluidInventoryInfo> {
 
-	public List<StoredFluidStack> stacks = new ArrayList();
+	public ArrayList<StoredFluidStack> stacks = new ArrayList();
 	public String rend = "ITEMINV";
 
-	public static FluidInventoryInfo createInfo(List<StoredFluidStack> stacks) {
+	public static FluidInventoryInfo createInfo(ArrayList<StoredFluidStack> stacks) {
 		FluidInventoryInfo info = new FluidInventoryInfo();
 		info.stacks = stacks;
 		return info;
@@ -35,7 +42,7 @@ public class FluidInventoryInfo extends Info<FluidInventoryInfo> {
 
 	@Override
 	public String getName() {
-		return "InventoryInfo";
+		return "FluidInventoryInfo";
 	}
 
 	@Override
@@ -107,74 +114,87 @@ public class FluidInventoryInfo extends Info<FluidInventoryInfo> {
 	}
 
 	@Override
-	public void renderInfo(Tessellator tess, TileEntity tile, float minX, float minY, float maxX, float maxY, float zOffset, float scale) {
-
+	public void renderInfo(Tessellator tess, TileEntity tile, float minX, float minY, float maxX, float maxY, float zOffset, ScreenType type) {
+	
 		if (stacks != null) {
-			int xSlots = Math.round(maxX - minX) * 2;
-			int ySlots = (int) (Math.round(maxY - minY) * 2);
-			if (scale == 120) {
-				xSlots = 2;
-				ySlots = 1;
-			}
+			int xSlots = Math.round(maxX - minX);
+			int ySlots = (int) (Math.round(maxY - minY));
+			if (type.isNormalSize()) {
+				if (stacks != null && stacks.get(0) != null) {
+					FluidStackInfo.createInfo(stacks.get(0)).renderInfo(tess, tile, minX, minY, maxX, maxY, zOffset, type);
+				}
 
-			int currentSlot = 0;
+			} else {
+				float fluidMaxX = 1.0F - 0.0625f * 2;
+				float fluidMinX = 0;
+				float fluidMaxY = 1.0F - 0.0625f * 2;
+				float fluidMinY = 0;
+				int currentSlot = 0;
 
-			if (stacks != null) {
-				List<StoredFluidStack> currentStacks = (List<StoredFluidStack>) (((ArrayList<StoredFluidStack>) (stacks)).clone());
+				if (stacks != null) {
+					List<StoredFluidStack> currentStacks = (List<StoredFluidStack>) (((ArrayList<StoredFluidStack>) (stacks)).clone());
 
-				GL11.glTranslatef(minX + 0.18f, minY + 0.18f, 0.01f);
+					GL11.glTranslatef(minX, minY, 0.01f);
 
-				GL11.glTranslatef(0.0f, 0.0f, +0.19f);
-				GL11.glTranslated(0.0, 0.07F, zOffset - 0.01);
-				float spacing = 0.665f;
-				GL11.glScaled(0.75, 0.75, 0.75);
+					// GL11.glTranslatef(0.0f, 0.0f, +0.19f);
+					GL11.glTranslated(0.0, 0.0, zOffset - 0.01);
+					float spacing = 1f;
+					// GL11.glScaled(0.75, 0.75, 0.75);
 
-				for (StoredFluidStack stack : currentStacks) {
-					if (stack != null) {
-						if (currentSlot < (xSlots * (ySlots))) {
-							int xLevel = (int) (currentSlot - ((Math.floor((currentSlot / xSlots))) * xSlots));
-							int yLevel = (int) (Math.floor((currentSlot / xSlots)));
+					for (StoredFluidStack stack : currentStacks) {
+						if (stack != null) {
+							if (currentSlot < (xSlots * (ySlots))) {
+								int xLevel = (int) (currentSlot - ((Math.floor((currentSlot / xSlots))) * xSlots));
+								int yLevel = (int) (Math.floor((currentSlot / xSlots)));
 
-							FontRenderer rend = Minecraft.getMinecraft().fontRenderer;
-							if (stack.item != null) {
-								stack.item.stackSize = 1;
+								float width = stack.stored * (fluidMaxX - fluidMinX) / stack.capacity;
+								IIcon icon = stack.fluid.getFluid().getIcon();
+								if (icon != null) {
+									Minecraft.getMinecraft().renderEngine.bindTexture(TextureMap.locationBlocksTexture);
 
-								GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+									GL11.glTranslatef(xLevel * spacing, yLevel * spacing, 0);
+									tess.startDrawingQuads();
+									double divide = Math.max((0.5 + (fluidMaxX - fluidMinX)), (0.5 + (fluidMaxY - fluidMinY)));
+									double widthnew = (icon.getMinU() + (width * (icon.getMaxU() - icon.getMinU()) / divide));
+									double heightnew = (icon.getMinV() + ((fluidMaxY - fluidMinY) * (icon.getMaxV() - icon.getMinV()) / divide));
 
-								GL11.glDisable(GL12.GL_RESCALE_NORMAL);
-								GL11.glEnable(GL11.GL_CULL_FACE);
-								tess.setColorOpaque_F(1.0f, 1.0f, 1.0f);
-								double sizing = Math.round(Math.min((maxX - minX), (maxY - minY)));
-								double itemScale = sizing >= 2 ? (2.5F + sizing - 1 * 1.0F) : scale >= 120 ? 0.8F : 1.4F;
+									double height = (fluidMaxY);
+									tess.addVertexWithUV((fluidMinX + 0), height, 0, icon.getMinU(), heightnew);
+									tess.addVertexWithUV((fluidMinX + width), height, 0, widthnew, heightnew);
+									tess.addVertexWithUV((fluidMinX + width), fluidMinY, 0, widthnew, icon.getMinV());
+									tess.addVertexWithUV((fluidMinX + 0), fluidMinY, 0, icon.getMinU(), icon.getMinV());
+									tess.draw();
 
+									GL11.glTranslatef(-xLevel * spacing, -yLevel * spacing, 0);
+								}
+								FontRenderer rend = Minecraft.getMinecraft().fontRenderer;
+								String category = (stack != null ? stack.fluid.getFluid().getLocalizedName(stack.fluid) : this.rend);
+
+								String data = (stack != null && stack.capacity != 0 ? String.valueOf(stack.stored) : String.valueOf(0));
+								float itemScale = 120f;
+								GL11.glPushMatrix();
 								GL11.glTranslatef(xLevel * spacing, yLevel * spacing, 0);
-								RenderHelper.doRenderItem(stack.item, tile.getWorldObj(), false);
-								GL11.glDisable(GL11.GL_CULL_FACE);
-								GL11.glEnable(GL12.GL_RESCALE_NORMAL);
-								GL11.glTranslatef(0.0f, 0.0f, -0.242f);
+								GL11.glTranslatef(fluidMinX + (fluidMaxX - fluidMinX) / 2, fluidMinY + (fluidMaxY - fluidMinY) / 2, 0.01f);
+								GL11.glScaled(1.0f / itemScale, 1.0f / itemScale, 1.0f / itemScale);
 
-								GL11.glScalef(1.0f / 40.0f, 1.0f / 40.0f, 1.0f / 40.0f);
-								String s1 = FontHelper.formatStackSize(stack.stored);
-								final float scaleFactor = 0.5F;
-								final float inverseScaleFactor = 1.0f / scaleFactor;
-								GL11.glScaled(scaleFactor, scaleFactor, scaleFactor);
-
-								final int X = (int) (((float) -8 + 15.0f - rend.getStringWidth(s1) * scaleFactor) * inverseScaleFactor);
-								final int Y = (int) (((float) -12 + 15.0f - 7.0f * scaleFactor) * inverseScaleFactor);
-
-								GL11.glDisable(GL11.GL_LIGHTING);
-								rend.drawString(s1, X, Y, 16777215);
-								GL11.glScaled(inverseScaleFactor, inverseScaleFactor, inverseScaleFactor);
-								GL11.glScaled(40.0f, 40.0f, 40.0f);
-								GL11.glTranslatef(0.0f, 0.0f, 0.242f);
+								rend.drawString(category, -rend.getStringWidth(category) / 2, -8, -1);
+								rend.drawString(data, -rend.getStringWidth(data) / 2, 4, -1);
+								GL11.glScaled(itemScale, itemScale, itemScale);
 								GL11.glTranslatef(-xLevel * spacing, -yLevel * spacing, 0);
+								GL11.glPopMatrix();
+								// GL11.glTranslated(0, 0, -zOffset - 0.01);
+
+								// LogisticsAPI.getInfoRenderer().renderStandardInfo(FluidStackInfo.createInfo(stack),
+								// Minecraft.getMinecraft().fontRenderer,
+								// fluidMinX, fluidMinY, fluidMaxX, fluidMaxY,
+								// 0, 0);
+								// GL11.glTranslated(0, 0, +zOffset - 0.01);
 							}
 						}
+						currentSlot++;
 					}
-					currentSlot++;
 				}
 			}
-
 		}
 
 	}
@@ -194,24 +214,25 @@ public class FluidInventoryInfo extends Info<FluidInventoryInfo> {
 
 	@Override
 	public void writeUpdate(FluidInventoryInfo currentInfo, NBTTagCompound tag) {
-		if (currentInfo.stacks == null) {
-			currentInfo.stacks = new ArrayList();
+		List<StoredFluidStack> currentList = new ArrayList();
+		if (currentInfo.stacks != null) {
+			currentList= currentInfo.stacks;
 		}
 		if (stacks == null) {
 			stacks = new ArrayList();
 		}
-		if (currentInfo.stacks.size() <= 0 && (!(this.stacks.size() <= 0))) {
+		if (currentList.size() <= 0 && (!(this.stacks.size() <= 0))) {
 			tag.setBoolean("null", true);
 			this.stacks = new ArrayList();
 			return;
 		}
 		NBTTagList list = new NBTTagList();
-		int size = Math.max(currentInfo.stacks.size(), this.stacks.size());
+		int size = Math.max(currentList.size(), this.stacks.size());
 		for (int i = 0; i < size; ++i) {
 			StoredFluidStack current = null;
 			StoredFluidStack last = null;
-			if (i < currentInfo.stacks.size()) {
-				current = currentInfo.stacks.get(i);
+			if (i < currentList.size()) {
+				current = currentList.get(i);
 			}
 			if (i < this.stacks.size()) {
 				last = this.stacks.get(i);
@@ -222,18 +243,22 @@ public class FluidInventoryInfo extends Info<FluidInventoryInfo> {
 					if (!last.equalStack(current.fluid) || current.stored != last.stored) {
 						compound.setByte("f", (byte) 0);
 						this.stacks.set(i, current);
-						StoredFluidStack.writeToNBT(compound, currentInfo.stacks.get(i));
+						StoredFluidStack.writeToNBT(compound, currentList.get(i));
 
 					} else if (last.stored != current.stored) {
 						compound.setByte("f", (byte) 1);
 						this.stacks.set(i, current);
-						StoredFluidStack.writeToNBT(compound, currentInfo.stacks.get(i));
+						StoredFluidStack.writeToNBT(compound, currentList.get(i));
 						compound.setLong("Stored", current.stored);
 					}
 				} else {
 					compound.setByte("f", (byte) 0);
-					this.stacks.add(i, current);
-					StoredFluidStack.writeToNBT(compound, currentInfo.stacks.get(i));
+					if (i < stacks.size()) {
+						 stacks.set(i, current);
+					} else{
+						stacks.add(i, current);
+					}
+					StoredFluidStack.writeToNBT(compound, current);
 				}
 			} else if (last != null) {
 				this.stacks.set(i, null);

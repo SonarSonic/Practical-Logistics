@@ -6,6 +6,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.inventory.StoredItemStack;
+import sonar.core.utils.ActionType;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.providers.InventoryHandler;
 
@@ -72,22 +73,22 @@ public class DrawersInventoryProvider extends InventoryHandler {
 		return Loader.isModLoaded("StorageDrawers");
 	}
 
+	private long injectItemsIntoDrawer(IDrawer drawer, long itemCount) {
+		return itemCount;
+	}
+
 	/**
 	 * taken from DrawerMEInventory class in StorageDrawers <a href=
 	 * "https://github.com/jaquadro/StorageDrawers/blob/master/src/com/jaquadro/minecraft/storagedrawers/integration/ae2/DrawerMEInventory.java"
 	 * >Storage Drawers GitHub</a>
 	 */
 	@Override
-	public StoredItemStack addStack(StoredItemStack add, TileEntity tile, ForgeDirection dir) {
+	public StoredItemStack addStack(StoredItemStack add, TileEntity tile, ForgeDirection dir, ActionType action) {
 		return add;
 	}
 
-	private long injectItemsIntoDrawer(IDrawer drawer, long itemCount) {
-		return itemCount;
-	}
-
 	@Override
-	public StoredItemStack removeStack(StoredItemStack remove, TileEntity tile, ForgeDirection dir) {
+	public StoredItemStack removeStack(StoredItemStack remove, TileEntity tile, ForgeDirection dir, ActionType action) {
 		return remove;
 	}
 }

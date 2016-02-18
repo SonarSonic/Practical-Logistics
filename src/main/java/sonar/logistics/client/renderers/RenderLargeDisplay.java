@@ -15,6 +15,7 @@ import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.utils.helpers.RenderHelper;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.render.LargeScreenSizing;
+import sonar.logistics.api.render.ScreenType;
 import sonar.logistics.client.models.ModelLargeDisplay;
 import sonar.logistics.common.handlers.LargeDisplayScreenHandler;
 import sonar.logistics.registries.BlockRegistry;
@@ -197,11 +198,11 @@ public class RenderLargeDisplay extends RenderDisplayScreen {
 		}
 		if (sizing == null || sizing.maxH == 0 && sizing.minH == 0 && sizing.maxY == 0 && sizing.minY == 0) {
 			float pixel = 1.0F / 16F;
-			info.renderInfo(tess, tile, -0.5F + pixel, -0.4400F, (1.0f - (pixel) * 9), (pixel * 14), -0.204F, 110F);
+			info.renderInfo(tess, tile, -0.5F + pixel, -0.4400F, (1.0f - (pixel) * 9), (pixel * 14), -0.204F, ScreenType.LARGE);
 
 		} else {
 			float pixel = 1.0F / 16F;
-			info.renderInfo(tess, tile, -0.5F + pixel + (north ? -sizing.maxH : sizing.minH), -0.4400F - sizing.maxY, (1.0f - (pixel) * 9) + (north ? -sizing.minH : sizing.maxH), (pixel * 14) + sizing.minY, -0.204F, 40F);
+			info.renderInfo(tess, tile, -0.5F + pixel + (north ? -sizing.maxH : sizing.minH), -0.4400F - sizing.maxY, (1.0f - (pixel) * 9) + (north ? -sizing.minH : sizing.maxH), (pixel * 14) + sizing.minY, -0.204F, ScreenType.CONNECTED);
 
 		}
 	}

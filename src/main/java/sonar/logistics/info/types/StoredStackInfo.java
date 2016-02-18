@@ -14,6 +14,7 @@ import sonar.core.inventory.StoredItemStack;
 import sonar.core.utils.helpers.FontHelper;
 import sonar.core.utils.helpers.RenderHelper;
 import sonar.logistics.api.Info;
+import sonar.logistics.api.render.ScreenType;
 
 public class StoredStackInfo extends Info<StoredStackInfo> {
 
@@ -80,7 +81,7 @@ public class StoredStackInfo extends Info<StoredStackInfo> {
 	}
 
 	@Override
-	public void renderInfo(Tessellator tess, TileEntity tile, float minX, float minY, float maxX, float maxY, float zOffset, float scale) {
+	public void renderInfo(Tessellator tess, TileEntity tile, float minX, float minY, float maxX, float maxY, float zOffset, ScreenType type) {
 		if (stack != null && stack.item != null) {
 
 			GL11.glTranslatef(minX + (maxX - minX) / 2, minY + (maxY - minY) / 2, 0.01f);
@@ -93,8 +94,8 @@ public class StoredStackInfo extends Info<StoredStackInfo> {
 			GL11.glEnable(GL11.GL_CULL_FACE);
 			tess.setColorOpaque_F(1.0f, 1.0f, 1.0f);
 			double sizing = Math.round(Math.min((maxX - minX), (maxY - minY)));
-			double itemScale = sizing >= 2 ? (2.5F + sizing - 1 * 1.0F) : scale >= 120 ? 0.8F : 1.4F;
-			GL11.glTranslated(0.0, getXTranslate(scale, sizing), zOffset - 0.01);
+			double itemScale = sizing >= 2 ? (2.5F + sizing - 1 * 1.0F) : type.isNormalSize() ? 0.8F : 1.4F;
+			GL11.glTranslated(0.0, getXTranslate(type.getScaling(), sizing), zOffset - 0.01);
 
 			GL11.glScaled(itemScale, itemScale, itemScale);
 			GL11.glTranslatef(0.0f, 0.0f, +0.25f);

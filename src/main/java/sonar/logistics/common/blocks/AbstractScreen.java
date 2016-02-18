@@ -42,14 +42,14 @@ public abstract class AbstractScreen extends SonarMachineBlock {
 	public abstract TileEntity createNewTileEntity(World world, int i);
 
 	@Override
-	public final boolean operateBlock(World world, int x, int y, int z, EntityPlayer player, int side, float hitx, float hity, float hitz, BlockInteraction interact) {
+	public final boolean operateBlock(World world, int x, int y, int z, EntityPlayer player, BlockInteraction interact) {
 		if (player != null) {
 			TileHandler target = FMPHelper.getHandler(world.getTileEntity(x, y, z));
 			if (target != null && target instanceof DisplayScreenHandler) {
 				DisplayScreenHandler handler = (DisplayScreenHandler) target;
 
 				if (!world.isRemote) {
-					handler.screenClicked(world, player, x, y, z, ForgeDirection.getOrientation(side), hitx, hity, hitz, interact);
+					handler.screenClicked(world, player, x, y, z, interact);
 				} else {
 					world.playSound(x, y, z, "dig.stone", 1.0F, 1.0F, true);
 				}

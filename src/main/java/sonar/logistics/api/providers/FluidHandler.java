@@ -5,6 +5,7 @@ import java.util.List;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.fluid.StoredFluidStack;
+import sonar.core.utils.ActionType;
 import sonar.core.utils.IRegistryObject;
 import sonar.logistics.api.LogisticsAPI;
 
@@ -28,11 +29,13 @@ public abstract class FluidHandler implements IRegistryObject {
 	/**only called if canProvideFluids is true*/
 	public abstract boolean getFluids(List<StoredFluidStack> fluids, TileEntity tile, ForgeDirection dir);	
 
-	/**returns what wasn't added*/
-	public abstract StoredFluidStack addStack(StoredFluidStack add, TileEntity tile, ForgeDirection dir);
+	/**returns what wasn't added
+	 * @param action TODO*/
+	public abstract StoredFluidStack addStack(StoredFluidStack add, TileEntity tile, ForgeDirection dir, ActionType action);
 
-	/**returns what wasn't extracted*/
-	public abstract StoredFluidStack removeStack(StoredFluidStack remove, TileEntity tile, ForgeDirection dir);
+	/**returns what wasn't extracted
+	 * @param action TODO*/
+	public abstract StoredFluidStack removeStack(StoredFluidStack remove, TileEntity tile, ForgeDirection dir, ActionType action);
 	
 	/** used when the provider is loaded normally used to check if relevant mods are loaded for APIs to work */
 	public boolean isLoadable() {

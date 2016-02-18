@@ -16,6 +16,7 @@ import net.minecraftforge.fluids.IFluidContainerItem;
 import sonar.core.fluid.StoredFluidStack;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.inventory.StoredItemStack;
+import sonar.core.utils.ActionType;
 import sonar.core.utils.BlockCoords;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.LogisticsAPI;
@@ -48,15 +49,12 @@ public class FluidHelper extends FluidWrapper {
 				}
 			}
 		}
-		Collections.sort(fluidList, new Comparator<StoredFluidStack>() {
-			public int compare(StoredFluidStack str1, StoredFluidStack str2) {
-				if (str1.stored < str2.stored)
-					return 1;
-				if (str1.stored == str2.stored)
-					return 0;
-				return -1;
-			}
-		});
+		/*
+		 * Collections.sort(fluidList, new Comparator<StoredFluidStack>() {
+		 * public int compare(StoredFluidStack str1, StoredFluidStack str2) { if
+		 * (str1.stored < str2.stored) return 1; if (str1.stored == str2.stored)
+		 * return 0; return -1; } });
+		 */
 		return fluidList;
 	}
 
@@ -73,7 +71,7 @@ public class FluidHelper extends FluidWrapper {
 
 	}
 
-	public StoredFluidStack addFluids(StoredFluidStack add, List<BlockCoords> network) {
+	public StoredFluidStack addFluids(StoredFluidStack add, List<BlockCoords> network, ActionType action) {
 		if (add.stored == 0) {
 			return add;
 		}
@@ -82,7 +80,7 @@ public class FluidHelper extends FluidWrapper {
 			TileEntity tile = entry.getKey().getTileEntity();
 			for (FluidHandler provider : Logistics.fluidProviders.getObjects()) {
 				if (provider.canHandleFluids(tile, entry.getValue())) {
-					add = provider.addStack(add, tile, entry.getValue());
+					add = provider.addStack(add, tile, entry.getValue(), action);
 					if (add == null) {
 						return null;
 					}
@@ -92,7 +90,7 @@ public class FluidHelper extends FluidWrapper {
 		return add;
 	}
 
-	public StoredFluidStack removeFluids(StoredFluidStack remove, List<BlockCoords> network) {
+	public StoredFluidStack removeFluids(StoredFluidStack remove, List<BlockCoords> network, ActionType action) {
 		if (remove.stored == 0) {
 			return remove;
 		}
@@ -101,7 +99,7 @@ public class FluidHelper extends FluidWrapper {
 			TileEntity tile = entry.getKey().getTileEntity();
 			for (FluidHandler provider : Logistics.fluidProviders.getObjects()) {
 				if (provider.canHandleFluids(tile, entry.getValue())) {
-					remove = provider.removeStack(remove, tile, entry.getValue());
+					remove = provider.removeStack(remove, tile, entry.getValue(), action);
 					if (remove == null) {
 						return null;
 					}
@@ -110,26 +108,27 @@ public class FluidHelper extends FluidWrapper {
 		}
 		return remove;
 	}
-
-	public ItemStack fillFluidItemStack(ItemStack container, StoredFluidStack fill, List<BlockCoords> network) {
+	/**if simulating your expected to pass copies of both the container and stack to fill with*/
+	public ItemStack fillFluidItemStack(ItemStack container, StoredFluidStack fill, List<BlockCoords> network, ActionType action) {
 		if (FluidContainerRegistry.isContainer(container)) {
-			return fillFluidContainer(container, fill, network);
+			return fillFluidContainer(container, fill, network, action);
 		} else if ((container.getItem() instanceof IFluidContainerItem)) {
-			return fillFluidHandler(container, fill, network);
+			return fillFluidHandler(container, fill, network, action);
 		}
 		return container;
 	}
 
-	public ItemStack drainFluidItemStack(ItemStack container, List<BlockCoords> network) {
+	/**if simulating your expected to pass copies of both the container and stack to fill with*/
+	public ItemStack drainFluidItemStack(ItemStack container, List<BlockCoords> network, ActionType action) {
 		if (FluidContainerRegistry.isContainer(container)) {
-			return drainFluidContainer(container, network);
+			return drainFluidContainer(container, network, action);
 		} else if ((container.getItem() instanceof IFluidContainerItem)) {
-			return drainFluidHandler(container, network);
+			return drainFluidHandler(container, network, action);
 		}
 		return container;
 	}
 
-	public ItemStack fillFluidContainer(ItemStack container, StoredFluidStack fill, List<BlockCoords> network) {
+	public ItemStack fillFluidContainer(ItemStack container, StoredFluidStack fill, List<BlockCoords> network, ActionType action) {
 		FluidStack stack = FluidContainerRegistry.getFluidForFilledItem(container);
 		int extractSize = 0;
 		if (stack != null && stack.isFluidEqual(fill.fluid)) {
@@ -144,7 +143,7 @@ public class FluidHelper extends FluidWrapper {
 		if (extractSize == 0) {
 			return container;
 		}
-		StoredFluidStack remainder = removeFluids(fill.setStackSize(extractSize), network);
+		StoredFluidStack remainder = removeFluids(fill.setStackSize(extractSize), network, action);
 		FluidStack fillStack = fill.fluid.copy();
 		if (remainder == null || remainder.stored == 0) {
 			fillStack.amount = extractSize;
@@ -153,37 +152,37 @@ public class FluidHelper extends FluidWrapper {
 		}
 
 		ItemStack filledStack = FluidContainerRegistry.fillFluidContainer(fillStack, container);
+
 		if (filledStack != null) {
 			container = filledStack;
 		}
 		return container;
 	}
 
-	public ItemStack drainFluidContainer(ItemStack container, List<BlockCoords> network) {
+	public ItemStack drainFluidContainer(ItemStack container, List<BlockCoords> network, ActionType action) {
 		FluidStack stack = FluidContainerRegistry.getFluidForFilledItem(container);
 		if (stack != null) {
-			StoredFluidStack remainder = addFluids(new StoredFluidStack(stack), network);
+			StoredFluidStack remainder = addFluids(new StoredFluidStack(stack), network, action);
 			if (remainder == null || remainder.stored == 0) {
-				System.out.print("drain");
 				container = FluidContainerRegistry.drainFluidContainer(container);
 			}
 		}
 		return container;
 	}
 
-	public ItemStack fillFluidHandler(ItemStack handler, StoredFluidStack fill, List<BlockCoords> network) {
+	public ItemStack fillFluidHandler(ItemStack handler, StoredFluidStack fill, List<BlockCoords> network, ActionType action) {
 		IFluidContainerItem container = (IFluidContainerItem) handler.getItem();
 		FluidStack stack = container.getFluid(handler);
 		int extractSize = 0;
 		if (stack != null && stack.isFluidEqual(fill.fluid)) {
-			extractSize = container.getCapacity(handler) - stack.amount;
+			extractSize = (int) Math.min(fill.stored, container.getCapacity(handler) - stack.amount);
 		} else if (stack == null) {
 			extractSize = container.fill(handler, fill.getFullStack(), false);
 		}
 		if (extractSize == 0) {
 			return handler;
 		}
-		StoredFluidStack remainder = LogisticsAPI.getFluidHelper().removeFluids(fill.setStackSize(extractSize), network);
+		StoredFluidStack remainder = LogisticsAPI.getFluidHelper().removeFluids(fill.setStackSize(extractSize), network, action);
 		FluidStack fillStack = fill.fluid.copy();
 		if (remainder == null || remainder.stored == 0) {
 			fillStack.amount = extractSize;
@@ -195,12 +194,12 @@ public class FluidHelper extends FluidWrapper {
 
 	}
 
-	public ItemStack drainFluidHandler(ItemStack handler, List<BlockCoords> network) {
+	public ItemStack drainFluidHandler(ItemStack handler, List<BlockCoords> network, ActionType action) {
 		IFluidContainerItem container = (IFluidContainerItem) handler.getItem();
 		FluidStack stack = container.getFluid(handler);
 		if (stack != null) {
 			FluidStack insertSize = container.drain(handler, Integer.MAX_VALUE, false);
-			StoredFluidStack remainder = addFluids(new StoredFluidStack(insertSize), network);
+			StoredFluidStack remainder = addFluids(new StoredFluidStack(insertSize), network, action);
 			int drainSize = 0;
 			if (remainder == null || remainder.stored == 0) {
 				drainSize = insertSize.amount;

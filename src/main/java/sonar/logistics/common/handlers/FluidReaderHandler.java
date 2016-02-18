@@ -1,6 +1,7 @@
 package sonar.logistics.common.handlers;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import net.minecraft.entity.player.EntityPlayer;
@@ -18,11 +19,13 @@ import sonar.core.fluid.StoredFluidStack;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.inventory.StoredItemStack;
+import sonar.core.utils.ActionType;
 import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.StandardInfo;
+import sonar.logistics.info.types.FluidInventoryInfo;
 import sonar.logistics.info.types.FluidStackInfo;
 
 public class FluidReaderHandler extends TileHandler {
@@ -51,19 +54,21 @@ public class FluidReaderHandler extends TileHandler {
 			return;
 		}
 		if (heldItem.stackSize == 1) {
-			player.inventory.setInventorySlotContents(player.inventory.currentItem, LogisticsAPI.getFluidHelper().fillFluidItemStack(heldItem, storedStack, LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite())));
+			List<BlockCoords> network = LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite());
+			ItemStack simulate = LogisticsAPI.getFluidHelper().fillFluidItemStack(heldItem.copy(), storedStack.copy(), network, ActionType.SIMULATE);
+			if (!ItemStack.areItemStacksEqual(simulate, heldItem) || !ItemStack.areItemStackTagsEqual(simulate, heldItem)) {
+				player.inventory.setInventorySlotContents(player.inventory.currentItem, LogisticsAPI.getFluidHelper().fillFluidItemStack(heldItem, storedStack, network, ActionType.PERFORM));
+			}
 		} else {
-			int slot = player.inventory.getFirstEmptyStack();
-			if (slot != -1) {
-				ItemStack insert = heldItem.copy();
-				insert.stackSize = 1;
-				ItemStack toAdd = LogisticsAPI.getFluidHelper().fillFluidItemStack(insert, storedStack, LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite()));
+			ItemStack insert = heldItem.copy();
+			insert.stackSize = 1;
 
-				if (!ItemStack.areItemStacksEqual(insert, toAdd) || !ItemStack.areItemStackTagsEqual(heldItem, toAdd)) {
-					player.inventory.decrStackSize(player.inventory.currentItem, 1);
-					player.inventory.setInventorySlotContents(slot, toAdd);
-					((EntityPlayerMP) player).playerNetServerHandler.sendPacket(new S2FPacketSetSlot(player.openContainer.windowId, slot, toAdd));
-				}
+			List<BlockCoords> network = LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite());
+			ItemStack simulate = LogisticsAPI.getFluidHelper().fillFluidItemStack(insert.copy(), storedStack.copy(), network, ActionType.SIMULATE);
+			if (!ItemStack.areItemStacksEqual(simulate, insert) || !ItemStack.areItemStackTagsEqual(simulate, insert)) {
+				ItemStack toAdd = LogisticsAPI.getFluidHelper().fillFluidItemStack(insert, storedStack, network, ActionType.PERFORM);
+				player.inventory.decrStackSize(player.inventory.currentItem, 1);
+				StoredItemStack add = LogisticsAPI.getItemHelper().addStackToPlayer(new StoredItemStack(toAdd), player, false, ActionType.PERFORM);
 			}
 		}
 	}
@@ -73,9 +78,20 @@ public class FluidReaderHandler extends TileHandler {
 		if (heldItem == null) {
 			return;
 		}
-		ItemStack empty = LogisticsAPI.getFluidHelper().drainFluidItemStack(heldItem, LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite()));
+		ItemStack insert = heldItem.copy();
+		insert.stackSize = 1;
+		List<BlockCoords> network = LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite());
+		ItemStack empty = LogisticsAPI.getFluidHelper().drainFluidItemStack(insert.copy(), network, ActionType.PERFORM);
 		if (!player.capabilities.isCreativeMode) {
-			player.inventory.setInventorySlotContents(player.inventory.currentItem, empty);
+			if (insert.stackSize == heldItem.stackSize) {
+				player.inventory.setInventorySlotContents(player.inventory.currentItem, empty);
+			} else {
+				player.inventory.decrStackSize(player.inventory.currentItem, 1);
+				if(empty!=null){
+					System.out.print(empty);
+					LogisticsAPI.getItemHelper().addStackToPlayer(new StoredItemStack(empty), player, false, ActionType.PERFORM);
+				}
+			}
 		}
 	}
 
@@ -90,18 +106,21 @@ public class FluidReaderHandler extends TileHandler {
 	}
 
 	public Info currentInfo(TileEntity te) {
-		if (current != null && current.getFluid() != null) {
-			if (stacks != null) {
-				for (StoredFluidStack stack : stacks) {
-					if (stack != null && stack.fluid.isFluidEqual(current)) {
-						return FluidStackInfo.createInfo(stack);
-					}
-				}
-			}
-			return FluidStackInfo.createInfo(new StoredFluidStack(current, 0, 0));
-
-		}
-		return new StandardInfo((byte) -1, "ITEMREND", " ", "NO DATA");
+		/*
+		 * if (current != null && current.getFluid() != null) {
+		 * 
+		 * if (stacks != null) {
+		 * 
+		 * for (StoredFluidStack stack : stacks) { if (stack != null &&
+		 * stack.fluid.isFluidEqual(current)) { return
+		 * FluidStackInfo.createInfo(stack); } }
+		 * 
+		 * } return FluidStackInfo.createInfo(new StoredFluidStack(current, 0,
+		 * 0));
+		 * 
+		 * } return new StandardInfo((byte) -1, "ITEMREND", " ", "NO DATA");
+		 */
+		return FluidInventoryInfo.createInfo((ArrayList<StoredFluidStack>) (stacks == null ? new ArrayList() : stacks));
 	}
 
 	public void readData(NBTTagCompound nbt, SyncType type) {

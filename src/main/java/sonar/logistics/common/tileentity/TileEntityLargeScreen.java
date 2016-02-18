@@ -7,6 +7,7 @@ import sonar.core.utils.BlockCoords;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.connecting.IInfoTile;
 import sonar.logistics.api.connecting.ILargeDisplay;
+import sonar.logistics.api.render.LargeScreenSizing;
 import sonar.logistics.common.handlers.LargeDisplayScreenHandler;
 import sonar.logistics.helpers.DisplayHelper;
 
@@ -63,5 +64,10 @@ public class TileEntityLargeScreen extends TileEntityHandler implements IInfoTil
 	@Override
 	public int getOrientation() {
 		return this.getBlockMetadata();
+	}
+
+	@Override
+	public LargeScreenSizing getSizing() {
+		return handler.sizing;
 	}
 }

@@ -17,15 +17,19 @@ import sonar.core.integration.fmp.handlers.InventoryTileHandler;
 import sonar.core.inventory.StoredItemStack;
 import sonar.core.network.sync.SyncInt;
 import sonar.core.network.utils.IByteBufTile;
+import sonar.core.utils.ActionType;
 import sonar.core.utils.BlockCoords;
+import sonar.core.utils.BlockInteraction;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.StandardInfo;
+import sonar.logistics.api.interaction.IDefaultInteraction;
+import sonar.logistics.api.render.ScreenType;
 import sonar.logistics.info.types.InventoryInfo;
 import sonar.logistics.info.types.StoredStackInfo;
 
-public class InventoryReaderHandler extends InventoryTileHandler implements IByteBufTile {
+public class InventoryReaderHandler extends InventoryTileHandler implements IByteBufTile, IDefaultInteraction {
 
 	public BlockCoords coords;
 	public List<StoredItemStack> stacks = new ArrayList();
@@ -100,12 +104,23 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 		return new StandardInfo((byte) -1, "ITEMREND", " ", "NO DATA");
 	}
 
+	@Override
+	public void handleInteraction(Info info, ScreenType type, TileEntity screen, TileEntity reader, EntityPlayer player, int x, int y, int z, BlockInteraction interact, boolean doubleClick) {
+		if (player.getHeldItem() != null) {
+			if (!doubleClick) {
+				insertItem(player, reader, player.inventory.currentItem);
+			} else {
+				insertInventory(player, reader, player.inventory.currentItem);
+			}
+		}
+	}
+
 	public StoredItemStack extractItem(TileEntity te, StoredItemStack stack, int max) {
 		if (stack == null || stack.stored == 0) {
 			return null;
 		}
 		int extractSize = (int) Math.min(stack.getItemStack().getMaxStackSize(), Math.min(stack.stored, max));
-		StoredItemStack remainder = LogisticsAPI.getItemHelper().removeItems(stack.setStackSize(extractSize), LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite()));
+		StoredItemStack remainder = LogisticsAPI.getItemHelper().removeItems(stack.setStackSize(extractSize), LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite()), ActionType.PERFORM);
 		StoredItemStack storedStack = null;
 		if (remainder == null || remainder.stored == 0) {
 			storedStack = new StoredItemStack(stack.getItemStack(), extractSize);
@@ -121,7 +136,7 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 		if (add == null) {
 			return;
 		}
-		StoredItemStack stack = LogisticsAPI.getItemHelper().addItems(new StoredItemStack(add), LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite()));
+		StoredItemStack stack = LogisticsAPI.getItemHelper().addItems(new StoredItemStack(add), LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite()), ActionType.PERFORM);
 
 		if (stack == null || stack.stored == 0) {
 			add = null;
@@ -149,7 +164,7 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 			}
 		}
 
-		StoredItemStack remainder = LogisticsAPI.getItemHelper().addItems(stack.copy(), LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite()));
+		StoredItemStack remainder = LogisticsAPI.getItemHelper().addItems(stack.copy(), LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite()), ActionType.PERFORM);
 		long insertSize = 0;
 		if (remainder == null || remainder.stored == 0) {
 			insertSize = stack.getStackSize();

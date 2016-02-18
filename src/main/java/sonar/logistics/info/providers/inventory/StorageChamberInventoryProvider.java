@@ -7,6 +7,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.calculator.mod.common.tileentity.machines.TileEntityStorageChamber;
 import sonar.core.inventory.StoredItemStack;
+import sonar.core.utils.ActionType;
 import sonar.logistics.api.providers.InventoryHandler;
 import cpw.mods.fml.common.Loader;
 
@@ -68,7 +69,7 @@ public class StorageChamberInventoryProvider extends InventoryHandler {
 	}
 
 	@Override
-	public StoredItemStack addStack(StoredItemStack add, TileEntity tile, ForgeDirection dir) {
+	public StoredItemStack addStack(StoredItemStack add, TileEntity tile, ForgeDirection dir, ActionType action) {
 		TileEntityStorageChamber chamber = (TileEntityStorageChamber) tile;
 		if (chamber.getSavedStack() != null) {
 			if (chamber.getCircuitType(add.getItemStack()) == chamber.getCircuitType(chamber.getSavedStack())) {
@@ -77,23 +78,29 @@ public class StorageChamberInventoryProvider extends InventoryHandler {
 					return add;
 				}
 				if (stored + add.getStackSize() <= chamber.maxSize) {
-					chamber.increaseStored(add.getItemDamage(), (int) add.getStackSize());
+					if (!action.shouldSimulate())
+						chamber.increaseStored(add.getItemDamage(), (int) add.getStackSize());
 					return null;
 				} else {
-					chamber.setStored(add.getItemDamage(), chamber.maxSize);
+					if (!action.shouldSimulate())
+						chamber.setStored(add.getItemDamage(), chamber.maxSize);
 					add.stored -= chamber.maxSize - stored;
 					return add;
 				}
 			}
 		} else if (chamber.getCircuitType(add.getItemStack()) != null) {
 
-			chamber.setSavedStack(add.getItemStack().copy());
+			if (!action.shouldSimulate())
+				chamber.setSavedStack(add.getItemStack().copy());
 
 			if (add.getStackSize() <= chamber.maxSize) {
-				chamber.stored[add.getItemDamage()] += add.getStackSize();
+
+				if (!action.shouldSimulate())
+					chamber.stored[add.getItemDamage()] += add.getStackSize();
 				return null;
 			} else {
-				chamber.stored[add.getItemDamage()] = chamber.maxSize;
+				if (!action.shouldSimulate())
+					chamber.stored[add.getItemDamage()] = chamber.maxSize;
 				add.stored -= chamber.maxSize;
 				return add;
 			}
@@ -103,23 +110,25 @@ public class StorageChamberInventoryProvider extends InventoryHandler {
 	}
 
 	@Override
-	public StoredItemStack removeStack(StoredItemStack remove, TileEntity tile, ForgeDirection dir) {
+	public StoredItemStack removeStack(StoredItemStack remove, TileEntity tile, ForgeDirection dir, ActionType action) {
 		TileEntityStorageChamber chamber = (TileEntityStorageChamber) tile;
 		if (chamber.getSavedStack() != null) {
 			if (chamber.getCircuitType(remove.getItemStack()) == chamber.getCircuitType(chamber.getSavedStack())) {
 				int stored = chamber.stored[remove.getItemDamage()];
 				if (stored != 0) {
 					if (stored <= remove.getStackSize()) {
-
 						ItemStack stack = chamber.getFullStack(remove.getItemDamage());
-						chamber.stored[remove.getItemDamage()] = 0;
-						chamber.resetSavedStack(remove.getItemDamage());
-						remove.stored-=stack.stackSize;
-					} else {
+						if (!action.shouldSimulate()) {
+							chamber.stored[remove.getItemDamage()] = 0;
+							chamber.resetSavedStack(remove.getItemDamage());
+						}
+						remove.stored -= stack.stackSize;
 
+					} else {
 						ItemStack stack = chamber.getSlotStack(remove.getItemDamage(), (int) remove.getStackSize());
-						chamber.stored[remove.getItemDamage()] -= remove.getStackSize();
-						
+						if (!action.shouldSimulate())
+							chamber.stored[remove.getItemDamage()] -= remove.getStackSize();
+
 						return null;
 					}
 				}

@@ -3,9 +3,13 @@ package sonar.logistics.api.wrappers;
 import java.util.Collections;
 import java.util.List;
 
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.inventory.StoredItemStack;
+import sonar.core.utils.ActionType;
 import sonar.core.utils.BlockCoords;
 import sonar.logistics.api.connecting.IConnectionNode;
 import sonar.logistics.api.connecting.IEntityNode;
@@ -56,18 +60,20 @@ public class ItemWrapper {
 	/**used for adding Items to the network
 	 * @param add {@link StoredItemStack} to add
 	 * @param network current coordinates of the network
+	 * @param action what type of action should be carried out
 	 * @return remaining {@link StoredItemStack} (what wasn't added), can be null
 	 */
-	public StoredItemStack addItems(StoredItemStack add, List<BlockCoords> network) {
+	public StoredItemStack addItems(StoredItemStack add, List<BlockCoords> network, ActionType action) {
 		return add;
 	}
 	
 	/**used for removing Items from the network
 	 * @param remove {@link StoredItemStack} to remove
 	 * @param network current coordinates of the network
+	 * @param action what type of action should be carried out
 	 * @return remaining {@link StoredItemStack} (what wasn't removed), can be null
 	 */
-	public StoredItemStack removeItems(StoredItemStack remove, List<BlockCoords> network) {
+	public StoredItemStack removeItems(StoredItemStack remove, List<BlockCoords> network, ActionType action) {
 		return remove;
 	}
 	/**gets the {@link StoredItemStack} in the given slot of the first valid inventory on the network, used by the Inventory Reader
@@ -94,4 +100,23 @@ public class ItemWrapper {
 	public StoredItemStack getTileStack(IConnectionNode node, int slot) {
 		return null;
 	}
+	/**should NEVER be called on client, adds a StoredItemStack to a player inventory and sends changes with client
+	 * @param add {@link StoredItemStack} to add
+	 * @param player player to remove from
+	 * @param enderChest should change player Ender Chest or their normal inventory
+	 * @param action what type of action should be carried out
+	 * @return remaining {@link StoredItemStack} (what wasn't added), can be null
+	 */
+	public StoredItemStack addStackToPlayer(StoredItemStack add, EntityPlayer player, boolean enderChest, ActionType action) {
+		return add;
+	}
+	/**drops a full StoredItemStack on the floor
+	 * @param drop {@link StoredItemStack} to drop
+	 * @param world the world to drop it in
+	 * @param x the X coordinate it will be dropped from
+	 * @param y the Y coordinate it will be dropped from
+	 * @param z the Z coordinate it will be dropped from
+	 * @param side side to drop from
+	 */
+	public void spawnStoredItemStack(StoredItemStack drop, World world, int x, int y, int z, ForgeDirection side) {}
 }

@@ -26,7 +26,7 @@ public class BlockHammer extends SonarMachineBlock {
 	}
 
 	@Override
-	public boolean operateBlock(World world, int x, int y, int z, EntityPlayer player, int side, float hitx, float hity, float hitz, BlockInteraction interact) {
+	public boolean operateBlock(World world, int x, int y, int z, EntityPlayer player, BlockInteraction interact) {
 		if (player != null) {
 			player.openGui(Logistics.instance, LogisticsGui.hammer, world, x, y, z);
 			return true;

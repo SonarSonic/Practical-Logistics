@@ -6,8 +6,11 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import sonar.core.inventory.ContainerSync;
+import sonar.core.inventory.StoredItemStack;
 import sonar.core.inventory.slots.SlotList;
+import sonar.core.utils.ActionType;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
+import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.common.containers.slots.NetworkSlot;
 import sonar.logistics.common.handlers.InventoryReaderHandler;
 
@@ -61,20 +64,55 @@ public class ContainerInventoryReader extends ContainerSync {
 				itemstack1 = slot.getStack();
 			}
 			itemstack = itemstack1.copy();
-			if (id < 36) {
+			if (id >= 36 && id < 120) {
+				/*
+				 * int extractSize = (int)
+				 * Math.min(handler.stacks.get(slot.getSlotIndex
+				 * ()).item.getMaxStackSize(),
+				 * Math.min(handler.stacks.get(slot.getSlotIndex()).stored,
+				 * 64)); StoredItemStack stack = new
+				 * StoredItemStack(handler.stacks
+				 * .get(slot.getSlotIndex()).getFullStack(), extractSize);
+				 * 
+				 * StoredItemStack simulate =
+				 * LogisticsAPI.getItemHelper().addStackToPlayer(stack.copy(),
+				 * player, false, ActionType.SIMULATE); if (simulate == null ||
+				 * simulate.stored == 0 || simulate.stored < stack.stored) {
+				 * StoredItemStack perform =
+				 * LogisticsAPI.getItemHelper().removeItems(stack.copy(),
+				 * handler.getNetwork(tile), ActionType.PERFORM);
+				 * StoredItemStack storedStack = null; if (perform == null ||
+				 * perform.stored == 0) { storedStack = new
+				 * StoredItemStack(stack.getItemStack(), extractSize); } else {
+				 * storedStack = new StoredItemStack(stack.getItemStack(),
+				 * extractSize - perform.stored); } if (storedStack != null) {
+				 * LogisticsAPI.getItemHelper().addStackToPlayer(storedStack,
+				 * player, false, ActionType.PERFORM);
+				 * this.detectAndSendChanges(); } }
+				 */
+			} else if (id < 36) {
 				// ((Slot)
 				// this.inventorySlots.get(36)).putStack(itemstack1.copy());
 				// handler.insertItem(player, tile, slot.getSlotIndex());
 
 				if (!tile.getWorldObj().isRemote) {
-					return null;
+					StoredItemStack stack = new StoredItemStack(itemstack);
+					StoredItemStack perform = LogisticsAPI.getItemHelper().addItems(stack, handler.getNetwork(tile), ActionType.PERFORM);
+					System.out.print(perform);
+					if (perform == null || perform.stored == 0) {
+						itemstack1.stackSize = 0;
+					} else {
+						itemstack1.stackSize = (int) (perform.getStackSize());
+					}
+					this.detectAndSendChanges();
 				}
-				if (!this.mergeItemStack(itemstack1, 37, 121, false)) {
-					return null;
-				}
-				if (slot instanceof NetworkSlot) {
-					return ((NetworkSlot) slot).getStoredStack().getFullStack();
-				}
+
+				/*
+				 * if (!tile.getWorldObj().isRemote) { return null; } if
+				 * (!this.mergeItemStack(itemstack1, 37, 120, false)) { return
+				 * null; } if (slot instanceof NetworkSlot) { return
+				 * ((NetworkSlot) slot).getStoredStack().getFullStack(); }
+				 */
 			} else if (id < 27) {
 				if (!this.mergeItemStack(itemstack1, 27, 36, false)) {
 					return null;
@@ -114,8 +152,28 @@ public class ContainerInventoryReader extends ContainerSync {
 				}
 				return player.inventory.getItemStack();
 			}
+			if (slotID >= 36 && slotID < 120) {
+				Slot slot = (Slot) this.inventorySlots.get(slotID);
+				if (!slot.getHasStack()) {
+					ItemStack itemstack1 = player.inventory.getItemStack();
+					if (!tile.getWorldObj().isRemote && itemstack1 != null) {
+						StoredItemStack stack = new StoredItemStack(itemstack1);
+						StoredItemStack perform = LogisticsAPI.getItemHelper().addItems(stack, handler.getNetwork(tile), ActionType.PERFORM);
+						if (perform == null || perform.stored == 0) {
+							itemstack1.stackSize = 0;
+						} else {
+							itemstack1.stackSize = (int) (perform.getStackSize());
+						}
+						player.inventory.setItemStack(itemstack1);
+						player.inventory.markDirty();
+						this.detectAndSendChanges();
+					}
+					return null;
+				}
+			}
 
 			return super.slotClick(slotID, buttonID, flag, player);
+
 		}
 		return null;
 	}

@@ -5,6 +5,7 @@ import java.util.List;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.inventory.StoredItemStack;
+import sonar.core.utils.ActionType;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.providers.InventoryHandler;
 import sonar.logistics.integration.AE2Helper;
@@ -76,11 +77,11 @@ public class AE2InventoryProvider extends InventoryHandler {
 	}
 
 	@Override
-	public StoredItemStack addStack(StoredItemStack add, TileEntity tile, ForgeDirection dir) {
+	public StoredItemStack addStack(StoredItemStack add, TileEntity tile, ForgeDirection dir, ActionType action) {
 		IStorageMonitorable monitor = ((ITileStorageMonitorable) tile).getMonitorable(dir, new MachineSource(((IActionHost) tile)));
 		if (monitor != null) {
 			IMEMonitor<IAEItemStack> stacks = monitor.getItemInventory();
-			IAEItemStack stack = stacks.injectItems(AE2Helper.convertStoredItemStack(add), Actionable.MODULATE, new MachineSource(((IActionHost) tile)));
+			IAEItemStack stack = stacks.injectItems(AE2Helper.convertStoredItemStack(add), AE2Helper.getActionable(action), new MachineSource(((IActionHost) tile)));
 			if (stack == null || stack.getStackSize() == 0) {
 				return null;
 			}
@@ -90,11 +91,11 @@ public class AE2InventoryProvider extends InventoryHandler {
 	}
 
 	@Override
-	public StoredItemStack removeStack(StoredItemStack remove, TileEntity tile, ForgeDirection dir) {
+	public StoredItemStack removeStack(StoredItemStack remove, TileEntity tile, ForgeDirection dir, ActionType action) {
 		IStorageMonitorable monitor = ((ITileStorageMonitorable) tile).getMonitorable(dir, new MachineSource(((IActionHost) tile)));
 		if (monitor != null) {
 			IMEMonitor<IAEItemStack> stacks = monitor.getItemInventory();
-			IAEItemStack stack = stacks.extractItems(AEApi.instance().storage().createItemStack(remove.item).setStackSize(remove.stored), Actionable.MODULATE, new MachineSource(((IActionHost) tile)));
+			IAEItemStack stack = stacks.extractItems(AEApi.instance().storage().createItemStack(remove.item).setStackSize(remove.stored), AE2Helper.getActionable(action), new MachineSource(((IActionHost) tile)));
 			if (stack == null || stack.getStackSize() == 0) {
 				return remove;
 			}

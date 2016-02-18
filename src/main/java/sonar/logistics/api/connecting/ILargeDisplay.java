@@ -1,5 +1,7 @@
 package sonar.logistics.api.connecting;
 
+import sonar.logistics.api.render.LargeScreenSizing;
+
 /** implemented by LargeDisplays */
 public interface ILargeDisplay extends ILogicTile {
 	/**
@@ -12,4 +14,6 @@ public interface ILargeDisplay extends ILogicTile {
 	public void setRegistryID(int id);
 
 	public int getOrientation();
+	
+	public LargeScreenSizing getSizing();
 }

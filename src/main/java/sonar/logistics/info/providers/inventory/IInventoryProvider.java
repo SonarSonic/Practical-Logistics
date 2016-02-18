@@ -9,6 +9,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.inventory.StoredItemStack;
+import sonar.core.utils.ActionType;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.providers.InventoryHandler;
 
@@ -47,7 +48,7 @@ public class IInventoryProvider extends InventoryHandler {
 	}
 
 	@Override
-	public StoredItemStack addStack(StoredItemStack add, TileEntity tile, ForgeDirection dir) {
+	public StoredItemStack addStack(StoredItemStack add, TileEntity tile, ForgeDirection dir, ActionType action) {
 		IInventory inv = (IInventory) tile;
 		List<Integer> empty = new ArrayList();
 		int invSize = inv.getSizeInventory();
@@ -67,7 +68,8 @@ public class IInventoryProvider extends InventoryHandler {
 						long used = (long) Math.min(add.stored, inv.getInventoryStackLimit() - stack.stackSize);
 						stack.stackSize += used;
 						add.stored -= used;
-						inv.setInventorySlotContents(slot, stack);
+						if (!action.shouldSimulate())
+							inv.setInventorySlotContents(slot, stack);
 						if (add.stored == 0) {
 							return null;
 						}
@@ -82,7 +84,8 @@ public class IInventoryProvider extends InventoryHandler {
 			int used = (int) Math.min(add.stored, inv.getInventoryStackLimit());
 			stack.stackSize = used;
 			add.stored -= used;
-			inv.setInventorySlotContents(slot, stack);
+			if (!action.shouldSimulate())
+				inv.setInventorySlotContents(slot, stack);
 			if (add.stored == 0) {
 				return null;
 			}
@@ -91,7 +94,7 @@ public class IInventoryProvider extends InventoryHandler {
 	}
 
 	@Override
-	public StoredItemStack removeStack(StoredItemStack remove, TileEntity tile, ForgeDirection dir) {
+	public StoredItemStack removeStack(StoredItemStack remove, TileEntity tile, ForgeDirection dir, ActionType action) {
 		// int removed = 0;
 		IInventory inv = (IInventory) tile;
 		int invSize = inv.getSizeInventory();
@@ -113,7 +116,8 @@ public class IInventoryProvider extends InventoryHandler {
 						if (stack.stackSize == 0) {
 							stack = null;
 						}
-						inv.setInventorySlotContents(slot, stack);
+						if (!action.shouldSimulate())
+							inv.setInventorySlotContents(slot, stack);
 						if (remove.stored == 0) {
 							return null;
 						}

@@ -11,6 +11,7 @@ import org.lwjgl.opengl.GL11;
 
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.StandardInfo;
+import sonar.logistics.api.render.ScreenType;
 import thaumcraft.api.aspects.Aspect;
 import cpw.mods.fml.common.network.ByteBufUtils;
 
@@ -54,7 +55,7 @@ public class ThaumcraftAspectInfo extends StandardInfo<ThaumcraftAspectInfo> {
 	}
 
 	@Override
-	public void renderInfo(Tessellator tess, TileEntity tile, float minX, float minY, float maxX, float maxY, float zOffset, float scale) {
+	public void renderInfo(Tessellator tess, TileEntity tile, float minX, float minY, float maxX, float maxY, float zOffset, ScreenType type) {
 		FontRenderer rend = Minecraft.getMinecraft().fontRenderer;
 
 		GL11.glTranslatef(minX + (maxX - minX) / 2, minY + (maxY - minY) / 2, 0.01f);
@@ -79,7 +80,7 @@ public class ThaumcraftAspectInfo extends StandardInfo<ThaumcraftAspectInfo> {
 		}
 		GL11.glTranslated(0.5, 0.00, 0.0);
 		GL11.glTranslated(0, 0, -zOffset);
-		LogisticsAPI.getInfoRenderer().renderStandardInfo(this, rend, minX, minY, maxX, maxY, zOffset, scale);
+		LogisticsAPI.getInfoRenderer().renderStandardInfo(this, rend, minX, minY, maxX, maxY, zOffset, type);
 	}
 
 	@Override

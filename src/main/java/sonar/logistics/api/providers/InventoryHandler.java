@@ -5,6 +5,7 @@ import java.util.List;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.inventory.StoredItemStack;
+import sonar.core.utils.ActionType;
 import sonar.core.utils.IRegistryObject;
 import sonar.logistics.api.LogisticsAPI;
 
@@ -33,11 +34,13 @@ public abstract class InventoryHandler implements IRegistryObject {
 
 	public abstract StoredItemStack getStack(int slot, TileEntity tile, ForgeDirection dir);
 
-	/**returns what wasn't added*/
-	public abstract StoredItemStack addStack(StoredItemStack add, TileEntity tile, ForgeDirection dir);
+	/**returns what wasn't added
+	 * @param action TODO*/
+	public abstract StoredItemStack addStack(StoredItemStack add, TileEntity tile, ForgeDirection dir, ActionType action);
 
-	/**returns what wasn't extracted*/
-	public abstract StoredItemStack removeStack(StoredItemStack remove, TileEntity tile, ForgeDirection dir);
+	/**returns what wasn't extracted
+	 * @param action TODO*/
+	public abstract StoredItemStack removeStack(StoredItemStack remove, TileEntity tile, ForgeDirection dir, ActionType action);
 
 	/**
 	 * only called if canProvideInfo is true

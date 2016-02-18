@@ -7,12 +7,18 @@ import java.util.List;
 import java.util.Map;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
+import sonar.core.SonarCore;
 import sonar.core.inventory.StoredItemStack;
+import sonar.core.network.PacketInvUpdate;
+import sonar.core.utils.ActionType;
 import sonar.core.utils.BlockCoords;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.LogisticsAPI;
@@ -119,13 +125,13 @@ public class ItemHelper extends ItemWrapper {
 		list.add(new StoredItemStack(stack));
 	}
 
-	public StoredItemStack addItems(StoredItemStack add, List<BlockCoords> network) {
+	public StoredItemStack addItems(StoredItemStack add, List<BlockCoords> network, ActionType action) {
 		Map<BlockCoords, ForgeDirection> connections = LogisticsAPI.getCableHelper().getTileConnections(network);
 		for (Map.Entry<BlockCoords, ForgeDirection> entry : connections.entrySet()) {
 			TileEntity tile = entry.getKey().getTileEntity();
 			for (InventoryHandler provider : Logistics.inventoryProviders.getObjects()) {
 				if (provider.canHandleItems(tile, entry.getValue())) {
-					add = provider.addStack(add, tile, entry.getValue());
+					add = provider.addStack(add, tile, entry.getValue(), action);
 					if (add == null) {
 						return null;
 					}
@@ -135,13 +141,13 @@ public class ItemHelper extends ItemWrapper {
 		return add;
 	}
 
-	public StoredItemStack removeItems(StoredItemStack remove, List<BlockCoords> network) {
+	public StoredItemStack removeItems(StoredItemStack remove, List<BlockCoords> network, ActionType action) {
 		Map<BlockCoords, ForgeDirection> connections = LogisticsAPI.getCableHelper().getTileConnections(network);
 		for (Map.Entry<BlockCoords, ForgeDirection> entry : connections.entrySet()) {
 			TileEntity tile = entry.getKey().getTileEntity();
 			for (InventoryHandler provider : Logistics.inventoryProviders.getObjects()) {
 				if (provider.canHandleItems(tile, entry.getValue())) {
-					remove = provider.removeStack(remove, tile, entry.getValue());
+					remove = provider.removeStack(remove, tile, entry.getValue(), action);
 					if (remove == null) {
 						return null;
 					}
@@ -205,4 +211,89 @@ public class ItemHelper extends ItemWrapper {
 		return null;
 	}
 
+	public StoredItemStack addStackToPlayer(StoredItemStack add, EntityPlayer player, boolean enderChest, ActionType action) {
+		if (add == null) {
+			return null;
+		}
+		IInventory inv = null;
+		if (!enderChest) {
+			inv = player.inventory;
+		} else {
+			inv = player.getInventoryEnderChest();
+		}
+		if (inv == null) {
+			return add;
+		}
+		List<Integer> empty = new ArrayList();
+		for (int i = 0; i < inv.getSizeInventory(); i++) {
+			ItemStack stack = inv.getStackInSlot(i);
+			if (stack != null) {
+				if (!(stack.stackSize >= stack.getMaxStackSize()) && add.equalStack(stack) && stack.stackSize < inv.getInventoryStackLimit()) {
+					long used = (long) Math.min(add.item.getMaxStackSize(), Math.min(add.stored, inv.getInventoryStackLimit() - stack.stackSize));
+					stack.stackSize += used;
+					add.stored -= used;
+					if (used == 0 || !action.shouldSimulate()) {
+						inv.setInventorySlotContents(i, stack);
+						if (!enderChest) {
+							SonarCore.network.sendTo(new PacketInvUpdate(i, stack), (EntityPlayerMP) player);
+						}
+					}
+					if (add.stored == 0) {
+						return null;
+					}
+				}
+
+			} else {
+				empty.add(i);
+			}
+
+		}
+		for (Integer slot : empty) {
+			ItemStack stack = add.item.copy();
+			int used = (int) Math.min(add.stored, inv.getInventoryStackLimit());
+			stack.stackSize = used;
+			add.stored -= used;
+			if (!action.shouldSimulate()) {
+				inv.setInventorySlotContents(slot, stack);
+				if (!enderChest) {
+					SonarCore.network.sendTo(new PacketInvUpdate(slot, stack), (EntityPlayerMP) player);
+				}
+			}
+			if (add.stored == 0) {
+				return null;
+			}
+		}
+		return add;
+	}
+
+	public void spawnStoredItemStack(StoredItemStack drop, World world, int x, int y, int z, ForgeDirection side) {
+		List<EntityItem> drops = new ArrayList();
+		while (!(drop.stored <= 0)) {
+			ItemStack dropStack = drop.getItemStack();
+			dropStack.stackSize = (int) Math.min(drop.stored, dropStack.getMaxStackSize());
+			drop.stored -= dropStack.stackSize;
+			drops.add(new EntityItem(world, x + 0.5, y + 0.5, z + 0.5, dropStack));
+		}
+		if (drop.stored < 0) {
+			Logistics.logger.error("ERROR: Excess Items in Drop");
+		}
+		for (EntityItem item : drops) {
+			item.motionX = 0;
+			item.motionY = 0;
+			item.motionZ = 0;
+			if (side == ForgeDirection.NORTH) {
+				item.motionZ = -0.1;
+			}
+			if (side == ForgeDirection.SOUTH) {
+				item.motionZ = 0.1;
+			}
+			if (side == ForgeDirection.WEST) {
+				item.motionX = -0.1;
+			}
+			if (side == ForgeDirection.EAST) {
+				item.motionX = 0.1;
+			}
+			world.spawnEntityInWorld(item);
+		}
+	}
 }

@@ -2,10 +2,13 @@ package sonar.logistics.integration;
 
 import sonar.core.fluid.StoredFluidStack;
 import sonar.core.inventory.StoredItemStack;
+import sonar.core.utils.ActionType;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import appeng.api.AEApi;
+import appeng.api.config.Actionable;
 import appeng.api.networking.security.BaseActionSource;
+import appeng.api.networking.security.MachineSource;
 import appeng.api.storage.IExternalStorageHandler;
 import appeng.api.storage.IMEInventory;
 import appeng.api.storage.StorageChannel;
@@ -50,8 +53,25 @@ public class AE2Helper {
 		return null;
 	}
 
+	public static Actionable getActionable(ActionType action) {
+		switch (action) {
+		case PERFORM:
+			return Actionable.MODULATE;
+		default:
+			return Actionable.SIMULATE;
+		}
+	}
+
+	public static ActionType getActionType(Actionable action) {
+		switch (action) {
+		case MODULATE:
+			return ActionType.PERFORM;
+		default:
+			return ActionType.SIMULATE;
+		}
+	}
 	public static class SourceHandler extends BaseActionSource {
-		
+
 	}
 
 }

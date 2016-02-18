@@ -6,6 +6,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.fluid.StoredFluidStack;
 import sonar.core.inventory.StoredItemStack;
+import sonar.core.utils.ActionType;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.providers.FluidHandler;
 import sonar.logistics.api.providers.InventoryHandler;
@@ -58,21 +59,21 @@ public class AE2ExternalFluidProvider extends FluidHandler {
 	}
 
 	@Override
-	public StoredFluidStack addStack(StoredFluidStack add, TileEntity tile, ForgeDirection dir) {
+	public StoredFluidStack addStack(StoredFluidStack add, TileEntity tile, ForgeDirection dir, ActionType action) {
 		IMEInventory inv = AE2Helper.getMEInventory(tile, dir, StorageChannel.FLUIDS);
 		if (inv == null) {
 			return add;
 		}
-		return AE2Helper.convertAEFluidStack(inv.injectItems(AE2Helper.convertStoredFluidStack(add), Actionable.MODULATE, AE2Helper.sourceHandler));
+		return AE2Helper.convertAEFluidStack(inv.injectItems(AE2Helper.convertStoredFluidStack(add), AE2Helper.getActionable(action), AE2Helper.sourceHandler));
 	}
 
 	@Override
-	public StoredFluidStack removeStack(StoredFluidStack remove, TileEntity tile, ForgeDirection dir) {
+	public StoredFluidStack removeStack(StoredFluidStack remove, TileEntity tile, ForgeDirection dir, ActionType action) {
 		IMEInventory inv = AE2Helper.getMEInventory(tile, dir, StorageChannel.FLUIDS);
 		if (inv == null) {
 			return remove;
 		}
-		return AE2Helper.convertAEFluidStack(inv.extractItems(AE2Helper.convertStoredFluidStack(remove), Actionable.MODULATE, AE2Helper.sourceHandler));
+		return AE2Helper.convertAEFluidStack(inv.extractItems(AE2Helper.convertStoredFluidStack(remove), AE2Helper.getActionable(action), AE2Helper.sourceHandler));
 	}
 
 	public boolean isLoadable() {

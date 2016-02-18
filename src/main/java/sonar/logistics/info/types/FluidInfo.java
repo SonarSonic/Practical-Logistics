@@ -13,6 +13,7 @@ import net.minecraftforge.fluids.FluidRegistry;
 import org.lwjgl.opengl.GL11;
 
 import sonar.logistics.api.StandardInfo;
+import sonar.logistics.api.render.ScreenType;
 
 public class FluidInfo extends StandardInfo {
 
@@ -57,7 +58,7 @@ public class FluidInfo extends StandardInfo {
 	}
 
 	@Override
-	public void renderInfo(Tessellator tess, TileEntity tile, float minX, float minY, float maxX, float maxY, float zOffset, float scale) {
+	public void renderInfo(Tessellator tess, TileEntity tile, float minX, float minY, float maxX, float maxY, float zOffset, ScreenType type) {
 		FontRenderer rend = Minecraft.getMinecraft().fontRenderer;
 		GL11.glTranslated(0, 0, zOffset + 0.002);
 		float width = (maxX - minX);
@@ -85,7 +86,7 @@ public class FluidInfo extends StandardInfo {
 			}
 		}
 		GL11.glTranslated(0, 0, -zOffset);
-		super.renderInfo(tess, tile, minX, minY, maxX, maxY, zOffset, scale);
+		super.renderInfo(tess, tile, minX, minY, maxX, maxY, zOffset, type);
 	}
 
 	@Override

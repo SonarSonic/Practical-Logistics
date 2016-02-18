@@ -7,6 +7,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import sonar.core.utils.IBufObject;
 import sonar.core.utils.INBTObject;
+import sonar.logistics.api.render.ScreenType;
 
 public abstract class Info<T extends Info> implements INBTObject, IBufObject {
 
@@ -54,8 +55,8 @@ public abstract class Info<T extends Info> implements INBTObject, IBufObject {
 		return false;
 	}
 
-	public void renderInfo(Tessellator tess, TileEntity tile, float minX, float minY, float maxX, float maxY, float zOffset, float scale) {
-		LogisticsAPI.getInfoRenderer().renderStandardInfo(this, Minecraft.getMinecraft().fontRenderer, minX, minY, maxX, maxY, zOffset, scale);
+	public void renderInfo(Tessellator tess, TileEntity tile, float minX, float minY, float maxX, float maxY, float zOffset, ScreenType type) {
+		LogisticsAPI.getInfoRenderer().renderStandardInfo(this, Minecraft.getMinecraft().fontRenderer, minX, minY, maxX, maxY, zOffset, type);
 	}
 
 	public boolean isLoadable() {

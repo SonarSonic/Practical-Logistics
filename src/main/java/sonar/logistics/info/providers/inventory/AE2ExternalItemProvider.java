@@ -2,9 +2,11 @@ package sonar.logistics.info.providers.inventory;
 
 import java.util.List;
 
+import logisticspipes.api.ILPPipeTile;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.inventory.StoredItemStack;
+import sonar.core.utils.ActionType;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.providers.InventoryHandler;
 import sonar.logistics.integration.AE2Helper;
@@ -34,9 +36,10 @@ public class AE2ExternalItemProvider extends InventoryHandler {
 
 	@Override
 	public boolean canHandleItems(TileEntity tile, ForgeDirection dir) {
-		IExternalStorageHandler handler = AEApi.instance().registries().externalStorage().getHandler(tile, dir, StorageChannel.ITEMS, AE2Helper.sourceHandler);
+		//IExternalStorageHandler handler = AEApi.instance().registries().externalStorage().getHandler(tile, dir, StorageChannel.ITEMS, AE2Helper.sourceHandler);
 
-		return handler != null;
+		//return handler != null && (!Loader.isModLoaded("LogisticsPipes") || !(tile instanceof ILPPipeTile));
+		return false;
 	}
 
 	@Override
@@ -77,21 +80,21 @@ public class AE2ExternalItemProvider extends InventoryHandler {
 	}
 
 	@Override
-	public StoredItemStack addStack(StoredItemStack add, TileEntity tile, ForgeDirection dir) {
+	public StoredItemStack addStack(StoredItemStack add, TileEntity tile, ForgeDirection dir, ActionType action) {
 		IMEInventory inv = AE2Helper.getMEInventory(tile, dir, StorageChannel.ITEMS);
 		if (inv == null) {
 			return add;
 		}
-		return AE2Helper.convertAEItemStack(inv.injectItems(AE2Helper.convertStoredItemStack(add), Actionable.MODULATE, AE2Helper.sourceHandler));
+		return AE2Helper.convertAEItemStack(inv.injectItems(AE2Helper.convertStoredItemStack(add), AE2Helper.getActionable(action), AE2Helper.sourceHandler));
 	}
 
 	@Override
-	public StoredItemStack removeStack(StoredItemStack remove, TileEntity tile, ForgeDirection dir) {
+	public StoredItemStack removeStack(StoredItemStack remove, TileEntity tile, ForgeDirection dir, ActionType action) {
 		IMEInventory inv = AE2Helper.getMEInventory(tile, dir, StorageChannel.ITEMS);
 		if (inv == null) {
 			return remove;
 		}
-		return AE2Helper.convertAEItemStack(inv.extractItems(AE2Helper.convertStoredItemStack(remove), Actionable.MODULATE, AE2Helper.sourceHandler));
+		return AE2Helper.convertAEItemStack(inv.extractItems(AE2Helper.convertStoredItemStack(remove), AE2Helper.getActionable(action), AE2Helper.sourceHandler));
 	}
 
 	public boolean isLoadable() {
