@@ -3,7 +3,6 @@ package sonar.logistics.common.blocks;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
-import sonar.core.utils.BlockInteractionType;
 import sonar.logistics.Logistics;
 import sonar.logistics.common.tileentity.TileEntityChannelSelector;
 import sonar.logistics.network.LogisticsGui;

@@ -6,17 +6,18 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.fluid.StoredFluidStack;
 import sonar.core.utils.ActionType;
+import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.providers.FluidHandler;
+import sonar.logistics.api.providers.InventoryHandler.StorageSize;
 import sonar.logistics.integration.AE2Helper;
 import appeng.api.AEApi;
-import appeng.api.config.Actionable;
-import appeng.api.implementations.tiles.ITileStorageMonitorable;
 import appeng.api.networking.security.IActionHost;
 import appeng.api.networking.security.MachineSource;
-import appeng.api.storage.IMEMonitor;
-import appeng.api.storage.IStorageMonitorable;
+import appeng.api.networking.storage.IStorageGrid;
 import appeng.api.storage.data.IAEFluidStack;
 import appeng.api.storage.data.IItemList;
+import appeng.me.GridAccessException;
+import appeng.me.helpers.IGridProxyable;
 import cpw.mods.fml.common.Loader;
 
 public class AE2FluidProvider extends FluidHandler {
@@ -28,61 +29,63 @@ public class AE2FluidProvider extends FluidHandler {
 		return name;
 	}
 
-	@Override
-	public boolean canHandleFluids(TileEntity tile, ForgeDirection dir) {
-		return tile instanceof ITileStorageMonitorable && tile instanceof IActionHost;
-	}
-
-	@Override
-	public boolean getFluids(List<StoredFluidStack> fluids, TileEntity tile, ForgeDirection dir) {
-		if (tile instanceof ITileStorageMonitorable && tile instanceof IActionHost) {
-			IStorageMonitorable monitor = ((ITileStorageMonitorable) tile).getMonitorable(dir, new MachineSource(((IActionHost) tile)));
-			if (monitor != null) {
-				IMEMonitor<IAEFluidStack> stacks = monitor.getFluidInventory();
-				if (stacks != null) {
-					IItemList<IAEFluidStack> fluidStacks = stacks.getStorageList();
-					for (IAEFluidStack item : fluidStacks) {
-						fluids.add(new StoredFluidStack(item.getFluidStack(), item.getStackSize(), item.getStackSize()));
-					}
-				}
-			}
-			return true;
-		}
-		return false;
-	}
-
-	@Override
 	public boolean isLoadable() {
 		return Loader.isModLoaded("appliedenergistics2");
 	}
 
 	@Override
-	public StoredFluidStack addStack(StoredFluidStack add, TileEntity tile, ForgeDirection dir, ActionType action) {
-		IStorageMonitorable monitor = ((ITileStorageMonitorable) tile).getMonitorable(dir, new MachineSource(((IActionHost) tile)));
-		if (monitor != null) {
-			IMEMonitor<IAEFluidStack> stacks = monitor.getFluidInventory();
-			IItemList<IAEFluidStack> fluidStacks = stacks.getStorageList();
+	public boolean canHandleFluids(TileEntity tile, ForgeDirection dir) {
+		return tile instanceof IGridProxyable;
+	}
 
-			IAEFluidStack stack = stacks.injectItems(AEApi.instance().storage().createFluidStack(add.fluid).setStackSize(add.stored), AE2Helper.getActionable(action), new MachineSource(((IActionHost) tile)));
-			if (stack == null || stack.getStackSize() == 0) {
+	@Override
+	public StorageSize getFluids(List<StoredFluidStack> storedStacks, TileEntity tile, ForgeDirection dir) {
+		long maxStorage = 0;
+		IGridProxyable proxy = (IGridProxyable) tile;
+		try {
+			IStorageGrid storage = proxy.getProxy().getStorage();
+			IItemList<IAEFluidStack> fluids = storage.getFluidInventory().getStorageList();
+			if (fluids == null) {
+				return StorageSize.EMPTY;
+			}
+			for (IAEFluidStack fluid : fluids) {
+				LogisticsAPI.getFluidHelper().addFluidToList(storedStacks, AE2Helper.convertAEFluidStack(fluid));
+				maxStorage += fluid.getStackSize();
+			}
+		} catch (GridAccessException e) {
+			e.printStackTrace();
+		}
+		return new StorageSize(maxStorage, maxStorage);
+	}
+
+	@Override
+	public StoredFluidStack addStack(StoredFluidStack add, TileEntity tile, ForgeDirection dir, ActionType action) {
+		IGridProxyable proxy = (IGridProxyable) tile;
+		try {
+			IStorageGrid storage = proxy.getProxy().getStorage();
+			IAEFluidStack fluid = storage.getFluidInventory().injectItems(AE2Helper.convertStoredFluidStack(add), AE2Helper.getActionable(action), new MachineSource(((IActionHost) tile)));
+			if (fluid == null || fluid.getStackSize() == 0) {
 				return null;
 			}
-			return new StoredFluidStack(stack.getFluidStack(), stack.getStackSize());
+			return AE2Helper.convertAEFluidStack(fluid);
+		} catch (GridAccessException e) {
+			e.printStackTrace();
 		}
 		return add;
 	}
 
 	@Override
 	public StoredFluidStack removeStack(StoredFluidStack remove, TileEntity tile, ForgeDirection dir, ActionType action) {
-		IStorageMonitorable monitor = ((ITileStorageMonitorable) tile).getMonitorable(dir, new MachineSource(((IActionHost) tile)));
-		if (monitor != null) {
-			IMEMonitor<IAEFluidStack> stacks = monitor.getFluidInventory();
-			IItemList<IAEFluidStack> fluidStacks = stacks.getStorageList();
-			IAEFluidStack stack = stacks.extractItems(AEApi.instance().storage().createFluidStack(remove.fluid).setStackSize(remove.stored), AE2Helper.getActionable(action), new MachineSource(((IActionHost) tile)));
-			if (stack.getStackSize() == 0) {
-				return remove;
+		IGridProxyable proxy = (IGridProxyable) tile;
+		try {
+			IStorageGrid storage = proxy.getProxy().getStorage();
+			IAEFluidStack fluid = storage.getFluidInventory().extractItems(AEApi.instance().storage().createFluidStack(remove.fluid).setStackSize(remove.stored), AE2Helper.getActionable(action), new MachineSource(((IActionHost) tile)));
+			if (fluid == null || fluid.getStackSize() == 0) {
+				return null;
 			}
-			return new StoredFluidStack(stack.getFluidStack(), remove.stored - stack.getStackSize());
+			return AE2Helper.convertAEFluidStack(fluid);
+		} catch (GridAccessException e) {
+			e.printStackTrace();
 		}
 		return remove;
 	}

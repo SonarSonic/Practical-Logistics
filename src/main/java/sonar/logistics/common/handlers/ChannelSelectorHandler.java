@@ -21,6 +21,7 @@ import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.core.utils.helpers.SonarHelper;
 import sonar.logistics.api.IdentifiedCoords;
 import sonar.logistics.api.LogisticsAPI;
+import sonar.logistics.api.connecting.CableType;
 import sonar.logistics.api.connecting.IConnectionNode;
 import sonar.logistics.network.SyncIdentifiedCoords;
 
@@ -215,8 +216,8 @@ public class ChannelSelectorHandler extends TileHandler {
 		}
 	}
 
-	public int canRenderConnection(TileEntity te, ForgeDirection dir) {
-		return LogisticsAPI.getCableHelper().canRenderConnection(te, dir);
+	public CableType canRenderConnection(TileEntity te, ForgeDirection dir) {
+		return LogisticsAPI.getCableHelper().canRenderConnection(te, dir, CableType.BLOCK_CONNECTION);
 	}
 
 	public boolean canConnect(TileEntity te, ForgeDirection dir) {

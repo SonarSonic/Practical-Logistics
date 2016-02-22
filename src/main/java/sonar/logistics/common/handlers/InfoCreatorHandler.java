@@ -5,12 +5,13 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.handlers.TileHandler;
-import sonar.core.network.sync.SyncString;
+import sonar.core.network.sync.SyncTagType;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.StandardInfo;
+import sonar.logistics.api.connecting.CableType;
 
 public class InfoCreatorHandler extends TileHandler {
 
@@ -18,8 +19,8 @@ public class InfoCreatorHandler extends TileHandler {
 		super(isMultipart, tile);
 	}
 
-	public SyncString subCategory = new SyncString(0);
-	public SyncString data = new SyncString(1);
+	public SyncTagType.STRING subCategory = new SyncTagType.STRING(0);
+	public SyncTagType.STRING data = new SyncTagType.STRING(1);
 	public Info info;
 
 	public void update(TileEntity te) {
@@ -57,11 +58,11 @@ public class InfoCreatorHandler extends TileHandler {
 		}
 	}
 
-	public int canRenderConnection(TileEntity te, ForgeDirection dir) {
+	public CableType canRenderConnection(TileEntity te, ForgeDirection dir) {
 		if (dir == ForgeDirection.getOrientation(FMPHelper.getMeta(te))) {
-			return LogisticsAPI.getCableHelper().canRenderConnection(te, dir);
+			return LogisticsAPI.getCableHelper().canRenderConnection(te, dir, CableType.BLOCK_CONNECTION);
 		} else {
-			return 0;
+			return CableType.NONE;
 		}
 	}
 
@@ -77,13 +78,13 @@ public class InfoCreatorHandler extends TileHandler {
 		String text = (string == null || string.isEmpty()) ? " " : string;
 		switch (id) {
 		case 0:
-			this.subCategory.setString(string);
+			this.subCategory.setObject(string);
 			break;
 		case 1:
-			this.data.setString(string);
+			this.data.setObject(string);
 			break;
 		}
-		this.info = new StandardInfo((byte) -1, "CREATOR", this.subCategory.getString(), this.data.getString());
+		this.info = new StandardInfo((byte) -1, "CREATOR", this.subCategory.getObject(), this.data.getObject());
 	}
 
 }

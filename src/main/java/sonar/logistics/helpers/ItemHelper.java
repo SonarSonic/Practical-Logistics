@@ -25,24 +25,23 @@ import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.connecting.IConnectionNode;
 import sonar.logistics.api.connecting.IEntityNode;
 import sonar.logistics.api.providers.InventoryHandler;
+import sonar.logistics.api.providers.InventoryHandler.StorageSize;
 import sonar.logistics.api.wrappers.ItemWrapper;
 
 public class ItemHelper extends ItemWrapper {
 
-	public List<StoredItemStack> getStackList(List<BlockCoords> network) {
+	public StorageItems getStackList(List<BlockCoords> network) {
 		List<StoredItemStack> storedStacks = new ArrayList();
-		if (network == null) {
-			return storedStacks;
-		}
+		StorageSize storage = new StorageSize(0,0);
 		for (BlockCoords connect : network) {
 			Object tile = connect.getTileEntity();
 			if (tile != null) {
 				if (tile instanceof IConnectionNode) {
-					getTileInventory(storedStacks, (IConnectionNode) tile);
+					storage = getTileInventory(storedStacks, storage, (IConnectionNode) tile);
 
 				}
 				if (tile instanceof IEntityNode) {
-					getEntityInventory(storedStacks, (IEntityNode) tile);
+					storage = getEntityInventory(storedStacks, storage, (IEntityNode) tile);
 				}
 			}
 		}
@@ -55,10 +54,10 @@ public class ItemHelper extends ItemWrapper {
 				return -1;
 			}
 		});
-		return storedStacks;
+		return new StorageItems(storedStacks,storage);
 	}
 
-	public List<StoredItemStack> getTileInventory(List<StoredItemStack> storedStacks, IConnectionNode node) {
+	public StorageSize getTileInventory(List<StoredItemStack> storedStacks, StorageSize storage, IConnectionNode node) {
 		Map<BlockCoords, ForgeDirection> connections = node.getConnections();
 		for (Map.Entry<BlockCoords, ForgeDirection> entry : connections.entrySet()) {
 			TileEntity tile = entry.getKey().getTileEntity();
@@ -66,7 +65,12 @@ public class ItemHelper extends ItemWrapper {
 			for (InventoryHandler provider : Logistics.inventoryProviders.getObjects()) {
 				if (tile != null && provider.canHandleItems(tile, entry.getValue())) {
 					if (!specialProvider) {
-						specialProvider = provider.getItems(storedStacks, tile, entry.getValue());
+						StorageSize size = provider.getItems(storedStacks, tile, entry.getValue());
+						if (size != StorageSize.EMPTY) {
+							specialProvider = true;
+							storage.addItems(size.getStoredFluids());
+							storage.addStorage(size.getMaxFluids());
+						}
 					} else {
 						continue;
 					}
@@ -74,28 +78,33 @@ public class ItemHelper extends ItemWrapper {
 			}
 		}
 
-		return storedStacks;
+		return storage;
 	}
 
-	public List<StoredItemStack> getEntityInventory(List<StoredItemStack> storedStacks, IEntityNode tileNode) {
+	public StorageSize getEntityInventory(List<StoredItemStack> storedStacks, StorageSize storage, IEntityNode tileNode) {
 		List<Entity> entityList = tileNode.getEntities();
 		for (Entity entity : entityList) {
 			if (entity instanceof EntityPlayer) {
 				EntityPlayer player = (EntityPlayer) entity;
-				addInventoryToList(storedStacks, player.inventory);
+				StorageSize size = addInventoryToList(storedStacks, player.inventory);
+				storage.addItems(size.getStoredFluids());
+				storage.addStorage(size.getMaxFluids());
 			}
 		}
-		return storedStacks;
+		return storage;
 
 	}
 
-	public void addInventoryToList(List<StoredItemStack> list, IInventory inv) {
+	public StorageSize addInventoryToList(List<StoredItemStack> list, IInventory inv) {
+		long stored = 0;
 		for (int i = 0; i < inv.getSizeInventory(); i++) {
 			ItemStack stack = inv.getStackInSlot(i);
 			if (stack != null) {
+				stored += stack.stackSize;
 				addStackToList(list, inv.getStackInSlot(i));
 			}
 		}
+		return new StorageSize(stored, inv.getInventoryStackLimit() * inv.getSizeInventory());
 	}
 
 	public void addStackToList(List<StoredItemStack> list, StoredItemStack stack) {

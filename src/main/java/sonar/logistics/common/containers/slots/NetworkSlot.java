@@ -1,15 +1,12 @@
 package sonar.logistics.common.containers.slots;
 
-import sonar.core.integration.fmp.FMPHelper;
+import net.minecraft.inventory.Slot;
+import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 import sonar.core.inventory.StoredItemStack;
 import sonar.core.utils.ActionType;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.common.handlers.InventoryReaderHandler;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.Slot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraftforge.common.util.ForgeDirection;
 
 public class NetworkSlot extends Slot {
 

@@ -258,12 +258,12 @@ public class GuiInfoReader extends GuiSonar {
 						if (buttonID == 0) {
 							if (getPrimaryInfo() != null && info.equals(getPrimaryInfo())) {
 								Logistics.network.sendToServer(new PacketInfoBlock(xCoord, yCoord, zCoord, true));
-								if (handler.isMultipart.getBoolean()) {
+								if (handler.isMultipart.getObject()) {
 									handler.primaryInfo = null;
 								}
 							} else {
 								Logistics.network.sendToServer(new PacketInfoBlock(xCoord, yCoord, zCoord, info, true));
-								if (handler.isMultipart.getBoolean()) {
+								if (handler.isMultipart.getObject()) {
 									handler.primaryInfo.setObject(info);
 								}
 							}
@@ -272,12 +272,12 @@ public class GuiInfoReader extends GuiSonar {
 							if (!info.equals(getPrimaryInfo())) {
 								if (getSecondInfo() != null && info.equals(getSecondInfo())) {
 									Logistics.network.sendToServer(new PacketInfoBlock(xCoord, yCoord, zCoord, false));
-									if (handler.isMultipart.getBoolean()) {
+									if (handler.isMultipart.getObject()) {
 										handler.secondaryInfo = null;
 									}
 								} else {
 									Logistics.network.sendToServer(new PacketInfoBlock(xCoord, yCoord, zCoord, info, false));
-									if (handler.isMultipart.getBoolean()) {
+									if (handler.isMultipart.getObject()) {
 										handler.secondaryInfo.setObject(info);
 									}
 								}

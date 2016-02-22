@@ -4,84 +4,240 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumChatFormatting;
-import net.minecraft.util.StatCollector;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fluids.FluidStack;
 
 import org.lwjgl.opengl.GL11;
 
+import sonar.core.SonarCore;
 import sonar.core.fluid.StoredFluidStack;
+import sonar.core.network.PacketByteBufServer;
 import sonar.core.utils.helpers.FontHelper;
 import sonar.logistics.Logistics;
 import sonar.logistics.common.containers.ContainerFluidReader;
 import sonar.logistics.common.handlers.FluidReaderHandler;
+import sonar.logistics.network.LogisticsGui;
 import sonar.logistics.network.packets.PacketFluidReader;
+import sonar.logistics.network.packets.PacketGuiChange;
 
 public class GuiFluidReader extends GuiSelectionGrid<StoredFluidStack> {
 
+	public static final ResourceLocation stackBGround = new ResourceLocation("PracticalLogistics:textures/gui/inventoryReader_stack.png");
+	public static final ResourceLocation clearBGround = new ResourceLocation("PracticalLogistics:textures/gui/inventoryReader_clear.png");
+
 	public FluidReaderHandler handler;
+	private GuiTextField slotField;
+	private GuiTextField searchField;
+	public static final int STACK = 0, POS = 1, INV = 2, STORAGE = 3;
+
+	public InventoryPlayer inventoryPlayer;
 
 	public GuiFluidReader(FluidReaderHandler handler, TileEntity entity, InventoryPlayer inventoryPlayer) {
 		super(new ContainerFluidReader(handler, entity, inventoryPlayer), entity);
 		this.handler = handler;
+		this.inventoryPlayer = inventoryPlayer;
+	}
+
+	public int getSetting() {
+		return handler.setting.getObject();
+	}
+
+	public void initGui() {
+		super.initGui();
+		this.buttonList.add(new GuiButton(0, guiLeft + 120 - (18 * 6), guiTop + 7, 65 + 3, 20, getSettingsString()) {
+
+			public void func_146111_b(int x, int y) {
+				drawCreativeTabHoveringText(getSettingsHover(), x, y);
+			}
+		});
+		switch (getSetting()) {
+		case POS:
+			slotField = new GuiTextField(this.fontRendererObj, 195 - (18 * 6), 8, 34 + 14, 18);
+			slotField.setMaxStringLength(7);
+			slotField.setText("" + handler.posSlot.getObject());
+			break;
+		}
+		searchField = new GuiTextField(this.fontRendererObj, 195 - (18 * 3), 8, 32 + 18 * 3, 18);
+		searchField.setMaxStringLength(20);
+	}
+
+	protected void actionPerformed(GuiButton button) {
+		if (button != null) {
+			if (button.id == 0) {
+
+				if (handler.setting.getObject() == 3) {
+					handler.setting.setObject(0);
+				} else {
+					handler.setting.increaseBy(1);
+				}
+				SonarCore.network.sendToServer(new PacketByteBufServer(handler, entity.xCoord, entity.yCoord, entity.zCoord, 0));
+				switchState();
+				reset();
+			}
+		}
+	}
+
+	public void switchState() {
+		Logistics.network.sendToServer(new PacketGuiChange(tile.xCoord, tile.yCoord, tile.zCoord, getSetting() == STACK, LogisticsGui.fluidReader));
+		if (this.mc.thePlayer.openContainer instanceof ContainerFluidReader) {
+			((ContainerFluidReader) this.mc.thePlayer.openContainer).addSlots(handler, inventoryPlayer, getSetting() == STACK);
+		}
+		this.inventorySlots = this.mc.thePlayer.openContainer;
+	}
+
+	@Override
+	public void drawGuiContainerForegroundLayer(int x, int y) {
+		searchField.drawTextBox();
+		switch (getSetting()) {
+		case STACK:
+			if (x - guiLeft >= 103 && x - guiLeft <= 103 + 16 && y - guiTop >= 9 && y - guiTop <= 9 + 16) {
+				FluidStack storedStack = handler.current;
+				if (storedStack != null) {
+					GL11.glDisable(GL11.GL_DEPTH_TEST);
+					GL11.glDisable(GL11.GL_LIGHTING);
+					List list = new ArrayList();
+					list.add(storedStack.getLocalizedName());
+					drawHoveringText(list, x - guiLeft, y - guiTop, fontRendererObj);
+					GL11.glEnable(GL11.GL_LIGHTING);
+					GL11.glEnable(GL11.GL_DEPTH_TEST);
+					net.minecraft.client.renderer.RenderHelper.enableGUIStandardItemLighting();
+
+				}
+			}
+			break;
+		case POS:
+			slotField.drawTextBox();
+			break;
+		}
+		super.drawGuiContainerForegroundLayer(x, y);
+	}
+
+	@Override
+	protected void mouseClicked(int i, int j, int k) {
+		super.mouseClicked(i, j, k);
+		switch (getSetting()) {
+		case POS:
+			slotField.mouseClicked(i - guiLeft, j - guiTop, k);
+			break;
+		}
+		searchField.mouseClicked(i - guiLeft, j - guiTop, k);
+	}
+
+	@Override
+	protected void keyTyped(char c, int i) {
+		if ((getSetting() == POS) && slotField.isFocused()) {
+			if (c == 13 || c == 27) {
+				slotField.setFocused(false);
+			} else {
+				FontHelper.addDigitsToString(slotField, c, i);
+				final String text = slotField.getText();
+				if (text.isEmpty() || text == "" || text == null) {
+					setPosSlot("0");
+				} else {
+					setPosSlot(text);
+				}
+
+			}
+		} else if (searchField.isFocused()) {
+			if (c == 13 || c == 27) {
+				searchField.setFocused(false);
+			} else {
+				searchField.textboxKeyTyped(c, i);
+			}
+		} else {
+			super.keyTyped(c, i);
+		}
+	}
+
+	public void setPosSlot(String string) {
+		handler.posSlot.setObject(Integer.parseInt(string));
+		SonarCore.network.sendToServer(new PacketByteBufServer(handler, entity.xCoord, entity.yCoord, entity.zCoord, 1));
+	}
+
+	public String getSettingsHover() {
+		switch (handler.setting.getObject()) {
+		case 0:
+			return "Selected Fluid";
+		case 1:
+			return "Fluid at the given position";
+		case 2:
+			return "List of Fluids";
+		case 3:
+			return "Current Tank Usage";
+		default:
+			return "Inventories";
+		}
+	}
+
+	public String getSettingsString() {
+		switch (handler.setting.getObject()) {
+		case 0:
+			return "Fluid";
+		case 1:
+			return "Pos";
+		case 2:
+			return "Tanks";
+		case 3:
+			return "Storage";
+		default:
+			return "Inventories";
+		}
 	}
 
 	@Override
 	public List<StoredFluidStack> getGridList() {
-		return handler.stacks;
+		if (searchField.getText() == null || searchField.getText().isEmpty() || searchField.getText().equals(" "))
+			return handler.fluids;
+		else {
+			List<StoredFluidStack> searchList = new ArrayList();
+			List<StoredFluidStack> currentList = (List<StoredFluidStack>) ((ArrayList<StoredFluidStack>) handler.fluids).clone();
+			for (StoredFluidStack stack : currentList) {
+				if (stack.fluid.getLocalizedName().toLowerCase().contains(searchField.getText().toLowerCase())) {
+					searchList.add(stack);
+				}
+			}
+			return searchList;
+		}
 	}
 
 	@Override
 	public void onGridClicked(StoredFluidStack selection, int pos) {
-		if (selection.fluid != null) {
-			Logistics.network.sendToServer(new PacketFluidReader(tile.xCoord, tile.yCoord, tile.zCoord, selection.fluid));
+		if (getSetting() == STACK) {
+			if (selection.fluid != null) {
+				Logistics.network.sendToServer(new PacketFluidReader(tile.xCoord, tile.yCoord, tile.zCoord, selection.fluid));
+			}
+		}
+		if (getSetting() == POS) {
+			List<StoredFluidStack> currentList = (List<StoredFluidStack>) ((ArrayList<StoredFluidStack>) handler.fluids).clone();
+			int position = 0;
+			for (StoredFluidStack stack : currentList) {
+				if (stack != null) {
+					if (stack.equals(selection)) {
+						String posString = String.valueOf(position);
+						slotField.setText(posString);
+						setPosSlot(posString);
+					}
+				}
+				position++;
+			}
+
 		}
 	}
 
 	@Override
 	public void renderStrings(int x, int y) {
-		FontHelper.textCentre(StatCollector.translateToLocal("tile.FluidReader.name"), xSize, 6, 1);
-		FontHelper.textCentre("Click the fluid you wish to monitor", xSize, 18, 0);
-	}
-
-	@Override
-	public void renderSelection(StoredFluidStack selection, int x, int y) {
-		if (selection.fluid != null) {
-			Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.locationBlocksTexture);
-			RenderItem.getInstance().renderIcon(13 + (x * 18), 32 + (y * 18), selection.fluid.getFluid().getIcon(), 16, 16);
-		}
-	}
-
-	@Override
-	public void renderToolTip(StoredFluidStack selection, int x, int y) {
-		List list = new ArrayList();
-		list.add(selection.fluid.getFluid().getLocalizedName(selection.fluid));
-		if (selection.stored != 0) {
-			list.add(EnumChatFormatting.GRAY + (String) "Stored: " + selection.stored + " mB");
-		}
-		drawHoveringText(list, x, y, fontRendererObj);
-	}
-
-	@Override
-	public void drawGuiContainerForegroundLayer(int x, int y) {
-		super.drawGuiContainerForegroundLayer(x, y);
-		if (x - guiLeft >= 13 && x - guiLeft <= 13 + 16 && y - guiTop >= 9 && y - guiTop <= 9 + 16) {
-			FluidStack storedStack = handler.current;
-			if (storedStack != null) {
-				GL11.glDisable(GL11.GL_DEPTH_TEST);
-				GL11.glDisable(GL11.GL_LIGHTING);
-				this.renderToolTip(storedStack, x - guiLeft, y - guiTop);
-				GL11.glEnable(GL11.GL_LIGHTING);
-				GL11.glEnable(GL11.GL_DEPTH_TEST);
-				net.minecraft.client.renderer.RenderHelper.enableGUIStandardItemLighting();
-
-			}
-		}
+		// FontHelper.textOffsetCentre(StatCollector.translateToLocal("tile.InventoryReader.name").split(" ")[0],
+		// 197, 8, 1);
+		// FontHelper.textOffsetCentre(StatCollector.translateToLocal("tile.InventoryReader.name").split(" ")[1],
+		// 197, 18, 1);
 	}
 
 	public void preRender() {
@@ -100,15 +256,36 @@ public class GuiFluidReader extends GuiSelectionGrid<StoredFluidStack> {
 			final int var11 = br % 65536;
 			final int var12 = br / 65536;
 			Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.locationBlocksTexture);
-
-			RenderItem.getInstance().renderIcon(13, 9, handler.current.getFluid().getIcon(), 16, 16);
+			if (STACK == handler.setting.getObject())
+				RenderItem.getInstance().renderIcon(103, 9, handler.current.getFluid().getIcon(), 16, 16);
 		}
 
 	}
 
-	protected void renderToolTip(FluidStack storedStack, int x, int y) {
+	@Override
+	public void renderSelection(StoredFluidStack selection, int x, int y) {
+		if (selection.fluid != null) {
+			Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.locationBlocksTexture);
+
+			RenderItem.getInstance().renderIcon(13 + (x * 18), 32 + (y * 18), selection.fluid.getFluid().getIcon(), 16, 16);
+		}
+	}
+
+	@Override
+	public void renderToolTip(StoredFluidStack selection, int x, int y) {
 		List list = new ArrayList();
-		list.add(storedStack.getLocalizedName());
+		list.add(selection.fluid.getFluid().getLocalizedName(selection.fluid));
+		if (selection.stored != 0) {
+			list.add(EnumChatFormatting.GRAY + (String) "Stored: " + selection.stored + " mB");
+		}
 		drawHoveringText(list, x, y, fontRendererObj);
+	}
+
+	@Override
+	public ResourceLocation getBackground() {
+		if (getSetting() == 0) {
+			return stackBGround;
+		}
+		return clearBGround;
 	}
 }

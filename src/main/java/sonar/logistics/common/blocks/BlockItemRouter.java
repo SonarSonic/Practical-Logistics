@@ -48,10 +48,10 @@ public class BlockItemRouter extends BaseNode {
 			if (target instanceof TileEntityItemRouter) {
 				TileEntityItemRouter router = (TileEntityItemRouter) target;
 				if (interact.type == BlockInteractionType.SHIFT_RIGHT) {
-					if (router.handler.sideConfigs[interact.side].getInt() < 2) {
+					if (router.handler.sideConfigs[interact.side].getObject() < 2) {
 						router.handler.sideConfigs[interact.side].increaseBy(1);
 					} else {
-						router.handler.sideConfigs[interact.side].setInt(0);
+						router.handler.sideConfigs[interact.side].setObject(0);
 					}
 
 					SonarCore.sendFullSyncAround(router, 64);

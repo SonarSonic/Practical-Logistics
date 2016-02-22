@@ -7,7 +7,6 @@ import java.util.Map;
 
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.utils.BlockCoords;
-import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.connecting.IDataCable;
 import sonar.logistics.api.connecting.IInfoEmitter;
 
@@ -143,7 +142,7 @@ public class CableRegistry {
 				Object target = FMPHelper.checkObject(oldCable.getTileEntity());
 				if (target != null && target instanceof IDataCable) {
 					IDataCable tile = (IDataCable) target;
-					LogisticsAPI.getCableHelper().addCable(tile);
+					tile.addCable();
 				}
 			}
 			for (BlockCoords coords : oldConnections) {

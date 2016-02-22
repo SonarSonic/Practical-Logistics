@@ -57,10 +57,10 @@ public class GuiEntityNode extends GuiSonar {
 	protected void actionPerformed(GuiButton button) {
 		if (button != null) {
 			if (button.id == 0) {
-				if (!(entity.entityTarget.getInt() > 2)) {
+				if (!(entity.entityTarget.getObject() > 2)) {
 					entity.entityTarget.increaseBy(1);
 				} else {
-					entity.entityTarget.setInt(0);
+					entity.entityTarget.setObject(0);
 				}
 			}
 			SonarCore.network.sendToServer(new PacketByteBufServer(entity, entity.xCoord, entity.yCoord, entity.zCoord, button.id));
@@ -72,7 +72,7 @@ public class GuiEntityNode extends GuiSonar {
 	public void drawGuiContainerForegroundLayer(int x, int y) {
 		super.drawGuiContainerForegroundLayer(x, y);
 		FontHelper.textCentre(FontHelper.translate("tile.EntityNode.name"), xSize, 6, 0);
-		FontHelper.textCentre("Range: " + entity.entityRange.getInt(), xSize, 40, 0);
+		FontHelper.textCentre("Range: " + entity.entityRange.getObject(), xSize, 40, 0);
 	}
 
 	@Override
@@ -81,7 +81,7 @@ public class GuiEntityNode extends GuiSonar {
 	}
 
 	public int getEntityType() {
-		return entity.entityTarget.getInt();
+		return entity.entityTarget.getObject();
 	}
 
 	public void changeEntityType() {

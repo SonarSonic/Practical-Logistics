@@ -15,12 +15,20 @@ import sonar.logistics.common.handlers.FluidReaderHandler;
 
 public class ContainerFluidReader extends ContainerSync {
 
-	private static final int INV_START = 0, INV_END = INV_START + 26, HOTBAR_START = INV_END + 1, HOTBAR_END = HOTBAR_START + 8;
-	public FluidReaderHandler handler;
+	private static final int INV_START = 1, INV_END = INV_START + 26, HOTBAR_START = INV_END + 1, HOTBAR_END = HOTBAR_START + 8;
+	public boolean stackMode = false;
+	FluidReaderHandler handler;
 
 	public ContainerFluidReader(FluidReaderHandler handler, TileEntity entity, InventoryPlayer inventoryPlayer) {
 		super(handler, entity);
+		addSlots(handler, inventoryPlayer, handler.setting.getObject() == 0);
 		this.handler = handler;
+	}
+
+	public void addSlots(FluidReaderHandler handler, InventoryPlayer inventoryPlayer, boolean hasStack) {
+		stackMode = hasStack;
+		this.inventoryItemStacks.clear();
+		this.inventorySlots.clear();
 		for (int i = 0; i < 3; ++i) {
 			for (int j = 0; j < 9; ++j) {
 				this.addSlotToContainer(new Slot(inventoryPlayer, j + i * 9 + 9, 41 + j * 18, 174 + i * 18));
@@ -30,7 +38,6 @@ public class ContainerFluidReader extends ContainerSync {
 		for (int i = 0; i < 9; ++i) {
 			this.addSlotToContainer(new Slot(inventoryPlayer, i, 41 + i * 18, 232));
 		}
-
 	}
 
 	@Override
@@ -46,7 +53,7 @@ public class ContainerFluidReader extends ContainerSync {
 			ItemStack itemstack1 = slot.getStack();
 			itemstack = itemstack1.copy();
 
-			if (par2 >= INV_START) {
+			if (stackMode && par2 >= INV_START) {
 				if (!tile.getWorldObj().isRemote) {
 					ItemStack copy = itemstack1.copy();
 					if (copy != null && copy.getItem() instanceof IFluidContainerItem) {
@@ -106,4 +113,5 @@ public class ContainerFluidReader extends ContainerSync {
 	public SyncType[] getSyncTypes() {
 		return new SyncType[] { SyncType.SPECIAL };
 	}
+
 }

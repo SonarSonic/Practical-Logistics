@@ -20,8 +20,9 @@ import sonar.core.utils.helpers.RenderHelper;
 import sonar.logistics.Logistics;
 import sonar.logistics.common.containers.ContainerInventoryReader;
 import sonar.logistics.common.handlers.InventoryReaderHandler;
+import sonar.logistics.network.LogisticsGui;
+import sonar.logistics.network.packets.PacketGuiChange;
 import sonar.logistics.network.packets.PacketInventoryReader;
-import sonar.logistics.network.packets.PacketInventoryReaderGui;
 
 public class GuiInventoryReader extends GuiSelectionGrid<StoredItemStack> {
 
@@ -32,7 +33,7 @@ public class GuiInventoryReader extends GuiSelectionGrid<StoredItemStack> {
 	public InventoryReaderHandler handler;
 	private GuiTextField slotField;
 	private GuiTextField searchField;
-	public static final int STACK = 0, SLOT = 1, POS = 2, INV = 3;
+	public static final int STACK = 0, SLOT = 1, POS = 2, INV = 3, STORAGE=4;
 
 	public InventoryPlayer inventoryPlayer;
 
@@ -43,12 +44,12 @@ public class GuiInventoryReader extends GuiSelectionGrid<StoredItemStack> {
 	}
 
 	public int getSetting() {
-		return handler.setting.getInt();
+		return handler.setting.getObject();
 	}
 
 	public void initGui() {
 		super.initGui();
-		// System.out.print(" RESET: " + handler.setting.getInt());
+		// System.out.print(" RESET: " + handler.setting.getObject());
 		this.buttonList.add(new GuiButton(0, guiLeft + 120 - (18 * 6), guiTop + 7, 65 + 3, 20, getSettingsString()));
 		switch (getSetting()) {
 		case SLOT:
@@ -56,9 +57,9 @@ public class GuiInventoryReader extends GuiSelectionGrid<StoredItemStack> {
 			slotField = new GuiTextField(this.fontRendererObj, 195 - (18 * 6), 8, 34 + 14, 18);
 			slotField.setMaxStringLength(7);
 			if (getSetting() == SLOT)
-				slotField.setText("" + handler.targetSlot.getInt());
+				slotField.setText("" + handler.targetSlot.getObject());
 			else if (getSetting() == POS)
-				slotField.setText("" + handler.posSlot.getInt());
+				slotField.setText("" + handler.posSlot.getObject());
 			break;
 		}
 		searchField = new GuiTextField(this.fontRendererObj, 195 - (18 * 3), 8, 32 + 18 * 3, 18);
@@ -70,13 +71,13 @@ public class GuiInventoryReader extends GuiSelectionGrid<StoredItemStack> {
 		if (button != null) {
 			if (button.id == 0) {
 
-				if (handler.setting.getInt() == 3) {
-					handler.setting.setInt(0);
+				if (handler.setting.getObject() == 4) {
+					handler.setting.setObject(0);
 				} else {
 					handler.setting.increaseBy(1);
 				}
 
-				// System.out.print(" AFTER: " + handler.setting.getInt());
+				// System.out.print(" AFTER: " + handler.setting.getObject());
 				SonarCore.network.sendToServer(new PacketByteBufServer(handler, entity.xCoord, entity.yCoord, entity.zCoord, 0));
 				switchState();
 				reset();
@@ -85,7 +86,7 @@ public class GuiInventoryReader extends GuiSelectionGrid<StoredItemStack> {
 	}
 
 	public void switchState() {
-		Logistics.network.sendToServer(new PacketInventoryReaderGui(tile.xCoord, tile.yCoord, tile.zCoord, getSetting() == STACK));
+		Logistics.network.sendToServer(new PacketGuiChange(tile.xCoord, tile.yCoord, tile.zCoord, getSetting() == STACK, LogisticsGui.inventoryReader));
 		if (this.mc.thePlayer.openContainer instanceof ContainerInventoryReader) {
 			((ContainerInventoryReader) this.mc.thePlayer.openContainer).addSlots(handler, inventoryPlayer, getSetting() == STACK);
 		}
@@ -149,17 +150,17 @@ public class GuiInventoryReader extends GuiSelectionGrid<StoredItemStack> {
 	}
 
 	public void setTargetSlot(String string) {
-		handler.targetSlot.setInt(Integer.parseInt(string));
+		handler.targetSlot.setObject(Integer.parseInt(string));
 		SonarCore.network.sendToServer(new PacketByteBufServer(handler, entity.xCoord, entity.yCoord, entity.zCoord, 1));
 	}
 
 	public void setPosSlot(String string) {
-		handler.posSlot.setInt(Integer.parseInt(string));
+		handler.posSlot.setObject(Integer.parseInt(string));
 		SonarCore.network.sendToServer(new PacketByteBufServer(handler, entity.xCoord, entity.yCoord, entity.zCoord, 2));
 	}
 
 	public String getSettingsString() {
-		switch (handler.setting.getInt()) {
+		switch (handler.setting.getObject()) {
 		case 0:
 			return "Stack";
 		case 1:
@@ -168,6 +169,8 @@ public class GuiInventoryReader extends GuiSelectionGrid<StoredItemStack> {
 			return "Pos";
 		case 3:
 			return "Inventories";
+		case 4:
+			return "Storage";
 		default:
 			return "Inventories";
 		}
@@ -233,8 +236,7 @@ public class GuiInventoryReader extends GuiSelectionGrid<StoredItemStack> {
 	}
 
 	@Override
-	public void renderToolTip(StoredItemStack selection, int x, int y) {
-		
+	public void renderToolTip(StoredItemStack selection, int x, int y) {		
 		List list = selection.item.getTooltip(this.mc.thePlayer, this.mc.gameSettings.advancedItemTooltips);
 		list.add(1, "Stored: " + selection.stored);
 		for (int k = 0; k < list.size(); ++k) {

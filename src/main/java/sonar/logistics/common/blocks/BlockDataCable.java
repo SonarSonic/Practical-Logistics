@@ -11,6 +11,9 @@ import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.common.block.SonarMachineBlock;
 import sonar.core.common.block.SonarMaterials;
 import sonar.core.utils.BlockInteraction;
+import sonar.core.utils.helpers.FontHelper;
+import sonar.logistics.api.connecting.CableType;
+import sonar.logistics.common.tileentity.TileEntityChannelledCable;
 import sonar.logistics.common.tileentity.TileEntityDataCable;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -30,6 +33,10 @@ public class BlockDataCable extends SonarMachineBlock {
 
 	@Override
 	public boolean operateBlock(World world, int x, int y, int z, EntityPlayer player, BlockInteraction interact) {
+		if(!world.isRemote){
+			TileEntityChannelledCable cable = (TileEntityChannelledCable) world.getTileEntity(x, y, z);
+			FontHelper.sendMessage(" " + cable.registryID, world, player);
+		}
 		return false;
 	}
 
@@ -43,8 +50,8 @@ public class BlockDataCable extends SonarMachineBlock {
 		TileEntity tileentity = world.getTileEntity(x, y, z);
 		if (tileentity != null && tileentity instanceof TileEntityDataCable) {
 			TileEntityDataCable cable = (TileEntityDataCable) world.getTileEntity(x, y, z);
-			this.setBlockBounds((float) (cable.canRenderConnection(ForgeDirection.WEST)!=0 ? 0 : 0.0625 * 6), (float) (cable.canRenderConnection(ForgeDirection.DOWN)!=0 ? 0 : 0.0625 * 6), (float) (cable.canRenderConnection(ForgeDirection.NORTH)!=0 ? 0 : 0.0625 * 6), (float) (cable.canRenderConnection(ForgeDirection.EAST)!=0 ? 1 : (1 - (0.0625 * 6))), (float) (cable.canRenderConnection(ForgeDirection.UP)!=0 ? 1
-					: (1 - (0.0625 * 6))), (float) (cable.canRenderConnection(ForgeDirection.SOUTH)!=0 ? 1 : (1 - (0.0625 * 6))));
+			this.setBlockBounds((float) (cable.canRenderConnection(ForgeDirection.WEST).canConnect(CableType.DATA_CABLE) ? 0 : 0.0625 * 6), (float) (cable.canRenderConnection(ForgeDirection.DOWN).canConnect(CableType.DATA_CABLE) ? 0 : 0.0625 * 6), (float) (cable.canRenderConnection(ForgeDirection.NORTH).canConnect(CableType.DATA_CABLE) ? 0 : 0.0625 * 6), (float) (cable.canRenderConnection(ForgeDirection.EAST).canConnect(CableType.DATA_CABLE) ? 1 : (1 - (0.0625 * 6))), (float) (cable.canRenderConnection(ForgeDirection.UP).canConnect(CableType.DATA_CABLE) ? 1
+					: (1 - (0.0625 * 6))), (float) (cable.canRenderConnection(ForgeDirection.SOUTH).canConnect(CableType.DATA_CABLE) ? 1 : (1 - (0.0625 * 6))));
 		} else {
 			this.setBlockBounds((float) 0.0625 * 6, (float) 0.0625 * 6, (float) 0.0625 * 6, (float) (1 - (0.0625 * 6)), (float) (1 - (0.0625 * 6)), (float) (1 - (0.0625 * 6)));
 		}

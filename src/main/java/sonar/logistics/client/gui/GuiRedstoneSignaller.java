@@ -193,21 +193,21 @@ public abstract class GuiRedstoneSignaller extends GuiSonar {
 
 		@Override
 		public String getString() {
-			return entity.stringName.getString();
+			return entity.stringName.getObject();
 		}
 
 		@Override
 		public void setString(String string) {
 			SonarCore.network.sendToServer(new PacketTextField(string, entity.xCoord, entity.yCoord, entity.zCoord, 1));
-			entity.stringName.setString(string);
+			entity.stringName.setObject(string);
 		}
 
 		@Override
 		public void changeGuiType() {
-			if (!(entity.dataType.getInt() > 0)) {
+			if (!(entity.dataType.getObject() > 0)) {
 				entity.dataType.increaseBy(1);
 			} else {
-				entity.dataType.setInt(0);
+				entity.dataType.setObject(0);
 			}
 
 			SonarCore.network.sendToServer(new PacketByteBufServer(entity, entity.xCoord, entity.yCoord, entity.zCoord, 0));
@@ -215,39 +215,39 @@ public abstract class GuiRedstoneSignaller extends GuiSonar {
 
 		@Override
 		public void changeIntegerType() {
-			if (!(entity.integerEmitType.getInt() > 2)) {
+			if (!(entity.integerEmitType.getObject() > 2)) {
 				entity.integerEmitType.increaseBy(1);
 			} else {
-				entity.integerEmitType.setInt(0);
+				entity.integerEmitType.setObject(0);
 			}
 			SonarCore.network.sendToServer(new PacketByteBufServer(entity, entity.xCoord, entity.yCoord, entity.zCoord, 1));
 		}
 
 		@Override
 		public int getGuiType() {
-			return entity.dataType.getInt();
+			return entity.dataType.getObject();
 
 		}
 
 		@Override
 		public int getInteger() {
-			return entity.integerTarget.getInt();
+			return entity.integerTarget.getObject();
 		}
 
 		@Override
 		public void setInteger(String string) {
 			SonarCore.network.sendToServer(new PacketTextField(string, entity.xCoord, entity.yCoord, entity.zCoord, 0));
-			entity.integerTarget.setInt(Integer.parseInt(string));
+			entity.integerTarget.setObject(Integer.parseInt(string));
 		}
 
 		@Override
 		public int getIntegerType() {
-			return entity.integerEmitType.getInt();
+			return entity.integerEmitType.getObject();
 		}
 
 		@Override
 		public int getErrorFlag() {
-			return entity.errorFlag.getInt();
+			return entity.errorFlag.getObject();
 		}
 
 	}

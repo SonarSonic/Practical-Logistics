@@ -2,6 +2,8 @@ package sonar.logistics.client.renderers;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.model.ModelSign;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
@@ -9,6 +11,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntitySign;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 
@@ -189,13 +192,13 @@ public class RenderHandlers {
 			super.texture = modelFolder + "fluidReader.png";
 		}
 	}
-	
+
 	public static class EnergyReader extends InfoReader {
 		public EnergyReader() {
 			super.texture = modelFolder + "energyReader.png";
 		}
 	}
-	
+
 	public static class DataReceiver extends TileEntitySpecialRenderer {
 		public ModelDataReceiver model = new ModelDataReceiver();
 		public String texture = modelFolder + "blockReceiver.png";
@@ -258,11 +261,11 @@ public class RenderHandlers {
 			boolean cooling = false;
 			if (entity != null && entity.getWorldObj() != null) {
 				TileEntityHammer hammer = (TileEntityHammer) entity;
-				if (hammer.coolDown.getInt() != 0) {
-					progress = hammer.coolDown.getInt();
+				if (hammer.coolDown.getObject() != 0) {
+					progress = hammer.coolDown.getObject();
 					cooling = true;
 				} else
-					progress = hammer.progress.getInt();
+					progress = hammer.progress.getObject();
 				double move = !cooling ? progress * 1.625 / hammer.speed : progress * 1.625 / 200;
 				model.render((Entity) null, 0.0F, 0.0F, -0.1F, 0.0F, 0.0F, 0.0625F, true, move);
 			} else {
@@ -389,7 +392,7 @@ public class RenderHandlers {
 
 				if (entity.getWorldObj() != null) {
 					for (int i = 0; i < 6; i++) {
-						sides[i] = router.handler.sideConfigs[i].getInt();
+						sides[i] = router.handler.sideConfigs[i].getObject();
 					}
 
 				}
@@ -503,6 +506,76 @@ public class RenderHandlers {
 			}
 			model.render((TileEntity) entity, 0.0F, 0.0F, -0.1F, 0.0F, 0.0F, 0.0625F, rotation);
 			RenderHelper.finishRender();
+		}
+	}
+
+	public static class DigitalScreen extends TileEntitySpecialRenderer {
+
+		public ResourceLocation tex = new ResourceLocation(modelFolder + "digital_sign.png");
+		private final ModelSign model = new ModelSign();
+
+		public void renderTileEntityAt(TileEntity te, double x, double y, double z, float par) {
+			TileEntitySign sign = (TileEntitySign) te;
+			Block block = sign.getBlockType();
+			GL11.glPushMatrix();
+			float f1 = 0.6666667F;
+			float f3;
+
+			if (block == BlockRegistry.digitalSign_standing) {
+				GL11.glTranslatef((float) x + 0.5F, (float) y + 0.75F * f1, (float) z + 0.5F);
+				float f2 = (float) (sign.getBlockMetadata() * 360) / 16.0F;
+				GL11.glRotatef(-f2, 0.0F, 1.0F, 0.0F);
+				this.model.signStick.showModel = true;
+			} else {
+				int j = sign.getBlockMetadata();
+				f3 = 0.0F;
+
+				if (j == 2) {
+					f3 = 180.0F;
+				}
+
+				if (j == 4) {
+					f3 = 90.0F;
+				}
+
+				if (j == 5) {
+					f3 = -90.0F;
+				}
+
+				GL11.glTranslatef((float) x + 0.5F, (float) y + 0.75F * f1, (float) z + 0.5F);
+				GL11.glRotatef(-f3, 0.0F, 1.0F, 0.0F);
+				GL11.glTranslatef(0.0F, -0.3125F, -0.4375F);
+				this.model.signStick.showModel = false;
+			}
+
+			this.bindTexture(tex);
+			GL11.glPushMatrix();
+			GL11.glScalef(f1, -f1, -f1);
+			this.model.renderSign();
+			GL11.glPopMatrix();
+			FontRenderer fontrenderer = this.func_147498_b();
+			f3 = 0.016666668F * f1;
+			GL11.glTranslatef(0.0F, 0.5F * f1, 0.07F * f1);
+			GL11.glScalef(f3, -f3, f3);
+			//GL11.glNormal3f(0.0F, 0.0F, -1.0F * f3);
+			GL11.glDepthMask(false);
+			GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+			byte colour = -1;
+
+			for (int i = 0; i < sign.signText.length; ++i) {
+				String s = sign.signText[i];
+
+				if (i == sign.lineBeingEdited) {
+					s = "> " + s + " <";
+					fontrenderer.drawString(s, -fontrenderer.getStringWidth(s) / 2, i * 10 - sign.signText.length * 5, colour);
+				} else {
+					fontrenderer.drawString(s, -fontrenderer.getStringWidth(s) / 2, i * 10 - sign.signText.length * 5, colour);
+				}
+			}
+
+			GL11.glDepthMask(true);
+			GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+			GL11.glPopMatrix();
 		}
 	}
 

@@ -23,12 +23,12 @@ public abstract class SignallerStatement {
 		switch (statement.getType()) {
 		case number:
 			IntegerStatement integer = (IntegerStatement) statement;
-			tag.setInteger("emit", integer.emitType.getInt());
-			tag.setLong("target", integer.target.getLong());
+			tag.setInteger("emit", integer.emitType.getObject());
+			tag.setLong("target", integer.target.getObject());
 			break;
 		case string:
 			StringStatement string = (StringStatement) statement;
-			tag.setString("word", string.target.getString());
+			tag.setString("word", string.target.getObject());
 			break;
 		}
 	}

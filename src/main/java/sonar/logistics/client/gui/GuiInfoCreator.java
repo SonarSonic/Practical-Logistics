@@ -102,9 +102,9 @@ public class GuiInfoCreator extends GuiSonar {
 	public String getText(int id){
 		switch (id) {
 		case 1:
-			return handler.data.getString();
+			return handler.data.getObject();
 		case 0:
-			return handler.subCategory.getString();
+			return handler.subCategory.getObject();
 		}
 		return " ";
 	}
@@ -113,10 +113,10 @@ public class GuiInfoCreator extends GuiSonar {
 		SonarCore.network.sendToServer(new PacketTextField(string, entity.xCoord,  entity.yCoord,  entity.zCoord, id));
 		switch (id) {
 		case 0:
-			handler.subCategory.setString(string);
+			handler.subCategory.setObject(string);
 			break;
 		case 1:
-			handler.data.setString(string);
+			handler.data.setObject(string);
 			break;
 		}
 	}

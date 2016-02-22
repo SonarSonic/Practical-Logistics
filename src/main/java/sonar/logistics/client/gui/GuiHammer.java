@@ -30,7 +30,7 @@ public class GuiHammer extends GuiSonar {
 	@Override
 	protected void drawGuiContainerBackgroundLayer(float var1, int var2, int var3) {
 		super.drawGuiContainerBackgroundLayer(var1, var2, var3);;
-		int l = this.entity.progress.getInt() * 23 / this.entity.speed;
+		int l = this.entity.progress.getObject() * 23 / this.entity.speed;
 		drawTexturedModalRect(this.guiLeft + 76, this.guiTop + 24, 176, 0, l, 16);
 	}
 

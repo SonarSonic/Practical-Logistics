@@ -8,15 +8,27 @@ import sonar.core.fluid.StoredFluidStack;
 import sonar.core.utils.ActionType;
 import sonar.core.utils.BlockCoords;
 import sonar.logistics.api.providers.FluidHandler;
+import sonar.logistics.api.providers.InventoryHandler.StorageSize;
 
 public class FluidWrapper {
 
+	public static class StorageFluids {
+		
+		public static final StorageFluids EMPTY = new StorageFluids(Collections.EMPTY_LIST, StorageSize.EMPTY);
+		public List<StoredFluidStack> fluids;
+		public StorageSize sizing;
+		
+		public StorageFluids(List<StoredFluidStack> items, StorageSize sizing) {
+			this.fluids=items;
+			this.sizing=sizing;
+		}
+	}
 	/**used for getting the full list of Fluids on a given network
 	 * @param network current coordinates of the network
 	 * @return list of {@link StoredFluidStack} on the network
 	 */
-	public List<StoredFluidStack> getFluids(List<BlockCoords> network) {
-		return Collections.EMPTY_LIST;
+	public StorageFluids getFluids(List<BlockCoords> network) {
+		return StorageFluids.EMPTY;
 	}
 	/**convenient method, adds the given stack to the list, used by {@link FluidHandler}
 	 * @param list {@link StoredFluidStack} list to add to

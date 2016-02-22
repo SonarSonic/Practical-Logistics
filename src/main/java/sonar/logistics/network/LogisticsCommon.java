@@ -61,9 +61,9 @@ import sonar.logistics.integration.multipart.InventoryReaderPart;
 import sonar.logistics.network.packets.PacketCoordsSelection;
 import sonar.logistics.network.packets.PacketDataEmitters;
 import sonar.logistics.network.packets.PacketFluidReader;
+import sonar.logistics.network.packets.PacketGuiChange;
 import sonar.logistics.network.packets.PacketInfoBlock;
 import sonar.logistics.network.packets.PacketInventoryReader;
-import sonar.logistics.network.packets.PacketInventoryReaderGui;
 import sonar.logistics.network.packets.PacketProviders;
 import sonar.logistics.network.packets.PacketRouterGui;
 import cpw.mods.fml.common.network.IGuiHandler;
@@ -81,7 +81,7 @@ public class LogisticsCommon implements IGuiHandler {
 		Logistics.network.registerMessage(PacketInventoryReader.Handler.class, PacketInventoryReader.class, 4, Side.SERVER);
 		Logistics.network.registerMessage(PacketFluidReader.Handler.class, PacketFluidReader.class, 5, Side.SERVER);
 		Logistics.network.registerMessage(PacketRouterGui.Handler.class, PacketRouterGui.class, 6, Side.SERVER);
-		Logistics.network.registerMessage(PacketInventoryReaderGui.Handler.class, PacketInventoryReaderGui.class, 7, Side.SERVER);
+		Logistics.network.registerMessage(PacketGuiChange.Handler.class, PacketGuiChange.class, 7, Side.SERVER);
 	}
 
 	@Override

@@ -2,20 +2,14 @@ package sonar.logistics.info.interaction;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.handlers.TileHandler;
-import sonar.core.inventory.StoredItemStack;
 import sonar.core.utils.BlockInteraction;
 import sonar.core.utils.BlockInteractionType;
-import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.render.InfoInteractionHandler;
 import sonar.logistics.api.render.ScreenType;
 import sonar.logistics.common.handlers.FluidReaderHandler;
-import sonar.logistics.common.handlers.InventoryReaderHandler;
 import sonar.logistics.info.types.FluidStackInfo;
-import sonar.logistics.info.types.InventoryInfo;
-import sonar.logistics.info.types.StoredStackInfo;
 
 public class StoredFluidInteraction extends InfoInteractionHandler<FluidStackInfo> {
 

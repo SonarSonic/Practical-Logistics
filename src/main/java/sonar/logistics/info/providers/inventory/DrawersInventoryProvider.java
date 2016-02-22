@@ -12,11 +12,6 @@ import sonar.logistics.api.providers.InventoryHandler;
 
 import com.jaquadro.minecraft.storagedrawers.api.storage.IDrawer;
 import com.jaquadro.minecraft.storagedrawers.api.storage.IDrawerGroup;
-import com.jaquadro.minecraft.storagedrawers.api.storage.IFractionalDrawer;
-import com.jaquadro.minecraft.storagedrawers.api.storage.IPriorityGroup;
-import com.jaquadro.minecraft.storagedrawers.api.storage.attribute.ILockable;
-import com.jaquadro.minecraft.storagedrawers.api.storage.attribute.IVoidable;
-import com.jaquadro.minecraft.storagedrawers.api.storage.attribute.LockAttribute;
 
 import cpw.mods.fml.common.Loader;
 
@@ -53,20 +48,25 @@ public class DrawersInventoryProvider extends InventoryHandler {
 	}
 
 	@Override
-	public boolean getItems(List<StoredItemStack> storedStacks, TileEntity tile, ForgeDirection dir) {
+	public StorageSize getItems(List<StoredItemStack> storedStacks, TileEntity tile, ForgeDirection dir) {
 		if (tile instanceof IDrawerGroup) {
 			IDrawerGroup drawers = (IDrawerGroup) tile;
+			long maxStorage = 0;
+			long stored=0;
 			for (int i = 0; i < drawers.getDrawerCount(); i++) {
 				if (drawers.getDrawer(i) != null) {
-					IDrawer draw = drawers.getDrawer(i);
+					IDrawer draw = drawers.getDrawer(i);					
 					ItemStack item = draw.getStoredItemCopy();
-					if (item != null)
+					maxStorage+=draw.getMaxCapacity();
+					stored+=draw.getStoredItemCount();
+					if (item != null){						
 						LogisticsAPI.getItemHelper().addStackToList(storedStacks, new StoredItemStack(item, draw.getStoredItemCount()));
+					}
 				}
 			}
-			return true;
+			return new StorageSize(stored,maxStorage);
 		}
-		return false;
+		return StorageSize.EMPTY;
 	}
 
 	public boolean isLoadable() {

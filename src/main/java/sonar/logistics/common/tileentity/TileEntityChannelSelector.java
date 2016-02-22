@@ -8,6 +8,7 @@ import sonar.core.utils.BlockCoords;
 import sonar.logistics.api.IdentifiedCoords;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.LogisticsAPI;
+import sonar.logistics.api.connecting.CableType;
 import sonar.logistics.api.connecting.IChannelProvider;
 import sonar.logistics.api.connecting.IInfoEmitter;
 import sonar.logistics.api.render.ICableRenderer;
@@ -38,7 +39,7 @@ public class TileEntityChannelSelector extends TileEntityHandler implements IInf
 	}
 
 	@Override
-	public int canRenderConnection(ForgeDirection dir) {
+	public CableType canRenderConnection(ForgeDirection dir) {
 		return handler.canRenderConnection(this, dir);
 	}
 

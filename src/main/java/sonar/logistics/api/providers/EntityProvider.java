@@ -22,7 +22,6 @@ public abstract class EntityProvider implements IRegistryObject {
 
 	/**
 	 * can provide info on the given entity
-	 * 
 	 * @param entity
 	 * @return
 	 */

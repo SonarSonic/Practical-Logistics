@@ -22,7 +22,7 @@ public class ContainerInventoryReader extends ContainerSync {
 
 	public ContainerInventoryReader(InventoryReaderHandler handler, TileEntity entity, InventoryPlayer inventoryPlayer) {
 		super(handler, entity);
-		addSlots(handler, inventoryPlayer, handler.setting.getInt() == 0);
+		addSlots(handler, inventoryPlayer, handler.setting.getObject() == 0);
 		this.handler = handler;
 	}
 
@@ -39,11 +39,12 @@ public class ContainerInventoryReader extends ContainerSync {
 		for (int i = 0; i < 9; ++i) {
 			this.addSlotToContainer(new Slot(inventoryPlayer, i, 41 + i * 18, 232));
 		}
-		for (int i = 0; i < 7; ++i) {
-			for (int j = 0; j < 12; ++j) {
-				this.addSlotToContainer(new NetworkSlot(handler, tile, j + i * 12, 13 + j * 18, 32 + i * 18));
-			}
-		}
+		// for (int i = 0; i < 7; ++i) {
+		// for (int j = 0; j < 12; ++j) {
+		// this.addSlotToContainer(new NetworkSlot(handler, tile, j + i * 12, 13
+		// + j * 18, 32 + i * 18));
+		// }
+		// }
 		if (hasStack)
 			addSlotToContainer(new SlotList(handler, 0, 103, 9));
 	}
@@ -152,26 +153,22 @@ public class ContainerInventoryReader extends ContainerSync {
 				}
 				return player.inventory.getItemStack();
 			}
-			if (slotID >= 36 && slotID < 120) {
-				Slot slot = (Slot) this.inventorySlots.get(slotID);
-				if (!slot.getHasStack()) {
-					ItemStack itemstack1 = player.inventory.getItemStack();
-					if (!tile.getWorldObj().isRemote && itemstack1 != null) {
-						StoredItemStack stack = new StoredItemStack(itemstack1);
-						StoredItemStack perform = LogisticsAPI.getItemHelper().addItems(stack, handler.getNetwork(tile), ActionType.PERFORM);
-						if (perform == null || perform.stored == 0) {
-							itemstack1.stackSize = 0;
-						} else {
-							itemstack1.stackSize = (int) (perform.getStackSize());
-						}
-						player.inventory.setItemStack(itemstack1);
-						player.inventory.markDirty();
-						this.detectAndSendChanges();
-					}
-					return null;
-				}
-			}
-
+			
+			/*
+			 * if (slotID >= 36 && slotID < 120) { Slot slot = (Slot)
+			 * this.inventorySlots.get(slotID); if (!slot.getHasStack()) {
+			 * ItemStack itemstack1 = player.inventory.getItemStack(); if
+			 * (!tile.getWorldObj().isRemote && itemstack1 != null) {
+			 * StoredItemStack stack = new StoredItemStack(itemstack1);
+			 * StoredItemStack perform =
+			 * LogisticsAPI.getItemHelper().addItems(stack,
+			 * handler.getNetwork(tile), ActionType.PERFORM); if (perform ==
+			 * null || perform.stored == 0) { itemstack1.stackSize = 0; } else {
+			 * itemstack1.stackSize = (int) (perform.getStackSize()); }
+			 * player.inventory.setItemStack(itemstack1);
+			 * player.inventory.markDirty(); this.detectAndSendChanges(); }
+			 * return null; } }
+			 */
 			return super.slotClick(slotID, buttonID, flag, player);
 
 		}

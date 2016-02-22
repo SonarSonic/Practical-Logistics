@@ -7,20 +7,21 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.handlers.TileHandler;
-import sonar.core.network.sync.SyncString;
+import sonar.core.network.sync.SyncTagType;
 import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.StandardInfo;
+import sonar.logistics.api.connecting.CableType;
 import sonar.logistics.api.connecting.IInfoEmitter;
 
 public class DataModifierHandler extends TileHandler {
 
-	public SyncString subCategory = new SyncString(0);
-	public SyncString prefix = new SyncString(1);
-	public SyncString suffix = new SyncString(2);
+	public SyncTagType.STRING subCategory = new SyncTagType.STRING(0);
+	public SyncTagType.STRING prefix = new SyncTagType.STRING(1);
+	public SyncTagType.STRING suffix = new SyncTagType.STRING(2);
 	public Info info;
 
 	public DataModifierHandler(boolean isMultipart, TileEntity tile) {
@@ -82,8 +83,8 @@ public class DataModifierHandler extends TileHandler {
 		}
 	}
 
-	public int canRenderConnection(ForgeDirection dir, TileEntity te) {
-		return LogisticsAPI.getCableHelper().canRenderConnection(te, dir);
+	public CableType canRenderConnection(ForgeDirection dir, TileEntity te) {
+		return LogisticsAPI.getCableHelper().canRenderConnection(te, dir, CableType.BLOCK_CONNECTION);
 	}
 
 	public boolean canConnect(ForgeDirection dir) {
@@ -97,9 +98,9 @@ public class DataModifierHandler extends TileHandler {
 		if (this.info.getProviderID() == -1 && this.info.getCategory().equals("PERCENT")) {
 			return info;
 		}
-		String currentSub = this.subCategory.getString();
-		String currentPre = this.prefix.getString();
-		String currentSuf = this.suffix.getString();
+		String currentSub = this.subCategory.getObject();
+		String currentPre = this.prefix.getObject();
+		String currentSuf = this.suffix.getObject();
 		String subCat = (currentSub == null || currentSub.isEmpty() || currentSub.equals("")) ? info.getSubCategory() : currentSub;
 		String prefix = (currentPre == null || currentPre.isEmpty() || currentPre.equals("")) ? "" : currentPre;
 		String suffix = (currentSuf == null || currentSuf.isEmpty() || currentSuf.equals("")) ? "" : currentSuf;
@@ -111,13 +112,13 @@ public class DataModifierHandler extends TileHandler {
 		String text = (string == null || string.isEmpty()) ? " " : string;
 		switch (id) {
 		case 1:
-			this.prefix.setString(string);
+			this.prefix.setObject(string);
 			break;
 		case 2:
-			this.suffix.setString(string);
+			this.suffix.setObject(string);
 			break;
 		default:
-			this.subCategory.setString(string);
+			this.subCategory.setObject(string);
 			break;
 		}
 	}

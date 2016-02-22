@@ -8,8 +8,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.common.tileentity.TileEntitySonar;
 import sonar.core.integration.fmp.FMPHelper;
-import sonar.core.network.sync.SyncInt;
-import sonar.core.network.sync.SyncString;
+import sonar.core.network.sync.SyncTagType;
 import sonar.core.network.utils.IByteBufTile;
 import sonar.core.network.utils.ITextField;
 import sonar.core.utils.BlockCoords;
@@ -24,11 +23,11 @@ import sonar.logistics.registries.BlockRegistry;
 public class TileEntityRedstoneSignaller extends TileEntitySonar implements ILogicTile, IByteBufTile, ITextField {
 
 	public Info currentInfo;
-	public SyncInt integerEmitType = new SyncInt(0);
-	public SyncInt integerTarget = new SyncInt(1);
-	public SyncInt dataType = new SyncInt(2);
-	public SyncInt errorFlag = new SyncInt(3);
-	public SyncString stringName = new SyncString(4);
+	public SyncTagType.INT integerEmitType = new SyncTagType.INT(0);
+	public SyncTagType.INT integerTarget = new SyncTagType.INT(1);
+	public SyncTagType.INT dataType = new SyncTagType.INT(2);
+	public SyncTagType.INT errorFlag = new SyncTagType.INT(3);
+	public SyncTagType.STRING stringName = new SyncTagType.STRING(4);
 
 	@Override
 	public boolean canConnect(ForgeDirection dir) {
@@ -90,29 +89,29 @@ public class TileEntityRedstoneSignaller extends TileEntitySonar implements ILog
 
 	public boolean canEmit() {
 		if (currentInfo != null) {
-			if (currentInfo.getDataType() == dataType.getInt()) {
-				if (dataType.getInt() == 0) {
-					this.errorFlag.setInt(0);
+			if (currentInfo.getDataType() == dataType.getObject()) {
+				if (dataType.getObject() == 0) {
+					this.errorFlag.setObject(0);
 					long integer = Long.parseLong(currentInfo.getData());
-					switch (integerEmitType.getInt()) {
+					switch (integerEmitType.getObject()) {
 					case 0:
-						return integer == integerTarget.getInt();
+						return integer == integerTarget.getObject();
 					case 1:
-						return integer > integerTarget.getInt();
+						return integer > integerTarget.getObject();
 					case 2:
-						return integer < integerTarget.getInt();
+						return integer < integerTarget.getObject();
 					case 3:
-						return integer != integerTarget.getInt();
+						return integer != integerTarget.getObject();
 					}
-				} else if (dataType.getInt() == 1) {
-					this.errorFlag.setInt(0);
-					return currentInfo.getData().equals(stringName.getString());
+				} else if (dataType.getObject() == 1) {
+					this.errorFlag.setObject(0);
+					return currentInfo.getData().equals(stringName.getObject());
 				}
 			} else {
-				this.errorFlag.setInt(2);
+				this.errorFlag.setObject(2);
 			}
 		} else {
-			this.errorFlag.setInt(1);
+			this.errorFlag.setObject(1);
 			return false;
 		}
 		return false;
@@ -122,16 +121,16 @@ public class TileEntityRedstoneSignaller extends TileEntitySonar implements ILog
 	public void textTyped(String string, int id) {
 		if (id == 0) {
 			if (string == null || string.isEmpty()) {
-				this.integerTarget.setInt(0);
+				this.integerTarget.setObject(0);
 			} else {
-				this.integerTarget.setInt(Integer.parseInt(string));
+				this.integerTarget.setObject(Integer.parseInt(string));
 			}
 		}
 		if (id == 1) {
 			if (string == null || string.isEmpty()) {
-				this.stringName.setString("Unnamed Emitter");
+				this.stringName.setObject("Unnamed Emitter");
 			} else {
-				this.stringName.setString(string);
+				this.stringName.setObject(string);
 				;
 			}
 		}
@@ -146,10 +145,10 @@ public class TileEntityRedstoneSignaller extends TileEntitySonar implements ILog
 	public void writePacket(ByteBuf buf, int id) {
 		switch (id) {
 		case 0:
-			buf.writeInt(dataType.getInt());
+			buf.writeInt(dataType.getObject());
 			break;
 		case 1:
-			buf.writeInt(integerEmitType.getInt());
+			buf.writeInt(integerEmitType.getObject());
 			break;
 		}	
 	}
@@ -158,10 +157,10 @@ public class TileEntityRedstoneSignaller extends TileEntitySonar implements ILog
 	public void readPacket(ByteBuf buf, int id) {
 		switch (id) {
 		case 0:
-			dataType.setInt(buf.readInt());
+			dataType.setObject(buf.readInt());
 			break;
 		case 1:
-			integerEmitType.setInt(buf.readInt());
+			integerEmitType.setObject(buf.readInt());
 			break;
 		}
 	}

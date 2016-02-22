@@ -2,7 +2,8 @@ package sonar.logistics.common.tileentity;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.util.ForgeDirection;
-import sonar.core.network.sync.SyncString;
+import sonar.core.network.sync.SyncTagType;
+import sonar.core.network.sync.SyncTagType.STRING;
 import sonar.core.network.utils.ITextField;
 import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
@@ -14,7 +15,7 @@ import sonar.logistics.registries.EmitterRegistry;
 
 public class TileEntityDataEmitter extends TileEntityNode implements IInfoEmitter, ITextField{
 
-	public SyncString clientName = new SyncString(0, "Unnamed Emitter");
+	public SyncTagType.STRING clientName = (STRING) new SyncTagType.STRING(0).setDefault("Unnamed Emitter");
 
 	public void readData(NBTTagCompound nbt, SyncType type) {
 		super.readData(nbt, type);
@@ -79,9 +80,9 @@ public class TileEntityDataEmitter extends TileEntityNode implements IInfoEmitte
 	public void textTyped(String string, int id) {
 		if (id == 0) {
 			if (string == null || string.isEmpty()) {
-				this.clientName.setString("Unnamed Emitter");
+				this.clientName.setObject("Unnamed Emitter");
 			} else {
-				this.clientName.setString(string);
+				this.clientName.setObject(string);
 			}
 		}
 	}

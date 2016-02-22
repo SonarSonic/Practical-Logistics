@@ -17,5 +17,11 @@ public interface IDataCable extends ICableRenderer, ILogicTile {
 	public void setRegistryID(int id);
 	
 	/**is the cable limited by the number of channels, true for Channelled Cables, false for Data Cables*/
-	public boolean unlimitedChannels();
+	public CableType getCableType();
+	
+	/**called when the cable is added to the world*/
+	public void addCable();
+
+	/**called when the cable is removed to the world*/
+	public void removeCable();
 }

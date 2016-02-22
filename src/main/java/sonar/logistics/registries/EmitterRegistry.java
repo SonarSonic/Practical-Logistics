@@ -33,7 +33,7 @@ public class EmitterRegistry {
 				if (tile != null && tile instanceof TileEntityDataEmitter) {
 					TileEntityDataEmitter dataEmitter = (TileEntityDataEmitter) tile;
 					if (tile.getWorldObj() != null && !tile.isInvalid()) {
-						emitterList.add(new IdentifiedCoords(dataEmitter.clientName.getString(), new ItemStack(BlockRegistry.dataEmitter), coords));
+						emitterList.add(new IdentifiedCoords(dataEmitter.clientName.getObject(), new ItemStack(BlockRegistry.dataEmitter), coords));
 					}
 				}
 			}

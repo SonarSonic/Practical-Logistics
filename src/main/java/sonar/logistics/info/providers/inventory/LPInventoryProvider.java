@@ -40,15 +40,17 @@ public class LPInventoryProvider extends InventoryHandler {
 	}
 
 	@Override
-	public boolean getItems(List<StoredItemStack> storedStacks, TileEntity tile, ForgeDirection dir) {
+	public StorageSize getItems(List<StoredItemStack> storedStacks, TileEntity tile, ForgeDirection dir) {
 		List<ItemStack> items = getStackList(tile);
+		if (items == null || items.isEmpty()) {
+			return StorageSize.EMPTY;
+		}
+		long maxStorage = 0;
 		for (ItemStack stack : items) {
 			LogisticsAPI.getItemHelper().addStackToList(storedStacks, new StoredItemStack(stack));
-			return true;
+			maxStorage +=stack.stackSize;
 		}
-
-		return false;
-
+		return new StorageSize(maxStorage,maxStorage);
 	}
 
 	public List<ItemStack> getStackList(TileEntity tile) {

@@ -46,22 +46,26 @@ public class StorageChamberInventoryProvider extends InventoryHandler {
 	}
 
 	@Override
-	public boolean getItems(List<StoredItemStack> storedStacks, TileEntity tile, ForgeDirection dir) {
+	public StorageSize getItems(List<StoredItemStack> storedStacks, TileEntity tile, ForgeDirection dir) {
 		if (tile instanceof TileEntityStorageChamber) {
 			TileEntityStorageChamber chamber = (TileEntityStorageChamber) tile;
 			if (chamber != null) {
 				if (chamber.getSavedStack() != null) {
+					long stored = 0;
+					long maxStorage = 0;
 					for (int i = 0; i < 14; i++) {
 						ItemStack stack = chamber.getFullStack(i);
 						if (stack != null) {
+							stored += stack.stackSize;
 							storedStacks.add(new StoredItemStack(stack));
 						}
+						maxStorage+=chamber.maxSize;
 					}
+					return new StorageSize(stored,maxStorage);
 				}
-				return true;
 			}
 		}
-		return false;
+		return StorageSize.EMPTY;
 	}
 
 	public boolean isLoadable() {

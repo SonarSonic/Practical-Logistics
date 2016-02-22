@@ -6,11 +6,12 @@ import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.common.tileentity.TileEntitySonar;
 import sonar.core.utils.BlockCoords;
 import sonar.logistics.api.LogisticsAPI;
+import sonar.logistics.api.connecting.CableType;
 import sonar.logistics.api.connecting.IDataCable;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-public class TileEntityMultiDataCable extends TileEntitySonar implements IDataCable {
+public class TileEntityChannelledCable extends TileEntitySonar implements IDataCable {
 
 	public int registryID = -1;
 
@@ -19,8 +20,8 @@ public class TileEntityMultiDataCable extends TileEntitySonar implements IDataCa
 		return false;
 	}
 
-	public int canRenderConnection(ForgeDirection dir) {
-		return LogisticsAPI.getCableHelper().canRenderConnection(this, dir);
+	public CableType canRenderConnection(ForgeDirection dir) {
+		return LogisticsAPI.getCableHelper().canRenderConnection(this, dir, getCableType());
 	}
 
 	public boolean maxRender() {
@@ -29,13 +30,24 @@ public class TileEntityMultiDataCable extends TileEntitySonar implements IDataCa
 
 	public void onLoaded() {
 		super.onLoaded();
-		if (!this.worldObj.isRemote)
-			LogisticsAPI.getCableHelper().addCable(this);
+		if (!this.worldObj.isRemote) {
+			addCable();
+		}
 	}
 
 	public void invalidate() {
-		LogisticsAPI.getCableHelper().removeCable(this);
+		if (!this.worldObj.isRemote) {
+			removeCable();
+		}
 		super.invalidate();
+	}
+
+	public void addCable() {
+		LogisticsAPI.getCableHelper().addCable(this);
+	}
+
+	public void removeCable() {
+		LogisticsAPI.getCableHelper().removeCable(this);
 	}
 
 	@SideOnly(Side.CLIENT)
@@ -59,8 +71,8 @@ public class TileEntityMultiDataCable extends TileEntitySonar implements IDataCa
 	}
 
 	@Override
-	public boolean unlimitedChannels() {
-		return true;
+	public CableType getCableType() {
+		return CableType.CHANNELLED_CABLE;
 	}
 
 	@Override

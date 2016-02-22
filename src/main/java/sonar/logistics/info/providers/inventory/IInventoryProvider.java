@@ -39,12 +39,12 @@ public class IInventoryProvider extends InventoryHandler {
 	}
 
 	@Override
-	public boolean getItems(List<StoredItemStack> storedStacks, TileEntity tile, ForgeDirection dir) {
+	public StorageSize getItems(List<StoredItemStack> storedStacks, TileEntity tile, ForgeDirection dir) {
 		if (tile instanceof IInventory) {
-			LogisticsAPI.getItemHelper().addInventoryToList(storedStacks, (IInventory) tile);
-			return true;
+			IInventory inv = (IInventory) tile;
+			return LogisticsAPI.getItemHelper().addInventoryToList(storedStacks, inv);
 		}
-		return false;
+		return StorageSize.EMPTY;
 	}
 
 	@Override

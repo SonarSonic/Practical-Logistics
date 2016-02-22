@@ -91,13 +91,13 @@ public abstract class GuiRenameEmitter extends GuiSonar {
 
 		@Override
 		public String getText() {
-			return entity.clientName.getString();
+			return entity.clientName.getObject();
 		}
 
 		@Override
 		public void setString(String string) {
 			SonarCore.network.sendToServer(new PacketTextField(string, entity.xCoord, entity.yCoord, entity.zCoord, 0));
-			entity.clientName.setString(string);;
+			entity.clientName.setObject(string);;
 		}
 
 	}

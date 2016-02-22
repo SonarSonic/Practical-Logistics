@@ -28,29 +28,24 @@ public class DSUInventoryProvider extends InventoryHandler {
 	@Override
 	public StoredItemStack getStack(int slot, TileEntity tile, ForgeDirection dir) {
 		if (!(slot > 0)) {
-			return getStoredItem(tile);
+			IDeepStorageUnit inv = (IDeepStorageUnit) tile;
+			if (inv.getStoredItemType() != null) {
+				return new StoredItemStack(inv.getStoredItemType());
+			}
 		}
 		return null;
 	}
 
 	@Override
-	public boolean getItems(List<StoredItemStack> storedStacks, TileEntity tile, ForgeDirection dir) {
-		StoredItemStack stack = getStoredItem(tile);
-		if (stack != null) {
-			LogisticsAPI.getItemHelper().addStackToList(storedStacks, stack);
-			return true;
-		}
-		return false;
-
-	}
-
-	public StoredItemStack getStoredItem(TileEntity tile) {
+	public StorageSize getItems(List<StoredItemStack> storedStacks, TileEntity tile, ForgeDirection dir) {		
+		
 		IDeepStorageUnit inv = (IDeepStorageUnit) tile;
 		if (inv.getStoredItemType() != null) {
-			return new StoredItemStack(inv.getStoredItemType());
+			StoredItemStack stack = new StoredItemStack(inv.getStoredItemType());
+			LogisticsAPI.getItemHelper().addStackToList(storedStacks, stack);
+			return new StorageSize(stack.stored,inv.getMaxStoredCount());
 		}
-
-		return null;
+		return new StorageSize(0,inv.getMaxStoredCount());
 	}
 
 	@Override

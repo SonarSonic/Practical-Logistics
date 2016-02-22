@@ -12,6 +12,7 @@ import sonar.core.utils.BlockCoords;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.LogisticsAPI;
+import sonar.logistics.api.connecting.CableType;
 import sonar.logistics.api.connecting.IInfoEmitter;
 import sonar.logistics.api.render.ICableRenderer;
 import sonar.logistics.client.renderers.RenderHandlers;
@@ -54,7 +55,7 @@ public class DataModifierPart extends ConnectionPart implements IInfoEmitter, IC
 	}
 
 	@Override
-	public int canRenderConnection(ForgeDirection dir) {
+	public CableType canRenderConnection(ForgeDirection dir) {
 		return handler.canRenderConnection(dir, tile());
 	}
 

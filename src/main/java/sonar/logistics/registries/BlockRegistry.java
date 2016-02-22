@@ -1,7 +1,6 @@
 package sonar.logistics.registries;
 
 import net.minecraft.block.Block;
-import net.minecraft.tileentity.TileEntity;
 import sonar.core.common.block.SonarBlockTip;
 import sonar.logistics.Logistics;
 import sonar.logistics.common.blocks.BlockChannelSelector;
@@ -10,6 +9,7 @@ import sonar.logistics.common.blocks.BlockDataCable;
 import sonar.logistics.common.blocks.BlockDataEmitter;
 import sonar.logistics.common.blocks.BlockDataModifier;
 import sonar.logistics.common.blocks.BlockDataReceiver;
+import sonar.logistics.common.blocks.BlockDigitalSign;
 import sonar.logistics.common.blocks.BlockEnergyReader;
 import sonar.logistics.common.blocks.BlockEntityNode;
 import sonar.logistics.common.blocks.BlockFluidReader;
@@ -28,11 +28,13 @@ import sonar.logistics.common.blocks.DisplayScreen;
 import sonar.logistics.common.blocks.LargeDisplayScreen;
 import sonar.logistics.common.tileentity.TileEntityBlockNode;
 import sonar.logistics.common.tileentity.TileEntityChannelSelector;
+import sonar.logistics.common.tileentity.TileEntityChannelledCable;
 import sonar.logistics.common.tileentity.TileEntityClock;
 import sonar.logistics.common.tileentity.TileEntityDataCable;
 import sonar.logistics.common.tileentity.TileEntityDataEmitter;
 import sonar.logistics.common.tileentity.TileEntityDataModifier;
 import sonar.logistics.common.tileentity.TileEntityDataReceiver;
+import sonar.logistics.common.tileentity.TileEntityDigitalScreen;
 import sonar.logistics.common.tileentity.TileEntityDisplayScreen;
 import sonar.logistics.common.tileentity.TileEntityEnergyReader;
 import sonar.logistics.common.tileentity.TileEntityEntityNode;
@@ -44,20 +46,29 @@ import sonar.logistics.common.tileentity.TileEntityInfoReader;
 import sonar.logistics.common.tileentity.TileEntityInventoryReader;
 import sonar.logistics.common.tileentity.TileEntityItemRouter;
 import sonar.logistics.common.tileentity.TileEntityLargeScreen;
-import sonar.logistics.common.tileentity.TileEntityMultiDataCable;
 import sonar.logistics.common.tileentity.TileEntityRedstoneSignaller;
 import cpw.mods.fml.common.registry.GameRegistry;
 
 public class BlockRegistry extends Logistics {
 
-	public static Block displayScreen, largeDisplayScreen, node, entityNode, infoReader, dataCable, dataMultiCable, dataReceiver, dataEmitter, inventoryReader, redstoneSignaller_on, redstoneSignaller_off, holographicDisplay, dataModifier, infoCreator, channelSelector, sapphire_ore, hammer, hammer_air, fluidReader, energyReader, itemRouter, clock;
+	// displays
+	public static Block displayScreen, largeDisplayScreen, holographicDisplay, digitalSign_wall, digitalSign_standing;
+
+	// readers
+	public static Block infoReader, inventoryReader, fluidReader, energyReader;
+
+	// connections
+	public static Block node, entityNode, dataCable, dataMultiCable, dataReceiver, dataEmitter, dataModifier, infoCreator, channelSelector;
+
+	// misc
+	public static Block redstoneSignaller_on, redstoneSignaller_off, sapphire_ore, hammer, hammer_air, itemRouter, clock;
 
 	public static void registerBlocks() {
 
 		hammer = new BlockHammer().setBlockName("Hammer").setHardness(1.0F).setCreativeTab(Logistics.creativeTab).setResistance(20.0F).setBlockTextureName(modid + ":" + "hammer_break");
 		GameRegistry.registerBlock(hammer, SonarBlockTip.class, "Hammer");
 		GameRegistry.registerTileEntity(TileEntityHammer.class, "Hammer");
-		
+
 		hammer_air = new BlockHammerAir().setBlockName("Hammer_Air").setHardness(1.0F).setResistance(20.0F).setBlockTextureName(modid + ":" + "hammer_break");
 		GameRegistry.registerBlock(hammer_air, SonarBlockTip.class, "Hammer_Air");
 
@@ -68,14 +79,20 @@ public class BlockRegistry extends Logistics {
 		GameRegistry.registerBlock(displayScreen, SonarBlockTip.class, "DisplayScreen");
 		GameRegistry.registerTileEntity(TileEntityDisplayScreen.class, "DisplayScreen");
 
+		digitalSign_wall = new BlockDigitalSign(TileEntityDigitalScreen.class, false).setBlockName("DigitalScreen");
+		digitalSign_standing = new BlockDigitalSign(TileEntityDigitalScreen.class, true).setBlockName("DigitalScreen");
+		GameRegistry.registerBlock(digitalSign_wall, SonarBlockTip.class, "DigitalScreen_Wall");
+		GameRegistry.registerBlock(digitalSign_standing, SonarBlockTip.class, "DigitalScreen_Standing");
+		GameRegistry.registerTileEntity(TileEntityDigitalScreen.class, "DigitalScreen");
+
 		dataCable = new BlockDataCable().setBlockName("DataCable").setHardness(0.1F).setCreativeTab(Logistics.creativeTab).setResistance(20.0F).setBlockTextureName(modid + ":" + "data_cable");
 		GameRegistry.registerBlock(dataCable, SonarBlockTip.class, "DataCable");
 		GameRegistry.registerTileEntity(TileEntityDataCable.class, "DataCable");
-		
+
 		dataMultiCable = new BlockMultiDataCable().setBlockName("MultiCable").setHardness(0.1F).setCreativeTab(Logistics.creativeTab).setResistance(20.0F).setBlockTextureName(modid + ":" + "data_cable");
 		GameRegistry.registerBlock(dataMultiCable, SonarBlockTip.class, "MultiCable");
-		GameRegistry.registerTileEntity(TileEntityMultiDataCable.class, "MultiCable");
-		
+		GameRegistry.registerTileEntity(TileEntityChannelledCable.class, "MultiCable");
+
 		node = new BlockNode().setBlockName("Node").setHardness(1.0F).setResistance(20.0F).setCreativeTab(Logistics.creativeTab).setBlockTextureName(modid + ":" + "data_cable");
 		GameRegistry.registerBlock(node, SonarBlockTip.class, "Node");
 		GameRegistry.registerTileEntity(TileEntityBlockNode.class, "Node");
@@ -117,7 +134,7 @@ public class BlockRegistry extends Logistics {
 		clock = new BlockClock().setBlockName("Clock").setHardness(1.0F).setResistance(100.0F).setCreativeTab(Logistics.creativeTab).setBlockTextureName(modid + ":" + "data_cable");
 		GameRegistry.registerBlock(clock, SonarBlockTip.class, "Clock");
 		GameRegistry.registerTileEntity(TileEntityClock.class, "Clock");
-		
+
 		dataModifier = new BlockDataModifier().setBlockName("DataModifier").setHardness(1.0F).setCreativeTab(Logistics.creativeTab).setResistance(20.0F).setBlockTextureName(modid + ":" + "data_cable");
 		GameRegistry.registerBlock(dataModifier, SonarBlockTip.class, "DataModifier");
 		GameRegistry.registerTileEntity(TileEntityDataModifier.class, "DataModifier");
@@ -129,7 +146,7 @@ public class BlockRegistry extends Logistics {
 		channelSelector = new BlockChannelSelector().setBlockName("ChannelSelector").setHardness(1.0F).setCreativeTab(Logistics.creativeTab).setResistance(20.0F).setBlockTextureName(modid + ":" + "data_cable");
 		GameRegistry.registerBlock(channelSelector, SonarBlockTip.class, "ChannelSelector");
 		GameRegistry.registerTileEntity(TileEntityChannelSelector.class, "ChannelSelector");
-		
+
 		holographicDisplay = new BlockHolographicDisplay().setBlockName("HolographicDisplay").setHardness(1.0F).setCreativeTab(Logistics.creativeTab).setResistance(20.0F).setBlockTextureName(modid + ":" + "data_cable");
 		GameRegistry.registerBlock(holographicDisplay, SonarBlockTip.class, "HolographicDisplay");
 		GameRegistry.registerTileEntity(TileEntityHolographicDisplay.class, "HolographicDisplay");
@@ -141,7 +158,7 @@ public class BlockRegistry extends Logistics {
 		itemRouter = new BlockItemRouter().setBlockName("ItemRouter").setHardness(1.0F).setResistance(100.0F).setCreativeTab(Logistics.creativeTab).setBlockTextureName(modid + ":" + "data_cable");
 		GameRegistry.registerBlock(itemRouter, SonarBlockTip.class, "ItemRouter");
 		GameRegistry.registerTileEntity(TileEntityItemRouter.class, "ItemRouter");
-		
+
 	}
 
 }

@@ -15,7 +15,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.SonarCore;
 import sonar.core.integration.fmp.handlers.InventoryTileHandler;
-import sonar.core.network.sync.SyncInt;
+import sonar.core.network.sync.SyncTagType;
 import sonar.core.network.utils.IByteBufTile;
 import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.InventoryHelper;
@@ -33,10 +33,10 @@ import sonar.logistics.info.filters.items.OreDictionaryFilter;
 public class ItemRouterHandler extends InventoryTileHandler implements ISidedInventory, IByteBufTile {
 
 	// 0=nothing, 1=input, 2=output
-	public SyncInt[] sideConfigs = new SyncInt[6];
-	public SyncInt listType = new SyncInt(7);
-	public SyncInt side = new SyncInt(8);
-	public SyncInt filterPos = new SyncInt(9);
+	public SyncTagType.INT[] sideConfigs = new SyncTagType.INT[6];
+	public SyncTagType.INT listType = new SyncTagType.INT(7);
+	public SyncTagType.INT side = new SyncTagType.INT(8);
+	public SyncTagType.INT filterPos = new SyncTagType.INT(9);
 
 	public List<BlockCoords>[] coords = new List[6];
 	public List<ItemFilter>[] lastWhitelist = new List[6];
@@ -57,7 +57,7 @@ public class ItemRouterHandler extends InventoryTileHandler implements ISidedInv
 		super(isMultipart, tile);
 		super.slots = new ItemStack[9];
 		for (int i = 0; i < 6; i++) {
-			sideConfigs[i] = new SyncInt(i + 1);
+			sideConfigs[i] = new SyncTagType.INT(i + 1);
 			lastWhitelist[i] = new ArrayList();
 			whitelist[i] = new ArrayList();
 			lastBlacklist[i] = new ArrayList();
@@ -67,7 +67,7 @@ public class ItemRouterHandler extends InventoryTileHandler implements ISidedInv
 	}
 
 	public List<ItemFilter> getFilters() {
-		return listType.getInt() == 0 ? whitelist[side.getInt()] : blacklist[side.getInt()];
+		return listType.getObject() == 0 ? whitelist[side.getObject()] : blacklist[side.getObject()];
 
 	}
 
@@ -83,7 +83,7 @@ public class ItemRouterHandler extends InventoryTileHandler implements ISidedInv
 			updateConnections(te);
 		}
 		if (update < 6) {
-			int config = this.sideConfigs[update].getInt();
+			int config = this.sideConfigs[update].getObject();
 			if (config != 0) {
 				TileEntity target = null;
 				ForgeDirection dir = null;
@@ -166,7 +166,7 @@ public class ItemRouterHandler extends InventoryTileHandler implements ISidedInv
 
 	public void updateConnections(TileEntity te) {
 		for (int i = 0; i < 6; i++) {
-			int config = sideConfigs[i].getInt();
+			int config = sideConfigs[i].getObject();
 			if (config != 0) {
 				List<BlockCoords> connections = LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(i));
 				if (!connections.isEmpty()) {
@@ -180,7 +180,7 @@ public class ItemRouterHandler extends InventoryTileHandler implements ISidedInv
 	}
 
 	public boolean canConnect(TileEntity te, ForgeDirection dir) {
-		return sideConfigs[dir.ordinal()].getInt() != 0;
+		return sideConfigs[dir.ordinal()].getObject() != 0;
 	}
 
 	public void readData(NBTTagCompound nbt, SyncType type) {
@@ -246,12 +246,12 @@ public class ItemRouterHandler extends InventoryTileHandler implements ISidedInv
 
 	@Override
 	public boolean canInsertItem(int slot, ItemStack item, int side) {
-		return side != -1 ? (sideConfigs[side].getInt() == 1 && matchesFilters(item, whitelist[side], blacklist[side])) : true;
+		return side != -1 ? (sideConfigs[side].getObject() == 1 && matchesFilters(item, whitelist[side], blacklist[side])) : true;
 	}
 
 	@Override
 	public boolean canExtractItem(int slot, ItemStack item, int side) {
-		return sideConfigs[side].getInt() == 2 && matchesFilters(item, whitelist[side], blacklist[side]);
+		return sideConfigs[side].getObject() == 2 && matchesFilters(item, whitelist[side], blacklist[side]);
 	}
 
 	public static boolean matchesFilters(ItemStack stack, List<ItemFilter> whitelist, List<ItemFilter> blacklist) {
@@ -309,28 +309,28 @@ public class ItemRouterHandler extends InventoryTileHandler implements ISidedInv
 			clientStackFilter.writeToBuf(buf);
 			break;
 		case 0:
-			if (side.getInt() + 1 < 6) {
+			if (side.getObject() + 1 < 6) {
 				side.increaseBy(1);
 			} else {
-				side.setInt(0);
+				side.setObject(0);
 			}
-			buf.writeInt(side.getInt());
+			buf.writeInt(side.getObject());
 			break;
 		case 1:
-			if (sideConfigs[side.getInt()].getInt() < 2) {
-				sideConfigs[side.getInt()].increaseBy(1);
+			if (sideConfigs[side.getObject()].getObject() < 2) {
+				sideConfigs[side.getObject()].increaseBy(1);
 			} else {
-				sideConfigs[side.getInt()].setInt(0);
+				sideConfigs[side.getObject()].setObject(0);
 			}
-			buf.writeInt(sideConfigs[side.getInt()].getInt());
+			buf.writeInt(sideConfigs[side.getObject()].getObject());
 			break;
 		case 2:
-			if (listType.getInt() == 0) {
-				listType.setInt(1);
+			if (listType.getObject() == 0) {
+				listType.setObject(1);
 			} else {
-				listType.setInt(0);
+				listType.setObject(0);
 			}
-			buf.writeInt(listType.getInt());
+			buf.writeInt(listType.getObject());
 			break;
 		case 5:
 
@@ -343,16 +343,16 @@ public class ItemRouterHandler extends InventoryTileHandler implements ISidedInv
 			break;
 		case 8:
 			boolean clicked = false;
-			if (listType.getInt() == 0 && clientClick != -1) {
-				if (clientClick < whitelist[side.getInt()].size()) {
-					if (whitelist[side.getInt()].get(clientClick) != null) {
+			if (listType.getObject() == 0 && clientClick != -1) {
+				if (clientClick < whitelist[side.getObject()].size()) {
+					if (whitelist[side.getObject()].get(clientClick) != null) {
 						buf.writeInt(clientClick);
 						clicked = true;
 					}
 				}
-			} else if (listType.getInt() == 1 && clientClick != -1) {
-				if (clientClick < blacklist[side.getInt()].size()) {
-					if (blacklist[side.getInt()].get(clientClick) != null) {
+			} else if (listType.getObject() == 1 && clientClick != -1) {
+				if (clientClick < blacklist[side.getObject()].size()) {
+					if (blacklist[side.getObject()].get(clientClick) != null) {
 						buf.writeInt(clientClick);
 						clicked = true;
 					}
@@ -400,61 +400,61 @@ public class ItemRouterHandler extends InventoryTileHandler implements ISidedInv
 			editStack = -1;
 			break;
 		case 0:
-			side.setInt(buf.readInt());
-			filterPos.setInt(-1);
+			side.setObject(buf.readInt());
+			filterPos.setObject(-1);
 			break;
 		case 1:
-			sideConfigs[side.getInt()].setInt(buf.readInt());
+			sideConfigs[side.getObject()].setObject(buf.readInt());
 			SonarCore.sendFullSyncAround(tile, 64);
 			break;
 		case 2:
-			listType.setInt(buf.readInt());
-			filterPos.setInt(-1);
+			listType.setObject(buf.readInt());
+			filterPos.setObject(-1);
 			break;
 		case 5:
-			if (filterPos.getInt() != -1 && filterPos.getInt() != 0) {
-				if (listType.getInt() == 0) {
-					if (filterPos.getInt() - 1 < whitelist[side.getInt()].size()) {
-						Collections.swap(whitelist[side.getInt()], filterPos.getInt(), filterPos.getInt() - 1);
-						filterPos.setInt(filterPos.getInt() - 1);
+			if (filterPos.getObject() != -1 && filterPos.getObject() != 0) {
+				if (listType.getObject() == 0) {
+					if (filterPos.getObject() - 1 < whitelist[side.getObject()].size()) {
+						Collections.swap(whitelist[side.getObject()], filterPos.getObject(), filterPos.getObject() - 1);
+						filterPos.setObject(filterPos.getObject() - 1);
 					}
 				} else {
-					if (filterPos.getInt() - 1 < blacklist[side.getInt()].size()) {
-						Collections.swap(whitelist[side.getInt()], filterPos.getInt(), filterPos.getInt() - 1);
-						filterPos.setInt(filterPos.getInt() - 1);
+					if (filterPos.getObject() - 1 < blacklist[side.getObject()].size()) {
+						Collections.swap(whitelist[side.getObject()], filterPos.getObject(), filterPos.getObject() - 1);
+						filterPos.setObject(filterPos.getObject() - 1);
 					}
 				}
 			}
 			break;
 		case 6:
-			if (filterPos.getInt() != -1) {
-				if (listType.getInt() == 0) {
-					if (filterPos.getInt() + 1 < whitelist[side.getInt()].size()) {
-						Collections.swap(whitelist[side.getInt()], filterPos.getInt(), filterPos.getInt() + 1);
-						filterPos.setInt(filterPos.getInt() + 1);
+			if (filterPos.getObject() != -1) {
+				if (listType.getObject() == 0) {
+					if (filterPos.getObject() + 1 < whitelist[side.getObject()].size()) {
+						Collections.swap(whitelist[side.getObject()], filterPos.getObject(), filterPos.getObject() + 1);
+						filterPos.setObject(filterPos.getObject() + 1);
 					}
 				} else {
-					if (filterPos.getInt() + 1 < blacklist[side.getInt()].size()) {
-						Collections.swap(whitelist[side.getInt()], filterPos.getInt(), filterPos.getInt() + 1);
-						filterPos.setInt(filterPos.getInt() + 1);
+					if (filterPos.getObject() + 1 < blacklist[side.getObject()].size()) {
+						Collections.swap(whitelist[side.getObject()], filterPos.getObject(), filterPos.getObject() + 1);
+						filterPos.setObject(filterPos.getObject() + 1);
 					}
 				}
 			}
 			break;
 		case 7:
-			if (filterPos.getInt() != -1) {
-				if (listType.getInt() == 0) {
-					if (filterPos.getInt() < whitelist[side.getInt()].size())
-						whitelist[side.getInt()].remove(filterPos.getInt());
+			if (filterPos.getObject() != -1) {
+				if (listType.getObject() == 0) {
+					if (filterPos.getObject() < whitelist[side.getObject()].size())
+						whitelist[side.getObject()].remove(filterPos.getObject());
 				} else {
-					if (filterPos.getInt() < blacklist[side.getInt()].size())
-						blacklist[side.getInt()].remove(filterPos.getInt());
+					if (filterPos.getObject() < blacklist[side.getObject()].size())
+						blacklist[side.getObject()].remove(filterPos.getObject());
 				}
-				filterPos.setInt(-1);
+				filterPos.setObject(-1);
 			}
 			break;
 		case 8:
-			filterPos.setInt(buf.readInt());
+			filterPos.setObject(buf.readInt());
 			break;
 		case 9:
 			readPacket(buf, 8);

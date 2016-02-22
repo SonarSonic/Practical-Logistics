@@ -50,7 +50,7 @@ public class FluidStackInfo extends Info<FluidStackInfo> {
 	@Override
 	public String getDisplayableData() {
 
-		return getData() + " mb";
+		return getData() + " mB";
 	}
 
 	@Override

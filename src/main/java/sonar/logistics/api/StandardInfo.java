@@ -87,7 +87,6 @@ public class StandardInfo<T extends StandardInfo> extends Info<T> {
 	@Override
 	public void readFromBuf(ByteBuf buf) {
 		this.providerID = buf.readInt();
-
 		if (buf.readBoolean()) {
 			this.catID = buf.readInt();
 		} else {
@@ -98,20 +97,17 @@ public class StandardInfo<T extends StandardInfo> extends Info<T> {
 		} else {
 			this.subCategory = ByteBufUtils.readUTF8String(buf);
 		}
-
 		this.data = ByteBufUtils.readUTF8String(buf);
 		this.dataType = buf.readInt();
 		this.emptyData = buf.readBoolean();
 		if (buf.readBoolean()) {
 			this.suffix = ByteBufUtils.readUTF8String(buf);
 		}
-
 	}
 
 	@Override
 	public void writeToBuf(ByteBuf buf) {
 		buf.writeInt(providerID);
-
 		if (catID != -1) {
 			buf.writeBoolean(true);
 			buf.writeInt(catID);
@@ -126,7 +122,6 @@ public class StandardInfo<T extends StandardInfo> extends Info<T> {
 			buf.writeBoolean(false);
 			ByteBufUtils.writeUTF8String(buf, subCategory);
 		}
-
 		ByteBufUtils.writeUTF8String(buf, data);
 		buf.writeInt(dataType);
 		buf.writeBoolean(emptyData);

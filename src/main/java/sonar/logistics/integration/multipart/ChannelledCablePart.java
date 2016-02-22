@@ -10,6 +10,7 @@ import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.SonarTilePart;
 import sonar.core.utils.BlockCoords;
 import sonar.logistics.api.LogisticsAPI;
+import sonar.logistics.api.connecting.CableType;
 import sonar.logistics.api.connecting.IDataCable;
 import sonar.logistics.api.connecting.IInfoEmitter;
 import sonar.logistics.api.connecting.ILogicTile;
@@ -19,7 +20,7 @@ import codechicken.lib.vec.Cuboid6;
 import codechicken.multipart.NormallyOccludedPart;
 import codechicken.multipart.TMultiPart;
 
-public class MultiDataCablePart extends SonarTilePart implements IDataCable {
+public class ChannelledCablePart extends SonarTilePart implements IDataCable {
 
 	public int registryID = -1;
 
@@ -50,11 +51,11 @@ public class MultiDataCablePart extends SonarTilePart implements IDataCable {
 			// EAST(1, 0, 0),
 			new Cuboid6(LONGER, SHORTER, SHORTER, MAX_DIRECTION, LONGER, LONGER), };
 
-	public MultiDataCablePart() {
+	public ChannelledCablePart() {
 		super();
 	}
 
-	public MultiDataCablePart(int meta) {
+	public ChannelledCablePart(int meta) {
 		super(meta);
 	}
 
@@ -99,11 +100,11 @@ public class MultiDataCablePart extends SonarTilePart implements IDataCable {
 		return blocked;
 	}
 
-	public int canRenderConnection(ForgeDirection dir) {
+	public CableType canRenderConnection(ForgeDirection dir) {
 		if (this.isBlocked(dir)) {
-			return 0;
+			return CableType.NONE;
 		}
-		return LogisticsAPI.getCableHelper().canRenderConnection(tile(), dir);
+		return LogisticsAPI.getCableHelper().canRenderConnection(tile(), dir, CableType.CHANNELLED_CABLE);
 	}
 
 	@Override
@@ -138,8 +139,8 @@ public class MultiDataCablePart extends SonarTilePart implements IDataCable {
 		for (ILogicTile tile : adjacents) {
 			if (tile instanceof IDataCable) {
 				IDataCable cable = (IDataCable) tile;
-				LogisticsAPI.getCableHelper().removeCable(cable);
-				LogisticsAPI.getCableHelper().addCable(cable);
+				cable.removeCable();
+				cable.addCable();
 			}
 			if (tile instanceof IInfoEmitter) {
 				IInfoEmitter emitter = (IInfoEmitter) tile;
@@ -147,9 +148,8 @@ public class MultiDataCablePart extends SonarTilePart implements IDataCable {
 				emitter.addConnections();
 			}
 		}
-
-		LogisticsAPI.getCableHelper().removeCable(this);
-		LogisticsAPI.getCableHelper().addCable(this);
+		this.removeCable();
+		this.addCable();
 	}
 
 	@Override
@@ -168,7 +168,19 @@ public class MultiDataCablePart extends SonarTilePart implements IDataCable {
 	}
 
 	@Override
-	public boolean unlimitedChannels() {
-		return true;
+	public CableType getCableType() {
+		return CableType.CHANNELLED_CABLE;
+	}
+
+	@Override
+	public void addCable() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void removeCable() {
+		// TODO Auto-generated method stub
+		
 	}
 }

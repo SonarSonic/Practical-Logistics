@@ -8,7 +8,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.SonarCore;
 import sonar.core.integration.fmp.FMPHelper;
-import sonar.core.network.sync.SyncLong;
+import sonar.core.network.sync.SyncTagType;
 import sonar.core.network.utils.IByteBufTile;
 import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
@@ -25,7 +25,7 @@ public class TileEntityClock extends TileEntityConnection implements IByteBufTil
 	public long offset = 0;
 	// public long tickTime;// tick time in millis
 
-	public SyncLong tickTime = new SyncLong(0);
+	public SyncTagType.LONG tickTime = new SyncTagType.LONG(0);
 
 	public float rotation;// 0-360 indicating rotation of the clock hand.
 	public boolean isSet;
@@ -42,10 +42,10 @@ public class TileEntityClock extends TileEntityConnection implements IByteBufTil
 			return;
 		}
 		currentMillis = (worldObj.getTotalWorldTime() * 50);
-		if (!(tickTime.getLong() < 10)) {
+		if (!(tickTime.getObject() < 10)) {
 			long start = currentMillis - lastMillis;
-			rotation = (start) * 360 / (tickTime.getLong());
-			if (start > tickTime.getLong()) {
+			rotation = (start) * 360 / (tickTime.getObject());
+			if (start > tickTime.getObject()) {
 				this.lastMillis = currentMillis;
 				powering = true;
 				this.worldObj.notifyBlockChange(xCoord, yCoord, zCoord, getBlockType());
@@ -76,16 +76,16 @@ public class TileEntityClock extends TileEntityConnection implements IByteBufTil
 
 	@Override
 	public Info currentInfo() {
-		if (!(tickTime.getLong() < 10)) {
+		if (!(tickTime.getObject() < 10)) {
 			long start = currentMillis - lastMillis;
 			String timeString = new SimpleDateFormat("HH:mm:ss:SSS").format((start) - (60 * 60 * 1000)).substring(0, 11);
-			return new ProgressInfo(start, tickTime.getLong(), timeString);
+			return new ProgressInfo(start, tickTime.getObject(), timeString);
 		} else {
 			return BlockCoordsInfo.createInfo("CLOCK", new BlockCoords(this));
 		}
 
 		/*
-		 * if (setting.getInt() == 1) { if (wasStarted) { String timeString =
+		 * if (setting.getObject() == 1) { if (wasStarted) { String timeString =
 		 * new SimpleDateFormat("HH:mm:ss:SSS").format(start * 100 - (60 * 60 *
 		 * 1000)).substring(0, 11); return new StandardInfo(-1, "TIME",
 		 * " Running ", timeString); } else { String timeString = new
@@ -182,10 +182,10 @@ public class TileEntityClock extends TileEntityConnection implements IByteBufTil
 			tickTime.increaseBy(-(60000 * 60));
 
 		}
-		if (tickTime.getLong() < 0) {
-			tickTime.setLong(0);
-		} else if (tickTime.getLong() > (1000 * 60 * 60 * 24)) {
-			tickTime.setLong((1000 * 60 * 60 * 24)-1);
+		if (tickTime.getObject() < 0) {
+			tickTime.setObject((long) 0);
+		} else if (tickTime.getObject() > (1000 * 60 * 60 * 24)) {
+			tickTime.setObject((long) ((1000 * 60 * 60 * 24)-1));
 		}
 	}
 }

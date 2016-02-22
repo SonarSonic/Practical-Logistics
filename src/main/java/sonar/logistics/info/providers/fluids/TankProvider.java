@@ -7,10 +7,10 @@ import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidHandler;
-import net.minecraftforge.fluids.IFluidTank;
 import sonar.core.fluid.StoredFluidStack;
 import sonar.core.utils.ActionType;
 import sonar.logistics.api.providers.FluidHandler;
+import sonar.logistics.api.providers.InventoryHandler.StorageSize;
 
 public class TankProvider extends FluidHandler {
 
@@ -27,21 +27,25 @@ public class TankProvider extends FluidHandler {
 	}
 
 	@Override
-	public boolean getFluids(List<StoredFluidStack> fluids, TileEntity tile, ForgeDirection dir) {
+	public StorageSize getFluids(List<StoredFluidStack> fluids, TileEntity tile, ForgeDirection dir) {
 		if (tile instanceof IFluidHandler) {
+			long stored = 0;
+			long maxStorage = 0;
 			IFluidHandler handler = (IFluidHandler) tile;
 			FluidTankInfo[] tankInfo = handler.getTankInfo(dir);
 			if (tankInfo != null) {
 				int tankNumber = 0;
-				for (FluidTankInfo info : tankInfo) {
-					if (info != null && info.fluid != null && info.fluid.amount != 0) {
+				for (FluidTankInfo info : tankInfo) {					
+					if (info.fluid != null && info.fluid.amount != 0) {
+						stored+=info.fluid.amount;
 						fluids.add(new StoredFluidStack(info.fluid, info.capacity));
 					}
+					maxStorage+=info.capacity;
 				}
 			}
-			return true;
+			return new StorageSize(stored,maxStorage);
 		}
-		return false;
+		return StorageSize.EMPTY;
 	}
 
 	@Override

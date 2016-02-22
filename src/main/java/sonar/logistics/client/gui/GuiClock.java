@@ -76,11 +76,11 @@ public class GuiClock extends GuiSonar {
 	}
 
 	public long getLong() {
-		return entity.tickTime.getLong();
+		return entity.tickTime.getObject();
 	}
 
 	public void setLong(String string) {
-		entity.tickTime.setLong(Long.parseLong(string));
+		entity.tickTime.setObject(Long.parseLong(string));
 		SonarCore.network.sendToServer(new PacketByteBufServer(entity, entity.xCoord, entity.yCoord, entity.zCoord, 1));
 	}
 }

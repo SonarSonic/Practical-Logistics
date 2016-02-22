@@ -1,9 +1,11 @@
 package sonar.logistics.common.tileentity;
 
-public class TileEntityDataCable extends TileEntityMultiDataCable {
+import sonar.logistics.api.connecting.CableType;
+
+public class TileEntityDataCable extends TileEntityChannelledCable {
 
 	@Override
-	public boolean unlimitedChannels() {
-		return false;
+	public CableType getCableType() {
+		return CableType.DATA_CABLE;
 	}
 }

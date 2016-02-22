@@ -5,14 +5,14 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import sonar.core.SonarCore;
 import sonar.core.common.tileentity.TileEntityInventory;
-import sonar.core.network.sync.SyncInt;
+import sonar.core.network.sync.SyncTagType;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.utils.HammerRecipes;
 
 public class TileEntityHammer extends TileEntityInventory implements ISidedInventory {
 
-	public SyncInt progress = new SyncInt(0);
-	public SyncInt coolDown = new SyncInt(1);
+	public SyncTagType.INT progress = new SyncTagType.INT(0);
+	public SyncTagType.INT coolDown = new SyncTagType.INT(1);
 	public static int speed = 100;
 
 	public TileEntityHammer() {
@@ -26,22 +26,22 @@ public class TileEntityHammer extends TileEntityInventory implements ISidedInven
 		if (this.worldObj.isBlockIndirectlyGettingPowered(xCoord, yCoord, zCoord)) {
 			return;
 		}
-		if (coolDown.getInt() != 0) {
+		if (coolDown.getObject() != 0) {
 			coolDown.increaseBy(-1);
 			SonarCore.sendFullSyncAround(this, 64);
 		} else if (canProcess()) {
-			if (progress.getInt() < speed) {
+			if (progress.getObject() < speed) {
 				progress.increaseBy(1);
 			} else {
 				finishProcess();
-				this.coolDown.setInt(speed * 2);
-				progress.setInt(0);
+				this.coolDown.setObject(speed * 2);
+				progress.setObject(0);
 				this.worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
 			}
 			SonarCore.sendFullSyncAround(this, 64);
 		} else {
-			this.coolDown.setInt(this.progress.getInt() * 2);
-			this.progress.setInt(0);
+			this.coolDown.setObject(this.progress.getObject() * 2);
+			this.progress.setObject(0);
 		}
 	}
 

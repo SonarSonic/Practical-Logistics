@@ -12,7 +12,6 @@ import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.render.InfoInteractionHandler;
 import sonar.logistics.api.render.ScreenType;
 import sonar.logistics.common.handlers.InventoryReaderHandler;
-import sonar.logistics.info.types.InventoryInfo;
 import sonar.logistics.info.types.StoredStackInfo;
 
 public class StoredStackInteraction extends InfoInteractionHandler<StoredStackInfo> {

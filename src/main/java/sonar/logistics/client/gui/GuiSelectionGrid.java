@@ -90,7 +90,6 @@ public abstract class GuiSelectionGrid<T> extends GuiSonar {
 
 	@Override
 	public void drawGuiContainerForegroundLayer(int x, int y) {
-		super.drawGuiContainerForegroundLayer(x, y);
 		renderStrings(x, y);
 		preRender();
 		if (getGridList() != null) {
@@ -132,6 +131,7 @@ public abstract class GuiSelectionGrid<T> extends GuiSonar {
 				}
 			}
 		}
+		super.drawGuiContainerForegroundLayer(x, y);
 	}
 	
 	public void preRender(){}

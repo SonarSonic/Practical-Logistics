@@ -7,6 +7,7 @@ import java.util.Map;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.utils.BlockCoords;
+import sonar.logistics.api.connecting.CableType;
 import sonar.logistics.api.connecting.IDataCable;
 
 public class CablingWrapper {
@@ -17,12 +18,24 @@ public class CablingWrapper {
 	 */
 	public void addConnection(TileEntity connection, ForgeDirection side) {}
 
+	/**adds a connection to the given RegistryID
+	 * @param registryID 
+	 * @param coords
+	 */
+	public void addConnection(int registryID, BlockCoords coords) {}
+	
 	/**should be called on invalidate() method in your TileEntity class: for removing a TileEntity from a Network
 	 * @param connection TileEntity to remove
 	 * @param side {@link ForgeDirection} it was connected via (cable side)
 	 */
 	public void removeConnection(TileEntity connection, ForgeDirection side) {}
-
+	
+	/**removes a connection to the given RegistryID
+	 * @param registryID 
+	 * @param coords
+	 */
+	public void removeConnection(int registryID, BlockCoords coords) {}
+	
 	/**should be called on the {@code validate()} method in your TileEntity class: for adding a {@link IDataCable} to a network
 	 * @param cable {@link IDataCable} to be added
 	 */
@@ -53,9 +66,10 @@ public class CablingWrapper {
 	/**checks the given TileEntity for cable connections in a given direction
 	 * @param te TileEntity to check from
 	 * @param dir {@link ForgeDirection} to check in
+	 * @param cableType TODO
 	 * @return 0 = no connection, 1 = Data Cable connection, 2 = Channelled Cable connection
 	 */
-	public int canRenderConnection(TileEntity te, ForgeDirection dir) {
-		return 0;
+	public CableType canRenderConnection(TileEntity te, ForgeDirection dir, CableType cableType) {
+		return CableType.NONE;
 	}
 }

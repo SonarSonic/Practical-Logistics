@@ -56,7 +56,7 @@ public class RenderLargeDisplay extends RenderDisplayScreen {
 
 			if (target instanceof LargeDisplayScreenHandler) {
 				LargeDisplayScreenHandler display = (LargeDisplayScreenHandler) target;
-				if (display.isHandler.getBoolean()) {
+				if (display.isHandler.getObject()) {
 					GL11.glPushMatrix();
 					GL11.glTranslated(x + 0.5, y + 0.5, z + 0.5);
 					ForgeDirection d = ForgeDirection.getOrientation(RenderHelper.setMetaData(entity));

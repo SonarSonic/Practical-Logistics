@@ -86,7 +86,7 @@ public class GuiItemRouter extends GuiSonar {
 			scrollerEnd = scrollerStart + 92;
 			scrollerWidth = 10;
 
-			this.buttonList.add(new SideButton(0, guiLeft + 9, guiTop + 20, 47, 12, ForgeDirection.getOrientation(handler.side.getInt()).name()));
+			this.buttonList.add(new SideButton(0, guiLeft + 9, guiTop + 20, 47, 12, ForgeDirection.getOrientation(handler.side.getObject()).name()));
 			for (int i = 1; i < 8; i++) {
 				this.buttonList.add(new ListButton(i, guiLeft + 57 + ((i - 1) * 14), guiTop + 20));
 			}
@@ -106,12 +106,12 @@ public class GuiItemRouter extends GuiSonar {
 	}
 
 	public int getFilterPosition() {
-		List<ItemFilter> filters = handler.listType.getInt() == 0 ? handler.whitelist[handler.side.getInt()] : handler.blacklist[handler.side.getInt()];
+		List<ItemFilter> filters = handler.listType.getObject() == 0 ? handler.whitelist[handler.side.getObject()] : handler.blacklist[handler.side.getObject()];
 
 		if (filters == null) {
 			return -1;
 		}
-		if (handler.filterPos.getInt() == -1 || filters.get(handler.filterPos.getInt()) == null) {
+		if (handler.filterPos.getObject() == -1 || filters.get(handler.filterPos.getObject()) == null) {
 			return -1;
 		}
 		int size = filters.size();
@@ -121,7 +121,7 @@ public class GuiItemRouter extends GuiSonar {
 			if (filters.get(i) != null) {
 				ItemFilter filter = filters.get(i);
 				if (filter != null) {
-					if (filter.equalFilter(filters.get(handler.filterPos.getInt()))) {
+					if (filter.equalFilter(filters.get(handler.filterPos.getObject()))) {
 						return i - start;
 					}
 				}
@@ -135,7 +135,7 @@ public class GuiItemRouter extends GuiSonar {
 		if (state == MAIN) {
 			FontHelper.textCentre(StatCollector.translateToLocal("tile.ItemRouter.name"), xSize, 7, 1);
 			GL11.glTranslated(0, 0.5, 0);
-			FontHelper.textOffsetCentre(ForgeDirection.getOrientation(handler.side.getInt()).name(), 31, 22, -1);
+			FontHelper.textOffsetCentre(ForgeDirection.getOrientation(handler.side.getObject()).name(), 31, 22, -1);
 			GL11.glTranslated(0, -0.5, 0);
 
 			super.drawGuiContainerForegroundLayer(x, y);
@@ -446,8 +446,8 @@ public class GuiItemRouter extends GuiSonar {
 				int start = (int) (size * this.currentScroll);
 				int finish = Math.min(start + 5, size);
 
-				int pos = handler.filterPos.getInt() - start;
-				if (pos > -1 && handler.filterPos.getInt() < finish) {
+				int pos = handler.filterPos.getObject() - start;
+				if (pos > -1 && handler.filterPos.getObject() < finish) {
 					drawTexturedModalRect(this.guiLeft + 9, this.guiTop + 33 + (18 * pos), 0, 233, 154 + 72, 18);
 				}
 			}
@@ -478,12 +478,12 @@ public class GuiItemRouter extends GuiSonar {
 			String text = "BUTTON TEXT";
 			switch (id) {
 			case 1:
-				int config = handler.sideConfigs[handler.side.getInt()].getInt();
+				int config = handler.sideConfigs[handler.side.getObject()].getObject();
 				String type = config == 1 ? "Input" : config == 2 ? "Output" : "None";
 				text = "Side Config: " + type;
 				break;
 			case 2:
-				int listType = handler.listType.getInt();
+				int listType = handler.listType.getObject();
 				text = listType == 0 ? "Whitelist" : "Blacklist";
 				break;
 			case 3:
@@ -514,7 +514,7 @@ public class GuiItemRouter extends GuiSonar {
 		@Override
 		public int getTextureX() {
 			if (id == 1) {
-				int config = handler.sideConfigs[handler.side.getInt()].getInt();
+				int config = handler.sideConfigs[handler.side.getObject()].getObject();
 				return 176 + (config * 12);
 			}
 
@@ -530,7 +530,7 @@ public class GuiItemRouter extends GuiSonar {
 				return 15;
 			}
 			if (id == 2) {
-				int listType = handler.listType.getInt();
+				int listType = handler.listType.getObject();
 				return listType == 0 ? 15 + 12 : 15 + 24;
 			}
 			return 15 + (id * 12);
@@ -565,7 +565,7 @@ public class GuiItemRouter extends GuiSonar {
 				text = (filter.matchModid ? EnumChatFormatting.WHITE : EnumChatFormatting.GRAY) + "Use MODID: " + filter.matchModid;
 				break;
 			case 4:
-				int listType = handler.listType.getInt();
+				int listType = handler.listType.getObject();
 				text = listType == 0 ? "Whitelist" : "Blacklist";
 				break;
 			}
@@ -595,7 +595,7 @@ public class GuiItemRouter extends GuiSonar {
 				secondary = !filter.matchModid;
 				break;
 			case 4:
-				secondary = handler.listType.getInt() != 0;
+				secondary = handler.listType.getObject() != 0;
 				break;
 			}
 

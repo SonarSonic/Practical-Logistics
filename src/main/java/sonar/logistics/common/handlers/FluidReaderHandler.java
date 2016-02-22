@@ -1,40 +1,49 @@
 package sonar.logistics.common.handlers;
 
+import io.netty.buffer.ByteBuf;
+
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.network.play.server.S2FPacketSetSlot;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
-import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.IFluidContainerItem;
 import sonar.core.fluid.StoredFluidStack;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.inventory.StoredItemStack;
+import sonar.core.network.sync.SyncTagType;
+import sonar.core.network.utils.IByteBufTile;
 import sonar.core.utils.ActionType;
 import sonar.core.utils.BlockCoords;
+import sonar.core.utils.BlockInteraction;
+import sonar.core.utils.helpers.FontHelper;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.StandardInfo;
+import sonar.logistics.api.interaction.IDefaultInteraction;
+import sonar.logistics.api.providers.InventoryHandler.StorageSize;
+import sonar.logistics.api.render.ScreenType;
+import sonar.logistics.api.wrappers.FluidWrapper.StorageFluids;
 import sonar.logistics.info.types.FluidInventoryInfo;
 import sonar.logistics.info.types.FluidStackInfo;
+import sonar.logistics.info.types.ProgressInfo;
 
-public class FluidReaderHandler extends TileHandler {
+public class FluidReaderHandler extends TileHandler implements IByteBufTile, IDefaultInteraction {
 
 	public BlockCoords coords;
-	public List<StoredFluidStack> stacks;
-	public List<StoredFluidStack> lastStacks;
+	public List<StoredFluidStack> fluids;
+	public List<StoredFluidStack> lastFluids;
 
 	public FluidStack current;
+	public SyncTagType.INT setting = new SyncTagType.INT(1);
+	public SyncTagType.INT posSlot = new SyncTagType.INT(2);
+	public StorageSize maxStorage = StorageSize.EMPTY;
 
 	public FluidReaderHandler(boolean isMultipart, TileEntity tile) {
 		super(isMultipart, tile);
@@ -45,7 +54,16 @@ public class FluidReaderHandler extends TileHandler {
 		if (te.getWorldObj().isRemote) {
 			return;
 		}
-		stacks = LogisticsAPI.getFluidHelper().getFluids(LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite()));
+		StorageFluids list = LogisticsAPI.getFluidHelper().getFluids(LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite()));
+		fluids = list.fluids;
+		maxStorage = list.sizing;
+	}
+
+	@Override
+	public void handleInteraction(Info info, ScreenType type, TileEntity screen, TileEntity reader, EntityPlayer player, int x, int y, int z, BlockInteraction interact, boolean doubleClick) {
+		if (player.getHeldItem() != null) {
+			emptyFluid(player, reader, player.getHeldItem());
+		}
 	}
 
 	public void fillItemStack(EntityPlayer player, TileEntity te, StoredFluidStack storedStack) {
@@ -87,7 +105,7 @@ public class FluidReaderHandler extends TileHandler {
 				player.inventory.setInventorySlotContents(player.inventory.currentItem, empty);
 			} else {
 				player.inventory.decrStackSize(player.inventory.currentItem, 1);
-				if(empty!=null){
+				if (empty != null) {
 					System.out.print(empty);
 					LogisticsAPI.getItemHelper().addStackToPlayer(new StoredItemStack(empty), player, false, ActionType.PERFORM);
 				}
@@ -106,26 +124,40 @@ public class FluidReaderHandler extends TileHandler {
 	}
 
 	public Info currentInfo(TileEntity te) {
-		/*
-		 * if (current != null && current.getFluid() != null) {
-		 * 
-		 * if (stacks != null) {
-		 * 
-		 * for (StoredFluidStack stack : stacks) { if (stack != null &&
-		 * stack.fluid.isFluidEqual(current)) { return
-		 * FluidStackInfo.createInfo(stack); } }
-		 * 
-		 * } return FluidStackInfo.createInfo(new StoredFluidStack(current, 0,
-		 * 0));
-		 * 
-		 * } return new StandardInfo((byte) -1, "ITEMREND", " ", "NO DATA");
-		 */
-		return FluidInventoryInfo.createInfo((ArrayList<StoredFluidStack>) (stacks == null ? new ArrayList() : stacks));
+
+		switch (setting.getObject()) {
+		case 0:
+			if (current != null) {
+				if (fluids != null) {
+					for (StoredFluidStack stack : fluids) {
+						if (stack.equalStack(current)) {
+							return FluidStackInfo.createInfo(stack);
+						}
+					}
+				}
+				return FluidStackInfo.createInfo(new StoredFluidStack(current, 0));
+			}
+			break;
+		case 1:
+			if (posSlot.getObject() < fluids.size()) {
+				return FluidStackInfo.createInfo(fluids.get(posSlot.getObject()));
+			}
+			break;
+		case 2:
+			if (fluids != null) {
+				return FluidInventoryInfo.createInfo((ArrayList<StoredFluidStack>) fluids);
+			}
+			break;
+		case 3:
+			return new ProgressInfo(maxStorage.getStoredFluids(), maxStorage.getMaxFluids(), FontHelper.formatFluidSize(maxStorage.getStoredFluids()) + " / " + FontHelper.formatFluidSize(maxStorage.getMaxFluids()));
+		}
+		return new StandardInfo((byte) -1, "ITEMREND", " ", "NO DATA");
 	}
 
 	public void readData(NBTTagCompound nbt, SyncType type) {
 		super.readData(nbt, type);
-
+		setting.readFromNBT(nbt, type);
+		posSlot.readFromNBT(nbt, type);
 		if (nbt.hasKey("FluidName")) {
 			this.current = FluidStack.loadFluidStackFromNBT(nbt);
 		}
@@ -141,29 +173,29 @@ public class FluidReaderHandler extends TileHandler {
 		if (type == SyncType.SPECIAL) {
 
 			if (nbt.hasKey("null")) {
-				this.stacks = new ArrayList();
+				this.fluids = new ArrayList();
 				return;
 			}
 			NBTTagList list = nbt.getTagList("Stacks", 10);
-			if (this.stacks == null) {
-				this.stacks = new ArrayList();
+			if (this.fluids == null) {
+				this.fluids = new ArrayList();
 			}
 			for (int i = 0; i < list.tagCount(); i++) {
 				NBTTagCompound compound = list.getCompoundTagAt(i);
 				int slot = compound.getInteger("Slot");
-				boolean set = slot < stacks.size();
+				boolean set = slot < fluids.size();
 				switch (compound.getByte("f")) {
 				case 0:
 					if (set)
-						stacks.set(slot, StoredFluidStack.readFromNBT(compound));
+						fluids.set(slot, StoredFluidStack.readFromNBT(compound));
 					else
-						stacks.add(slot, StoredFluidStack.readFromNBT(compound));
+						fluids.add(slot, StoredFluidStack.readFromNBT(compound));
 					break;
 				case 2:
 					if (set)
-						stacks.set(slot, null);
+						fluids.set(slot, null);
 					else
-						stacks.add(slot, null);
+						fluids.add(slot, null);
 					break;
 				}
 
@@ -172,10 +204,10 @@ public class FluidReaderHandler extends TileHandler {
 		}
 		if (type == SyncType.SYNC) {
 			NBTTagList list = nbt.getTagList("StoredStacks", 10);
-			this.stacks = new ArrayList();
+			this.fluids = new ArrayList();
 			for (int i = 0; i < list.tagCount(); i++) {
 				NBTTagCompound compound = list.getCompoundTagAt(i);
-				this.stacks.add(StoredFluidStack.readFromNBT(compound));
+				this.fluids.add(StoredFluidStack.readFromNBT(compound));
 
 			}
 		}
@@ -183,6 +215,8 @@ public class FluidReaderHandler extends TileHandler {
 
 	public void writeData(NBTTagCompound nbt, SyncType type) {
 		super.writeData(nbt, type);
+		setting.writeToNBT(nbt, type);
+		posSlot.writeToNBT(nbt, type);
 		if (current != null) {
 			current.writeToNBT(nbt);
 		}
@@ -198,43 +232,43 @@ public class FluidReaderHandler extends TileHandler {
 		}
 		if (type == SyncType.SPECIAL) {
 
-			if (stacks == null) {
-				stacks = new ArrayList();
+			if (fluids == null) {
+				fluids = new ArrayList();
 			}
-			if (lastStacks == null) {
-				lastStacks = new ArrayList();
+			if (lastFluids == null) {
+				lastFluids = new ArrayList();
 			}
-			if (this.stacks.size() <= 0 && (!(this.lastStacks.size() <= 0))) {
+			if (this.fluids.size() <= 0 && (!(this.lastFluids.size() <= 0))) {
 				nbt.setBoolean("null", true);
-				this.lastStacks = new ArrayList();
+				this.lastFluids = new ArrayList();
 				return;
 			}
 			NBTTagList list = new NBTTagList();
-			int size = Math.max(this.stacks.size(), this.lastStacks.size());
+			int size = Math.max(this.fluids.size(), this.lastFluids.size());
 			for (int i = 0; i < size; ++i) {
 				StoredFluidStack current = null;
 				StoredFluidStack last = null;
-				if (i < this.stacks.size()) {
-					current = this.stacks.get(i);
+				if (i < this.fluids.size()) {
+					current = this.fluids.get(i);
 				}
-				if (i < this.lastStacks.size()) {
-					last = this.lastStacks.get(i);
+				if (i < this.lastFluids.size()) {
+					last = this.lastFluids.get(i);
 				}
 				NBTTagCompound compound = new NBTTagCompound();
 				if (current != null) {
 					if (last != null) {
 						if (!last.equalStack(current.fluid) || current.stored != last.stored) {
 							compound.setByte("f", (byte) 0);
-							this.lastStacks.set(i, current);
-							StoredFluidStack.writeToNBT(compound, this.stacks.get(i));
+							this.lastFluids.set(i, current);
+							StoredFluidStack.writeToNBT(compound, this.fluids.get(i));
 						}
 					} else {
 						compound.setByte("f", (byte) 0);
-						this.lastStacks.add(i, current);
-						StoredFluidStack.writeToNBT(compound, this.stacks.get(i));
+						this.lastFluids.add(i, current);
+						StoredFluidStack.writeToNBT(compound, this.fluids.get(i));
 					}
 				} else if (last != null) {
-					this.lastStacks.set(i, null);
+					this.lastFluids.set(i, null);
 					compound.setByte("f", (byte) 2);
 				}
 				if (!compound.hasNoTags()) {
@@ -250,13 +284,13 @@ public class FluidReaderHandler extends TileHandler {
 		}
 		if (type == SyncType.SYNC) {
 			NBTTagList list = new NBTTagList();
-			if (stacks == null) {
-				stacks = new ArrayList();
+			if (fluids == null) {
+				fluids = new ArrayList();
 			}
-			for (int i = 0; i < this.stacks.size(); i++) {
-				if (this.stacks.get(i) != null) {
+			for (int i = 0; i < this.fluids.size(); i++) {
+				if (this.fluids.get(i) != null) {
 					NBTTagCompound compound = new NBTTagCompound();
-					StoredFluidStack.writeToNBT(compound, this.stacks.get(i));
+					StoredFluidStack.writeToNBT(compound, this.fluids.get(i));
 					list.appendTag(compound);
 				}
 			}
@@ -264,4 +298,28 @@ public class FluidReaderHandler extends TileHandler {
 			nbt.setTag("StoredStacks", list);
 		}
 	}
+
+	@Override
+	public void writePacket(ByteBuf buf, int id) {
+		if (id == 0) {
+		}
+		if (id == 1) {
+			posSlot.writeToBuf(buf);
+		}
+	}
+
+	@Override
+	public void readPacket(ByteBuf buf, int id) {
+		if (id == 0) {
+			if (setting.getObject() == 3) {
+				setting.setObject(0);
+			} else {
+				setting.increaseBy(1);
+			}
+		}
+		if (id == 1) {
+			posSlot.readFromBuf(buf);
+		}
+	}
+
 }

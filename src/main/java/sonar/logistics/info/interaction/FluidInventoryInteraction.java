@@ -14,8 +14,6 @@ import sonar.logistics.api.render.InfoInteractionHandler;
 import sonar.logistics.api.render.LargeScreenSizing;
 import sonar.logistics.api.render.ScreenType;
 import sonar.logistics.common.handlers.FluidReaderHandler;
-import sonar.logistics.common.handlers.InventoryReaderHandler;
-import sonar.logistics.common.handlers.LargeDisplayScreenHandler;
 import sonar.logistics.info.types.FluidInventoryInfo;
 
 public class FluidInventoryInteraction extends InfoInteractionHandler<FluidInventoryInfo> {

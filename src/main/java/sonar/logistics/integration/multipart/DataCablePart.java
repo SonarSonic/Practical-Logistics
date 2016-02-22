@@ -1,10 +1,11 @@
 package sonar.logistics.integration.multipart;
 
 import net.minecraft.block.Block;
+import sonar.logistics.api.connecting.CableType;
 import sonar.logistics.client.renderers.RenderHandlers;
 import sonar.logistics.registries.BlockRegistry;
 
-public class DataCablePart extends MultiDataCablePart {
+public class DataCablePart extends ChannelledCablePart {
 
 	public DataCablePart() {
 		super();
@@ -30,7 +31,7 @@ public class DataCablePart extends MultiDataCablePart {
 	}
 
 	@Override
-	public boolean unlimitedChannels() {
-		return false;
+	public CableType getCableType() {
+		return CableType.DATA_CABLE;
 	}
 }

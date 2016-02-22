@@ -31,7 +31,7 @@ public class ForgeMultipartHandler implements IPartFactory, IPartConverter {
 		if (name.equals("Fluid Reader"))
 			return new FluidReaderPart();
 		if (name.equals("Multi Cable Part"))
-			return new MultiDataCablePart();
+			return new ChannelledCablePart();
 		return null;
 	}
 
@@ -72,7 +72,7 @@ public class ForgeMultipartHandler implements IPartFactory, IPartConverter {
 			return new FluidReaderPart(meta);
 		}
 		if (b == BlockRegistry.dataMultiCable) {
-			return new MultiDataCablePart(meta);
+			return new ChannelledCablePart(meta);
 		}
 		return null;
 	}

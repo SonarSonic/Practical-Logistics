@@ -8,6 +8,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.integration.fmp.FMPHelper;
+import sonar.logistics.api.connecting.CableType;
 import sonar.logistics.api.render.ICableRenderer;
 import sonar.logistics.client.renderers.RenderHandlers;
 import sonar.logistics.common.tileentity.TileEntityBlockNode;
@@ -119,16 +120,19 @@ public class ModelDataCable extends ModelBase {
 	}
 
 	private boolean setTexture(ICableRenderer rend, ForgeDirection dir) {
-		int type = rend.canRenderConnection(dir);
+		CableType type = rend.canRenderConnection(dir);
+		
 		switch (type) {
-		case 1:
+		case DATA_CABLE:
 			Minecraft.getMinecraft().getTextureManager().bindTexture(cable);
 			return true;
-		case 2:
+		case BLOCK_CONNECTION:
+		case CHANNELLED_CABLE:
 			Minecraft.getMinecraft().getTextureManager().bindTexture(multicable);
 			return true;
+		default:
+			return false;
 		}
-		return false;
 	}
 
 	private void setRotation(ModelRenderer model, float x, float y, float z) {

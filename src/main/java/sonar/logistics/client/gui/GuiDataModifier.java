@@ -122,11 +122,11 @@ public class GuiDataModifier extends GuiSonar {
 	public String getText(int id) {
 		switch (id) {
 		case 1:
-			return handler.prefix.getString();
+			return handler.prefix.getObject();
 		case 2:
-			return handler.suffix.getString();
+			return handler.suffix.getObject();
 		default:
-			return handler.subCategory.getString();
+			return handler.subCategory.getObject();
 		}
 	}
 
@@ -134,13 +134,13 @@ public class GuiDataModifier extends GuiSonar {
 		SonarCore.network.sendToServer(new PacketTextField(string, entity.xCoord, entity.yCoord, entity.zCoord, id));
 		switch (id) {
 		case 1:
-			handler.prefix.setString(string);
+			handler.prefix.setObject(string);
 			break;
 		case 2:
-			handler.suffix.setString(string);
+			handler.suffix.setObject(string);
 			break;
 		default:
-			handler.subCategory.setString(string);
+			handler.subCategory.setObject(string);
 			break;
 		}
 	}

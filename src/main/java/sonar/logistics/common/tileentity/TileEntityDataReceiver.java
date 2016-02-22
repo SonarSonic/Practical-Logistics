@@ -59,7 +59,7 @@ public class TileEntityDataReceiver extends TileEntityNode implements IChannelPr
 			TileEntity tile = emitter.getCoords().blockCoords.getTileEntity();
 			if (tile != null && tile instanceof TileEntityDataEmitter) {
 				TileEntityDataEmitter dataEmitter = (TileEntityDataEmitter) tile;
-				emitter.setCoords(new IdentifiedCoords(dataEmitter.clientName.getString(), new ItemStack(BlockRegistry.dataEmitter), emitter.getCoords().blockCoords));
+				emitter.setCoords(new IdentifiedCoords(dataEmitter.clientName.getObject(), new ItemStack(BlockRegistry.dataEmitter), emitter.getCoords().blockCoords));
 			}
 		}
 	}

@@ -15,18 +15,22 @@ import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.handlers.InventoryTileHandler;
 import sonar.core.inventory.StoredItemStack;
-import sonar.core.network.sync.SyncInt;
+import sonar.core.network.sync.SyncTagType;
 import sonar.core.network.utils.IByteBufTile;
 import sonar.core.utils.ActionType;
 import sonar.core.utils.BlockCoords;
 import sonar.core.utils.BlockInteraction;
+import sonar.core.utils.helpers.FontHelper;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.StandardInfo;
 import sonar.logistics.api.interaction.IDefaultInteraction;
+import sonar.logistics.api.providers.InventoryHandler.StorageSize;
 import sonar.logistics.api.render.ScreenType;
+import sonar.logistics.api.wrappers.ItemWrapper.StorageItems;
 import sonar.logistics.info.types.InventoryInfo;
+import sonar.logistics.info.types.ProgressInfo;
 import sonar.logistics.info.types.StoredStackInfo;
 
 public class InventoryReaderHandler extends InventoryTileHandler implements IByteBufTile, IDefaultInteraction {
@@ -37,9 +41,10 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 
 	public ItemStack current;
 	// 0=Stack, 1=Slot (only accepts one input)
-	public SyncInt setting = new SyncInt(1);
-	public SyncInt targetSlot = new SyncInt(2);
-	public SyncInt posSlot = new SyncInt(3);
+	public SyncTagType.INT setting = new SyncTagType.INT(1);
+	public SyncTagType.INT targetSlot = new SyncTagType.INT(2);
+	public SyncTagType.INT posSlot = new SyncTagType.INT(3);
+	public StorageSize maxStorage = StorageSize.EMPTY;
 
 	public InventoryReaderHandler(boolean isMultipart, TileEntity tile) {
 		super(isMultipart, tile);
@@ -51,7 +56,9 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 		if (te.getWorldObj().isRemote) {
 			return;
 		}
-		stacks = LogisticsAPI.getItemHelper().getStackList(getNetwork(te));
+		StorageItems list = LogisticsAPI.getItemHelper().getStackList(getNetwork(te));
+		stacks = list.items;
+		maxStorage = list.sizing;
 	}
 
 	public List<BlockCoords> getNetwork(TileEntity te) {
@@ -70,7 +77,7 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 
 	public Info currentInfo(TileEntity te) {
 
-		switch (setting.getInt()) {
+		switch (setting.getObject()) {
 		case 0:
 			if (slots[0] != null) {
 				if (stacks != null) {
@@ -84,15 +91,15 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 			}
 			break;
 		case 1:
-			StoredItemStack stack = LogisticsAPI.getItemHelper().getStack(LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite()), targetSlot.getInt());
+			StoredItemStack stack = LogisticsAPI.getItemHelper().getStack(LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite()), targetSlot.getObject());
 			if (stack != null) {
 				return StoredStackInfo.createInfo(stack);
 			}
 			return new StandardInfo((byte) -1, "ITEMREND", " ", " ");
 
 		case 2:
-			if (posSlot.getInt() < stacks.size()) {
-				return StoredStackInfo.createInfo(stacks.get(posSlot.getInt()));
+			if (posSlot.getObject() < stacks.size()) {
+				return StoredStackInfo.createInfo(stacks.get(posSlot.getObject()));
 			}
 			break;
 		case 3:
@@ -100,6 +107,8 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 				return InventoryInfo.createInfo(stacks);
 			}
 			break;
+		case 4:
+			return new ProgressInfo(maxStorage.getStoredFluids(), maxStorage.getMaxFluids(), FontHelper.formatStackSize(maxStorage.getStoredFluids()) + " / " + FontHelper.formatStackSize(maxStorage.getMaxFluids()));
 		}
 		return new StandardInfo((byte) -1, "ITEMREND", " ", "NO DATA");
 	}
@@ -356,7 +365,6 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 	@Override
 	public void writePacket(ByteBuf buf, int id) {
 		if (id == 0) {
-			// setting.writeToBuf(buf);
 		}
 		if (id == 1) {
 			targetSlot.writeToBuf(buf);
@@ -369,10 +377,8 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 	@Override
 	public void readPacket(ByteBuf buf, int id) {
 		if (id == 0) {
-			// setting.readFromBuf(buf);
-			// System.out.print(setting.getInt());
-			if (setting.getInt() == 3) {
-				setting.setInt(0);
+			if (setting.getObject() == 4) {
+				setting.setObject(0);
 			} else {
 				setting.increaseBy(1);
 			}

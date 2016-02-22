@@ -5,7 +5,6 @@ import java.util.List;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.inventory.StoredItemStack;
@@ -14,24 +13,38 @@ import sonar.core.utils.BlockCoords;
 import sonar.logistics.api.connecting.IConnectionNode;
 import sonar.logistics.api.connecting.IEntityNode;
 import sonar.logistics.api.providers.InventoryHandler;
+import sonar.logistics.api.providers.InventoryHandler.StorageSize;
 
 public class ItemWrapper {
+
+	public static class StorageItems {
+		
+		public static final StorageItems EMPTY = new StorageItems(Collections.EMPTY_LIST, StorageSize.EMPTY);
+		public List<StoredItemStack> items;
+		public StorageSize sizing;
+		
+		public StorageItems(List<StoredItemStack> items, StorageSize sizing) {
+			this.items=items;
+			this.sizing=sizing;
+		}
+	}
 
 	/**used for getting the full list of Items on a given network
 	 * @param network current coordinates of the network
 	 * @return list of {@link StoredItemStack} on the network
 	 */
-	public List<StoredItemStack> getStackList(List<BlockCoords> network) {
-		return Collections.EMPTY_LIST;
+	public StorageItems getStackList(List<BlockCoords> network) {
+		return StorageItems.EMPTY;
 	}
 
 	/**used for getting the full list of Items at a given {@link IConnectionNode}
 	 * @param storedStacks current list of {@link StoredItemStack} to be added to
+	 * @param storage TODO
 	 * @param node {@link IConnectionNode} to check from
 	 * @return list of {@link StoredItemStack} on the network
 	 */
-	public List<StoredItemStack> getTileInventory(List<StoredItemStack> storedStacks, IConnectionNode node) {
-		return Collections.EMPTY_LIST;
+	public StorageSize getTileInventory(List<StoredItemStack> storedStacks, StorageSize storage, IConnectionNode node) {
+		return storage;
 	}
 	
 	/**used for getting the full list of Items at a given {@link IEntityNode}
@@ -39,15 +52,17 @@ public class ItemWrapper {
 	 * @param node {@link IEntityNode} to check from
 	 * @return list of {@link StoredItemStack} on the network
 	 */
-	public List<StoredItemStack> getEntityInventory(List<StoredItemStack> storedStacks, IEntityNode node) {
-		return Collections.EMPTY_LIST;
+	public StorageSize getEntityInventory(List<StoredItemStack> storedStacks, StorageSize storage, IEntityNode tileNode) {
+		return storage;
 	}
 
 	/**convenient method, adds the given inventory {@link IInventory} to the list, used by {@link InventoryHandler}
 	 * @param list {@link StoredItemStack} list to add to
 	 * @param inv {@link IInventory} to combine
+	 * @return returns how many ite
 	 */
-	public void addInventoryToList(List<StoredItemStack> list, IInventory inv) {
+	public StorageSize addInventoryToList(List<StoredItemStack> list, IInventory inv) {
+		return StorageSize.EMPTY;
 	}
 
 	/**convenient method, adds the given stack to the list, used by {@link InventoryHandler}

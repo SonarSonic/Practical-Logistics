@@ -3,29 +3,22 @@ package sonar.logistics.info.types;
 import io.netty.buffer.ByteBuf;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.TextureMap;
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
-import net.minecraftforge.fluids.FluidRegistry;
 
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
 
-import scala.actors.threadpool.Arrays;
 import sonar.core.fluid.StoredFluidStack;
 import sonar.core.utils.helpers.FontHelper;
-import sonar.core.utils.helpers.RenderHelper;
 import sonar.logistics.api.Info;
-import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.render.ScreenType;
 import cpw.mods.fml.common.network.ByteBufUtils;
 
@@ -170,7 +163,7 @@ public class FluidInventoryInfo extends Info<FluidInventoryInfo> {
 								FontRenderer rend = Minecraft.getMinecraft().fontRenderer;
 								String category = (stack != null ? stack.fluid.getFluid().getLocalizedName(stack.fluid) : this.rend);
 
-								String data = (stack != null && stack.capacity != 0 ? String.valueOf(stack.stored) : String.valueOf(0));
+								String data = FontHelper.formatFluidSize(stack.stored);
 								float itemScale = 120f;
 								GL11.glPushMatrix();
 								GL11.glTranslatef(xLevel * spacing, yLevel * spacing, 0);
@@ -182,13 +175,6 @@ public class FluidInventoryInfo extends Info<FluidInventoryInfo> {
 								GL11.glScaled(itemScale, itemScale, itemScale);
 								GL11.glTranslatef(-xLevel * spacing, -yLevel * spacing, 0);
 								GL11.glPopMatrix();
-								// GL11.glTranslated(0, 0, -zOffset - 0.01);
-
-								// LogisticsAPI.getInfoRenderer().renderStandardInfo(FluidStackInfo.createInfo(stack),
-								// Minecraft.getMinecraft().fontRenderer,
-								// fluidMinX, fluidMinY, fluidMaxX, fluidMaxY,
-								// 0, 0);
-								// GL11.glTranslated(0, 0, +zOffset - 0.01);
 							}
 						}
 						currentSlot++;

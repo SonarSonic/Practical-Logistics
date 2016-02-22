@@ -11,7 +11,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.SonarCore;
 import sonar.core.integration.fmp.FMPHelper;
-import sonar.core.network.sync.SyncBoolean;
+import sonar.core.network.sync.SyncTagType;
 import sonar.core.network.utils.IByteBufTile;
 import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
@@ -23,7 +23,7 @@ import sonar.logistics.registries.DisplayRegistry;
 
 public class LargeDisplayScreenHandler extends DisplayScreenHandler implements IByteBufTile {
 
-	public SyncBoolean isHandler = new SyncBoolean(0);
+	public SyncTagType.BOOLEAN isHandler = new SyncTagType.BOOLEAN(0);
 	public LargeScreenSizing sizing;
 	public boolean resetSizing = true;
 	public BlockCoords connectedTile = null;
@@ -36,7 +36,7 @@ public class LargeDisplayScreenHandler extends DisplayScreenHandler implements I
 	@Override
 	public void update(TileEntity te) {
 		if (!te.getWorldObj().isRemote) {
-			boolean lastHandler = isHandler.getBoolean();
+			boolean lastHandler = isHandler.getObject();
 			List<BlockCoords> displays = DisplayRegistry.getScreens(registryID);
 			if (displays != null) {
 				if (BlockCoords.equalCoords(displays.get(0), new BlockCoords(te))) {
@@ -54,7 +54,7 @@ public class LargeDisplayScreenHandler extends DisplayScreenHandler implements I
 							}
 						}
 					}
-					isHandler.setBoolean(true);
+					isHandler.setObject(true);
 					LargeScreenSizing lastSize = sizing;
 					sizing = DisplayHelper.getScreenSizing(te);
 
@@ -69,10 +69,10 @@ public class LargeDisplayScreenHandler extends DisplayScreenHandler implements I
 						this.updateData(connectedTile.getTileEntity(te.getWorldObj()), te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)));
 					}
 				} else {
-					isHandler.setBoolean(false);
+					isHandler.setObject(false);
 				}
 			}
-			if (lastHandler != isHandler.getBoolean()) {
+			if (lastHandler != isHandler.getObject()) {
 				SonarCore.sendPacketAround(te, 64, 4);
 			}
 

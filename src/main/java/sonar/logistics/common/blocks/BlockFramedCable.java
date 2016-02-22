@@ -12,6 +12,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.common.block.SonarMaterials;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.ITileHandler;
+import sonar.logistics.api.connecting.CableType;
 import sonar.logistics.common.tileentity.TileEntityDataCable;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -53,7 +54,7 @@ public abstract class BlockFramedCable extends BaseNode {
 		TileEntity tileentity = world.getTileEntity(x, y, z);
 		if (tileentity != null && tileentity instanceof TileEntityDataCable) {
 			TileEntityDataCable cable = (TileEntityDataCable) world.getTileEntity(x, y, z);
-			this.setBlockBounds((float) (cable.canRenderConnection(ForgeDirection.WEST) != 0 ? 0 : 0.0625 * 6), (float) (cable.canRenderConnection(ForgeDirection.DOWN) != 0 ? 0 : 0.0625 * 6), (float) (cable.canRenderConnection(ForgeDirection.NORTH) != 0 ? 0 : 0.0625 * 6), (float) (cable.canRenderConnection(ForgeDirection.EAST) != 0 ? 1 : (1 - (0.0625 * 6))), (float) (cable.canRenderConnection(ForgeDirection.UP) != 0 ? 1 : (1 - (0.0625 * 6))), (float) (cable.canRenderConnection(ForgeDirection.SOUTH) != 0 ? 1 : (1 - (0.0625 * 6))));
+			this.setBlockBounds((float) (cable.canRenderConnection(ForgeDirection.WEST).canConnect(CableType.BLOCK_CONNECTION) ? 0 : 0.0625 * 6), (float) (cable.canRenderConnection(ForgeDirection.DOWN).canConnect(CableType.BLOCK_CONNECTION) ? 0 : 0.0625 * 6), (float) (cable.canRenderConnection(ForgeDirection.NORTH).canConnect(CableType.BLOCK_CONNECTION) ? 0 : 0.0625 * 6), (float) (cable.canRenderConnection(ForgeDirection.EAST).canConnect(CableType.BLOCK_CONNECTION) ? 1 : (1 - (0.0625 * 6))), (float) (cable.canRenderConnection(ForgeDirection.UP).canConnect(CableType.BLOCK_CONNECTION) ? 1 : (1 - (0.0625 * 6))), (float) (cable.canRenderConnection(ForgeDirection.SOUTH).canConnect(CableType.BLOCK_CONNECTION) ? 1 : (1 - (0.0625 * 6))));
 		} else {
 			this.setBlockBounds((float) 0.0625 * 4, (float) 0.0625 * 4, (float) 0.0625 * 4, (float) (1 - (0.0625 * 4)), (float) (1 - (0.0625 * 4)), (float) (1 - (0.0625 * 4)));
 		}

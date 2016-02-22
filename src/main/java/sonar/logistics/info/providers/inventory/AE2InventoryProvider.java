@@ -10,14 +10,16 @@ import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.providers.InventoryHandler;
 import sonar.logistics.integration.AE2Helper;
 import appeng.api.AEApi;
-import appeng.api.config.Actionable;
 import appeng.api.implementations.tiles.ITileStorageMonitorable;
 import appeng.api.networking.security.IActionHost;
 import appeng.api.networking.security.MachineSource;
+import appeng.api.networking.storage.IStorageGrid;
 import appeng.api.storage.IMEMonitor;
 import appeng.api.storage.IStorageMonitorable;
 import appeng.api.storage.data.IAEItemStack;
 import appeng.api.storage.data.IItemList;
+import appeng.me.GridAccessException;
+import appeng.me.helpers.IGridProxyable;
 import cpw.mods.fml.common.Loader;
 
 public class AE2InventoryProvider extends InventoryHandler {
@@ -29,37 +31,55 @@ public class AE2InventoryProvider extends InventoryHandler {
 		return name;
 	}
 
+	public boolean isLoadable() {
+		return Loader.isModLoaded("appliedenergistics2");
+	}
+
 	@Override
 	public boolean canHandleItems(TileEntity tile, ForgeDirection dir) {
-		return tile instanceof ITileStorageMonitorable && tile instanceof IActionHost;
+		return tile instanceof IGridProxyable;
 	}
 
 	@Override
 	public StoredItemStack getStack(int slot, TileEntity tile, ForgeDirection dir) {
-		IItemList<IAEItemStack> items = getItemList(tile, dir);
-		if (items == null) {
-			return null;
-		}
-		int current = 0;
-		for (IAEItemStack item : items) {
-			if (current == slot) {
-				return AE2Helper.convertAEItemStack(item);
+		IGridProxyable proxy = (IGridProxyable) tile;
+		try {
+			IStorageGrid storage = proxy.getProxy().getStorage();
+			IItemList<IAEItemStack> items = storage.getItemInventory().getStorageList();
+			if (items == null) {
+				return null;
 			}
-			current++;
+			int current = 0;
+			for (IAEItemStack item : items) {
+				if (current == slot) {
+					return AE2Helper.convertAEItemStack(item);
+				}
+				current++;
+			}
+		} catch (GridAccessException e) {
+			e.printStackTrace();
 		}
 		return null;
 	}
 
 	@Override
-	public boolean getItems(List<StoredItemStack> storedStacks, TileEntity tile, ForgeDirection dir) {
-		IItemList<IAEItemStack> items = getItemList(tile, dir);
-		if (items == null) {
-			return false;
+	public StorageSize getItems(List<StoredItemStack> storedStacks, TileEntity tile, ForgeDirection dir) {
+		long maxStorage = 0;
+		IGridProxyable proxy = (IGridProxyable) tile;
+		try {
+			IStorageGrid storage = proxy.getProxy().getStorage();
+			IItemList<IAEItemStack> items = storage.getItemInventory().getStorageList();
+			if (items == null) {
+				return StorageSize.EMPTY;
+			}
+			for (IAEItemStack item : items) {
+				LogisticsAPI.getItemHelper().addStackToList(storedStacks, AE2Helper.convertAEItemStack(item));
+				maxStorage += item.getStackSize();
+			}
+		} catch (GridAccessException e) {
+			e.printStackTrace();
 		}
-		for (IAEItemStack item : items) {
-			LogisticsAPI.getItemHelper().addStackToList(storedStacks, AE2Helper.convertAEItemStack(item));
-		}
-		return true;
+		return new StorageSize(maxStorage, maxStorage);
 	}
 
 	public IItemList<IAEItemStack> getItemList(TileEntity tile, ForgeDirection dir) {
@@ -72,34 +92,34 @@ public class AE2InventoryProvider extends InventoryHandler {
 		return null;
 	}
 
-	public boolean isLoadable() {
-		return Loader.isModLoaded("appliedenergistics2");
-	}
-
 	@Override
 	public StoredItemStack addStack(StoredItemStack add, TileEntity tile, ForgeDirection dir, ActionType action) {
-		IStorageMonitorable monitor = ((ITileStorageMonitorable) tile).getMonitorable(dir, new MachineSource(((IActionHost) tile)));
-		if (monitor != null) {
-			IMEMonitor<IAEItemStack> stacks = monitor.getItemInventory();
-			IAEItemStack stack = stacks.injectItems(AE2Helper.convertStoredItemStack(add), AE2Helper.getActionable(action), new MachineSource(((IActionHost) tile)));
+		IGridProxyable proxy = (IGridProxyable) tile;
+		try {
+			IStorageGrid storage = proxy.getProxy().getStorage();
+			IAEItemStack stack = storage.getItemInventory().injectItems(AE2Helper.convertStoredItemStack(add), AE2Helper.getActionable(action), new MachineSource(((IActionHost) tile)));
 			if (stack == null || stack.getStackSize() == 0) {
 				return null;
 			}
 			return AE2Helper.convertAEItemStack(stack);
+		} catch (GridAccessException e) {
+			e.printStackTrace();
 		}
 		return add;
 	}
 
 	@Override
 	public StoredItemStack removeStack(StoredItemStack remove, TileEntity tile, ForgeDirection dir, ActionType action) {
-		IStorageMonitorable monitor = ((ITileStorageMonitorable) tile).getMonitorable(dir, new MachineSource(((IActionHost) tile)));
-		if (monitor != null) {
-			IMEMonitor<IAEItemStack> stacks = monitor.getItemInventory();
-			IAEItemStack stack = stacks.extractItems(AEApi.instance().storage().createItemStack(remove.item).setStackSize(remove.stored), AE2Helper.getActionable(action), new MachineSource(((IActionHost) tile)));
+		IGridProxyable proxy = (IGridProxyable) tile;
+		try {
+			IStorageGrid storage = proxy.getProxy().getStorage();
+			IAEItemStack stack = storage.getItemInventory().extractItems(AEApi.instance().storage().createItemStack(remove.item).setStackSize(remove.stored), AE2Helper.getActionable(action), new MachineSource(((IActionHost) tile)));
 			if (stack == null || stack.getStackSize() == 0) {
-				return remove;
+				return null;
 			}
-			return new StoredItemStack(stack.getItemStack(), remove.stored - stack.getStackSize());
+			return AE2Helper.convertAEItemStack(stack);
+		} catch (GridAccessException e) {
+			e.printStackTrace();
 		}
 		return remove;
 	}

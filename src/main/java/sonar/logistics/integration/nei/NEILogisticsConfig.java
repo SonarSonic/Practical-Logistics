@@ -18,6 +18,8 @@ public class NEILogisticsConfig implements IConfigureNEI {
 		API.hideItem(new ItemStack(BlockRegistry.displayScreen));
 		API.hideItem(new ItemStack(BlockRegistry.redstoneSignaller_on));
 		API.hideItem(new ItemStack(BlockRegistry.hammer_air));
+		API.hideItem(new ItemStack(BlockRegistry.digitalSign_standing));
+		API.hideItem(new ItemStack(BlockRegistry.digitalSign_wall));
 	}
 
 	@Override

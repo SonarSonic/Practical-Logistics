@@ -8,6 +8,7 @@ import sonar.core.fluid.StoredFluidStack;
 import sonar.core.utils.ActionType;
 import sonar.core.utils.IRegistryObject;
 import sonar.logistics.api.LogisticsAPI;
+import sonar.logistics.api.providers.InventoryHandler.StorageSize;
 
 /** used for providing information on Fluids stored in Block/TileEntities for the Fluid Reader to read, the Provider must be registered in the {@link LogisticsAPI} to be used */
 public abstract class FluidHandler implements IRegistryObject {
@@ -27,14 +28,12 @@ public abstract class FluidHandler implements IRegistryObject {
 	public abstract boolean canHandleFluids(TileEntity tile, ForgeDirection dir);
 
 	/**only called if canProvideFluids is true*/
-	public abstract boolean getFluids(List<StoredFluidStack> fluids, TileEntity tile, ForgeDirection dir);	
+	public abstract StorageSize getFluids(List<StoredFluidStack> fluids, TileEntity tile, ForgeDirection dir);	
 
-	/**returns what wasn't added
-	 * @param action TODO*/
+	/**returns what wasn't added*/
 	public abstract StoredFluidStack addStack(StoredFluidStack add, TileEntity tile, ForgeDirection dir, ActionType action);
 
-	/**returns what wasn't extracted
-	 * @param action TODO*/
+	/**returns what wasn't extracted*/
 	public abstract StoredFluidStack removeStack(StoredFluidStack remove, TileEntity tile, ForgeDirection dir, ActionType action);
 	
 	/** used when the provider is loaded normally used to check if relevant mods are loaded for APIs to work */

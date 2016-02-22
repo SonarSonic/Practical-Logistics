@@ -9,9 +9,7 @@ import sonar.core.inventory.StoredItemStack;
 import sonar.core.utils.BlockCoords;
 import sonar.core.utils.BlockInteraction;
 import sonar.core.utils.BlockInteractionType;
-import sonar.logistics.api.Info;
 import sonar.logistics.api.LogisticsAPI;
-import sonar.logistics.api.connecting.ILargeDisplay;
 import sonar.logistics.api.render.InfoInteractionHandler;
 import sonar.logistics.api.render.LargeScreenSizing;
 import sonar.logistics.api.render.ScreenType;
@@ -25,7 +23,7 @@ public class InventoryInteraction extends InfoInteractionHandler<InventoryInfo> 
 	public String getName() {
 		return "Inventory Info";
 	}
-	
+
 	@Override
 	public boolean canHandle(ScreenType type, TileEntity te, TileEntity object) {
 		TileHandler handler = FMPHelper.getHandler(object);
@@ -36,7 +34,7 @@ public class InventoryInteraction extends InfoInteractionHandler<InventoryInfo> 
 	public void handleInteraction(InventoryInfo info, ScreenType type, TileEntity screen, TileEntity reader, EntityPlayer player, int x, int y, int z, BlockInteraction interact, boolean doubleClick) {
 		InventoryReaderHandler handler = (InventoryReaderHandler) FMPHelper.getHandler(reader);
 		TileHandler screenHandler = FMPHelper.getHandler(screen);
-		
+
 		ForgeDirection dir = ForgeDirection.getOrientation(interact.side);
 		BlockCoords screenCoords = new BlockCoords(screen);
 		if (interact.type == BlockInteractionType.RIGHT || interact.type == BlockInteractionType.SHIFT_RIGHT) {
@@ -49,13 +47,13 @@ public class InventoryInteraction extends InfoInteractionHandler<InventoryInfo> 
 					}
 				}
 			} else if (interact.type == BlockInteractionType.SHIFT_RIGHT) {
-				
+
 			}
-		} else if (screenHandler instanceof LargeDisplayScreenHandler) {			
+		} else if (screenHandler instanceof LargeDisplayScreenHandler) {
 			LargeDisplayScreenHandler largeScreen = (LargeDisplayScreenHandler) screenHandler;
 			LargeScreenSizing sizing = largeScreen.sizing;
 			if (sizing != null) {
-				int slot = -1;						
+				int slot = -1;
 				if (dir == ForgeDirection.NORTH) {
 					int hSlots = (Math.round(sizing.maxH - sizing.minH) * 2);
 					int yPos = (sizing.maxY - (y - screenCoords.getY())) * 2;
@@ -90,6 +88,23 @@ public class InventoryInteraction extends InfoInteractionHandler<InventoryInfo> 
 					if (extract != null) {
 						LogisticsAPI.getItemHelper().spawnStoredItemStack(extract, screen.getWorldObj(), x, y, z, dir);
 					}
+				}
+			}
+		} else {
+			int slot = -1;
+			if (dir == ForgeDirection.NORTH) {
+				slot = interact.hitx < 0.5 ? 1 : 0;
+			} else if (dir == ForgeDirection.SOUTH) {
+				slot = interact.hitx < 0.5 ? 0 : 1;
+			} else if (dir == ForgeDirection.EAST) {
+				slot = interact.hitz < 0.5 ? 1 : 0;
+			} else if (dir == ForgeDirection.WEST) {
+				slot = interact.hitz < 0.5 ? 0 : 1;
+			}
+			if (slot >= 0 && slot < info.stacks.size()) {
+				StoredItemStack extract = handler.extractItem(reader, info.stacks.get(slot), interact.type == BlockInteractionType.LEFT ? 1 : 64);
+				if (extract != null) {
+					LogisticsAPI.getItemHelper().spawnStoredItemStack(extract, screen.getWorldObj(), x, y, z, dir);
 				}
 			}
 		}
