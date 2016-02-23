@@ -21,6 +21,7 @@ import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.renderers.SonarTERender;
 import sonar.core.utils.helpers.RenderHelper;
 import sonar.logistics.Logistics;
+import sonar.logistics.api.connecting.CableType;
 import sonar.logistics.client.models.ModelBlockNode;
 import sonar.logistics.client.models.ModelClock;
 import sonar.logistics.client.models.ModelDataCable;
@@ -28,6 +29,7 @@ import sonar.logistics.client.models.ModelDataModifier;
 import sonar.logistics.client.models.ModelDataReceiver;
 import sonar.logistics.client.models.ModelDirectionalConnector;
 import sonar.logistics.client.models.ModelEntityNode;
+import sonar.logistics.client.models.ModelExpulsionPort;
 import sonar.logistics.client.models.ModelHammer;
 import sonar.logistics.client.models.ModelInfoCreator;
 import sonar.logistics.client.models.ModelItemRouter;
@@ -40,11 +42,11 @@ import sonar.logistics.registries.BlockRegistry;
 
 public class RenderHandlers {
 
-	public static String modelFolder = Logistics.modid + ":textures/model/";
+	public final static String modelFolder = Logistics.modid + ":textures/model/";
+	public final static ModelDataCable modelCable = new ModelDataCable();
+	public final static String textureCable = modelFolder + "dataCable.png";
 
 	public static class BlockNode extends SonarTERender {
-		public ModelDataCable modelCable = new ModelDataCable();
-		public String textureCable = modelFolder + "dataCable.png";
 
 		public BlockNode() {
 			super(new ModelBlockNode(), modelFolder + "blockNode_black.png");
@@ -53,7 +55,7 @@ public class RenderHandlers {
 		@Override
 		public void renderTileEntityAt(TileEntity entity, double x, double y, double z, float f) {
 			RenderHelper.beginRender(x + 0.5F, y + 1.5F, z + 0.5F, 0, textureCable);
-			modelCable.renderTile(entity, (Entity) null, 0.0F, 0.0F, -0.1F, 0.0F, 0.0F, 0.0625F);
+			RenderHandlers.modelCable.renderTile(entity, (Entity) null, 0.0F, 0.0F, -0.1F, 0.0F, 0.0F, 0.0625F, CableType.NONE);
 			RenderHelper.finishRender();
 
 			RenderHelper.beginRender(x + 0.5F, y + 1.5F, z + 0.5F, RenderHelper.setMetaData(entity), texture);
@@ -90,26 +92,26 @@ public class RenderHandlers {
 		}
 	}
 
-	public static class BlockCable extends TileEntitySpecialRenderer {
+	public static class DataCable extends TileEntitySpecialRenderer {
 		public ModelDataCable model = new ModelDataCable();
 		public String texture = modelFolder + "dataCable.png";
 
 		@Override
 		public void renderTileEntityAt(TileEntity entity, double x, double y, double z, float f) {
 			RenderHelper.beginRender(x + 0.5F, y + 1.5F, z + 0.5F, RenderHelper.setMetaData(entity), texture);
-			model.renderTile(entity, (Entity) null, 0.0F, 0.0F, -0.1F, 0.0F, 0.0F, 0.0625F);
+			model.renderTile(entity, (Entity) null, 0.0F, 0.0F, -0.1F, 0.0F, 0.0F, 0.0625F, CableType.DATA_CABLE);
 			RenderHelper.finishRender();
 		}
 	}
 
-	public static class BlockMultiCable extends TileEntitySpecialRenderer {
+	public static class ChannelledCable extends TileEntitySpecialRenderer {
 		public ModelDataCable model = new ModelDataCable();
 		public String texture = modelFolder + "dataMultiCable.png";
 
 		@Override
 		public void renderTileEntityAt(TileEntity entity, double x, double y, double z, float f) {
 			RenderHelper.beginRender(x + 0.5F, y + 1.5F, z + 0.5F, RenderHelper.setMetaData(entity), texture);
-			model.renderTile(entity, (Entity) null, 0.0F, 0.0F, -0.1F, 0.0F, 0.0F, 0.0625F);
+			model.renderTile(entity, (Entity) null, 0.0F, 0.0F, -0.1F, 0.0F, 0.0F, 0.0625F, CableType.CHANNELLED_CABLE);
 			RenderHelper.finishRender();
 		}
 	}
@@ -124,7 +126,7 @@ public class RenderHandlers {
 		@Override
 		public void renderTileEntityAt(TileEntity entity, double x, double y, double z, float f) {
 			RenderHelper.beginRender(x + 0.5F, y + 1.5F, z + 0.5F, 0, cableTex);
-			modelCable.renderTile(entity, (Entity) null, 0.0F, 0.0F, -0.1F, 0.0F, 0.0F, 0.0625F);
+			modelCable.renderTile(entity, (Entity) null, 0.0F, 0.0F, -0.1F, 0.0F, 0.0F, 0.0625F, CableType.NONE);
 			RenderHelper.finishRender();
 
 			RenderHelper.beginRender(x + 0.5F, y + 1.5F, z + 0.5F, RenderHelper.setMetaData(entity), modelTex);
@@ -144,7 +146,7 @@ public class RenderHandlers {
 		@Override
 		public void renderTileEntityAt(TileEntity entity, double x, double y, double z, float f) {
 			RenderHelper.beginRender(x + 0.5F, y + 1.5F, z + 0.5F, 0, cableTex);
-			modelCable.renderTile(entity, (Entity) null, 0.0F, 0.0F, -0.1F, 0.0F, 0.0F, 0.0625F);
+			modelCable.renderTile(entity, (Entity) null, 0.0F, 0.0F, -0.1F, 0.0F, 0.0F, 0.0625F, CableType.NONE);
 			RenderHelper.finishRender();
 
 			RenderHelper.beginRender(x + 0.5F, y + 1.5F, z + 0.5F, RenderHelper.setMetaData(entity), modelTex);
@@ -364,7 +366,7 @@ public class RenderHandlers {
 		@Override
 		public void renderTileEntityAt(TileEntity entity, double x, double y, double z, float f) {
 			RenderHelper.beginRender(x + 0.5F, y + 1.5F, z + 0.5F, 0, textureCable);
-			modelCable.renderTile(entity, (Entity) null, 0.0F, 0.0F, -0.1F, 0.0F, 0.0F, 0.0625F);
+			modelCable.renderTile(entity, (Entity) null, 0.0F, 0.0F, -0.1F, 0.0F, 0.0F, 0.0625F, CableType.NONE);
 			RenderHelper.finishRender();
 
 			RenderHelper.beginRender(x + 0.5F, y + 1.5F, z + 0.5F, RenderHelper.setMetaData(entity), texture);
@@ -557,7 +559,7 @@ public class RenderHandlers {
 			f3 = 0.016666668F * f1;
 			GL11.glTranslatef(0.0F, 0.5F * f1, 0.07F * f1);
 			GL11.glScalef(f3, -f3, f3);
-			//GL11.glNormal3f(0.0F, 0.0F, -1.0F * f3);
+			// GL11.glNormal3f(0.0F, 0.0F, -1.0F * f3);
 			GL11.glDepthMask(false);
 			GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 			byte colour = -1;
@@ -576,6 +578,51 @@ public class RenderHandlers {
 			GL11.glDepthMask(true);
 			GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 			GL11.glPopMatrix();
+		}
+	}
+
+	public static class ExpulsionPort extends SonarTERender {
+
+		public ExpulsionPort() {
+			super(new ModelExpulsionPort(), modelFolder + "port.png");
+		}
+		
+		@Override
+		public void renderTileEntityAt(TileEntity entity, double x, double y, double z, float f) {
+			RenderHelper.beginRender(x + 0.5F, y + 1.5F, z + 0.5F, 0, textureCable);
+			modelCable.renderTile(entity, (Entity) null, 0.0F, 0.0F, -0.1F, 0.0F, 0.0F, 0.0625F, CableType.NONE);
+			RenderHelper.finishRender();
+
+			RenderHelper.beginRender(x + 0.5F, y + 1.5F, z + 0.5F, RenderHelper.setMetaData(entity), texture);
+			if (entity != null && entity.getWorldObj() != null) {
+				int meta = entity.getBlockMetadata();
+				if (meta == 5) {
+					GL11.glRotated(90, 0, 1.0, 0);
+				} else if (meta == 6) {
+				} else if (meta == 4) {
+					GL11.glTranslated(-1, 1, 0);
+					GL11.glRotated(90, 0, 0, -1);
+				} else if (meta == 3) {
+					GL11.glTranslated(0, 1, -1);
+					GL11.glRotated(90, 1, 0, 0);
+				} else if (meta == 2) {
+					GL11.glTranslated(1, 1, 0);
+					GL11.glRotated(90, 0, 0, 1);
+				} else if (meta == 1) {
+					GL11.glTranslated(1, 1, 0);
+					GL11.glRotated(90, 0, 0, 1);
+				} else if (meta == 0) {
+					GL11.glTranslated(0, 2, 0);
+					GL11.glRotated(180, 0, 0, 1);
+				} else if (meta == 7) {
+					GL11.glTranslated(0, 2, 0);
+					GL11.glRotated(180, 0, 0, 1);
+				}
+
+			}
+			//GL11.glTranslated(0, 1.5, 0);
+			model.render((Entity) null, 0.0F, 0.0F, -0.1F, 0.0F, 0.0F, 0.0625F);
+			RenderHelper.finishRender();
 		}
 	}
 

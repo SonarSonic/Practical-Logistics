@@ -226,13 +226,13 @@ public class CableHelper extends CablingWrapper {
 				}
 
 			} else if (tile instanceof ILogicTile) {
-				int connect = (((ILogicTile) tile).canConnect(dir.getOpposite())) ? 1 : 0;
-				if (connect != 0 && target instanceof IDataCable) {
+				boolean canConnect = (((ILogicTile) tile).canConnect(dir.getOpposite()));
+				if (canConnect && target instanceof IDataCable) {
 					if (cableType.canConnect(((IDataCable) target).getCableType())) {
 						return ((IDataCable) target).getCableType();
 					}
 				}
-				return CableType.NONE;
+				return canConnect? CableType.DATA_CABLE : CableType.NONE;
 			}
 		}
 		return CableType.NONE;

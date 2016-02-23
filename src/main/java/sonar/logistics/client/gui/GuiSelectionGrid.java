@@ -90,6 +90,7 @@ public abstract class GuiSelectionGrid<T> extends GuiSonar {
 
 	@Override
 	public void drawGuiContainerForegroundLayer(int x, int y) {
+		net.minecraft.client.renderer.RenderHelper.enableGUIStandardItemLighting();
 		renderStrings(x, y);
 		preRender();
 		if (getGridList() != null) {

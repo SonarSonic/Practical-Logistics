@@ -106,7 +106,6 @@ public class FluidReaderHandler extends TileHandler implements IByteBufTile, IDe
 			} else {
 				player.inventory.decrStackSize(player.inventory.currentItem, 1);
 				if (empty != null) {
-					System.out.print(empty);
 					LogisticsAPI.getItemHelper().addStackToPlayer(new StoredItemStack(empty), player, false, ActionType.PERFORM);
 				}
 			}

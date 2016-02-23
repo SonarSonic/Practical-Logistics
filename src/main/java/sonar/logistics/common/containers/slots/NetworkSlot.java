@@ -21,7 +21,7 @@ public class NetworkSlot extends Slot {
 
 	public ItemStack getStack() {
 		 StoredItemStack stored = getStoredStack();
-		 return stored == null ? null : stored.getFullStack();
+		 return null;
 		//return null;
 		/*
 		 * if (this.getSlotIndex() < handler.stacks.size()) { StoredItemStack
@@ -41,7 +41,7 @@ public class NetworkSlot extends Slot {
 	}
 
 	public boolean getHasStack() {
-		return this.getStoredStack() != null;
+		return false;
 	}
 
 	public void putStack(ItemStack add) {
@@ -99,7 +99,6 @@ public class NetworkSlot extends Slot {
 		 * storedStack = new StoredItemStack(stack.getItemStack(), extractSize -
 		 * remainder.stored); }
 		 */
-		// System.out.print("yo");
 		// if (!te.getWorldObj().isRemote && this.getSlotIndex() <
 		// handler.stacks.size() && handler.stacks.get(this.getSlotIndex()) !=
 		// null) {

@@ -77,7 +77,7 @@ public class ModelDataCable extends ModelBase {
 		setRotation(Arm4, 0F, 1.570796F, 1.570796F);
 	}
 
-	public void renderTile(TileEntity tile, Entity entity, float f, float f1, float f2, float f3, float f4, float f5) {
+	public void renderTile(TileEntity tile, Entity entity, float f, float f1, float f2, float f3, float f4, float f5, CableType override) {
 		super.render(entity, f, f1, f2, f3, f4, f5);
 		setRotationAngles(entity, f, f1, f2, f3, f4, f5);
 		boolean blockNode = tile instanceof TileEntityBlockNode;
@@ -89,27 +89,27 @@ public class ModelDataCable extends ModelBase {
 			ICableRenderer cable = (ICableRenderer) object;
 			boolean renderCentre = false;
 
-			if (setTexture(cable, ForgeDirection.DOWN)) {
+			if (setTexture(cable, ForgeDirection.DOWN, override)) {
 				Bottom.render(f5);
 				renderCentre = true;
 			}
-			if (setTexture(cable, ForgeDirection.UP)) {
+			if (setTexture(cable, ForgeDirection.UP, override)) {
 				Top.render(f5);
 				renderCentre = true;
 			}
-			if (setTexture(cable, ForgeDirection.NORTH)) {
+			if (setTexture(cable, ForgeDirection.NORTH, override)) {
 				Arm1.render(f5);
 				renderCentre = true;
 			}
-			if (setTexture(cable, ForgeDirection.WEST)) {
+			if (setTexture(cable, ForgeDirection.WEST, override)) {
 				Arm2.render(f5);
 				renderCentre = true;
 			}
-			if (setTexture(cable, ForgeDirection.SOUTH)) {
+			if (setTexture(cable, ForgeDirection.SOUTH, override)) {
 				Arm3.render(f5);
 				renderCentre = true;
 			}
-			if (setTexture(cable, ForgeDirection.EAST)) {
+			if (setTexture(cable, ForgeDirection.EAST, override)) {
 				Arm4.render(f5);
 				renderCentre = true;
 			}
@@ -119,16 +119,16 @@ public class ModelDataCable extends ModelBase {
 		}
 	}
 
-	private boolean setTexture(ICableRenderer rend, ForgeDirection dir) {
+	private boolean setTexture(ICableRenderer rend, ForgeDirection dir, CableType override) {
 		CableType type = rend.canRenderConnection(dir);
-		
+
 		switch (type) {
 		case DATA_CABLE:
-			Minecraft.getMinecraft().getTextureManager().bindTexture(cable);
+			Minecraft.getMinecraft().getTextureManager().bindTexture(override != CableType.NONE ? (override.equals(CableType.CHANNELLED_CABLE) ? multicable : cable) : cable);
 			return true;
 		case BLOCK_CONNECTION:
 		case CHANNELLED_CABLE:
-			Minecraft.getMinecraft().getTextureManager().bindTexture(multicable);
+			Minecraft.getMinecraft().getTextureManager().bindTexture(override != CableType.NONE ? (override.equals(CableType.DATA_CABLE) ? cable : multicable) : multicable);
 			return true;
 		default:
 			return false;

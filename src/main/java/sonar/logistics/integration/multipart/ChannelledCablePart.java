@@ -66,7 +66,7 @@ public class ChannelledCablePart extends SonarTilePart implements IDataCable {
 
 	@Override
 	public Object getSpecialRenderer() {
-		return new RenderHandlers.BlockMultiCable();
+		return new RenderHandlers.ChannelledCable();
 	}
 
 	@Override

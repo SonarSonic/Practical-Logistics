@@ -22,6 +22,11 @@ public class TileEntityBlockNode extends TileEntityChannelledCable implements II
 	}
 
 	@Override
+	public boolean isBlocked(ForgeDirection dir) {
+		return !canConnect(dir);
+	}
+
+	@Override
 	public boolean canConnect(ForgeDirection dir) {
 		return dir != ForgeDirection.getOrientation(SonarHelper.invertMetadata(this.getBlockMetadata())).getOpposite();
 	}
@@ -29,7 +34,7 @@ public class TileEntityBlockNode extends TileEntityChannelledCable implements II
 	public CableType canRenderConnection(ForgeDirection dir) {
 		return LogisticsAPI.getCableHelper().canRenderConnection(this, dir, CableType.BLOCK_CONNECTION);
 	}
-	
+
 	public void addCable() {
 		super.addCable();
 		LogisticsAPI.getCableHelper().addConnection(registryID, this.getCoords());
@@ -39,7 +44,7 @@ public class TileEntityBlockNode extends TileEntityChannelledCable implements II
 		super.removeCable();
 		LogisticsAPI.getCableHelper().removeConnection(registryID, this.getCoords());
 	}
-	
+
 	@Override
 	public Info currentInfo() {
 		return BlockCoordsInfo.createInfo("Node", new BlockCoords(this));
@@ -55,8 +60,10 @@ public class TileEntityBlockNode extends TileEntityChannelledCable implements II
 	}
 
 	@Override
-	public void addConnections() {}
+	public void addConnections() {
+	}
 
 	@Override
-	public void removeConnections() {}
+	public void removeConnections() {
+	}
 }

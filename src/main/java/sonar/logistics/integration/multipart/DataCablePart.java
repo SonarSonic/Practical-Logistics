@@ -17,7 +17,7 @@ public class DataCablePart extends ChannelledCablePart {
 
 	@Override
 	public Object getSpecialRenderer() {
-		return new RenderHandlers.BlockCable();
+		return new RenderHandlers.DataCable();
 	}
 
 	@Override

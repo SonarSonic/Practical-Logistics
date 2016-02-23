@@ -49,7 +49,6 @@ public class GuiInventoryReader extends GuiSelectionGrid<StoredItemStack> {
 
 	public void initGui() {
 		super.initGui();
-		// System.out.print(" RESET: " + handler.setting.getObject());
 		this.buttonList.add(new GuiButton(0, guiLeft + 120 - (18 * 6), guiTop + 7, 65 + 3, 20, getSettingsString()));
 		switch (getSetting()) {
 		case SLOT:
@@ -76,8 +75,6 @@ public class GuiInventoryReader extends GuiSelectionGrid<StoredItemStack> {
 				} else {
 					handler.setting.increaseBy(1);
 				}
-
-				// System.out.print(" AFTER: " + handler.setting.getObject());
 				SonarCore.network.sendToServer(new PacketByteBufServer(handler, entity.xCoord, entity.yCoord, entity.zCoord, 0));
 				switchState();
 				reset();

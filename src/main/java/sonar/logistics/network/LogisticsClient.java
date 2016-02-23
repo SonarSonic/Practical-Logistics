@@ -20,6 +20,7 @@ import sonar.logistics.common.tileentity.TileEntityDigitalScreen;
 import sonar.logistics.common.tileentity.TileEntityDisplayScreen;
 import sonar.logistics.common.tileentity.TileEntityEnergyReader;
 import sonar.logistics.common.tileentity.TileEntityEntityNode;
+import sonar.logistics.common.tileentity.TileEntityExpulsionPort;
 import sonar.logistics.common.tileentity.TileEntityFluidReader;
 import sonar.logistics.common.tileentity.TileEntityHammer;
 import sonar.logistics.common.tileentity.TileEntityHolographicDisplay;
@@ -52,11 +53,11 @@ public class LogisticsClient extends LogisticsCommon {
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityEntityNode.class, entityNode);
 		MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(BlockRegistry.entityNode), new RenderItemHandlers.EntityNode(entityNode, new TileEntityEntityNode()));
 
-		TileEntitySpecialRenderer dataCable = new RenderHandlers.BlockCable();
+		TileEntitySpecialRenderer dataCable = new RenderHandlers.DataCable();
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityDataCable.class, dataCable);
 		MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(BlockRegistry.dataCable), new RenderItemHandlers.Cable(dataCable, new TileEntityDataCable()));
 		
-		TileEntitySpecialRenderer dataMultiCable = new RenderHandlers.BlockMultiCable();
+		TileEntitySpecialRenderer dataMultiCable = new RenderHandlers.ChannelledCable();
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityChannelledCable.class, dataMultiCable);
 		MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(BlockRegistry.dataMultiCable), new RenderItemHandlers.Cable(dataMultiCable, new TileEntityChannelledCable()));
 		
@@ -117,6 +118,10 @@ public class LogisticsClient extends LogisticsCommon {
 		TileEntitySpecialRenderer clock = new RenderHandlers.Clock();
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityClock.class, clock);
 		MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(BlockRegistry.clock), new RenderItemHandlers.Clock(clock, new TileEntityClock()));
+		
+		TileEntitySpecialRenderer expulsion = new RenderHandlers.ExpulsionPort();
+		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityExpulsionPort.class, expulsion);
+		MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(BlockRegistry.expulsion_port), new RenderItemHandlers.Cable(expulsion, new TileEntityExpulsionPort()));
 		
 	}
 }

@@ -60,7 +60,7 @@ public class ChannelSelectorHandler extends TileHandler {
 					}
 
 				} else {
-					channels.add(new IdentifiedCoords(name, stack, connect));
+					channels.add(new IdentifiedCoords(connect.toString(), stack, connect));
 				}
 			}
 		}

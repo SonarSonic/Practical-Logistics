@@ -1,7 +1,10 @@
 package sonar.logistics.common.blocks;
 
+import java.util.List;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
@@ -70,5 +73,18 @@ public class BlockItemRouter extends BaseNode {
 
 	public boolean hasSpecialCollisionBox() {
 		return false;
+
+	}
+
+	@Override
+	public boolean dropStandard(World world, int x, int y, int z) {
+		return false;
+	}
+
+	@Override
+	public void addSpecialToolTip(ItemStack stack, EntityPlayer player, List list) {
+		if(stack.hasTagCompound() && stack.getTagCompound().hasKey("dropped")){
+			list.add("Configured");
+		}
 	}
 }

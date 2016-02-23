@@ -12,6 +12,7 @@ import sonar.logistics.common.blocks.BlockDataReceiver;
 import sonar.logistics.common.blocks.BlockDigitalSign;
 import sonar.logistics.common.blocks.BlockEnergyReader;
 import sonar.logistics.common.blocks.BlockEntityNode;
+import sonar.logistics.common.blocks.BlockExpulsionPort;
 import sonar.logistics.common.blocks.BlockFluidReader;
 import sonar.logistics.common.blocks.BlockHammer;
 import sonar.logistics.common.blocks.BlockHammerAir;
@@ -38,6 +39,7 @@ import sonar.logistics.common.tileentity.TileEntityDigitalScreen;
 import sonar.logistics.common.tileentity.TileEntityDisplayScreen;
 import sonar.logistics.common.tileentity.TileEntityEnergyReader;
 import sonar.logistics.common.tileentity.TileEntityEntityNode;
+import sonar.logistics.common.tileentity.TileEntityExpulsionPort;
 import sonar.logistics.common.tileentity.TileEntityFluidReader;
 import sonar.logistics.common.tileentity.TileEntityHammer;
 import sonar.logistics.common.tileentity.TileEntityHolographicDisplay;
@@ -58,7 +60,7 @@ public class BlockRegistry extends Logistics {
 	public static Block infoReader, inventoryReader, fluidReader, energyReader;
 
 	// connections
-	public static Block node, entityNode, dataCable, dataMultiCable, dataReceiver, dataEmitter, dataModifier, infoCreator, channelSelector;
+	public static Block node, entityNode, dataCable, dataMultiCable, dataReceiver, dataEmitter, dataModifier, infoCreator, channelSelector, expulsion_port, admission_port;
 
 	// misc
 	public static Block redstoneSignaller_on, redstoneSignaller_off, sapphire_ore, hammer, hammer_air, itemRouter, clock;
@@ -159,6 +161,9 @@ public class BlockRegistry extends Logistics {
 		GameRegistry.registerBlock(itemRouter, SonarBlockTip.class, "ItemRouter");
 		GameRegistry.registerTileEntity(TileEntityItemRouter.class, "ItemRouter");
 
+		expulsion_port = new BlockExpulsionPort().setBlockName("ExpulsionPort").setHardness(1.0F).setResistance(100.0F).setCreativeTab(Logistics.creativeTab).setBlockTextureName(modid + ":" + "data_cable");
+		GameRegistry.registerBlock(expulsion_port, SonarBlockTip.class, "ExpulsionPort");
+		GameRegistry.registerTileEntity(TileEntityExpulsionPort.class, "ExpulsionPort");
 	}
 
 }

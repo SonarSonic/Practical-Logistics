@@ -1,13 +1,18 @@
 package sonar.logistics.common.containers;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraftforge.common.util.ForgeDirection;
+import sonar.core.SonarCore;
+import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.inventory.ContainerSync;
 import sonar.core.inventory.StoredItemStack;
 import sonar.core.inventory.slots.SlotList;
+import sonar.core.network.PacketStackUpdate;
 import sonar.core.utils.ActionType;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.api.LogisticsAPI;
@@ -39,12 +44,11 @@ public class ContainerInventoryReader extends ContainerSync {
 		for (int i = 0; i < 9; ++i) {
 			this.addSlotToContainer(new Slot(inventoryPlayer, i, 41 + i * 18, 232));
 		}
-		// for (int i = 0; i < 7; ++i) {
-		// for (int j = 0; j < 12; ++j) {
-		// this.addSlotToContainer(new NetworkSlot(handler, tile, j + i * 12, 13
-		// + j * 18, 32 + i * 18));
-		// }
-		// }
+		for (int i = 0; i < 7; ++i) {
+			for (int j = 0; j < 12; ++j) {
+				this.addSlotToContainer(new NetworkSlot(handler, tile, j + i * 12, 13 + j * 18, 32 + i * 18));
+			}
+		}
 		if (hasStack)
 			addSlotToContainer(new SlotList(handler, 0, 103, 9));
 	}
@@ -66,40 +70,11 @@ public class ContainerInventoryReader extends ContainerSync {
 			}
 			itemstack = itemstack1.copy();
 			if (id >= 36 && id < 120) {
-				/*
-				 * int extractSize = (int)
-				 * Math.min(handler.stacks.get(slot.getSlotIndex
-				 * ()).item.getMaxStackSize(),
-				 * Math.min(handler.stacks.get(slot.getSlotIndex()).stored,
-				 * 64)); StoredItemStack stack = new
-				 * StoredItemStack(handler.stacks
-				 * .get(slot.getSlotIndex()).getFullStack(), extractSize);
-				 * 
-				 * StoredItemStack simulate =
-				 * LogisticsAPI.getItemHelper().addStackToPlayer(stack.copy(),
-				 * player, false, ActionType.SIMULATE); if (simulate == null ||
-				 * simulate.stored == 0 || simulate.stored < stack.stored) {
-				 * StoredItemStack perform =
-				 * LogisticsAPI.getItemHelper().removeItems(stack.copy(),
-				 * handler.getNetwork(tile), ActionType.PERFORM);
-				 * StoredItemStack storedStack = null; if (perform == null ||
-				 * perform.stored == 0) { storedStack = new
-				 * StoredItemStack(stack.getItemStack(), extractSize); } else {
-				 * storedStack = new StoredItemStack(stack.getItemStack(),
-				 * extractSize - perform.stored); } if (storedStack != null) {
-				 * LogisticsAPI.getItemHelper().addStackToPlayer(storedStack,
-				 * player, false, ActionType.PERFORM);
-				 * this.detectAndSendChanges(); } }
-				 */
+				
 			} else if (id < 36) {
-				// ((Slot)
-				// this.inventorySlots.get(36)).putStack(itemstack1.copy());
-				// handler.insertItem(player, tile, slot.getSlotIndex());
-
 				if (!tile.getWorldObj().isRemote) {
 					StoredItemStack stack = new StoredItemStack(itemstack);
 					StoredItemStack perform = LogisticsAPI.getItemHelper().addItems(stack, handler.getNetwork(tile), ActionType.PERFORM);
-					System.out.print(perform);
 					if (perform == null || perform.stored == 0) {
 						itemstack1.stackSize = 0;
 					} else {
@@ -145,7 +120,50 @@ public class ContainerInventoryReader extends ContainerSync {
 	public ItemStack slotClick(int slotID, int buttonID, int flag, EntityPlayer player) {
 		if (slotID < this.inventorySlots.size()) {
 			Slot targetSlot = slotID < 0 ? null : (Slot) this.inventorySlots.get(slotID);
-			if ((targetSlot instanceof SlotList)) {
+			if (targetSlot instanceof NetworkSlot) {
+				NetworkSlot network = (NetworkSlot) targetSlot;
+				if (!tile.getWorldObj().isRemote) {
+					if (player.inventory.getItemStack() != null) {
+						ItemStack add = player.inventory.getItemStack();
+						int stackSize = Math.min(buttonID == 1 ? 1 : 64, add.stackSize);
+						StoredItemStack stack = LogisticsAPI.getItemHelper().addItems(new StoredItemStack(add.copy()).setStackSize(stackSize), LogisticsAPI.getCableHelper().getConnections(tile, ForgeDirection.getOrientation(FMPHelper.getMeta(tile)).getOpposite()), ActionType.PERFORM);
+
+						if (stack == null || stack.stored == 0) {
+							add.stackSize = add.stackSize - stackSize;
+						} else {
+							add.stackSize = (int) (add.stackSize - (stackSize - stack.stored));
+						}
+						if (add.stackSize <= 0) {
+							add = null;
+						}
+						if (!ItemStack.areItemStacksEqual(add, player.inventory.getItemStack())) {
+							player.inventory.setItemStack(add);					
+							SonarCore.network.sendTo(new PacketStackUpdate(add), (EntityPlayerMP) player);
+						}
+						return add;
+					} else if (player.inventory.getItemStack() == null) {
+						StoredItemStack stack = network.getStoredStack();
+
+						if (stack == null || stack.stored == 0) {
+							return null;
+						}
+						int extractSize = (int) Math.min(stack.getItemStack().getMaxStackSize(), Math.min(stack.stored, buttonID == 1 ? 1 : 64));
+						StoredItemStack remainder = LogisticsAPI.getItemHelper().removeItems(stack.setStackSize(extractSize), LogisticsAPI.getCableHelper().getConnections(tile, ForgeDirection.getOrientation(FMPHelper.getMeta(tile)).getOpposite()), ActionType.PERFORM);
+						StoredItemStack storedStack = null;
+						if (remainder == null || remainder.stored == 0) {
+							storedStack = new StoredItemStack(stack.getItemStack(), extractSize);
+						} else {
+							storedStack = new StoredItemStack(stack.getItemStack(), extractSize - remainder.stored);
+						}
+						player.inventory.setItemStack(storedStack.getFullStack());
+						SonarCore.network.sendTo(new PacketStackUpdate(storedStack.getFullStack()), (EntityPlayerMP) player);
+						this.detectAndSendChanges();
+						return storedStack.getFullStack();
+					}
+				}
+				return null;
+
+			} else if ((targetSlot instanceof SlotList)) {
 				if (buttonID == 2) {
 					targetSlot.putStack(null);
 				} else {
@@ -153,22 +171,6 @@ public class ContainerInventoryReader extends ContainerSync {
 				}
 				return player.inventory.getItemStack();
 			}
-			
-			/*
-			 * if (slotID >= 36 && slotID < 120) { Slot slot = (Slot)
-			 * this.inventorySlots.get(slotID); if (!slot.getHasStack()) {
-			 * ItemStack itemstack1 = player.inventory.getItemStack(); if
-			 * (!tile.getWorldObj().isRemote && itemstack1 != null) {
-			 * StoredItemStack stack = new StoredItemStack(itemstack1);
-			 * StoredItemStack perform =
-			 * LogisticsAPI.getItemHelper().addItems(stack,
-			 * handler.getNetwork(tile), ActionType.PERFORM); if (perform ==
-			 * null || perform.stored == 0) { itemstack1.stackSize = 0; } else {
-			 * itemstack1.stackSize = (int) (perform.getStackSize()); }
-			 * player.inventory.setItemStack(itemstack1);
-			 * player.inventory.markDirty(); this.detectAndSendChanges(); }
-			 * return null; } }
-			 */
 			return super.slotClick(slotID, buttonID, flag, player);
 
 		}

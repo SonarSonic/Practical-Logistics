@@ -244,10 +244,10 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 					break;
 				case 1:
 					long stored = compound.getLong("Stored");
-					if (stored != 0) {
+					if (stacks.get(slot) != null && stored != 0) {
 						stacks.set(slot, new StoredItemStack(stacks.get(slot).item, stored));
 					} else {
-						stacks.set(slot, null);
+						stacks.set(slot, StoredItemStack.readFromNBT(compound));
 					}
 					break;
 				case 2:
@@ -314,16 +314,11 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 				NBTTagCompound compound = new NBTTagCompound();
 				if (current != null) {
 					if (last != null) {
-						if (!ItemStack.areItemStacksEqual(last.item, current.item)) {
+						if (!last.item.equals(current.item)) {
 							compound.setByte("f", (byte) 0);
 							this.lastStacks.set(i, current);
 							StoredItemStack.writeToNBT(compound, this.stacks.get(i));
 
-						} else if (last.stored != current.stored) {
-							compound.setByte("f", (byte) 1);
-							this.lastStacks.set(i, current);
-							StoredItemStack.writeToNBT(compound, this.stacks.get(i));
-							compound.setLong("Stored", current.stored);
 						}
 					} else {
 						compound.setByte("f", (byte) 0);

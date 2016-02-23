@@ -2,7 +2,9 @@ package sonar.logistics.common.tileentity;
 
 import io.netty.buffer.ByteBuf;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.monster.EntityMob;
@@ -15,25 +17,43 @@ import sonar.core.network.sync.SyncTagType;
 import sonar.core.network.sync.SyncTagType.INT;
 import sonar.core.network.utils.IByteBufTile;
 import sonar.core.utils.BlockCoords;
-import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.core.utils.helpers.SonarHelper;
+import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.connecting.CableType;
+import sonar.logistics.api.connecting.IConnectionNode;
 import sonar.logistics.api.connecting.IEntityNode;
 import sonar.logistics.api.connecting.IInfoEmitter;
 import sonar.logistics.api.render.ICableRenderer;
 import sonar.logistics.info.types.BlockCoordsInfo;
 
-public class TileEntityEntityNode extends TileEntityConnection implements ICableRenderer, IInfoEmitter, IByteBufTile, IEntityNode {
+public class TileEntityEntityNode extends TileEntityChannelledCable implements IInfoEmitter, ICableRenderer, IEntityNode, IByteBufTile {
 
 	public SyncTagType.INT entityTarget = new SyncTagType.INT(0);
 	public SyncTagType.INT entityRange = (INT) new SyncTagType.INT(1).setDefault(10);
 	public float rotate = 0;
 
+	public void updateEntity() {
+		super.updateEntity();
+		if (this.worldObj.isRemote) {
+			if (!(rotate >= 1)) {
+				rotate += (float) 1 / 100;
+			} else {
+				rotate = 0;
+			}
+			return;
+		}
+	}
+
 	@Override
-	public Info currentInfo() {
-		return BlockCoordsInfo.createInfo("Entity Node", new BlockCoords(this));
+	public CableType getCableType() {
+		return CableType.BLOCK_CONNECTION;
+	}
+
+	@Override
+	public boolean isBlocked(ForgeDirection dir) {
+		return !canConnect(dir);
 	}
 
 	@Override
@@ -49,21 +69,27 @@ public class TileEntityEntityNode extends TileEntityConnection implements ICable
 		return LogisticsAPI.getCableHelper().canRenderConnection(this, dir, CableType.BLOCK_CONNECTION);
 	}
 
-	public void updateEntity() {
-		super.updateEntity();
-		if (this.worldObj.isRemote) {
-			if (!(rotate >= 1)) {
-				rotate += (float) 1 / 100;
-			} else {
-				rotate = 0;
-			}
-			return;
-		}
-
+	public void addCable() {
+		super.addCable();
+		LogisticsAPI.getCableHelper().addConnection(registryID, this.getCoords());
 	}
 
-	public boolean maxRender() {
-		return true;
+	public void removeCable() {
+		super.removeCable();
+		LogisticsAPI.getCableHelper().removeConnection(registryID, this.getCoords());
+	}
+
+	@Override
+	public Info currentInfo() {
+		return BlockCoordsInfo.createInfo("Entity Node", new BlockCoords(this));
+	}
+
+	@Override
+	public void addConnections() {
+	}
+
+	@Override
+	public void removeConnections() {
 	}
 
 	public void readData(NBTTagCompound nbt, SyncType type) {
@@ -97,33 +123,10 @@ public class TileEntityEntityNode extends TileEntityConnection implements ICable
 	}
 
 	@Override
-	public void addConnections() {
-		for (int i = 0; i < 6; i++) {
-			ForgeDirection dir = ForgeDirection.getOrientation(i);
-			if (dir != dir.UP) {
-				LogisticsAPI.getCableHelper().addConnection(this, dir);
-			}
-		}
-	}
-
-	@Override
-	public void removeConnections() {
-		for (int i = 0; i < 6; i++) {
-			ForgeDirection dir = ForgeDirection.getOrientation(i);
-			if (dir != dir.UP) {
-				LogisticsAPI.getCableHelper().removeConnection(this, dir);
-			}
-		}
-	}
-
-	@Override
 	public void writePacket(ByteBuf buf, int id) {
 		switch (id) {
 		case 0:
 			buf.writeInt(entityTarget.getObject());
-			break;
-		case 1:
-			//buf.writeInt(entityRange.getObject());
 			break;
 		}
 	}
@@ -135,7 +138,6 @@ public class TileEntityEntityNode extends TileEntityConnection implements ICable
 			entityTarget.setObject(buf.readInt());
 			break;
 		case 1:
-			
 			if (entityRange.getObject() != 64)
 				entityRange.increaseBy(1);
 			break;
@@ -148,6 +150,6 @@ public class TileEntityEntityNode extends TileEntityConnection implements ICable
 
 	@Override
 	public List<Entity> getEntities() {
-		return Arrays.asList(new Object[]{getNearestEntity()});
+		return Arrays.asList(new Object[] { getNearestEntity() });
 	}
 }
