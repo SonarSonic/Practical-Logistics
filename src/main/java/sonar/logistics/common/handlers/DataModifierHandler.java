@@ -2,14 +2,14 @@ package sonar.logistics.common.handlers;
 
 import java.util.List;
 
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.handlers.TileHandler;
+import sonar.core.network.sync.ISyncPart;
+import sonar.core.network.sync.SyncGeneric;
 import sonar.core.network.sync.SyncTagType;
 import sonar.core.utils.BlockCoords;
-import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.LogisticsAPI;
@@ -17,12 +17,14 @@ import sonar.logistics.api.StandardInfo;
 import sonar.logistics.api.connecting.CableType;
 import sonar.logistics.api.connecting.IInfoEmitter;
 
+import com.google.common.collect.Lists;
+
 public class DataModifierHandler extends TileHandler {
 
 	public SyncTagType.STRING subCategory = new SyncTagType.STRING(0);
 	public SyncTagType.STRING prefix = new SyncTagType.STRING(1);
 	public SyncTagType.STRING suffix = new SyncTagType.STRING(2);
-	public Info info;
+	public SyncGeneric<Info> info = new SyncGeneric(Logistics.infoTypes, "currentInfo");
 
 	public DataModifierHandler(boolean isMultipart, TileEntity tile) {
 		super(isMultipart, tile);
@@ -45,7 +47,7 @@ public class DataModifierHandler extends TileHandler {
 				IInfoEmitter infoNode = (IInfoEmitter) target;
 				if (infoNode.currentInfo() != null) {
 					if (!infoNode.currentInfo().equals(info)) {
-						this.info = infoNode.currentInfo();
+						this.info.setDefault(infoNode.currentInfo());
 					}
 				} else if (this.info != null) {
 					this.info = null;
@@ -55,32 +57,9 @@ public class DataModifierHandler extends TileHandler {
 
 	}
 
-	public void readData(NBTTagCompound nbt, SyncType type) {
-		super.readData(nbt, type);
-		if (type == SyncType.SAVE || type == SyncType.SYNC) {
-			subCategory.readFromNBT(nbt, type);
-			prefix.readFromNBT(nbt, type);
-			suffix.readFromNBT(nbt, type);
-			if (nbt.hasKey("currentInfo")) {
-				info = Logistics.infoTypes.readFromNBT(nbt.getCompoundTag("currentInfo"));
-			}
-
-		}
-	}
-
-	public void writeData(NBTTagCompound nbt, SyncType type) {
-		super.writeData(nbt, type);
-		if (type == SyncType.SAVE || type == SyncType.SYNC) {
-			subCategory.writeToNBT(nbt, type);
-			prefix.writeToNBT(nbt, type);
-			suffix.writeToNBT(nbt, type);
-			if (info != null) {
-				NBTTagCompound infoTag = new NBTTagCompound();
-				Logistics.infoTypes.writeToNBT(infoTag, info);
-				nbt.setTag("currentInfo", infoTag);
-			}
-
-		}
+	public void addSyncParts(List<ISyncPart> parts) {
+		super.addSyncParts(parts);
+		parts.addAll(Lists.newArrayList(subCategory, prefix, suffix, info));
 	}
 
 	public CableType canRenderConnection(ForgeDirection dir, TileEntity te) {
@@ -95,16 +74,16 @@ public class DataModifierHandler extends TileHandler {
 		if (this.info == null) {
 			return null;
 		}
-		if (this.info.getProviderID() == -1 && this.info.getCategory().equals("PERCENT")) {
-			return info;
+		if (this.info.getObject().getProviderID() == -1 && this.info.getObject().getCategory().equals("PERCENT")) {
+			return info.getObject();
 		}
 		String currentSub = this.subCategory.getObject();
 		String currentPre = this.prefix.getObject();
 		String currentSuf = this.suffix.getObject();
-		String subCat = (currentSub == null || currentSub.isEmpty() || currentSub.equals("")) ? info.getSubCategory() : currentSub;
+		String subCat = (currentSub == null || currentSub.isEmpty() || currentSub.equals("")) ? info.getObject().getSubCategory() : currentSub;
 		String prefix = (currentPre == null || currentPre.isEmpty() || currentPre.equals("")) ? "" : currentPre;
 		String suffix = (currentSuf == null || currentSuf.isEmpty() || currentSuf.equals("")) ? "" : currentSuf;
-		Info modifiedInfo = new StandardInfo((byte) -1, info.getCategory(), subCat, prefix + " " + info.getDisplayableData() + " " + suffix);
+		Info modifiedInfo = new StandardInfo((byte) -1, info.getObject().getCategory(), subCat, prefix + " " + info.getObject().getDisplayableData() + " " + suffix);
 		return modifiedInfo;
 	}
 

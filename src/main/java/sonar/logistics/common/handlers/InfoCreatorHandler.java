@@ -1,17 +1,21 @@
 package sonar.logistics.common.handlers;
 
-import net.minecraft.nbt.NBTTagCompound;
+import java.util.List;
+
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.handlers.TileHandler;
+import sonar.core.network.sync.ISyncPart;
+import sonar.core.network.sync.SyncGeneric;
 import sonar.core.network.sync.SyncTagType;
-import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.StandardInfo;
 import sonar.logistics.api.connecting.CableType;
+
+import com.google.common.collect.Lists;
 
 public class InfoCreatorHandler extends TileHandler {
 
@@ -21,7 +25,7 @@ public class InfoCreatorHandler extends TileHandler {
 
 	public SyncTagType.STRING subCategory = new SyncTagType.STRING(0);
 	public SyncTagType.STRING data = new SyncTagType.STRING(1);
-	public Info info;
+	public SyncGeneric<Info> info = new SyncGeneric(Logistics.infoTypes, "currentInfo");
 
 	public void update(TileEntity te) {
 		if (te.getWorldObj().isRemote) {
@@ -29,34 +33,11 @@ public class InfoCreatorHandler extends TileHandler {
 		}
 	}
 
-	public void readData(NBTTagCompound nbt, SyncType type) {
-		super.readData(nbt, type);
-		if (type == SyncType.SAVE || type == SyncType.SYNC) {
-			subCategory.readFromNBT(nbt, type);
-			data.readFromNBT(nbt, type);
-
-			if (type == SyncType.SAVE) {
-				if (nbt.hasKey("currentInfo")) {
-					info = Logistics.infoTypes.readFromNBT(nbt.getCompoundTag("currentInfo"));
-				}
-			}
-		}
+	public void addSyncParts(List<ISyncPart> parts) {
+		super.addSyncParts(parts);
+		parts.addAll(Lists.newArrayList(subCategory, data, info));
 	}
 
-	public void writeData(NBTTagCompound nbt, SyncType type) {
-		super.writeData(nbt, type);
-		if (type == SyncType.SAVE || type == SyncType.SYNC) {
-			subCategory.writeToNBT(nbt, type);
-			data.writeToNBT(nbt, type);
-			if (type == SyncType.SAVE) {
-				if (info != null) {
-					NBTTagCompound infoTag = new NBTTagCompound();
-					Logistics.infoTypes.writeToNBT(infoTag, info);
-					nbt.setTag("currentInfo", infoTag);
-				}
-			}
-		}
-	}
 
 	public CableType canRenderConnection(TileEntity te, ForgeDirection dir) {
 		if (dir == ForgeDirection.getOrientation(FMPHelper.getMeta(te))) {
@@ -71,7 +52,7 @@ public class InfoCreatorHandler extends TileHandler {
 	}
 
 	public Info currentInfo() {
-		return this.info;
+		return this.info.getObject();
 	}
 
 	public void textTyped(String string, int id) {
@@ -84,7 +65,7 @@ public class InfoCreatorHandler extends TileHandler {
 			this.data.setObject(string);
 			break;
 		}
-		this.info = new StandardInfo((byte) -1, "CREATOR", this.subCategory.getObject(), this.data.getObject());
+		this.info.setObject(new StandardInfo((byte) -1, "CREATOR", this.subCategory.getObject(), this.data.getObject()));
 	}
 
 }

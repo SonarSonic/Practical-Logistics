@@ -2,31 +2,29 @@ package sonar.logistics.common.tileentity;
 
 import io.netty.buffer.ByteBuf;
 
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.util.ForgeDirection;
 import scala.actors.threadpool.Arrays;
+import sonar.core.network.sync.ISyncPart;
 import sonar.core.network.sync.SyncTagType;
 import sonar.core.network.sync.SyncTagType.INT;
 import sonar.core.network.utils.IByteBufTile;
 import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.SonarHelper;
-import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.connecting.CableType;
-import sonar.logistics.api.connecting.IConnectionNode;
 import sonar.logistics.api.connecting.IEntityNode;
 import sonar.logistics.api.connecting.IInfoEmitter;
 import sonar.logistics.api.render.ICableRenderer;
 import sonar.logistics.info.types.BlockCoordsInfo;
+
+import com.google.common.collect.Lists;
 
 public class TileEntityEntityNode extends TileEntityChannelledCable implements IInfoEmitter, ICableRenderer, IEntityNode, IByteBufTile {
 
@@ -92,22 +90,11 @@ public class TileEntityEntityNode extends TileEntityChannelledCable implements I
 	public void removeConnections() {
 	}
 
-	public void readData(NBTTagCompound nbt, SyncType type) {
-		super.readData(nbt, type);
-		if (type == SyncType.SAVE || type == SyncType.SYNC) {
-			entityTarget.readFromNBT(nbt, type);
-			entityRange.readFromNBT(nbt, type);
-		}
+	public void addSyncParts(List<ISyncPart> parts) {
+		super.addSyncParts(parts);
+		parts.addAll(Lists.newArrayList(entityTarget, entityRange));
 	}
-
-	public void writeData(NBTTagCompound nbt, SyncType type) {
-		super.writeData(nbt, type);
-		if (type == SyncType.SAVE || type == SyncType.SYNC) {
-			entityTarget.writeToNBT(nbt, type);
-			entityRange.writeToNBT(nbt, type);
-		}
-	}
-
+	
 	public Entity getNearestEntity() {
 
 		switch (entityTarget.getObject()) {

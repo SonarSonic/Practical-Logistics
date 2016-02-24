@@ -1,11 +1,9 @@
 package sonar.logistics.common.tileentity;
 
 import net.minecraftforge.common.util.ForgeDirection;
-import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.utils.helpers.SonarHelper;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.connecting.CableType;
-import sonar.logistics.api.connecting.IDataCable;
 
 public class TileEntityExpulsionPort extends TileEntityChannelledCable {
 

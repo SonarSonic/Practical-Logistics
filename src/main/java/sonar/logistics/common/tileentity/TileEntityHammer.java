@@ -1,13 +1,16 @@
 package sonar.logistics.common.tileentity;
 
+import java.util.List;
+
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import sonar.core.SonarCore;
 import sonar.core.common.tileentity.TileEntityInventory;
+import sonar.core.network.sync.ISyncPart;
 import sonar.core.network.sync.SyncTagType;
-import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.utils.HammerRecipes;
+
+import com.google.common.collect.Lists;
 
 public class TileEntityHammer extends TileEntityInventory implements ISidedInventory {
 
@@ -82,20 +85,9 @@ public class TileEntityHammer extends TileEntityInventory implements ISidedInven
 
 	}
 
-	public void readData(NBTTagCompound nbt, SyncType type) {
-		super.readData(nbt, type);
-		if (type == SyncType.SAVE || type == SyncType.SYNC) {
-			this.progress.readFromNBT(nbt, type);
-			this.coolDown.readFromNBT(nbt, type);
-		}
-	}
-
-	public void writeData(NBTTagCompound nbt, SyncType type) {
-		super.writeData(nbt, type);
-		if (type == SyncType.SAVE || type == SyncType.SYNC) {
-			this.progress.writeToNBT(nbt, type);
-			this.coolDown.writeToNBT(nbt, type);
-		}
+	public void addSyncParts(List<ISyncPart> parts) {
+		super.addSyncParts(parts);
+		parts.addAll(Lists.newArrayList(progress, coolDown));
 	}
 
 	@Override

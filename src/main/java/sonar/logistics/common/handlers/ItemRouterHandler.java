@@ -15,6 +15,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.SonarCore;
 import sonar.core.integration.fmp.handlers.InventoryTileHandler;
+import sonar.core.network.sync.ISyncPart;
 import sonar.core.network.sync.SyncTagType;
 import sonar.core.network.utils.IByteBufTile;
 import sonar.core.utils.BlockCoords;
@@ -29,6 +30,8 @@ import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.common.tileentity.TileEntityBlockNode;
 import sonar.logistics.info.filters.items.ItemStackFilter;
 import sonar.logistics.info.filters.items.OreDictionaryFilter;
+
+import com.google.common.collect.Lists;
 
 public class ItemRouterHandler extends InventoryTileHandler implements ISidedInventory, IByteBufTile {
 
@@ -193,9 +196,6 @@ public class ItemRouterHandler extends InventoryTileHandler implements ISidedInv
 			}
 		}
 		if (type == SyncType.SAVE || type == SyncType.SYNC) {
-			listType.readFromNBT(nbt, type);
-			side.readFromNBT(nbt, type);
-			filterPos.readFromNBT(nbt, type);
 			NBTTagList sideList = nbt.getTagList("Sides", 10);
 			for (int i = 0; i < 6; i++) {
 				NBTTagCompound compound = sideList.getCompoundTagAt(i);
@@ -220,9 +220,6 @@ public class ItemRouterHandler extends InventoryTileHandler implements ISidedInv
 		}
 
 		if (type == SyncType.SAVE || type == SyncType.SYNC) {
-			listType.writeToNBT(nbt, type);
-			side.writeToNBT(nbt, type);
-			filterPos.writeToNBT(nbt, type);
 			NBTTagList sideList = new NBTTagList();
 			for (int i = 0; i < 6; i++) {
 				NBTTagCompound compound = new NBTTagCompound();
@@ -238,7 +235,12 @@ public class ItemRouterHandler extends InventoryTileHandler implements ISidedInv
 			}
 		}
 	}
-
+	
+	public void addSyncParts(List<ISyncPart> parts) {
+		super.addSyncParts(parts);
+		parts.addAll(Lists.newArrayList(listType, side, filterPos));
+	}
+	
 	@Override
 	public int[] getAccessibleSlotsFromSide(int side) {
 		return new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 };

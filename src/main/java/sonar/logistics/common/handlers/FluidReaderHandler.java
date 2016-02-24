@@ -16,7 +16,9 @@ import sonar.core.fluid.StoredFluidStack;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.inventory.StoredItemStack;
+import sonar.core.network.sync.ISyncPart;
 import sonar.core.network.sync.SyncTagType;
+import sonar.core.network.sync.SyncTagType.INT;
 import sonar.core.network.utils.IByteBufTile;
 import sonar.core.utils.ActionType;
 import sonar.core.utils.BlockCoords;
@@ -34,6 +36,8 @@ import sonar.logistics.info.types.FluidInventoryInfo;
 import sonar.logistics.info.types.FluidStackInfo;
 import sonar.logistics.info.types.ProgressInfo;
 
+import com.google.common.collect.Lists;
+
 public class FluidReaderHandler extends TileHandler implements IByteBufTile, IDefaultInteraction {
 
 	public BlockCoords coords;
@@ -41,8 +45,8 @@ public class FluidReaderHandler extends TileHandler implements IByteBufTile, IDe
 	public List<StoredFluidStack> lastFluids;
 
 	public FluidStack current;
-	public SyncTagType.INT setting = new SyncTagType.INT(1);
-	public SyncTagType.INT posSlot = new SyncTagType.INT(2);
+	public SyncTagType.INT setting = (INT) new SyncTagType.INT(1).addSyncType(SyncType.SPECIAL);
+	public SyncTagType.INT posSlot = (INT) new SyncTagType.INT(2).addSyncType(SyncType.SPECIAL);
 	public StorageSize maxStorage = StorageSize.EMPTY;
 
 	public FluidReaderHandler(boolean isMultipart, TileEntity tile) {
@@ -296,6 +300,11 @@ public class FluidReaderHandler extends TileHandler implements IByteBufTile, IDe
 
 			nbt.setTag("StoredStacks", list);
 		}
+	}
+
+	public void addSyncParts(List<ISyncPart> parts) {
+		super.addSyncParts(parts);
+		parts.addAll(Lists.newArrayList(setting, posSlot));
 	}
 
 	@Override

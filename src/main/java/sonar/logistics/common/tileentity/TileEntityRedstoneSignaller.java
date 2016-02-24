@@ -4,21 +4,22 @@ import io.netty.buffer.ByteBuf;
 
 import java.util.List;
 
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.common.tileentity.TileEntitySonar;
 import sonar.core.integration.fmp.FMPHelper;
+import sonar.core.network.sync.ISyncPart;
 import sonar.core.network.sync.SyncTagType;
 import sonar.core.network.utils.IByteBufTile;
 import sonar.core.network.utils.ITextField;
 import sonar.core.utils.BlockCoords;
-import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.connecting.IInfoEmitter;
 import sonar.logistics.api.connecting.ILogicTile;
 import sonar.logistics.common.blocks.BlockRedstoneSignaller;
 import sonar.logistics.registries.BlockRegistry;
+
+import com.google.common.collect.Lists;
 
 public class TileEntityRedstoneSignaller extends TileEntitySonar implements ILogicTile, IByteBufTile, ITextField {
 
@@ -34,27 +35,9 @@ public class TileEntityRedstoneSignaller extends TileEntitySonar implements ILog
 		return ForgeDirection.getOrientation(this.getBlockMetadata()).getOpposite() == dir;
 	}
 
-	public void readData(NBTTagCompound nbt, SyncType type) {
-		super.readData(nbt, type);
-		if (type == SyncType.SAVE || type == SyncType.SYNC) {
-			this.stringName.readFromNBT(nbt, type);
-			this.integerEmitType.readFromNBT(nbt, type);
-			this.integerTarget.readFromNBT(nbt, type);
-			this.dataType.readFromNBT(nbt, type);
-			this.errorFlag.readFromNBT(nbt, type);
-		}
-	}
-
-	public void writeData(NBTTagCompound nbt, SyncType type) {
-		super.writeData(nbt, type);
-		if (type == SyncType.SAVE || type == SyncType.SYNC) {
-			this.stringName.writeToNBT(nbt, type);
-			this.integerEmitType.writeToNBT(nbt, type);
-			this.integerTarget.writeToNBT(nbt, type);
-			this.dataType.writeToNBT(nbt, type);
-			this.errorFlag.writeToNBT(nbt, type);
-
-		}
+	public void addSyncParts(List<ISyncPart> parts) {
+		super.addSyncParts(parts);
+		parts.addAll(Lists.newArrayList(stringName,integerEmitType,integerTarget,dataType,errorFlag));
 	}
 
 	public void updateEntity() {

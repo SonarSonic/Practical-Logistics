@@ -11,6 +11,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.SonarCore;
 import sonar.core.integration.fmp.FMPHelper;
+import sonar.core.network.sync.ISyncPart;
 import sonar.core.network.sync.SyncTagType;
 import sonar.core.network.utils.IByteBufTile;
 import sonar.core.utils.BlockCoords;
@@ -20,6 +21,8 @@ import sonar.logistics.api.connecting.ILargeDisplay;
 import sonar.logistics.api.render.LargeScreenSizing;
 import sonar.logistics.helpers.DisplayHelper;
 import sonar.logistics.registries.DisplayRegistry;
+
+import com.google.common.collect.Lists;
 
 public class LargeDisplayScreenHandler extends DisplayScreenHandler implements IByteBufTile {
 
@@ -76,10 +79,10 @@ public class LargeDisplayScreenHandler extends DisplayScreenHandler implements I
 				SonarCore.sendPacketAround(te, 64, 4);
 			}
 
-			if (updateTicks == updateTime){
+			if (updateTicks == updateTime) {
 				updateTicks = 0;
 				SonarCore.sendPacketAround(te, 64, 0);
-			}else
+			} else
 				updateTicks++;
 		}
 
@@ -135,22 +138,23 @@ public class LargeDisplayScreenHandler extends DisplayScreenHandler implements I
 	public void readData(NBTTagCompound nbt, SyncType type) {
 		super.readData(nbt, type);
 		if (type == SyncType.SAVE || type == SyncType.SYNC) {
-			isHandler.readFromNBT(nbt, type);
 			if (nbt.hasKey("mxY")) {
 				sizing = LargeScreenSizing.readFromNBT(nbt);
 			}
-
 		}
 	}
 
 	public void writeData(NBTTagCompound nbt, SyncType type) {
 		super.writeData(nbt, type);
 		if (type == SyncType.SAVE || type == SyncType.SYNC) {
-			isHandler.writeToNBT(nbt, type);
 			if (sizing != null) {
 				sizing.writeToNBT(nbt);
 			}
 		}
 	}
 
+	public void addSyncParts(List<ISyncPart> parts) {
+		super.addSyncParts(parts);
+		parts.addAll(Lists.newArrayList(isHandler));
+	}
 }

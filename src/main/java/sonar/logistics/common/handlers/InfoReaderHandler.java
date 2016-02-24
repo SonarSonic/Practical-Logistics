@@ -14,6 +14,7 @@ import sonar.core.integration.IWailaInfo;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.network.PacketTileSync;
+import sonar.core.network.sync.ISyncPart;
 import sonar.core.network.sync.SyncGeneric;
 import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
@@ -25,6 +26,8 @@ import sonar.logistics.api.connecting.IConnectionNode;
 import sonar.logistics.common.tileentity.TileEntityBlockNode;
 import sonar.logistics.common.tileentity.TileEntityEntityNode;
 import sonar.logistics.info.types.CategoryInfo;
+
+import com.google.common.collect.Lists;
 
 public class InfoReaderHandler extends TileHandler implements IWailaInfo {
 
@@ -163,8 +166,6 @@ public class InfoReaderHandler extends TileHandler implements IWailaInfo {
 	public void readData(NBTTagCompound nbt, SyncType type) {
 		super.readData(nbt, type);
 		if (type == SyncType.SAVE || type == SyncType.SYNC) {
-			primaryInfo.readFromNBT(nbt, type);
-			secondaryInfo.readFromNBT(nbt, type);
 			if (type == SyncType.SAVE) {
 				if (nbt.hasKey("coords")) {
 					if (nbt.getCompoundTag("coords").getBoolean("hasCoords")) {
@@ -210,9 +211,6 @@ public class InfoReaderHandler extends TileHandler implements IWailaInfo {
 	public void writeData(NBTTagCompound nbt, SyncType type) {
 		super.writeData(nbt, type);
 		if (type == SyncType.SAVE || type == SyncType.SYNC) {
-			this.primaryInfo.writeToNBT(nbt, type);
-			this.secondaryInfo.writeToNBT(nbt, type);
-
 			if (type == SyncType.SAVE) {
 				NBTTagCompound coordTag = new NBTTagCompound();
 				if (coords != null) {
@@ -275,6 +273,11 @@ public class InfoReaderHandler extends TileHandler implements IWailaInfo {
 				}
 			}
 		}
+	}
+
+	public void addSyncParts(List<ISyncPart> parts) {
+		super.addSyncParts(parts);
+		parts.addAll(Lists.newArrayList(primaryInfo, secondaryInfo));
 	}
 
 	@Override
