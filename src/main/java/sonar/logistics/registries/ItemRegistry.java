@@ -13,8 +13,10 @@ public class ItemRegistry extends Logistics {
 	public static void registerItems() {
 		displayScreen = new DisplayScreen().setUnlocalizedName("DisplayScreenItem").setCreativeTab(Logistics.creativeTab).setTextureName(modid + ":" + "display_screen");
 		GameRegistry.registerItem(displayScreen, "DisplayScreenItem");
+		/*
 		digitalSign = new DigitalSign().setUnlocalizedName("DigitalSignItem").setCreativeTab(Logistics.creativeTab).setTextureName(modid + ":" + "digital_sign");
-		GameRegistry.registerItem(digitalSign, "DigitalSignItem");		
+		GameRegistry.registerItem(digitalSign, "DigitalSignItem");	
+		*/	
 		sapphire = new Item().setUnlocalizedName("Sapphire").setCreativeTab(Logistics.creativeTab).setTextureName(modid + ":" + "sapphire");
 		GameRegistry.registerItem(sapphire, "Sapphire");
 		sapphire_dust = new Item().setUnlocalizedName("SapphireDust").setCreativeTab(Logistics.creativeTab).setTextureName(modid + ":" + "sapphire_dust");

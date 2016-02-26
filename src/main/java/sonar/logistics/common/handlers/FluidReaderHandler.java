@@ -3,6 +3,8 @@ package sonar.logistics.common.handlers;
 import io.netty.buffer.ByteBuf;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import net.minecraft.entity.player.EntityPlayer;
@@ -38,6 +40,9 @@ import sonar.logistics.info.types.ProgressInfo;
 
 import com.google.common.collect.Lists;
 
+import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.common.registry.GameRegistry.UniqueIdentifier;
+
 public class FluidReaderHandler extends TileHandler implements IByteBufTile, IDefaultInteraction {
 
 	public BlockCoords coords;
@@ -47,6 +52,8 @@ public class FluidReaderHandler extends TileHandler implements IByteBufTile, IDe
 	public FluidStack current;
 	public SyncTagType.INT setting = (INT) new SyncTagType.INT(1).addSyncType(SyncType.SPECIAL);
 	public SyncTagType.INT posSlot = (INT) new SyncTagType.INT(2).addSyncType(SyncType.SPECIAL);
+	public SyncTagType.INT sortingOrder = (INT) new SyncTagType.INT(3).addSyncType(SyncType.SPECIAL);
+	public SyncTagType.INT sortingType = (INT) new SyncTagType.INT(4).addSyncType(SyncType.SPECIAL);
 	public StorageSize maxStorage = StorageSize.EMPTY;
 
 	public FluidReaderHandler(boolean isMultipart, TileEntity tile) {
@@ -59,6 +66,38 @@ public class FluidReaderHandler extends TileHandler implements IByteBufTile, IDe
 			return;
 		}
 		StorageFluids list = LogisticsAPI.getFluidHelper().getFluids(LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite()));
+		if (sortingType.getObject() == 0) {
+			Collections.sort(list.fluids, new Comparator<StoredFluidStack>() {
+				public int compare(StoredFluidStack str1, StoredFluidStack str2) {
+					if (str1.stored < str2.stored)
+						return sortingOrder.getObject() == 0 ? 1 : -1;
+					if (str1.stored == str2.stored)
+						return 0;
+					return sortingOrder.getObject() == 0 ? -1 : 1;
+				}
+			});
+		} else if (sortingType.getObject() == 1) {
+			Collections.sort(list.fluids, new Comparator<StoredFluidStack>() {
+				public int compare(StoredFluidStack str1, StoredFluidStack str2) {
+					int res = String.CASE_INSENSITIVE_ORDER.compare(str1.getFullStack().getLocalizedName(), str2.getFullStack().getLocalizedName());
+					if (res == 0) {
+						res = str1.getFullStack().getLocalizedName().compareTo(str2.getFullStack().getLocalizedName());
+					}
+					return sortingOrder.getObject() == 0 ? res : -res;
+				}
+			});
+		} else if (sortingType.getObject() == 2) {
+			Collections.sort(list.fluids, new Comparator<StoredFluidStack>() {
+				public int compare(StoredFluidStack str1, StoredFluidStack str2) {
+					if (str1.getFullStack().getFluid().getTemperature() < str2.getFullStack().getFluid().getTemperature())
+						return sortingOrder.getObject() == 0 ? 1 : -1;
+					if (str1.getFullStack().getFluid().getTemperature() == str2.getFullStack().getFluid().getTemperature())
+						return 0;
+					return sortingOrder.getObject() == 0 ? -1 : 1;
+				}
+			});
+		}
+
 		fluids = list.fluids;
 		maxStorage = list.sizing;
 	}
@@ -304,29 +343,35 @@ public class FluidReaderHandler extends TileHandler implements IByteBufTile, IDe
 
 	public void addSyncParts(List<ISyncPart> parts) {
 		super.addSyncParts(parts);
-		parts.addAll(Lists.newArrayList(setting, posSlot));
+		parts.addAll(Lists.newArrayList(setting, posSlot, sortingOrder, sortingType));
 	}
 
 	@Override
 	public void writePacket(ByteBuf buf, int id) {
 		if (id == 0) {
-		}
-		if (id == 1) {
+		} else if (id == 1) {
 			posSlot.writeToBuf(buf);
+		} else if (id == 3) {
+			sortingOrder.writeToBuf(buf);
+		} else if (id == 4) {
+			sortingType.writeToBuf(buf);
 		}
 	}
 
 	@Override
 	public void readPacket(ByteBuf buf, int id) {
 		if (id == 0) {
-			if (setting.getObject() == 3) {
+			if (setting.getObject() == 4) {
 				setting.setObject(0);
 			} else {
 				setting.increaseBy(1);
 			}
-		}
-		if (id == 1) {
+		} else if (id == 1) {
 			posSlot.readFromBuf(buf);
+		} else if (id == 3) {
+			sortingOrder.readFromBuf(buf);
+		} else if (id == 4) {
+			sortingType.readFromBuf(buf);
 		}
 	}
 

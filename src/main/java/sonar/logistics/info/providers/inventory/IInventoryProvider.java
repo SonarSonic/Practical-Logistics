@@ -95,8 +95,8 @@ public class IInventoryProvider extends InventoryHandler {
 
 	@Override
 	public StoredItemStack removeStack(StoredItemStack remove, TileEntity tile, ForgeDirection dir, ActionType action) {
-		// int removed = 0;
 		IInventory inv = (IInventory) tile;
+		IInventory adjust = inv;
 		int invSize = inv.getSizeInventory();
 		int[] slots = null;
 		if (tile instanceof ISidedInventory) {
@@ -106,18 +106,19 @@ public class IInventoryProvider extends InventoryHandler {
 		}
 		for (int i = 0; i < invSize; i++) {
 			int slot = slots != null ? slots[i] : i;
-			ItemStack stack = inv.getStackInSlot(slot);
-			if (stack != null) {
+			if (inv.getStackInSlot(slot) != null) {
+				ItemStack stack = inv.getStackInSlot(slot).copy();
 				if (!(tile instanceof ISidedInventory) || ((ISidedInventory) tile).canExtractItem(slot, stack, dir.ordinal())) {
 					if (remove.equalStack(stack)) {
 						long used = (long) Math.min(remove.stored, Math.min(inv.getInventoryStackLimit(), stack.stackSize));
 						stack.stackSize -= used;
 						remove.stored -= used;
-						if (stack.stackSize == 0) {
-							stack = null;
-						}
-						if (!action.shouldSimulate())
+						if (!action.shouldSimulate()){
+							if (stack.stackSize == 0) {
+								stack = null;
+							}
 							inv.setInventorySlotContents(slot, stack);
+						}
 						if (remove.stored == 0) {
 							return null;
 						}

@@ -33,10 +33,6 @@ public class BlockDataCable extends SonarMachineBlock {
 
 	@Override
 	public boolean operateBlock(World world, int x, int y, int z, EntityPlayer player, BlockInteraction interact) {
-		if(!world.isRemote){
-			TileEntityChannelledCable cable = (TileEntityChannelledCable) world.getTileEntity(x, y, z);
-			FontHelper.sendMessage(" " + cable.registryID, world, player);
-		}
 		return false;
 	}
 

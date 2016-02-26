@@ -80,13 +80,7 @@ public class BlockRegistry extends Logistics {
 		displayScreen = new DisplayScreen().setBlockName("DisplayScreen").setHardness(0.2F).setResistance(20.0F).setBlockTextureName(modid + ":" + "data_cable");
 		GameRegistry.registerBlock(displayScreen, SonarBlockTip.class, "DisplayScreen");
 		GameRegistry.registerTileEntity(TileEntityDisplayScreen.class, "DisplayScreen");
-
-		digitalSign_wall = new BlockDigitalSign(TileEntityDigitalScreen.class, false).setBlockName("DigitalScreen");
-		digitalSign_standing = new BlockDigitalSign(TileEntityDigitalScreen.class, true).setBlockName("DigitalScreen");
-		GameRegistry.registerBlock(digitalSign_wall, SonarBlockTip.class, "DigitalScreen_Wall");
-		GameRegistry.registerBlock(digitalSign_standing, SonarBlockTip.class, "DigitalScreen_Standing");
-		GameRegistry.registerTileEntity(TileEntityDigitalScreen.class, "DigitalScreen");
-
+		
 		dataCable = new BlockDataCable().setBlockName("DataCable").setHardness(0.1F).setCreativeTab(Logistics.creativeTab).setResistance(20.0F).setBlockTextureName(modid + ":" + "data_cable");
 		GameRegistry.registerBlock(dataCable, SonarBlockTip.class, "DataCable");
 		GameRegistry.registerTileEntity(TileEntityDataCable.class, "DataCable");
@@ -160,10 +154,19 @@ public class BlockRegistry extends Logistics {
 		itemRouter = new BlockItemRouter().setBlockName("ItemRouter").setHardness(1.0F).setResistance(100.0F).setCreativeTab(Logistics.creativeTab).setBlockTextureName(modid + ":" + "data_cable");
 		GameRegistry.registerBlock(itemRouter, SonarBlockTip.class, "ItemRouter");
 		GameRegistry.registerTileEntity(TileEntityItemRouter.class, "ItemRouter");
-
+		
+		/*
 		expulsion_port = new BlockExpulsionPort().setBlockName("ExpulsionPort").setHardness(1.0F).setResistance(100.0F).setCreativeTab(Logistics.creativeTab).setBlockTextureName(modid + ":" + "data_cable");
 		GameRegistry.registerBlock(expulsion_port, SonarBlockTip.class, "ExpulsionPort");
-		GameRegistry.registerTileEntity(TileEntityExpulsionPort.class, "ExpulsionPort");
+		GameRegistry.registerTileEntity(TileEntityExpulsionPort.class, "ExpulsionPort");		
+
+		digitalSign_wall = new BlockDigitalSign(TileEntityDigitalScreen.class, false).setBlockName("DigitalScreen");
+		digitalSign_standing = new BlockDigitalSign(TileEntityDigitalScreen.class, true).setBlockName("DigitalScreen");
+		GameRegistry.registerBlock(digitalSign_wall, SonarBlockTip.class, "DigitalScreen_Wall");
+		GameRegistry.registerBlock(digitalSign_standing, SonarBlockTip.class, "DigitalScreen_Standing");
+		GameRegistry.registerTileEntity(TileEntityDigitalScreen.class, "DigitalScreen");
+
+		*/
 	}
 
 }

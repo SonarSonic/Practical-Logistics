@@ -3,6 +3,8 @@ package sonar.logistics.common.handlers;
 import io.netty.buffer.ByteBuf;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import net.minecraft.entity.player.EntityPlayer;
@@ -37,6 +39,9 @@ import sonar.logistics.info.types.StoredStackInfo;
 
 import com.google.common.collect.Lists;
 
+import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.common.registry.GameRegistry.UniqueIdentifier;
+
 public class InventoryReaderHandler extends InventoryTileHandler implements IByteBufTile, IDefaultInteraction {
 
 	public BlockCoords coords;
@@ -48,6 +53,8 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 	public SyncTagType.INT setting = (INT) new SyncTagType.INT(1).addSyncType(SyncType.SPECIAL);
 	public SyncTagType.INT targetSlot = (INT) new SyncTagType.INT(2).addSyncType(SyncType.SPECIAL);
 	public SyncTagType.INT posSlot = (INT) new SyncTagType.INT(3).addSyncType(SyncType.SPECIAL);
+	public SyncTagType.INT sortingOrder = (INT) new SyncTagType.INT(4).addSyncType(SyncType.SPECIAL);
+	public SyncTagType.INT sortingType = (INT) new SyncTagType.INT(5).addSyncType(SyncType.SPECIAL);
 	public StorageSize maxStorage = StorageSize.EMPTY;
 
 	public InventoryReaderHandler(boolean isMultipart, TileEntity tile) {
@@ -61,6 +68,46 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 			return;
 		}
 		StorageItems list = LogisticsAPI.getItemHelper().getStackList(getNetwork(te));
+		if (sortingType.getObject() == 0) {
+			Collections.sort(list.items, new Comparator<StoredItemStack>() {
+				public int compare(StoredItemStack str1, StoredItemStack str2) {
+					if (str1.stored < str2.stored)
+						return sortingOrder.getObject() == 0 ? 1 : -1;
+					if (str1.stored == str2.stored)
+						return 0;
+					return sortingOrder.getObject() == 0 ? -1 : 1;
+				}
+			});
+		} else if (sortingType.getObject() == 1) {
+			Collections.sort(list.items, new Comparator<StoredItemStack>() {
+				public int compare(StoredItemStack str1, StoredItemStack str2) {
+					int res = String.CASE_INSENSITIVE_ORDER.compare(str1.getItemStack().getDisplayName(), str2.getItemStack().getDisplayName());
+					if (res == 0) {
+						res = str1.getItemStack().getDisplayName().compareTo(str2.getItemStack().getDisplayName());
+					}
+					return sortingOrder.getObject() == 0 ? res : -res;
+				}
+			});
+		} else if (sortingType.getObject() == 2) {
+			Collections.sort(list.items, new Comparator<StoredItemStack>() {
+				public int compare(StoredItemStack str1, StoredItemStack str2) {
+					UniqueIdentifier modid1 = GameRegistry.findUniqueIdentifierFor(str1.getItemStack().getItem());
+					UniqueIdentifier modid2 = GameRegistry.findUniqueIdentifierFor(str2.getItemStack().getItem());
+					int res = String.CASE_INSENSITIVE_ORDER.compare(modid1.modId, modid2.modId);
+					if (res == 0) {
+						res = modid1.modId.compareTo(modid2.modId);
+					}
+					if (res == 0) {
+						res = String.CASE_INSENSITIVE_ORDER.compare(modid1.name, modid2.name);
+						if (res == 0) {
+							res = modid1.name.compareTo(modid2.name);
+						}
+					}
+					return sortingOrder.getObject() == 0 ? res : -res;
+				}
+			});
+		}
+
 		stacks = list.items;
 		maxStorage = list.sizing;
 	}
@@ -150,7 +197,6 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 			return;
 		}
 		StoredItemStack stack = LogisticsAPI.getItemHelper().addItems(new StoredItemStack(add), LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite()), ActionType.PERFORM);
-
 		if (stack == null || stack.stored == 0) {
 			add = null;
 		} else {
@@ -162,7 +208,11 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 	}
 
 	public void insertInventory(EntityPlayer player, TileEntity te, int slotID) {
-		ItemStack add = player.inventory.getStackInSlot(slotID);
+		ItemStack add = null;
+		if (slotID == -1) {
+			add = player.inventory.getItemStack();
+		} else
+			add = player.inventory.getStackInSlot(slotID);
 		if (add == null) {
 			return;
 		}
@@ -176,8 +226,8 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 				slots.add(i);
 			}
 		}
-
 		StoredItemStack remainder = LogisticsAPI.getItemHelper().addItems(stack.copy(), LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite()), ActionType.PERFORM);
+
 		long insertSize = 0;
 		if (remainder == null || remainder.stored == 0) {
 			insertSize = stack.getStackSize();
@@ -187,11 +237,12 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 		if (insertSize == 0) {
 			return;
 		}
+		LogisticsAPI.getItemHelper().removeStackFromPlayer(stack.copy().setStackSize(insertSize), player, false, ActionType.PERFORM);
+		/*
 		for (Integer slot : slots) {
 			ItemStack item = inv.getStackInSlot(slot);
 			int oldSize = item.stackSize;
 			if (stack.equalStack(item)) {
-
 				if (remainder == null || remainder.stored == 0) {
 					item.stackSize = 0;
 				} else {
@@ -208,8 +259,10 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 				}
 			}
 		}
+		*/
 
 	}
+
 
 	public void readData(NBTTagCompound nbt, SyncType type) {
 		super.readData(nbt, type);
@@ -360,18 +413,20 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 
 	public void addSyncParts(List<ISyncPart> parts) {
 		super.addSyncParts(parts);
-		parts.addAll(Lists.newArrayList(setting, targetSlot, posSlot));
+		parts.addAll(Lists.newArrayList(setting, targetSlot, posSlot, sortingOrder, sortingType));
 	}
-	
+
 	@Override
 	public void writePacket(ByteBuf buf, int id) {
 		if (id == 0) {
-		}
-		if (id == 1) {
+		} else if (id == 1) {
 			targetSlot.writeToBuf(buf);
-		}
-		if (id == 2) {
+		} else if (id == 2) {
 			posSlot.writeToBuf(buf);
+		} else if (id == 3) {
+			sortingOrder.writeToBuf(buf);
+		} else if (id == 4) {
+			sortingType.writeToBuf(buf);
 		}
 	}
 
@@ -383,12 +438,14 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 			} else {
 				setting.increaseBy(1);
 			}
-		}
-		if (id == 1) {
+		} else if (id == 1) {
 			targetSlot.readFromBuf(buf);
-		}
-		if (id == 2) {
+		} else if (id == 2) {
 			posSlot.readFromBuf(buf);
+		} else if (id == 3) {
+			sortingOrder.readFromBuf(buf);
+		} else if (id == 4) {
+			sortingType.readFromBuf(buf);
 		}
 	}
 

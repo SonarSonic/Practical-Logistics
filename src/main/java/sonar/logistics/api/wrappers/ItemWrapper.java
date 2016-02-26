@@ -117,13 +117,23 @@ public class ItemWrapper {
 	}
 	/**should NEVER be called on client, adds a StoredItemStack to a player inventory and sends changes with client
 	 * @param add {@link StoredItemStack} to add
-	 * @param player player to remove from
+	 * @param player player to add to
 	 * @param enderChest should change player Ender Chest or their normal inventory
 	 * @param action what type of action should be carried out
 	 * @return remaining {@link StoredItemStack} (what wasn't added), can be null
 	 */
 	public StoredItemStack addStackToPlayer(StoredItemStack add, EntityPlayer player, boolean enderChest, ActionType action) {
 		return add;
+	}
+	/**should NEVER be called on client, removes a StoredItemStack to a player inventory and sends changes with client
+	 * @param remove {@link StoredItemStack} to remove
+	 * @param player player to remove from
+	 * @param enderChest should change player Ender Chest or their normal inventory
+	 * @param action what type of action should be carried out
+	 * @return remaining {@link StoredItemStack} (what wasn't removed), can be null
+	 */
+	public StoredItemStack removeStackFromPlayer(StoredItemStack remove, EntityPlayer player, boolean enderChest, ActionType action) {
+		return remove;
 	}
 	/**drops a full StoredItemStack on the floor
 	 * @param drop {@link StoredItemStack} to drop
@@ -134,4 +144,34 @@ public class ItemWrapper {
 	 * @param side side to drop from
 	 */
 	public void spawnStoredItemStack(StoredItemStack drop, World world, int x, int y, int z, ForgeDirection side) {}
+	
+	/** convenience method, adds the given stack to the player's inventory and returns what was/can be added.
+	 * @param stack
+	 * @param extractSize
+	 * @param network
+	 * @param player
+	 * @return the {@link StoredItemStack} to add to the player
+	 */
+	public StoredItemStack removeToPlayerInventory(StoredItemStack stack, long extractSize, List<BlockCoords> network, EntityPlayer player, ActionType type) {
+		return null;		
+	}
+	/** convenience method, removes the given stack to the player's inventory and returns what was/can be added.
+	 * @param stack
+	 * @param extractSize
+	 * @param network
+	 * @param player
+	 * @return the {@link StoredItemStack} to add to the player
+	 */
+	public StoredItemStack addFromPlayerInventory(StoredItemStack stack, long extractSize, List<BlockCoords> network, EntityPlayer player, ActionType type) {
+		return null;
+	}
+	/** convenience method, gets the stack to be added to the inventory from the remainder, can return null.
+	 * @param inputSize
+	 * @param stack
+	 * @param returned
+	 * @return
+	 */
+	public StoredItemStack getStackToAdd(long inputSize, StoredItemStack stack, StoredItemStack returned) {
+		return null;		
+	}
 }

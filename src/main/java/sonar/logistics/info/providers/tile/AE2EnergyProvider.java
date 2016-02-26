@@ -35,8 +35,8 @@ public class AE2EnergyProvider extends TileProvider {
 		TileEntity target = world.getTileEntity(x, y, z);
 		if (target instanceof IAEPowerStorage) {
 			IAEPowerStorage power = (IAEPowerStorage) target;
-			infoList.add(new StandardInfo(id, 0, 0, (int) power.getAECurrentPower()).addSuffix("ae"));
-			infoList.add(new StandardInfo(id, 0, 1, (int) power.getAEMaxPower()).addSuffix("ae"));
+			infoList.add(new StandardInfo(id, 0, 0, (long) power.getAECurrentPower()).addSuffix("ae"));
+			infoList.add(new StandardInfo(id, 0, 1, (long) power.getAEMaxPower()).addSuffix("ae"));
 		}
 		if (target instanceof IEnergyGrid) {
 			IEnergyGrid grid = (IEnergyGrid) target;

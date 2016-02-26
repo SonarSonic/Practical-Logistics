@@ -11,7 +11,7 @@ import cpw.mods.fml.common.Loader;
 
 /**Use this for all your interaction with the mod.
  * This will be initilized by Practical Logistics if it is loaded. Make sure you only register stuff once Practical Logistics is loaded thefore in the FMLPostInitializationEvent*/
-public class LogisticsAPI {
+public final class LogisticsAPI {
 
 	public static final String VERSION = "1.1";
 	

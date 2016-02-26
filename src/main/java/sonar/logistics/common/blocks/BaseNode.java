@@ -44,10 +44,6 @@ public abstract class BaseNode extends SonarMachineBlock {
 	@Override
 	public boolean operateBlock(World world, int x, int y, int z, EntityPlayer player, BlockInteraction interact) {
 		TileEntity tile = world.getTileEntity(x, y, z);
-		if(!world.isRemote && tile instanceof TileEntityChannelledCable){
-			TileEntityChannelledCable cable = (TileEntityChannelledCable) tile;
-			FontHelper.sendMessage("" + cable.registryID, world, player);
-		}
 		if (!hasGui()) {
 			return false;
 		}

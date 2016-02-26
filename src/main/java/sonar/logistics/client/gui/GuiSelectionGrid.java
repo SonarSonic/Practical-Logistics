@@ -16,6 +16,7 @@ import sonar.core.inventory.GuiSonar;
 public abstract class GuiSelectionGrid<T> extends GuiSonar {
 
 	public static final ResourceLocation bground = new ResourceLocation("PracticalLogistics:textures/gui/gridSelection.png");
+	public static final ResourceLocation sorting_icons = new ResourceLocation("PracticalLogistics:textures/gui/sorting_icons.png");
 
 	public TileEntity tile;
 	public int xCoord, yCoord, zCoord;
@@ -25,7 +26,7 @@ public abstract class GuiSelectionGrid<T> extends GuiSonar {
 	private boolean wasClicking;
 	private int scrollerLeft, scrollerStart, scrollerEnd, scrollerWidth;
 
-	public abstract void onGridClicked(T selection, int pos);
+	public abstract void onGridClicked(T selection, int pos, int button);
 
 	public abstract void renderSelection(T selection, int x, int y);
 
@@ -81,7 +82,7 @@ public abstract class GuiSelectionGrid<T> extends GuiSonar {
 				if (i < getGridList().size()) {
 					T storedStack = getGridList().get(i);
 					if (storedStack != null) {
-						onGridClicked(storedStack, i);
+						onGridClicked(storedStack, i, button);
 					}
 				}
 			}

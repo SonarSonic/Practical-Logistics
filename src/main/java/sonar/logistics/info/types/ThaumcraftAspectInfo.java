@@ -90,6 +90,6 @@ public class ThaumcraftAspectInfo extends StandardInfo<ThaumcraftAspectInfo> {
 
 	@Override
 	public boolean matches(ThaumcraftAspectInfo currentInfo) {
-		return tex.equals(currentInfo.tex) && super.matches(currentInfo);
+		return tex.equals(currentInfo.tex) && currentInfo.getProviderID() == this.providerID && currentInfo.dataType == dataType && currentInfo.category.equals(category) && currentInfo.subCategory.equals(subCategory) && currentInfo.suffix.equals(suffix) && currentInfo.catID == catID && currentInfo.subCatID == subCatID;
 	}
 }

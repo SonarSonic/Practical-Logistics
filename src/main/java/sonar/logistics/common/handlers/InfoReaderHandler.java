@@ -38,8 +38,10 @@ public class InfoReaderHandler extends TileHandler implements IWailaInfo {
 	public List<Info> clientInfo;
 	public List<Info> lastInfo;
 
-	public SyncGeneric<Info> primaryInfo = new SyncGeneric(Logistics.infoTypes, 0);
-	public SyncGeneric<Info> secondaryInfo = new SyncGeneric(Logistics.infoTypes, 1);
+	private int primaryUpdate = 0;
+	private int secondaryUpdate = 0;
+	public SyncGeneric<Info> primaryInfo = (SyncGeneric<Info>) new SyncGeneric(Logistics.infoTypes, 0).addSyncType(SyncType.SPECIAL);
+	public SyncGeneric<Info> secondaryInfo = (SyncGeneric<Info>) new SyncGeneric(Logistics.infoTypes, 1).addSyncType(SyncType.SPECIAL);
 	public BlockCoords coords;
 
 	@Override
@@ -47,10 +49,24 @@ public class InfoReaderHandler extends TileHandler implements IWailaInfo {
 		if (te.getWorldObj().isRemote) {
 			return;
 		}
-		updateData(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)));
+		boolean primary = false;
+		boolean secondary = false;
+		if (primaryInfo.getObject() == null || primaryInfo.getObject().updateTicks() == 1 || primaryUpdate >= primaryInfo.getObject().updateTicks()) {
+			primary = true;
+			primaryUpdate = 0;
+		}
+		if (secondaryInfo.getObject() == null || secondaryInfo.getObject().updateTicks() == 1 || secondaryUpdate >= secondaryInfo.getObject().updateTicks()) {
+			secondary = true;
+			secondaryUpdate = 0;
+		}
+		if (primary || secondary)
+			updateData(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)), primary, secondary);
+
+		primaryUpdate++;
+		secondaryUpdate++;
 	}
 
-	public void updateData(TileEntity te, ForgeDirection dir) {
+	public void updateData(TileEntity te, ForgeDirection dir, boolean primary, boolean secondary) {
 
 		List<BlockCoords> connections = LogisticsAPI.getCableHelper().getConnections(te, dir.getOpposite());
 		List<IConnectionNode> nodes = new ArrayList();
@@ -67,12 +83,16 @@ public class InfoReaderHandler extends TileHandler implements IWailaInfo {
 		}
 
 		if (!nodes.isEmpty()) {
-			this.setData(te, LogisticsAPI.getInfoHelper().getLatestTileInfo(primaryInfo.getObject(), nodes.get(0)), true);
-			this.setData(te, LogisticsAPI.getInfoHelper().getLatestTileInfo(secondaryInfo.getObject(), (IConnectionNode) nodes.get(0)), false);
+			if (primary)
+				this.setData(te, LogisticsAPI.getInfoHelper().getLatestTileInfo(primaryInfo.getObject(), nodes.get(0)), true);
+			if (secondary)
+				this.setData(te, LogisticsAPI.getInfoHelper().getLatestTileInfo(secondaryInfo.getObject(), (IConnectionNode) nodes.get(0)), false);
 			this.coords = new BlockCoords((TileEntityBlockNode) nodes.get(0));
 		} else if (!entityNodes.isEmpty()) {
-			this.setData(te, LogisticsAPI.getInfoHelper().getLatestEntityInfo(primaryInfo.getObject(), (TileEntityEntityNode) entityNodes.get(0)), true);
-			this.setData(te, LogisticsAPI.getInfoHelper().getLatestEntityInfo(secondaryInfo.getObject(), (TileEntityEntityNode) entityNodes.get(0)), false);
+			if (primary)
+				this.setData(te, LogisticsAPI.getInfoHelper().getLatestEntityInfo(primaryInfo.getObject(), (TileEntityEntityNode) entityNodes.get(0)), true);
+			if (secondary)
+				this.setData(te, LogisticsAPI.getInfoHelper().getLatestEntityInfo(secondaryInfo.getObject(), (TileEntityEntityNode) entityNodes.get(0)), false);
 			this.coords = new BlockCoords((TileEntityEntityNode) entityNodes.get(0));
 		} else {
 			coords = null;

@@ -92,10 +92,8 @@ public class TileEntityHammer extends TileEntityInventory implements ISidedInven
 
 	@Override
 	public boolean isItemValidForSlot(int slot, ItemStack stack) {
-		if (slot == 0) {
-			if (HammerRecipes.instance().validInput(stack)) {
-				return true;
-			}
+		if (slot == 0 && HammerRecipes.instance().validInput(stack)) {
+			return true;
 		}
 		return false;
 

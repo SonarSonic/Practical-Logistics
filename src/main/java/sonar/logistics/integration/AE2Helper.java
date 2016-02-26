@@ -5,6 +5,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.fluid.StoredFluidStack;
 import sonar.core.inventory.StoredItemStack;
 import sonar.core.utils.ActionType;
+import sonar.logistics.api.StandardInfo;
 import appeng.api.AEApi;
 import appeng.api.config.Actionable;
 import appeng.api.networking.security.BaseActionSource;
@@ -69,8 +70,27 @@ public class AE2Helper {
 			return ActionType.SIMULATE;
 		}
 	}
+
 	public static class SourceHandler extends BaseActionSource {
 
 	}
 
+	public static class StorageInfo extends StandardInfo {
+		public StorageInfo() {
+
+		}
+
+		public StorageInfo(int providerID, int category, int subCategory, Object data) {
+			super(providerID, category, subCategory, data);
+
+		}
+
+		public StorageInfo(int providerID, String category, String subCategory, Object data) {
+			super(providerID, category, subCategory, data);
+		}
+
+		public int updateTicks() {
+			return 20;
+		}
+	}
 }

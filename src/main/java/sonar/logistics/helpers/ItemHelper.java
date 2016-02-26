@@ -32,7 +32,7 @@ public class ItemHelper extends ItemWrapper {
 
 	public StorageItems getStackList(List<BlockCoords> network) {
 		List<StoredItemStack> storedStacks = new ArrayList();
-		StorageSize storage = new StorageSize(0,0);
+		StorageSize storage = new StorageSize(0, 0);
 		for (BlockCoords connect : network) {
 			Object tile = connect.getTileEntity();
 			if (tile != null) {
@@ -45,16 +45,7 @@ public class ItemHelper extends ItemWrapper {
 				}
 			}
 		}
-		Collections.sort(storedStacks, new Comparator<StoredItemStack>() {
-			public int compare(StoredItemStack str1, StoredItemStack str2) {
-				if (str1.stored < str2.stored)
-					return 1;
-				if (str1.stored == str2.stored)
-					return 0;
-				return -1;
-			}
-		});
-		return new StorageItems(storedStacks,storage);
+		return new StorageItems(storedStacks, storage);
 	}
 
 	public StorageSize getTileInventory(List<StoredItemStack> storedStacks, StorageSize storage, IConnectionNode node) {
@@ -225,23 +216,26 @@ public class ItemHelper extends ItemWrapper {
 			return null;
 		}
 		IInventory inv = null;
+		int size = 0;
 		if (!enderChest) {
 			inv = player.inventory;
+			size = player.inventory.mainInventory.length;
 		} else {
 			inv = player.getInventoryEnderChest();
+			size = inv.getSizeInventory();
 		}
-		if (inv == null) {
+		if (inv == null || size == 0) {
 			return add;
 		}
 		List<Integer> empty = new ArrayList();
-		for (int i = 0; i < inv.getSizeInventory(); i++) {
+		for (int i = 0; i < size; i++) {
 			ItemStack stack = inv.getStackInSlot(i);
 			if (stack != null) {
 				if (!(stack.stackSize >= stack.getMaxStackSize()) && add.equalStack(stack) && stack.stackSize < inv.getInventoryStackLimit()) {
 					long used = (long) Math.min(add.item.getMaxStackSize(), Math.min(add.stored, inv.getInventoryStackLimit() - stack.stackSize));
 					stack.stackSize += used;
 					add.stored -= used;
-					if (used == 0 || !action.shouldSimulate()) {
+					if (used != 0 && !action.shouldSimulate()) {
 						inv.setInventorySlotContents(i, stack);
 						if (!enderChest) {
 							SonarCore.network.sendTo(new PacketInvUpdate(i, stack), (EntityPlayerMP) player);
@@ -259,20 +253,63 @@ public class ItemHelper extends ItemWrapper {
 		}
 		for (Integer slot : empty) {
 			ItemStack stack = add.item.copy();
-			int used = (int) Math.min(add.stored, inv.getInventoryStackLimit());
-			stack.stackSize = used;
-			add.stored -= used;
-			if (!action.shouldSimulate()) {
-				inv.setInventorySlotContents(slot, stack);
-				if (!enderChest) {
-					SonarCore.network.sendTo(new PacketInvUpdate(slot, stack), (EntityPlayerMP) player);
+			if (inv.isItemValidForSlot(slot, stack)) {
+				int used = (int) Math.min(add.stored, inv.getInventoryStackLimit());
+				stack.stackSize = used;
+				add.stored -= used;
+				if (!action.shouldSimulate()) {
+					inv.setInventorySlotContents(slot, stack);
+					if (!enderChest) {
+						SonarCore.network.sendTo(new PacketInvUpdate(slot, stack), (EntityPlayerMP) player);
+					}
 				}
-			}
-			if (add.stored == 0) {
-				return null;
+				if (add.stored == 0) {
+					return null;
+				}
 			}
 		}
 		return add;
+	}
+
+	public StoredItemStack removeStackFromPlayer(StoredItemStack remove, EntityPlayer player, boolean enderChest, ActionType action) {
+		if (remove == null) {
+			return null;
+		}
+		IInventory inv = null;
+		int size = 0;
+		if (!enderChest) {
+			inv = player.inventory;
+			size = player.inventory.mainInventory.length;
+		} else {
+			inv = player.getInventoryEnderChest();
+			size = inv.getSizeInventory();
+		}
+		if (inv == null || size == 0) {
+			return remove;
+		}
+		List<Integer> empty = new ArrayList();
+		for (int i = 0; i < size; i++) {
+			ItemStack stack = inv.getStackInSlot(i);
+			if (stack != null) {
+				if (remove.equalStack(stack)) {
+					long used = (long) Math.min(remove.stored, Math.min(inv.getInventoryStackLimit(), stack.stackSize));
+					stack.stackSize -= used;
+					remove.stored -= used;
+					if (!action.shouldSimulate()) {
+						if (stack.stackSize == 0) {
+							stack = null;
+						}
+						inv.setInventorySlotContents(i, stack);
+					}
+					if (remove.stored == 0) {
+						return null;
+					}
+				}
+
+			}
+
+		}
+		return remove;
 	}
 
 	public void spawnStoredItemStack(StoredItemStack drop, World world, int x, int y, int z, ForgeDirection side) {
@@ -304,5 +341,35 @@ public class ItemHelper extends ItemWrapper {
 			}
 			world.spawnEntityInWorld(item);
 		}
+	}
+
+	public StoredItemStack removeToPlayerInventory(StoredItemStack stack, long extractSize, List<BlockCoords> network, EntityPlayer player, ActionType type) {
+		StoredItemStack simulate = getStackToAdd(extractSize, stack, removeItems(stack.copy().setStackSize(extractSize), network, type));
+		if (simulate == null) {
+			return null;
+		}
+		StoredItemStack returned = getStackToAdd(stack.stored, simulate, addStackToPlayer(simulate.copy(), player, false, type));
+		return returned;
+
+	}
+
+	public StoredItemStack addFromPlayerInventory(StoredItemStack stack, long extractSize, List<BlockCoords> network, EntityPlayer player, ActionType type) {
+		StoredItemStack simulate = getStackToAdd(extractSize, stack, removeStackFromPlayer(stack.copy().setStackSize(extractSize), player, false, type));
+		if (simulate == null) {
+			return null;
+		}
+		StoredItemStack returned = getStackToAdd(stack.stored, simulate, addItems(simulate.copy(), network, type));
+		return returned;
+
+	}
+
+	public StoredItemStack getStackToAdd(long inputSize, StoredItemStack stack, StoredItemStack returned) {
+		StoredItemStack simulateStack = null;
+		if (returned == null || returned.stored == 0) {
+			simulateStack = new StoredItemStack(stack.getItemStack(), inputSize);
+		} else {
+			simulateStack = new StoredItemStack(stack.getItemStack(), inputSize - returned.stored);
+		}
+		return simulateStack;
 	}
 }

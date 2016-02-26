@@ -144,7 +144,7 @@ public class GuiInfoReader extends GuiSonar {
 					boolean isSelected = info.equals(getPrimaryInfo());
 					if (!(info instanceof CategoryInfo)) {
 						int colour = isSelected ? Color.green.getRGB() : Color.lightGray.getRGB();
-						FontHelper.text(info.getSubCategory().substring(0, Math.min(16, info.getSubCategory().length())), 10, 31 + (12 * i) - (12 * start), colour);
+						FontHelper.text(info.getSubCategory().substring(0, Math.min(15, info.getSubCategory().length())), 10, 31 + (12 * i) - (12 * start), colour);
 						FontHelper.text(info.getDisplayableData().substring(0, Math.min(25, info.getDisplayableData().length())), 10 + 92, 31 + (12 * i) - (12 * start), colour);
 
 					} else {
@@ -258,28 +258,28 @@ public class GuiInfoReader extends GuiSonar {
 						if (buttonID == 0) {
 							if (getPrimaryInfo() != null && info.equals(getPrimaryInfo())) {
 								Logistics.network.sendToServer(new PacketInfoBlock(xCoord, yCoord, zCoord, true));
-								if (handler.isMultipart.getObject()) {
-									handler.primaryInfo = null;
-								}
+								//if (handler.isMultipart.getObject()) {
+									handler.primaryInfo.setObject(null);
+								//}
 							} else {
 								Logistics.network.sendToServer(new PacketInfoBlock(xCoord, yCoord, zCoord, info, true));
-								if (handler.isMultipart.getObject()) {
+								//if (handler.isMultipart.getObject()) {
 									handler.primaryInfo.setObject(info);
-								}
+								//}
 							}
 
 						} else if (buttonID == 1) {
 							if (!info.equals(getPrimaryInfo())) {
 								if (getSecondInfo() != null && info.equals(getSecondInfo())) {
 									Logistics.network.sendToServer(new PacketInfoBlock(xCoord, yCoord, zCoord, false));
-									if (handler.isMultipart.getObject()) {
-										handler.secondaryInfo = null;
-									}
+									//if (handler.isMultipart.getObject()) {
+										handler.secondaryInfo.setObject(null);
+									//}
 								} else {
 									Logistics.network.sendToServer(new PacketInfoBlock(xCoord, yCoord, zCoord, info, false));
-									if (handler.isMultipart.getObject()) {
+									//if (handler.isMultipart.getObject()) {
 										handler.secondaryInfo.setObject(info);
-									}
+									//}
 								}
 							}
 						}

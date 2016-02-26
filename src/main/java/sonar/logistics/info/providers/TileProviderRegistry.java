@@ -5,6 +5,7 @@ import sonar.logistics.api.providers.TileProvider;
 import sonar.logistics.info.providers.tile.AE2CraftingProvider;
 import sonar.logistics.info.providers.tile.AE2EnergyProvider;
 import sonar.logistics.info.providers.tile.AE2GridProvider;
+import sonar.logistics.info.providers.tile.BigReactorsProvider;
 import sonar.logistics.info.providers.tile.BlockProvider;
 import sonar.logistics.info.providers.tile.BloodMagicProvider;
 import sonar.logistics.info.providers.tile.BuildcraftProvider;
@@ -48,6 +49,7 @@ public class TileProviderRegistry extends RegistryHelper<TileProvider> {
 		registerObject(new MekanismReactorProvider());
 		registerObject(new RotaryCraftProvider());
 		registerObject(new CalculatorMachineProvider());
+		registerObject(new BigReactorsProvider());
 
 	}
 

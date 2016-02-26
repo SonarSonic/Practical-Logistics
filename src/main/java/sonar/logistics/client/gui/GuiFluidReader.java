@@ -17,11 +17,15 @@ import net.minecraftforge.fluids.FluidStack;
 
 import org.lwjgl.opengl.GL11;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import sonar.core.SonarCore;
 import sonar.core.fluid.StoredFluidStack;
+import sonar.core.inventory.SonarButtons;
 import sonar.core.network.PacketByteBufServer;
 import sonar.core.utils.helpers.FontHelper;
 import sonar.logistics.Logistics;
+import sonar.logistics.client.gui.GuiInventoryReader.FilterButton;
 import sonar.logistics.common.containers.ContainerFluidReader;
 import sonar.logistics.common.handlers.FluidReaderHandler;
 import sonar.logistics.network.LogisticsGui;
@@ -52,12 +56,15 @@ public class GuiFluidReader extends GuiSelectionGrid<StoredFluidStack> {
 
 	public void initGui() {
 		super.initGui();
-		this.buttonList.add(new GuiButton(0, guiLeft + 120 - (18 * 6), guiTop + 7, 65 + 3, 20, getSettingsString()) {
+		this.buttonList.add(new GuiButton(-1, guiLeft + 120 - (18 * 6), guiTop + 7, 65 + 3, 20, getSettingsString()) {
 
 			public void func_146111_b(int x, int y) {
 				drawCreativeTabHoveringText(getSettingsHover(), x, y);
 			}
 		});
+
+		this.buttonList.add(new FilterButton(0, guiLeft + 193, guiTop + 9));
+		this.buttonList.add(new FilterButton(1, guiLeft + 193 + 18, guiTop + 9));
 		switch (getSetting()) {
 		case POS:
 			slotField = new GuiTextField(this.fontRendererObj, 195 - (18 * 6), 8, 34 + 14, 18);
@@ -65,15 +72,15 @@ public class GuiFluidReader extends GuiSelectionGrid<StoredFluidStack> {
 			slotField.setText("" + handler.posSlot.getObject());
 			break;
 		}
-		searchField = new GuiTextField(this.fontRendererObj, 195 - (18 * 3), 8, 32 + 18 * 3, 18);
+		searchField = new GuiTextField(this.fontRendererObj, 195 - (18 * 3), 9, 13 + 18 * 2, 16);
 		searchField.setMaxStringLength(20);
 	}
 
 	protected void actionPerformed(GuiButton button) {
 		if (button != null) {
-			if (button.id == 0) {
+			if (button.id == -1) {
 
-				if (handler.setting.getObject() == 3) {
+				if (handler.setting.getObject() == 4) {
 					handler.setting.setObject(0);
 				} else {
 					handler.setting.increaseBy(1);
@@ -81,6 +88,22 @@ public class GuiFluidReader extends GuiSelectionGrid<StoredFluidStack> {
 				SonarCore.network.sendToServer(new PacketByteBufServer(handler, entity.xCoord, entity.yCoord, entity.zCoord, 0));
 				switchState();
 				reset();
+			}
+			if (button.id == 0) {
+				if (handler.sortingOrder.getObject() == 1) {
+					handler.sortingOrder.setObject(0);
+				} else {
+					handler.sortingOrder.increaseBy(1);
+				}
+				SonarCore.network.sendToServer(new PacketByteBufServer(handler, entity.xCoord, entity.yCoord, entity.zCoord, 3));
+			}
+			if (button.id == 1) {
+				if (handler.sortingType.getObject() == 2) {
+					handler.sortingType.setObject(0);
+				} else {
+					handler.sortingType.increaseBy(1);
+				}
+				SonarCore.network.sendToServer(new PacketByteBufServer(handler, entity.xCoord, entity.yCoord, entity.zCoord, 4));
 			}
 		}
 	}
@@ -209,7 +232,7 @@ public class GuiFluidReader extends GuiSelectionGrid<StoredFluidStack> {
 	}
 
 	@Override
-	public void onGridClicked(StoredFluidStack selection, int pos) {
+	public void onGridClicked(StoredFluidStack selection, int pos, int button) {
 		if (getSetting() == STACK) {
 			if (selection.fluid != null) {
 				Logistics.network.sendToServer(new PacketFluidReader(tile.xCoord, tile.yCoord, tile.zCoord, selection.fluid));
@@ -287,5 +310,52 @@ public class GuiFluidReader extends GuiSelectionGrid<StoredFluidStack> {
 			return stackBGround;
 		}
 		return clearBGround;
+	}
+
+	@SideOnly(Side.CLIENT)
+	public class FilterButton extends SonarButtons.AnimatedButton {
+		public int id;
+
+		public FilterButton(int id, int x, int y) {
+			super(id, x, y, sorting_icons, 15, 15);
+			this.id = id;
+		}
+
+		public void func_146111_b(int x, int y) {
+			String text = "BUTTON TEXT";
+			switch (id) {
+			case 0:
+				text = ("Sorting Direction");
+				break;
+			case 1:
+				text = (handler.sortingType.getObject() == 0 ? "Amount Stored" : handler.sortingType.getObject() == 1 ? "Fluid Name" : "Temperature");
+			}
+
+			drawCreativeTabHoveringText(text, x, y);
+		}
+
+		@Override
+		public void onClicked() {
+		}
+
+		@Override
+		public int getTextureX() {
+			switch (id) {
+			case 0:
+				return 0 + handler.sortingOrder.getObject() * 16;
+			case 1:
+				if (handler.sortingType.getObject() == 2) {
+					return 32 + 3 * 16;
+				}
+				return 32 + (handler.sortingType.getObject() * 16);
+			}
+			return 0;
+		}
+
+		@Override
+		public int getTextureY() {
+			return 0;
+		}
+
 	}
 }

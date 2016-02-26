@@ -59,6 +59,10 @@ public abstract class Info<T extends Info> implements INBTObject, IBufObject {
 		LogisticsAPI.getInfoRenderer().renderStandardInfo(this, Minecraft.getMinecraft().fontRenderer, minX, minY, maxX, maxY, zOffset, type);
 	}
 
+	public int updateTicks() {
+		return 1;
+	}
+
 	public boolean isLoadable() {
 		return true;
 	}

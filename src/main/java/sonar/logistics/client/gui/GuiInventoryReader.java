@@ -3,6 +3,8 @@ package sonar.logistics.client.gui;
 import java.util.ArrayList;
 import java.util.List;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
@@ -13,13 +15,16 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.ResourceLocation;
 import sonar.core.SonarCore;
+import sonar.core.inventory.SonarButtons;
 import sonar.core.inventory.StoredItemStack;
 import sonar.core.network.PacketByteBufServer;
 import sonar.core.utils.helpers.FontHelper;
 import sonar.core.utils.helpers.RenderHelper;
 import sonar.logistics.Logistics;
+import sonar.logistics.client.gui.GuiItemRouter.SideButton;
 import sonar.logistics.common.containers.ContainerInventoryReader;
 import sonar.logistics.common.handlers.InventoryReaderHandler;
+import sonar.logistics.info.filters.items.ItemStackFilter;
 import sonar.logistics.network.LogisticsGui;
 import sonar.logistics.network.packets.PacketGuiChange;
 import sonar.logistics.network.packets.PacketInventoryReader;
@@ -27,13 +32,12 @@ import sonar.logistics.network.packets.PacketInventoryReader;
 public class GuiInventoryReader extends GuiSelectionGrid<StoredItemStack> {
 
 	public static final ResourceLocation stackBGround = new ResourceLocation("PracticalLogistics:textures/gui/inventoryReader_stack.png");
-
 	public static final ResourceLocation clearBGround = new ResourceLocation("PracticalLogistics:textures/gui/inventoryReader_clear.png");
 
 	public InventoryReaderHandler handler;
 	private GuiTextField slotField;
 	private GuiTextField searchField;
-	public static final int STACK = 0, SLOT = 1, POS = 2, INV = 3, STORAGE=4;
+	public static final int STACK = 0, SLOT = 1, POS = 2, INV = 3, STORAGE = 4;
 
 	public InventoryPlayer inventoryPlayer;
 
@@ -49,7 +53,9 @@ public class GuiInventoryReader extends GuiSelectionGrid<StoredItemStack> {
 
 	public void initGui() {
 		super.initGui();
-		this.buttonList.add(new GuiButton(0, guiLeft + 120 - (18 * 6), guiTop + 7, 65 + 3, 20, getSettingsString()));
+		this.buttonList.add(new GuiButton(-1, guiLeft + 120 - (18 * 6), guiTop + 7, 65 + 3, 20, getSettingsString()));
+		this.buttonList.add(new FilterButton(0, guiLeft + 193, guiTop + 9));
+		this.buttonList.add(new FilterButton(1, guiLeft + 193 +18, guiTop + 9));
 		switch (getSetting()) {
 		case SLOT:
 		case POS:
@@ -61,14 +67,15 @@ public class GuiInventoryReader extends GuiSelectionGrid<StoredItemStack> {
 				slotField.setText("" + handler.posSlot.getObject());
 			break;
 		}
-		searchField = new GuiTextField(this.fontRendererObj, 195 - (18 * 3), 8, 32 + 18 * 3, 18);
+		searchField = new GuiTextField(this.fontRendererObj, 195 - (18 * 3), 9, 13 + 18 * 2, 16);
+		//searchField = new GuiTextField(this.fontRendererObj, 95 - (18 * 3), 160, 16 + 18 * 8, 10);
 		searchField.setMaxStringLength(20);
 		// searchField.setText("");
 	}
 
 	protected void actionPerformed(GuiButton button) {
 		if (button != null) {
-			if (button.id == 0) {
+			if (button.id == -1) {
 
 				if (handler.setting.getObject() == 4) {
 					handler.setting.setObject(0);
@@ -78,6 +85,22 @@ public class GuiInventoryReader extends GuiSelectionGrid<StoredItemStack> {
 				SonarCore.network.sendToServer(new PacketByteBufServer(handler, entity.xCoord, entity.yCoord, entity.zCoord, 0));
 				switchState();
 				reset();
+			}
+			if (button.id == 0) {
+				if (handler.sortingOrder.getObject() == 1) {
+					handler.sortingOrder.setObject(0);
+				} else {
+					handler.sortingOrder.increaseBy(1);
+				}
+				SonarCore.network.sendToServer(new PacketByteBufServer(handler, entity.xCoord, entity.yCoord, entity.zCoord, 3));
+			}
+			if (button.id == 1) {
+				if (handler.sortingType.getObject() == 2) {
+					handler.sortingType.setObject(0);
+				} else {
+					handler.sortingType.increaseBy(1);
+				}
+				SonarCore.network.sendToServer(new PacketByteBufServer(handler, entity.xCoord, entity.yCoord, entity.zCoord, 4));
 			}
 		}
 	}
@@ -190,7 +213,7 @@ public class GuiInventoryReader extends GuiSelectionGrid<StoredItemStack> {
 	}
 
 	@Override
-	public void onGridClicked(StoredItemStack selection, int pos) {
+	public void onGridClicked(StoredItemStack selection, int pos, int button) {
 		if (getSetting() == STACK) {
 			handler.current = selection.item;
 			handler.current.stackSize = 1;
@@ -209,10 +232,6 @@ public class GuiInventoryReader extends GuiSelectionGrid<StoredItemStack> {
 				}
 				position++;
 			}
-
-			// Logistics.network.sendToServer(new
-			// PacketInventoryReader(tile.xCoord, tile.yCoord, tile.zCoord,
-			// handler.current));
 		}
 	}
 
@@ -233,7 +252,7 @@ public class GuiInventoryReader extends GuiSelectionGrid<StoredItemStack> {
 	}
 
 	@Override
-	public void renderToolTip(StoredItemStack selection, int x, int y) {		
+	public void renderToolTip(StoredItemStack selection, int x, int y) {
 		List list = selection.item.getTooltip(this.mc.thePlayer, this.mc.gameSettings.advancedItemTooltips);
 		list.add(1, "Stored: " + selection.stored);
 		for (int k = 0; k < list.size(); ++k) {
@@ -246,7 +265,7 @@ public class GuiInventoryReader extends GuiSelectionGrid<StoredItemStack> {
 
 		FontRenderer font = selection.item.getItem().getFontRenderer(selection.item);
 		drawHoveringText(list, x, y, (font == null ? fontRendererObj : font));
-		
+
 	}
 
 	@Override
@@ -256,4 +275,48 @@ public class GuiInventoryReader extends GuiSelectionGrid<StoredItemStack> {
 		}
 		return clearBGround;
 	}
+
+	@SideOnly(Side.CLIENT)
+	public class FilterButton extends SonarButtons.AnimatedButton {
+		public int id;
+
+		public FilterButton(int id, int x, int y) {
+			super(id, x, y, sorting_icons, 15, 15);
+			this.id = id;
+		}
+
+		public void func_146111_b(int x, int y) {
+			String text = "BUTTON TEXT";
+			switch (id) {
+			case 0:
+				text = ("Sorting Direction");
+				break;
+			case 1:
+				text = (handler.sortingType.getObject() == 0 ? "Items Stored" : handler.sortingType.getObject() == 1 ? "Item Name" : "Mod");
+			}
+
+			drawCreativeTabHoveringText(text, x, y);
+		}
+
+		@Override
+		public void onClicked() {}
+
+		@Override
+		public int getTextureX() {
+			switch (id) {
+			case 0:
+				return 0 + handler.sortingOrder.getObject()*16;
+			case 1:
+				return 32 + (handler.sortingType.getObject()*16);
+			}
+			return 0;
+		}
+
+		@Override
+		public int getTextureY() {
+			return 0;
+		}
+
+	}
+
 }
