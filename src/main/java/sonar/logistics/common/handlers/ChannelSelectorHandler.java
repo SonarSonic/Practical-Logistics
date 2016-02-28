@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
@@ -40,7 +41,7 @@ public class ChannelSelectorHandler extends TileHandler {
 		if (te.getWorldObj().isRemote) {
 			return;
 		}
-		List<BlockCoords> network = LogisticsAPI.getCableHelper().getConnections( te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite());
+		List<BlockCoords> network = LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite());
 		channels = new ArrayList();
 		for (BlockCoords connect : network) {
 			TileEntity target = connect.getTileEntity();
@@ -60,6 +61,13 @@ public class ChannelSelectorHandler extends TileHandler {
 					}
 
 				} else {
+					channels.add(new IdentifiedCoords(connect.toString(), stack, connect));
+				}
+			} else {
+				Block block = connect.getBlock(connect.getWorld());
+				if (block != null) {
+					int meta = connect.getWorld().getBlockMetadata(connect.getX(), connect.getY(), connect.getZ());
+					ItemStack stack = SonarHelper.createStackedBlock(block, meta);
 					channels.add(new IdentifiedCoords(connect.toString(), stack, connect));
 				}
 			}

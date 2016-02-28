@@ -25,6 +25,7 @@ import sonar.logistics.common.blocks.BlockMultiDataCable;
 import sonar.logistics.common.blocks.BlockNode;
 import sonar.logistics.common.blocks.BlockRedstoneSignaller;
 import sonar.logistics.common.blocks.BlockSapphireOre;
+import sonar.logistics.common.blocks.BlockTransceiverArray;
 import sonar.logistics.common.blocks.DisplayScreen;
 import sonar.logistics.common.blocks.LargeDisplayScreen;
 import sonar.logistics.common.tileentity.TileEntityBlockNode;
@@ -49,6 +50,7 @@ import sonar.logistics.common.tileentity.TileEntityInventoryReader;
 import sonar.logistics.common.tileentity.TileEntityItemRouter;
 import sonar.logistics.common.tileentity.TileEntityLargeScreen;
 import sonar.logistics.common.tileentity.TileEntityRedstoneSignaller;
+import sonar.logistics.common.tileentity.TileEntityArray;
 import cpw.mods.fml.common.registry.GameRegistry;
 
 public class BlockRegistry extends Logistics {
@@ -60,7 +62,7 @@ public class BlockRegistry extends Logistics {
 	public static Block infoReader, inventoryReader, fluidReader, energyReader;
 
 	// connections
-	public static Block node, entityNode, dataCable, dataMultiCable, dataReceiver, dataEmitter, dataModifier, infoCreator, channelSelector, expulsion_port, admission_port;
+	public static Block node, entityNode, dataCable, dataMultiCable, dataReceiver, dataEmitter, dataModifier, infoCreator, channelSelector, transceiverArray, expulsion_port, admission_port;
 
 	// misc
 	public static Block redstoneSignaller_on, redstoneSignaller_off, sapphire_ore, hammer, hammer_air, itemRouter, clock;
@@ -143,6 +145,10 @@ public class BlockRegistry extends Logistics {
 		GameRegistry.registerBlock(channelSelector, SonarBlockTip.class, "ChannelSelector");
 		GameRegistry.registerTileEntity(TileEntityChannelSelector.class, "ChannelSelector");
 
+		transceiverArray = new BlockTransceiverArray().setBlockName("TransceiverArray").setHardness(1.0F).setCreativeTab(Logistics.creativeTab).setResistance(20.0F).setBlockTextureName(modid + ":" + "data_cable");
+		GameRegistry.registerBlock(transceiverArray, SonarBlockTip.class, "TransceiverArray");
+		GameRegistry.registerTileEntity(TileEntityArray.class, "TransceiverArray");
+		
 		holographicDisplay = new BlockHolographicDisplay().setBlockName("HolographicDisplay").setHardness(1.0F).setCreativeTab(Logistics.creativeTab).setResistance(20.0F).setBlockTextureName(modid + ":" + "data_cable");
 		GameRegistry.registerBlock(holographicDisplay, SonarBlockTip.class, "HolographicDisplay");
 		GameRegistry.registerTileEntity(TileEntityHolographicDisplay.class, "HolographicDisplay");

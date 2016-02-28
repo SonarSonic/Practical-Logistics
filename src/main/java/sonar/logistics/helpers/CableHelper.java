@@ -6,6 +6,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.minecraft.block.Block;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.integration.fmp.FMPHelper;
@@ -15,6 +17,7 @@ import sonar.core.utils.helpers.SonarHelper;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.connecting.CableType;
 import sonar.logistics.api.connecting.IChannelProvider;
+import sonar.logistics.api.connecting.IConnectionArray;
 import sonar.logistics.api.connecting.IConnectionNode;
 import sonar.logistics.api.connecting.IDataCable;
 import sonar.logistics.api.connecting.IInfoEmitter;
@@ -124,7 +127,10 @@ public class CableHelper extends CablingWrapper {
 		CableType cableType = CableType.NONE;
 		Object adjacent = FMPHelper.getAdjacentTile(tile, dir);
 		if (adjacent != null) {
-			if (adjacent instanceof IDataCable) {
+			if (adjacent instanceof IConnectionArray) {
+				IConnectionArray array = ((IConnectionArray) adjacent);
+				connections.addAll(array.getCoordList());
+			} else if (adjacent instanceof IDataCable) {
 				IDataCable cable = ((IDataCable) adjacent);
 				if (cable.isBlocked(dir.getOpposite())) {
 					return connections;
@@ -146,6 +152,10 @@ public class CableHelper extends CablingWrapper {
 					addChannelConnections(connections, (IChannelProvider) target, tile, cableType);
 				} else if (target instanceof ILogicTile) {
 					connections.add(coord);
+				} else if (adjacent instanceof IConnectionArray) {
+					IConnectionArray array = ((IConnectionArray) adjacent);
+					if (!array.getCoordList().isEmpty())
+						connections.add(array.getCoordList().get(0));
 				}
 			}
 			if (!cableType.hasUnlimitedConnections()) {
@@ -156,39 +166,37 @@ public class CableHelper extends CablingWrapper {
 	}
 
 	private static void addChannelConnections(ArrayList<BlockCoords> connections, IChannelProvider receiver, TileEntity tile, CableType cableType) {
-		TileEntity channel = null;
+		// TileEntity channel = null;
 		if (receiver.getChannel() != null && receiver.getChannel().blockCoords != null) {
-			TileEntity target = receiver.getChannel().blockCoords.getTileEntity();
-			if (target != null && target instanceof ILogicTile) {
-				ILogicTile dataemitter = (ILogicTile) target;
-				if (tile.xCoord != dataemitter.getCoords().getX() || tile.yCoord != dataemitter.getCoords().getY() || tile.zCoord != dataemitter.getCoords().getZ()) {
-					channel = target;
-				}
-			}
-		}
-		if (channel != null) {
-			if (!(channel instanceof TileEntityDataEmitter)) {
-				connections.add(new BlockCoords(channel));
-			} else {
-				List<BlockCoords> emitterConnections = LogisticsAPI.getCableHelper().getConnections(channel, ForgeDirection.getOrientation(channel.getBlockMetadata()).getOpposite());
-				List<BlockCoords> toAdd = new ArrayList();
-				for (BlockCoords coords : emitterConnections) {
-					boolean hasCoords = false;
-					for (BlockCoords currentCoords : (ArrayList<BlockCoords>) connections.clone()) {
-						if (BlockCoords.equalCoords(currentCoords, coords)) {
-							hasCoords = true;
+			BlockCoords target = receiver.getChannel().blockCoords;
+			if (!target.equals(new BlockCoords(tile))) {
+				TileEntity channel = target.getTileEntity();
+				if (channel == null || !(channel instanceof TileEntityDataEmitter)) {
+					Block block = target.getBlock(target.getWorld());
+					if (block != null)
+						connections.add(target);
+				} else {
+					List<BlockCoords> emitterConnections = LogisticsAPI.getCableHelper().getConnections(channel, ForgeDirection.getOrientation(channel.getBlockMetadata()).getOpposite());
+					List<BlockCoords> toAdd = new ArrayList();
+					for (BlockCoords coords : emitterConnections) {
+						boolean hasCoords = false;
+						for (BlockCoords currentCoords : (ArrayList<BlockCoords>) connections.clone()) {
+							if (BlockCoords.equalCoords(currentCoords, coords)) {
+								hasCoords = true;
+							}
+						}
+						if (!hasCoords) {
+							toAdd.add(coords);
 						}
 					}
-					if (!hasCoords) {
-						toAdd.add(coords);
+					if (cableType.hasUnlimitedConnections()) {
+						connections.addAll(toAdd);
+					} else if (!toAdd.isEmpty() && toAdd.get(0) != null) {
+						connections.add(toAdd.get(0));
 					}
 				}
-				if (cableType.hasUnlimitedConnections()) {
-					connections.addAll(toAdd);
-				} else if (!toAdd.isEmpty() && toAdd.get(0) != null) {
-					connections.add(toAdd.get(0));
-				}
 			}
+
 		}
 	}
 
@@ -232,7 +240,7 @@ public class CableHelper extends CablingWrapper {
 						return ((IDataCable) target).getCableType();
 					}
 				}
-				return canConnect? CableType.DATA_CABLE : CableType.NONE;
+				return canConnect ? CableType.DATA_CABLE : CableType.NONE;
 			}
 		}
 		return CableType.NONE;

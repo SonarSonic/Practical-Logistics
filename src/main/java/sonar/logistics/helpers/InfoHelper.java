@@ -31,7 +31,7 @@ public class InfoHelper extends InfoWrapper {
 			return infoList;
 		}
 		if (tile instanceof IConnectionNode) {
-			infoList = getTileInfo((IConnectionNode) tile);
+			infoList = getTileInfo(((IConnectionNode) tile).getConnections());
 		} else if (tile instanceof IEntityNode) {
 			infoList = getEntityInfo((IEntityNode) tile);
 		}
@@ -39,11 +39,11 @@ public class InfoHelper extends InfoWrapper {
 
 	}
 
-	public List<Info> getTileInfo(IConnectionNode tileNode) {
+	public List<Info> getTileInfo(Map<BlockCoords, ForgeDirection> coordList) {
 		List<TileProvider> providers = Logistics.tileProviders.getObjects();
 		List<Info> providerInfo = new ArrayList();
 
-		Map<BlockCoords, ForgeDirection> connections = tileNode.getConnections();
+		Map<BlockCoords, ForgeDirection> connections = coordList;
 		for (TileProvider provider : providers) {
 			for (Map.Entry<BlockCoords, ForgeDirection> entry : connections.entrySet()) {
 				BlockCoords coords = entry.getKey();

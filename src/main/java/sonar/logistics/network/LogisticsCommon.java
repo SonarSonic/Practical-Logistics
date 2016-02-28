@@ -11,6 +11,7 @@ import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.Logistics;
+import sonar.logistics.client.gui.GuiArray;
 import sonar.logistics.client.gui.GuiChannelSelector;
 import sonar.logistics.client.gui.GuiClock;
 import sonar.logistics.client.gui.GuiDataModifier;
@@ -25,6 +26,7 @@ import sonar.logistics.client.gui.GuiInventoryReader;
 import sonar.logistics.client.gui.GuiItemRouter;
 import sonar.logistics.client.gui.GuiRedstoneSignaller;
 import sonar.logistics.client.gui.GuiRenameEmitter;
+import sonar.logistics.common.containers.ContainerArray;
 import sonar.logistics.common.containers.ContainerDataReceiver;
 import sonar.logistics.common.containers.ContainerEmptySync;
 import sonar.logistics.common.containers.ContainerFluidReader;
@@ -32,6 +34,7 @@ import sonar.logistics.common.containers.ContainerHammer;
 import sonar.logistics.common.containers.ContainerInfoNode;
 import sonar.logistics.common.containers.ContainerInventoryReader;
 import sonar.logistics.common.containers.ContainerItemRouter;
+import sonar.logistics.common.handlers.ArrayHandler;
 import sonar.logistics.common.handlers.ChannelSelectorHandler;
 import sonar.logistics.common.handlers.DataModifierHandler;
 import sonar.logistics.common.handlers.EnergyReaderHandler;
@@ -45,6 +48,7 @@ import sonar.logistics.common.tileentity.TileEntityClock;
 import sonar.logistics.common.tileentity.TileEntityDataEmitter;
 import sonar.logistics.common.tileentity.TileEntityDataModifier;
 import sonar.logistics.common.tileentity.TileEntityDataReceiver;
+import sonar.logistics.common.tileentity.TileEntityEnergyReader;
 import sonar.logistics.common.tileentity.TileEntityEntityNode;
 import sonar.logistics.common.tileentity.TileEntityFluidReader;
 import sonar.logistics.common.tileentity.TileEntityHammer;
@@ -88,83 +92,70 @@ public class LogisticsCommon implements IGuiHandler {
 	public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
 		TileEntity tile = world.getTileEntity(x, y, z);
 		Object entity = FMPHelper.checkObject(tile);
+		TileHandler handler = FMPHelper.getHandler(tile);
 		if (entity != null) {
 			switch (ID) {
 			case LogisticsGui.infoNode:
-				if (entity instanceof TileEntityInfoReader || entity instanceof InfoReaderPart) {
-					TileHandler handler = FMPHelper.getHandler(tile);
-					if (handler != null && handler instanceof InfoReaderHandler)
-						return new ContainerInfoNode((InfoReaderHandler) handler, tile);
-				}
+				if (handler != null && handler instanceof InfoReaderHandler)
+					return new ContainerInfoNode((InfoReaderHandler) handler, tile);
+
 			case LogisticsGui.dataReceiver:
-				if (entity instanceof TileEntityDataReceiver) {
+				if (entity instanceof TileEntityDataReceiver)
 					return new ContainerDataReceiver((TileEntityDataReceiver) entity, player.inventory);
-				}
 
 			case LogisticsGui.dataEmitter:
-				if (entity instanceof TileEntityDataEmitter) {
+				if (entity instanceof TileEntityDataEmitter)
 					return new ContainerEmptySync((TileEntityDataEmitter) entity);
-				}
+
 			case LogisticsGui.inventoryReader:
-				if (entity instanceof TileEntityInventoryReader || entity instanceof InventoryReaderPart) {
-					TileHandler handler = FMPHelper.getHandler(tile);
-					if (handler != null && handler instanceof InventoryReaderHandler)
-						return new ContainerInventoryReader((InventoryReaderHandler) handler, tile, player.inventory);
-				}
+				if (handler != null && handler instanceof InventoryReaderHandler)
+					return new ContainerInventoryReader((InventoryReaderHandler) handler, tile, player.inventory);
+
 			case LogisticsGui.redstoneSignaller:
 				if (entity instanceof TileEntityRedstoneSignaller) {
 					return new ContainerEmptySync((TileEntityRedstoneSignaller) entity);
 				}
 			case LogisticsGui.dataModifier:
-				if (entity instanceof TileEntityDataModifier || entity instanceof DataModifierPart) {
-					TileHandler handler = FMPHelper.getHandler(tile);
-					if (handler != null && handler instanceof DataModifierHandler)
-						return new ContainerEmptySync((DataModifierHandler) handler, tile);
-				}
+				if (handler != null && handler instanceof DataModifierHandler)
+					return new ContainerEmptySync((DataModifierHandler) handler, tile);
+
 			case LogisticsGui.infoCreator:
-				if (entity instanceof TileEntityInfoCreator || entity instanceof InfoCreatorPart) {
-					TileHandler handler = FMPHelper.getHandler(tile);
-					if (handler != null && handler instanceof InfoCreatorHandler)
-						return new ContainerEmptySync((InfoCreatorHandler) handler, tile);
-				}
+				if (handler != null && handler instanceof InfoCreatorHandler)
+					return new ContainerEmptySync((InfoCreatorHandler) handler, tile);
+
 			case LogisticsGui.hammer:
-				if (entity instanceof TileEntityHammer) {
+				if (entity instanceof TileEntityHammer)
 					return new ContainerHammer(player.inventory, (TileEntityHammer) entity);
-				}
+
 			case LogisticsGui.entityNode:
-				if (entity instanceof TileEntityEntityNode) {
+				if (entity instanceof TileEntityEntityNode)
 					return new ContainerEmptySync((TileEntityEntityNode) entity);
-				}
+
 			case LogisticsGui.fluidReader:
-				if (entity instanceof TileEntityFluidReader || entity instanceof FluidReaderPart) {
-					TileHandler handler = FMPHelper.getHandler(tile);
-					if (handler != null && handler instanceof FluidReaderHandler)
-						return new ContainerFluidReader((FluidReaderHandler) handler, tile, player.inventory);
-				}
+				if (handler != null && handler instanceof FluidReaderHandler)
+					return new ContainerFluidReader((FluidReaderHandler) handler, tile, player.inventory);
+
 			case LogisticsGui.itemRouter:
-				if (entity instanceof TileEntityItemRouter) {
-					TileHandler handler = FMPHelper.getHandler(tile);
-					if (handler != null && handler instanceof ItemRouterHandler)
-						return new ContainerItemRouter((TileEntityItemRouter) tile, player.inventory);
-				}
+				if (handler != null && handler instanceof ItemRouterHandler)
+					return new ContainerItemRouter((TileEntityItemRouter) tile, player.inventory);
+
 			case LogisticsGui.channelSelector:
-				if (entity instanceof TileEntityChannelSelector) {
-					TileHandler handler = FMPHelper.getHandler(tile);
-					if (handler != null && handler instanceof ChannelSelectorHandler)
-						return new ContainerEmptySync((ChannelSelectorHandler) handler, tile).setTypes(new SyncType[] { SyncType.SPECIAL });
-				}
+				if (handler != null && handler instanceof ChannelSelectorHandler)
+					return new ContainerEmptySync((ChannelSelectorHandler) handler, tile).setTypes(new SyncType[] { SyncType.SPECIAL });
+
 			case LogisticsGui.clock:
 				if (entity instanceof TileEntityClock) {
 					return new ContainerEmptySync((TileEntityClock) entity);
 				}
 			case LogisticsGui.energyReader:
-				// if (entity instanceof TileEntityInventoryReader || entity
-				// instanceof InventoryReaderPart) {
-				TileHandler handler = FMPHelper.getHandler(tile);
 				if (handler != null && handler instanceof EnergyReaderHandler) {
 					return new ContainerEmptySync((EnergyReaderHandler) handler, tile).setTypes(new SyncType[] { SyncType.SPECIAL });
 				}
-				// }
+
+			case LogisticsGui.transceiverArray:
+				if (handler != null && handler instanceof ArrayHandler) {
+					return new ContainerArray(player.inventory, (ArrayHandler) handler, tile);
+				}
 			}
 
 		}
@@ -176,15 +167,13 @@ public class LogisticsCommon implements IGuiHandler {
 
 		TileEntity tile = world.getTileEntity(x, y, z);
 		Object entity = FMPHelper.checkObject(tile);
-
+		TileHandler handler = FMPHelper.getHandler(tile);
 		if (entity != null) {
 			switch (ID) {
 			case LogisticsGui.infoNode:
-				if (entity instanceof TileEntityInfoReader || entity instanceof InfoReaderPart) {
-					TileHandler handler = FMPHelper.getHandler(tile);
-					if (handler != null && handler instanceof InfoReaderHandler)
-						return new GuiInfoReader((InfoReaderHandler) handler, tile);
-				}
+				if (handler != null && handler instanceof InfoReaderHandler)
+					return new GuiInfoReader((InfoReaderHandler) handler, tile);
+
 			case LogisticsGui.dataReceiver:
 				if (entity instanceof TileEntityDataReceiver) {
 					return new GuiDataReceiver(player.inventory, (TileEntityDataReceiver) entity);
@@ -194,27 +183,22 @@ public class LogisticsCommon implements IGuiHandler {
 					return new GuiRenameEmitter.DataEmitter((TileEntityDataEmitter) entity);
 				}
 			case LogisticsGui.inventoryReader:
-				if (entity instanceof TileEntityInventoryReader || entity instanceof InventoryReaderPart) {
-					TileHandler handler = FMPHelper.getHandler(tile);
-					if (handler != null && handler instanceof InventoryReaderHandler)
-						return new GuiInventoryReader((InventoryReaderHandler) handler, tile, player.inventory);
-				}
+				if (handler != null && handler instanceof InventoryReaderHandler)
+					return new GuiInventoryReader((InventoryReaderHandler) handler, tile, player.inventory);
+
 			case LogisticsGui.redstoneSignaller:
 				if (entity instanceof TileEntityRedstoneSignaller) {
 					return new GuiRedstoneSignaller.RedstoneSignaller((TileEntityRedstoneSignaller) entity);
 				}
 			case LogisticsGui.dataModifier:
 				if (entity instanceof TileEntityDataModifier || entity instanceof DataModifierPart) {
-					TileHandler handler = FMPHelper.getHandler(tile);
 					if (handler != null && handler instanceof DataModifierHandler)
 						return new GuiDataModifier((DataModifierHandler) handler, tile);
 				}
 			case LogisticsGui.infoCreator:
-				if (entity instanceof TileEntityInfoCreator || entity instanceof InfoCreatorPart) {
-					TileHandler handler = FMPHelper.getHandler(tile);
-					if (handler != null && handler instanceof InfoCreatorHandler)
-						return new GuiInfoCreator((InfoCreatorHandler) handler, tile);
-				}
+				if (handler != null && handler instanceof InfoCreatorHandler)
+					return new GuiInfoCreator((InfoCreatorHandler) handler, tile);
+
 			case LogisticsGui.hammer:
 				if (entity instanceof TileEntityHammer) {
 					return new GuiHammer(player.inventory, (TileEntityHammer) entity);
@@ -224,34 +208,29 @@ public class LogisticsCommon implements IGuiHandler {
 					return new GuiEntityNode((TileEntityEntityNode) entity);
 				}
 			case LogisticsGui.fluidReader:
-				if (entity instanceof TileEntityFluidReader || entity instanceof FluidReaderPart) {
-					TileHandler handler = FMPHelper.getHandler(tile);
-					if (handler != null && handler instanceof FluidReaderHandler)
-						return new GuiFluidReader((FluidReaderHandler) handler, tile, player.inventory);
-				}
+				if (handler != null && handler instanceof FluidReaderHandler)
+					return new GuiFluidReader((FluidReaderHandler) handler, tile, player.inventory);
+
 			case LogisticsGui.itemRouter:
-				if (entity instanceof TileEntityItemRouter) {
-					TileHandler handler = FMPHelper.getHandler(tile);
-					if (handler != null && handler instanceof ItemRouterHandler)
-						return new GuiItemRouter((ItemRouterHandler) handler, (TileEntityItemRouter) tile, player);
-				}
+				if (handler != null && handler instanceof ItemRouterHandler)
+					return new GuiItemRouter((ItemRouterHandler) handler, (TileEntityItemRouter) tile, player);
+
 			case LogisticsGui.channelSelector:
-				if (entity instanceof TileEntityChannelSelector) {
-					TileHandler handler = FMPHelper.getHandler(tile);
-					if (handler != null && handler instanceof ChannelSelectorHandler)
-						return new GuiChannelSelector(tile, (ChannelSelectorHandler) handler, player.inventory);
-				}
+				if (handler != null && handler instanceof ChannelSelectorHandler)
+					return new GuiChannelSelector(tile, (ChannelSelectorHandler) handler, player.inventory);
+
 			case LogisticsGui.clock:
 				if (entity instanceof TileEntityClock) {
 					return new GuiClock((TileEntityClock) entity);
 				}
 			case LogisticsGui.energyReader:
-				// if (entity instanceof TileEntityInventoryReader || entity
-				// instanceof InventoryReaderPart) {
-				TileHandler handler = FMPHelper.getHandler(tile);
 				if (handler != null && handler instanceof EnergyReaderHandler)
 					return new GuiEnergyReader(tile, (EnergyReaderHandler) handler, player.inventory);
-				// }
+				
+			case LogisticsGui.transceiverArray:
+				if (handler != null && handler instanceof ArrayHandler)
+					return new GuiArray(player.inventory, (ArrayHandler) handler, tile);
+
 			}
 
 		}

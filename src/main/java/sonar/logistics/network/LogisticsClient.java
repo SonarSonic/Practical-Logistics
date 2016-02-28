@@ -8,6 +8,7 @@ import sonar.logistics.client.renderers.RenderHandlers;
 import sonar.logistics.client.renderers.RenderHolographicDisplay;
 import sonar.logistics.client.renderers.RenderItemHandlers;
 import sonar.logistics.client.renderers.RenderLargeDisplay;
+import sonar.logistics.common.tileentity.TileEntityArray;
 import sonar.logistics.common.tileentity.TileEntityBlockNode;
 import sonar.logistics.common.tileentity.TileEntityChannelSelector;
 import sonar.logistics.common.tileentity.TileEntityChannelledCable;
@@ -122,6 +123,10 @@ public class LogisticsClient extends LogisticsCommon {
 		TileEntitySpecialRenderer expulsion = new RenderHandlers.ExpulsionPort();
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityExpulsionPort.class, expulsion);
 		MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(BlockRegistry.expulsion_port), new RenderItemHandlers.Cable(expulsion, new TileEntityExpulsionPort()));
+		
+		TileEntitySpecialRenderer array = new RenderHandlers.TransceiverArray();
+		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityArray.class, array);
+		MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(BlockRegistry.transceiverArray), new RenderItemHandlers.Cable(array, new TileEntityArray()));
 		
 	}
 }

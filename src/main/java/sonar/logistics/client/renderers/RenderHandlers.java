@@ -18,10 +18,12 @@ import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 
 import sonar.core.integration.fmp.FMPHelper;
+import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.renderers.SonarTERender;
 import sonar.core.utils.helpers.RenderHelper;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.connecting.CableType;
+import sonar.logistics.api.connecting.ITransceiver;
 import sonar.logistics.client.models.ModelBlockNode;
 import sonar.logistics.client.models.ModelClock;
 import sonar.logistics.client.models.ModelDataCable;
@@ -34,6 +36,8 @@ import sonar.logistics.client.models.ModelHammer;
 import sonar.logistics.client.models.ModelInfoCreator;
 import sonar.logistics.client.models.ModelItemRouter;
 import sonar.logistics.client.models.ModelRedstoneSignaller;
+import sonar.logistics.client.models.ModelTransceiverArray;
+import sonar.logistics.common.handlers.ArrayHandler;
 import sonar.logistics.common.tileentity.TileEntityClock;
 import sonar.logistics.common.tileentity.TileEntityEntityNode;
 import sonar.logistics.common.tileentity.TileEntityHammer;
@@ -586,7 +590,7 @@ public class RenderHandlers {
 		public ExpulsionPort() {
 			super(new ModelExpulsionPort(), modelFolder + "port.png");
 		}
-		
+
 		@Override
 		public void renderTileEntityAt(TileEntity entity, double x, double y, double z, float f) {
 			RenderHelper.beginRender(x + 0.5F, y + 1.5F, z + 0.5F, 0, textureCable);
@@ -620,10 +624,47 @@ public class RenderHandlers {
 				}
 
 			}
-			//GL11.glTranslated(0, 1.5, 0);
+			// GL11.glTranslated(0, 1.5, 0);
 			model.render((Entity) null, 0.0F, 0.0F, -0.1F, 0.0F, 0.0F, 0.0625F);
 			RenderHelper.finishRender();
 		}
 	}
 
+	public static class TransceiverArray extends TileEntitySpecialRenderer {
+		public ModelTransceiverArray model = new ModelTransceiverArray();
+		public String texture = modelFolder + "transceiverArray.png";
+
+		@Override
+		public void renderTileEntityAt(TileEntity entity, double x, double y, double z, float f) {
+			RenderHelper.beginRender(x + 0.5F, y + 1.5F, z + 0.5F, 0, textureCable);
+			modelCable.renderTile(entity, (Entity) null, 0.0F, 0.0F, -0.1F, 0.0F, 0.0F, 0.0625F, CableType.NONE);
+			RenderHelper.finishRender();
+
+			RenderHelper.beginRender(x + 0.5F, y + 1.5F, z + 0.5F, 0, texture);
+			model.render((Entity) null, 0.0F, 0.0F, -0.1F, 0.0F, 0.0F, 0.0625F);
+			if (entity != null && entity.getWorldObj() != null) {
+				GL11.glRotated(180, 1.0, 0.0, 0.0);
+				GL11.glScaled(0.7, 0.7, 0.7);
+				GL11.glTranslated(-0.195, -1.05, -0.27);
+				TileHandler handler = FMPHelper.getHandler(entity);
+				if (handler != null && handler instanceof ArrayHandler) {
+					ArrayHandler array = (ArrayHandler) handler;
+					ItemStack[] stacks = array.slots;
+					for (int i = 0; i < stacks.length; i++) {
+						ItemStack stack = stacks[i];
+						if (stack != null && stack.getItem() instanceof ITransceiver) {
+							double translateX =i<4?0:0.355;
+							int translateZ = i<4?i:i-4;							
+							GL11.glTranslated(translateX, 0.0, translateZ*0.182);
+							RenderHelper.renderItem(entity.getWorldObj(), stack);
+							GL11.glTranslated(-translateX, 0.0, -translateZ*0.182);
+						}
+					}
+				}
+			}
+
+			RenderHelper.finishRender();
+
+		}
+	}
 }

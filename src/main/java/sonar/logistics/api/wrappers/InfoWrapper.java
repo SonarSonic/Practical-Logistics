@@ -2,7 +2,9 @@ package sonar.logistics.api.wrappers;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
+import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.utils.BlockCoords;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.connecting.IConnectionNode;
@@ -18,10 +20,10 @@ public class InfoWrapper {
 		return Collections.EMPTY_LIST;
 	}
 	/**gets a list of all Info available at a given {@link IConnectionNode}, used by getInfoList(), here if the need should arise
-	 * @param coords {@link IConnectionNode} to check at
+	 * @param coordList the map containing coords and directions.
 	 * @return list of {@link Info}
 	 */
-	public List<Info> getTileInfo(IConnectionNode tileNode) {
+	public List<Info> getTileInfo(Map<BlockCoords, ForgeDirection> coordList) {
 		return Collections.EMPTY_LIST;
 	}
 

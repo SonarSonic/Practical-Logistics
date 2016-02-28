@@ -17,6 +17,7 @@ public class LogisticsGui {
 	public static final int channelSelector =  12;
 	public static final int clock =  13;
 	public static final int energyReader =  14;
+	public static final int transceiverArray =  15;
 	
 
 }
