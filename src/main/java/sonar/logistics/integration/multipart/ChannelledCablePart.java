@@ -71,7 +71,7 @@ public class ChannelledCablePart extends SonarTilePart implements IDataCable {
 
 	@Override
 	public Block getBlock() {
-		return BlockRegistry.dataMultiCable;
+		return BlockRegistry.channelledCable;
 	}
 
 	@Override

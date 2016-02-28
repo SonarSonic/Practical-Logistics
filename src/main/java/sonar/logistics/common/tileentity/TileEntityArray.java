@@ -3,6 +3,7 @@ package sonar.logistics.common.tileentity;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -47,17 +48,20 @@ public class TileEntityArray extends TileEntityHandlerInventory implements IConn
 	}
 
 	@Override
-	public List<BlockCoords> getCoordList() {
+	public Map<BlockCoords, ForgeDirection> getConnections() {
 		return handler.coordList;
 	}
 
 
 	@Override
 	public boolean isBlocked(ForgeDirection dir) {
-		return false;
+		return dir == ForgeDirection.UP;
 	}
 
 	public CableType canRenderConnection(ForgeDirection dir) {
+		if(dir == ForgeDirection.UP){
+			return CableType.NONE;
+		}
 		return LogisticsAPI.getCableHelper().canRenderConnection(this, dir, getCableType());
 	}
 
@@ -82,10 +86,12 @@ public class TileEntityArray extends TileEntityHandlerInventory implements IConn
 
 	public void addCable() {
 		LogisticsAPI.getCableHelper().addCable(this);
+		LogisticsAPI.getCableHelper().addConnection(registryID, this.getCoords());
 	}
 
 	public void removeCable() {
 		LogisticsAPI.getCableHelper().removeCable(this);
+		LogisticsAPI.getCableHelper().removeConnection(registryID, this.getCoords());
 	}
 
 	@SideOnly(Side.CLIENT)

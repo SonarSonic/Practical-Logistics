@@ -23,6 +23,7 @@ import sonar.logistics.api.Info;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.StandardInfo;
 import sonar.logistics.api.connecting.IConnectionNode;
+import sonar.logistics.api.connecting.IEntityNode;
 import sonar.logistics.common.tileentity.TileEntityBlockNode;
 import sonar.logistics.common.tileentity.TileEntityEntityNode;
 import sonar.logistics.info.types.CategoryInfo;
@@ -70,30 +71,30 @@ public class InfoReaderHandler extends TileHandler implements IWailaInfo {
 
 		List<BlockCoords> connections = LogisticsAPI.getCableHelper().getConnections(te, dir.getOpposite());
 		List<IConnectionNode> nodes = new ArrayList();
-		List<TileEntityEntityNode> entityNodes = new ArrayList();
-
+		List<IEntityNode> entityNodes = new ArrayList();
+		
 		for (BlockCoords connect : connections) {
 			Object tile = connect.getTileEntity();
 			if (tile instanceof IConnectionNode) {
 				nodes.add((IConnectionNode) tile);
 			}
-			if (tile instanceof TileEntityEntityNode) {
-				entityNodes.add((TileEntityEntityNode) tile);
+			if (tile instanceof IEntityNode) {
+				entityNodes.add((IEntityNode) tile);
 			}
 		}
 
 		if (!nodes.isEmpty()) {
 			if (primary)
-				this.setData(te, LogisticsAPI.getInfoHelper().getLatestTileInfo(primaryInfo.getObject(), nodes.get(0)), true);
+				this.setData(te, LogisticsAPI.getInfoHelper().getLatestTileInfo(primaryInfo.getObject(), (IConnectionNode) nodes.get(0)), true);
 			if (secondary)
 				this.setData(te, LogisticsAPI.getInfoHelper().getLatestTileInfo(secondaryInfo.getObject(), (IConnectionNode) nodes.get(0)), false);
-			this.coords = new BlockCoords((TileEntityBlockNode) nodes.get(0));
+			this.coords = new BlockCoords((TileEntity) nodes.get(0));
 		} else if (!entityNodes.isEmpty()) {
 			if (primary)
-				this.setData(te, LogisticsAPI.getInfoHelper().getLatestEntityInfo(primaryInfo.getObject(), (TileEntityEntityNode) entityNodes.get(0)), true);
+				this.setData(te, LogisticsAPI.getInfoHelper().getLatestEntityInfo(primaryInfo.getObject(), (IEntityNode) entityNodes.get(0)), true);
 			if (secondary)
-				this.setData(te, LogisticsAPI.getInfoHelper().getLatestEntityInfo(secondaryInfo.getObject(), (TileEntityEntityNode) entityNodes.get(0)), false);
-			this.coords = new BlockCoords((TileEntityEntityNode) entityNodes.get(0));
+				this.setData(te, LogisticsAPI.getInfoHelper().getLatestEntityInfo(secondaryInfo.getObject(), (IEntityNode) entityNodes.get(0)), false);
+			this.coords = new BlockCoords((TileEntity) entityNodes.get(0));
 		} else {
 			coords = null;
 			// this.setData(te, null, true);

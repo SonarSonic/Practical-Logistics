@@ -13,6 +13,7 @@ import sonar.core.utils.BlockCoords;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.StandardInfo;
+import sonar.logistics.api.connecting.IConnectionArray;
 import sonar.logistics.api.connecting.IConnectionNode;
 import sonar.logistics.api.connecting.IEntityNode;
 import sonar.logistics.api.providers.EntityProvider;
@@ -54,7 +55,10 @@ public class InfoHelper extends InfoWrapper {
 						providerInfo.add(blockInfo);
 					}
 				}
+				break; // currently info readers only support one input
+
 			}
+			break;
 		}
 		Collections.sort(providerInfo, new Comparator<Info>() {
 			public int compare(Info str1, Info str2) {

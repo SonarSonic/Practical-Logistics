@@ -31,7 +31,7 @@ public class InfoInteractionRegistry extends RegistryHelper<InfoInteractionHandl
 	public InfoInteractionHandler getInteractionHandler(Info info, ScreenType type, TileEntity te, TileEntity object) {
 		for (InfoInteractionHandler handler : getObjects()) {
 			Type subType = ((ParameterizedType) handler.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
-			if (subType.getClass() != null && subType == info.getClass()) {
+			if (subType != null && info != null && subType == info.getClass()) {
 				if (handler.canHandle(type, te, object)) {
 					return handler;
 				}

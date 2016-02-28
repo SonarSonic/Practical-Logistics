@@ -127,20 +127,17 @@ public class CableHelper extends CablingWrapper {
 		CableType cableType = CableType.NONE;
 		Object adjacent = FMPHelper.getAdjacentTile(tile, dir);
 		if (adjacent != null) {
-			if (adjacent instanceof IConnectionArray) {
-				IConnectionArray array = ((IConnectionArray) adjacent);
-				connections.addAll(array.getCoordList());
-			} else if (adjacent instanceof IDataCable) {
+			if (adjacent instanceof IDataCable) {
 				IDataCable cable = ((IDataCable) adjacent);
 				if (cable.isBlocked(dir.getOpposite())) {
 					return connections;
 				}
 				registryID = cable.registryID();
 				cableType = cable.getCableType();
-			} else if (adjacent instanceof IChannelProvider) {
+			}else if (adjacent instanceof IChannelProvider) {
 				addChannelConnections(connections, (IChannelProvider) adjacent, tile, cableType);
-			} else if (adjacent instanceof IInfoEmitter) {
-				IInfoEmitter connect = ((IInfoEmitter) adjacent);
+			} else if (adjacent instanceof ILogicTile) {
+				ILogicTile connect = ((ILogicTile) adjacent);
 				connections.add(connect.getCoords());
 			}
 		}
@@ -150,12 +147,8 @@ public class CableHelper extends CablingWrapper {
 				if (target instanceof TileEntityDataEmitter) {
 				} else if (target instanceof IChannelProvider) {
 					addChannelConnections(connections, (IChannelProvider) target, tile, cableType);
-				} else if (target instanceof ILogicTile) {
+				}else if (target instanceof ILogicTile) {
 					connections.add(coord);
-				} else if (adjacent instanceof IConnectionArray) {
-					IConnectionArray array = ((IConnectionArray) adjacent);
-					if (!array.getCoordList().isEmpty())
-						connections.add(array.getCoordList().get(0));
 				}
 			}
 			if (!cableType.hasUnlimitedConnections()) {
@@ -166,7 +159,6 @@ public class CableHelper extends CablingWrapper {
 	}
 
 	private static void addChannelConnections(ArrayList<BlockCoords> connections, IChannelProvider receiver, TileEntity tile, CableType cableType) {
-		// TileEntity channel = null;
 		if (receiver.getChannel() != null && receiver.getChannel().blockCoords != null) {
 			BlockCoords target = receiver.getChannel().blockCoords;
 			if (!target.equals(new BlockCoords(tile))) {

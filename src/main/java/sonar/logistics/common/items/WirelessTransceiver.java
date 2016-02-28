@@ -25,8 +25,8 @@ public class WirelessTransceiver extends SonarItem implements ITransceiver {
 		Block target = world.getBlock(x, y, z);
 		if (target != null) {
 			if (!world.isRemote) {
+				NBTTagCompound tag = new NBTTagCompound();
 				try {
-					NBTTagCompound tag = new NBTTagCompound();
 					BlockCoords coords = new BlockCoords(x, y, z, world.provider.dimensionId);
 					ForgeDirection dir = ForgeDirection.getOrientation(side);
 					ItemStack block = SonarHelper.createStackedBlock(coords.getBlock(coords.getWorld()), world.getBlockMetadata(x, y, z));
@@ -40,12 +40,15 @@ public class WirelessTransceiver extends SonarItem implements ITransceiver {
 					NBTTagCompound itemTag = new NBTTagCompound();
 					block.writeToNBT(itemTag);
 					tag.setTag("ITEM", itemTag);
-
-					stack.setTagCompound(tag);
 				} catch (NullPointerException exception) {
 					SonarCore.logger.error("Wireless Transceiver: Null", exception);
 				} finally {
-					FontHelper.sendMessage("Saved Position", world, player);
+					if(stack.hasTagCompound()){
+						FontHelper.sendMessage("Overwritten Position", world, player);
+					}else{
+						FontHelper.sendMessage("Saved Position", world, player);
+					}
+					stack.setTagCompound(tag);
 				}
 
 			}

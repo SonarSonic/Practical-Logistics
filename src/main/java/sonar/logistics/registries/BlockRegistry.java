@@ -62,7 +62,7 @@ public class BlockRegistry extends Logistics {
 	public static Block infoReader, inventoryReader, fluidReader, energyReader;
 
 	// connections
-	public static Block node, entityNode, dataCable, dataMultiCable, dataReceiver, dataEmitter, dataModifier, infoCreator, channelSelector, transceiverArray, expulsion_port, admission_port;
+	public static Block node, entityNode, dataCable, channelledCable, dataReceiver, dataEmitter, dataModifier, infoCreator, channelSelector, transceiverArray, expulsion_port, admission_port;
 
 	// misc
 	public static Block redstoneSignaller_on, redstoneSignaller_off, sapphire_ore, hammer, hammer_air, itemRouter, clock;
@@ -87,8 +87,8 @@ public class BlockRegistry extends Logistics {
 		GameRegistry.registerBlock(dataCable, SonarBlockTip.class, "DataCable");
 		GameRegistry.registerTileEntity(TileEntityDataCable.class, "DataCable");
 
-		dataMultiCable = new BlockMultiDataCable().setBlockName("MultiCable").setHardness(0.1F).setCreativeTab(Logistics.creativeTab).setResistance(20.0F).setBlockTextureName(modid + ":" + "data_cable");
-		GameRegistry.registerBlock(dataMultiCable, SonarBlockTip.class, "MultiCable");
+		channelledCable = new BlockMultiDataCable().setBlockName("MultiCable").setHardness(0.1F).setCreativeTab(Logistics.creativeTab).setResistance(20.0F).setBlockTextureName(modid + ":" + "data_cable");
+		GameRegistry.registerBlock(channelledCable, SonarBlockTip.class, "MultiCable");
 		GameRegistry.registerTileEntity(TileEntityChannelledCable.class, "MultiCable");
 
 		node = new BlockNode().setBlockName("Node").setHardness(1.0F).setResistance(20.0F).setCreativeTab(Logistics.creativeTab).setBlockTextureName(modid + ":" + "data_cable");

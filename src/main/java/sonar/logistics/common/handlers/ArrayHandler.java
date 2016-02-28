@@ -2,7 +2,9 @@ package sonar.logistics.common.handlers;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -15,7 +17,7 @@ import sonar.logistics.api.connecting.ITransceiver;
 
 public class ArrayHandler extends InventoryTileHandler {
 
-	public List<BlockCoords> coordList = Collections.EMPTY_LIST;
+	public Map<BlockCoords, ForgeDirection> coordList = Collections.EMPTY_MAP;
 
 	public ArrayHandler(boolean isMultipart, TileEntity tile) {
 		super(isMultipart, tile);
@@ -27,13 +29,13 @@ public class ArrayHandler extends InventoryTileHandler {
 	}
 
 	public void updateCoordsList() {
-		List<BlockCoords> coordList = new ArrayList();
+		Map<BlockCoords, ForgeDirection>coordList = new LinkedHashMap();
 		try {
 			for (int i = 0; i < 6; i++) {
 				ItemStack stack = slots[i];
 				if (stack != null && stack.getItem() instanceof ITransceiver && stack.hasTagCompound()) {
 					ITransceiver trans = (ITransceiver) stack.getItem();
-					coordList.add(trans.getCoords(stack));
+					coordList.put(trans.getCoords(stack), trans.getDirection(stack));
 				}
 			}
 		} catch (NullPointerException exception) {

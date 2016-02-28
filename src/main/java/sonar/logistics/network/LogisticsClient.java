@@ -60,7 +60,7 @@ public class LogisticsClient extends LogisticsCommon {
 		
 		TileEntitySpecialRenderer dataMultiCable = new RenderHandlers.ChannelledCable();
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityChannelledCable.class, dataMultiCable);
-		MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(BlockRegistry.dataMultiCable), new RenderItemHandlers.Cable(dataMultiCable, new TileEntityChannelledCable()));
+		MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(BlockRegistry.channelledCable), new RenderItemHandlers.Cable(dataMultiCable, new TileEntityChannelledCable()));
 		
 		TileEntitySpecialRenderer dataModifier = new RenderHandlers.DataModifier();
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityDataModifier.class, dataModifier);
@@ -126,7 +126,7 @@ public class LogisticsClient extends LogisticsCommon {
 		
 		TileEntitySpecialRenderer array = new RenderHandlers.TransceiverArray();
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityArray.class, array);
-		MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(BlockRegistry.transceiverArray), new RenderItemHandlers.Cable(array, new TileEntityArray()));
+		MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(BlockRegistry.transceiverArray), new RenderItemHandlers.EntityNode(array, new TileEntityArray()));
 		
 	}
 }

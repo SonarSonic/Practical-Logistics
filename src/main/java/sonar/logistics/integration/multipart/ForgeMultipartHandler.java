@@ -43,7 +43,7 @@ public class ForgeMultipartHandler implements IPartFactory, IPartConverter {
 
 	@Override
 	public Iterable<Block> blockTypes() {
-		return Arrays.asList(BlockRegistry.displayScreen,BlockRegistry.dataCable, BlockRegistry.infoReader, BlockRegistry.inventoryReader,BlockRegistry.infoCreator,BlockRegistry.dataModifier,BlockRegistry.fluidReader, BlockRegistry.dataMultiCable);
+		return Arrays.asList(BlockRegistry.displayScreen,BlockRegistry.dataCable, BlockRegistry.infoReader, BlockRegistry.inventoryReader,BlockRegistry.infoCreator,BlockRegistry.dataModifier,BlockRegistry.fluidReader, BlockRegistry.channelledCable);
 	}
 
 	@Override
@@ -71,7 +71,7 @@ public class ForgeMultipartHandler implements IPartFactory, IPartConverter {
 		if (b == BlockRegistry.fluidReader) {
 			return new FluidReaderPart(meta);
 		}
-		if (b == BlockRegistry.dataMultiCable) {
+		if (b == BlockRegistry.channelledCable) {
 			return new ChannelledCablePart(meta);
 		}
 		return null;

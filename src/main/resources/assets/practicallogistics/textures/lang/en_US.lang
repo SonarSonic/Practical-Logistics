@@ -24,6 +24,7 @@ tile.MultiCable.name=Channelled Cable
 tile.ChannelSelector.name=Channel Selector
 tile.Clock.name=Clock
 tile.EnergyReader.name=Energy Reader
+tile.TransceiverArray.name=Transceiver Array
 
 //items
 item.EnergyScreenItem.name=Energy Screen
