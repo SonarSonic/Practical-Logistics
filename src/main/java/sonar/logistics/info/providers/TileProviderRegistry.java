@@ -1,5 +1,6 @@
 package sonar.logistics.info.providers;
 
+import cpw.mods.fml.common.Loader;
 import sonar.core.utils.helpers.RegistryHelper;
 import sonar.logistics.api.providers.TileProvider;
 import sonar.logistics.info.providers.tile.AE2CraftingProvider;
@@ -40,9 +41,12 @@ public class TileProviderRegistry extends RegistryHelper<TileProvider> {
 		registerObject(new EUEnergyProvider());
 		registerObject(new IC2ReactorProvider());
 		registerObject(new HammerProvider());
-		registerObject(new AE2CraftingProvider());
-		registerObject(new AE2EnergyProvider());
-		registerObject(new AE2GridProvider());
+
+		if (Loader.isModLoaded("appliedenergistics2")) {
+			registerObject(new AE2CraftingProvider());
+			registerObject(new AE2EnergyProvider());
+			registerObject(new AE2GridProvider());
+		}
 		registerObject(new LogisticsPipesProvider());
 		registerObject(new BuildcraftProvider());
 		registerObject(new MekanismGeneralProvider());

@@ -39,7 +39,7 @@ public class ItemWrapper {
 
 	/**used for getting the full list of Items at a given {@link IConnectionNode}
 	 * @param storedStacks current list of {@link StoredItemStack} to be added to
-	 * @param storage TODO
+	 * @param storage currentStorageSize
 	 * @param node {@link IConnectionNode} to check from
 	 * @return list of {@link StoredItemStack} on the network
 	 */

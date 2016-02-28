@@ -113,11 +113,11 @@ public class AE2InventoryProvider extends InventoryHandler {
 		IGridProxyable proxy = (IGridProxyable) tile;
 		try {
 			IStorageGrid storage = proxy.getProxy().getStorage();
-			IAEItemStack stack = storage.getItemInventory().extractItems(AEApi.instance().storage().createItemStack(remove.item).setStackSize(remove.stored), AE2Helper.getActionable(action), new MachineSource(((IActionHost) tile)));
+			StoredItemStack stack = LogisticsAPI.getItemHelper().getStackToAdd(remove.stored, remove, AE2Helper.convertAEItemStack(storage.getItemInventory().extractItems(AE2Helper.convertStoredItemStack(remove), AE2Helper.getActionable(action), new MachineSource(((IActionHost) tile)))));
 			if (stack == null || stack.getStackSize() == 0) {
 				return null;
 			}
-			return AE2Helper.convertAEItemStack(stack);
+			return stack;
 		} catch (GridAccessException e) {
 			e.printStackTrace();
 		}

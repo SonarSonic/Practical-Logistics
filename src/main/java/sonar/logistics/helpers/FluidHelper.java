@@ -12,6 +12,7 @@ import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidContainerItem;
 import sonar.core.fluid.StoredFluidStack;
+import sonar.core.inventory.StoredItemStack;
 import sonar.core.utils.ActionType;
 import sonar.core.utils.BlockCoords;
 import sonar.logistics.Logistics;
@@ -49,12 +50,6 @@ public class FluidHelper extends FluidWrapper {
 				}
 			}
 		}
-		/*
-		 * Collections.sort(fluidList, new Comparator<StoredFluidStack>() {
-		 * public int compare(StoredFluidStack str1, StoredFluidStack str2) { if
-		 * (str1.stored < str2.stored) return 1; if (str1.stored == str2.stored)
-		 * return 0; return -1; } });
-		 */
 		return new StorageFluids(fluidList,storage);
 	}
 
@@ -216,6 +211,15 @@ public class FluidHelper extends FluidWrapper {
 			container.drain(handler, drainSize, true);
 		}
 		return handler;
-
+	}
+	
+	public StoredFluidStack getStackToAdd(long inputSize, StoredFluidStack stack, StoredItemStack returned) {
+		StoredFluidStack simulateStack = null;
+		if (returned == null || returned.stored == 0) {
+			simulateStack = new StoredFluidStack(stack.getFullStack(), inputSize);
+		} else {
+			simulateStack = new StoredFluidStack(stack.getFullStack(), inputSize - returned.stored);
+		}
+		return simulateStack;
 	}
 }

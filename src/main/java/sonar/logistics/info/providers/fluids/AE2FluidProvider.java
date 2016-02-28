@@ -5,6 +5,7 @@ import java.util.List;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.fluid.StoredFluidStack;
+import sonar.core.inventory.StoredItemStack;
 import sonar.core.utils.ActionType;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.providers.FluidHandler;
@@ -79,11 +80,11 @@ public class AE2FluidProvider extends FluidHandler {
 		IGridProxyable proxy = (IGridProxyable) tile;
 		try {
 			IStorageGrid storage = proxy.getProxy().getStorage();
-			IAEFluidStack fluid = storage.getFluidInventory().extractItems(AEApi.instance().storage().createFluidStack(remove.fluid).setStackSize(remove.stored), AE2Helper.getActionable(action), new MachineSource(((IActionHost) tile)));
-			if (fluid == null || fluid.getStackSize() == 0) {
+			StoredFluidStack fluid = LogisticsAPI.getFluidHelper().getStackToAdd(remove.stored, remove, AE2Helper.convertAEItemStack(storage.getFluidInventory().extractItems(AE2Helper.convertStoredFluidStack(remove), AE2Helper.getActionable(action), new MachineSource(((IActionHost) tile)))));
+			if (fluid == null || fluid.stored == 0) {
 				return null;
 			}
-			return AE2Helper.convertAEFluidStack(fluid);
+			return fluid;
 		} catch (GridAccessException e) {
 			e.printStackTrace();
 		}

@@ -5,6 +5,7 @@ import java.util.List;
 
 import net.minecraft.item.ItemStack;
 import sonar.core.fluid.StoredFluidStack;
+import sonar.core.inventory.StoredItemStack;
 import sonar.core.utils.ActionType;
 import sonar.core.utils.BlockCoords;
 import sonar.logistics.api.providers.FluidHandler;
@@ -59,5 +60,9 @@ public class FluidWrapper {
 	
 	public ItemStack drainFluidItemStack(ItemStack container, List<BlockCoords> network, ActionType action) {
 		return container;
+	}
+
+	public StoredFluidStack getStackToAdd(long inputSize, StoredFluidStack stack, StoredItemStack returned) {
+		return null;
 	}
 }
