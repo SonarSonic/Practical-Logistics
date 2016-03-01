@@ -14,6 +14,7 @@ import sonar.core.common.tileentity.TileEntityHandlerInventory;
 import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.utils.BlockCoords;
 import sonar.logistics.api.LogisticsAPI;
+import sonar.logistics.api.cache.CacheTypes;
 import sonar.logistics.api.connecting.CableType;
 import sonar.logistics.api.connecting.IConnectionArray;
 import sonar.logistics.api.connecting.IDataCable;
@@ -118,6 +119,12 @@ public class TileEntityArray extends TileEntityHandlerInventory implements IConn
 	public void setInventorySlotContents(int i, ItemStack itemstack) {
 		super.setInventorySlotContents(i, itemstack);
 		this.worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+	}
+
+	@Override
+	public void getCacheTypes(ArrayList<CacheTypes> types) {
+		types.add(CacheTypes.CABLE);		
+		types.add(CacheTypes.EMITTER);		
 	}
 
 }

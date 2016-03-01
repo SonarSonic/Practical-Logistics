@@ -18,6 +18,7 @@ import sonar.logistics.api.IdentifiedCoords;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.StandardInfo;
+import sonar.logistics.api.cache.CacheTypes;
 import sonar.logistics.api.connecting.IChannelProvider;
 import sonar.logistics.api.connecting.IInfoEmitter;
 import sonar.logistics.network.SyncIdentifiedCoords;
@@ -248,6 +249,12 @@ public class TileEntityDataReceiver extends TileEntityNode implements IChannelPr
 		if (!this.worldObj.isRemote) {
 			LogisticsAPI.getCableHelper().removeConnection(this, ForgeDirection.getOrientation(this.getBlockMetadata()));
 		}
+	}
+
+	@Override
+	public void getCacheTypes(ArrayList<CacheTypes> types) {
+		types.add(CacheTypes.EMITTER);
+		types.add(CacheTypes.CHANNELLED);
 	}
 
 }

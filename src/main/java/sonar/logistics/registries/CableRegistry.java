@@ -76,6 +76,7 @@ public class CableRegistry {
 				}
 				cables.get(registryID).add(cable);
 				((IDataCable) target).setRegistryID(registryID);
+				CacheRegistry.refreshCache(registryID);
 			}
 		}
 	}
@@ -100,6 +101,7 @@ public class CableRegistry {
 				}
 			}
 			connections.get(registryID).add(connection);
+			CacheRegistry.refreshCache(registryID);
 		}
 	}
 
@@ -154,6 +156,7 @@ public class CableRegistry {
 				}
 			}
 
+			CacheRegistry.refreshCache(registryID);
 		}
 	}
 
@@ -171,7 +174,7 @@ public class CableRegistry {
 		}
 		addCables(newID, oldCables);
 		addConnections(newID, oldConnections);
-
+		CacheRegistry.refreshCache(newID);
 	}
 
 	public static void removeConnection(int registryID, BlockCoords connection) {
@@ -188,6 +191,7 @@ public class CableRegistry {
 			for (BlockCoords remove : removeList) {
 				connections.get(registryID).remove(remove);
 			}
+			CacheRegistry.refreshCache(registryID);
 		}
 	}
 

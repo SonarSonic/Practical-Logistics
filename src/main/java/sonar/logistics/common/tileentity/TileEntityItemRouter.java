@@ -1,5 +1,7 @@
 package sonar.logistics.common.tileentity;
 
+import java.util.ArrayList;
+
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -8,6 +10,7 @@ import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.inventory.IFilteredInventory;
 import sonar.core.utils.BlockCoords;
 import sonar.logistics.api.Info;
+import sonar.logistics.api.cache.CacheTypes;
 import sonar.logistics.api.connecting.IInfoTile;
 import sonar.logistics.common.handlers.ItemRouterHandler;
 import sonar.logistics.info.types.BlockCoordsInfo;
@@ -63,6 +66,12 @@ public class TileEntityItemRouter extends TileEntityHandlerInventory implements 
 	@Override
 	public BlockCoords getCoords() {
 		return new BlockCoords(this);
+	}
+
+	@Override
+	public void getCacheTypes(ArrayList<CacheTypes> types) {
+		types.add(CacheTypes.EMITTER);
+		
 	}
 
 

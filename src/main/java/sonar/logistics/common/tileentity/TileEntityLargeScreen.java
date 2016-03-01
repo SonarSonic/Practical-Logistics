@@ -1,10 +1,13 @@
 package sonar.logistics.common.tileentity;
 
+import java.util.ArrayList;
+
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.common.tileentity.TileEntityHandler;
 import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.utils.BlockCoords;
 import sonar.logistics.api.Info;
+import sonar.logistics.api.cache.CacheTypes;
 import sonar.logistics.api.connecting.IInfoTile;
 import sonar.logistics.api.connecting.ILargeDisplay;
 import sonar.logistics.api.render.LargeScreenSizing;
@@ -70,4 +73,7 @@ public class TileEntityLargeScreen extends TileEntityHandler implements IInfoTil
 	public LargeScreenSizing getSizing() {
 		return handler.sizing;
 	}
+
+	@Override
+	public void getCacheTypes(ArrayList<CacheTypes> types) {}
 }

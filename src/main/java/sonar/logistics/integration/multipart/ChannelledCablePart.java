@@ -10,6 +10,7 @@ import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.SonarTilePart;
 import sonar.core.utils.BlockCoords;
 import sonar.logistics.api.LogisticsAPI;
+import sonar.logistics.api.cache.CacheTypes;
 import sonar.logistics.api.connecting.CableType;
 import sonar.logistics.api.connecting.IDataCable;
 import sonar.logistics.api.connecting.IInfoEmitter;
@@ -175,12 +176,18 @@ public class ChannelledCablePart extends SonarTilePart implements IDataCable {
 	@Override
 	public void addCable() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void removeCable() {
 		// TODO Auto-generated method stub
-		
+
+	}
+
+	@Override
+	public void getCacheTypes(ArrayList<CacheTypes> types) {
+		types.add(CacheTypes.CABLE);
+
 	}
 }

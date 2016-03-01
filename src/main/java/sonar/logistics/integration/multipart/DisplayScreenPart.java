@@ -1,5 +1,6 @@
 package sonar.logistics.integration.multipart;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import net.minecraft.block.Block;
@@ -10,6 +11,7 @@ import sonar.core.integration.fmp.SonarHandlerPart;
 import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.utils.BlockCoords;
 import sonar.logistics.api.Info;
+import sonar.logistics.api.cache.CacheTypes;
 import sonar.logistics.api.connecting.IInfoTile;
 import sonar.logistics.client.renderers.RenderDisplayScreen;
 import sonar.logistics.common.handlers.DisplayScreenHandler;
@@ -97,6 +99,11 @@ public class DisplayScreenPart extends SonarHandlerPart implements IInfoTile {
 	@Override
 	public BlockCoords getCoords() {
 		return new BlockCoords(tile());
+	}
+
+	@Override
+	public void getCacheTypes(ArrayList<CacheTypes> types) {
+		
 	}
 
 }

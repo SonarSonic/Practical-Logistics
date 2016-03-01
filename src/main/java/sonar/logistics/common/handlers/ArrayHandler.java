@@ -14,6 +14,7 @@ import sonar.core.integration.fmp.handlers.InventoryTileHandler;
 import sonar.core.utils.BlockCoords;
 import sonar.logistics.api.connecting.IConnectionArray;
 import sonar.logistics.api.connecting.ITransceiver;
+import sonar.logistics.registries.CacheRegistry;
 
 public class ArrayHandler extends InventoryTileHandler {
 
@@ -42,6 +43,7 @@ public class ArrayHandler extends InventoryTileHandler {
 			SonarCore.logger.error("[Transceiver Array] Issues reading coord lists", exception);
 		}
 		this.coordList = coordList;
+		//CacheRegistry.refreshCache();
 	}
 
 	public boolean isItemValidForSlot(int slot, ItemStack stack) {

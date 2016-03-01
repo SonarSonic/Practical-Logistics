@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import net.minecraft.block.Block;
 import net.minecraft.item.ItemStack;
@@ -14,7 +15,9 @@ import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.SonarHelper;
+import sonar.logistics.Logistics;
 import sonar.logistics.api.LogisticsAPI;
+import sonar.logistics.api.cache.CacheTypes;
 import sonar.logistics.api.connecting.CableType;
 import sonar.logistics.api.connecting.IChannelProvider;
 import sonar.logistics.api.connecting.IConnectionArray;
@@ -25,6 +28,7 @@ import sonar.logistics.api.connecting.ILogicTile;
 import sonar.logistics.api.wrappers.CablingWrapper;
 import sonar.logistics.common.tileentity.TileEntityDataEmitter;
 import sonar.logistics.registries.CableRegistry;
+import sonar.logistics.registries.CacheRegistry;
 
 public class CableHelper extends CablingWrapper {
 
@@ -134,27 +138,41 @@ public class CableHelper extends CablingWrapper {
 				}
 				registryID = cable.registryID();
 				cableType = cable.getCableType();
-			}else if (adjacent instanceof IChannelProvider) {
+			} else if (adjacent instanceof IChannelProvider) {
 				addChannelConnections(connections, (IChannelProvider) adjacent, tile, cableType);
 			} else if (adjacent instanceof ILogicTile) {
 				ILogicTile connect = ((ILogicTile) adjacent);
 				connections.add(connect.getCoords());
 			}
 		}
-		for (BlockCoords coord : (ArrayList<BlockCoords>) CableRegistry.getConnections(registryID).clone()) {
-			TileEntity target = coord.getTileEntity();
-			if (target != null) {
-				if (target instanceof TileEntityDataEmitter) {
-				} else if (target instanceof IChannelProvider) {
-					addChannelConnections(connections, (IChannelProvider) target, tile, cableType);
-				}else if (target instanceof ILogicTile) {
-					connections.add(coord);
+		if (registryID != -1) {
+			try {
+				if (cableType.hasUnlimitedConnections()) {
+					ArrayList<BlockCoords> coords = CacheRegistry.getCacheList(CacheTypes.NETWORK, registryID);
+					connections.addAll(coords);
+				} else {
+					Entry<BlockCoords, ForgeDirection> coords = CacheRegistry.getFirstConnection(registryID);
+					if (coords != null) {
+						connections.add(coords.getKey());
+					}else{
+						BlockCoords machines = CacheRegistry.getCacheList(CacheTypes.NETWORK, registryID).get(0);
+						connections.add(machines);
+					}
 				}
-			}
-			if (!cableType.hasUnlimitedConnections()) {
-				return connections;
+			} catch (Exception exception) {
+				Logistics.logger.error("CableHelper: Exception");
 			}
 		}
+		/*
+		 * for (BlockCoords coord : (ArrayList<BlockCoords>)
+		 * CableRegistry.getConnections(registryID).clone()) { TileEntity target
+		 * = coord.getTileEntity(); if (target != null) { if (target instanceof
+		 * TileEntityDataEmitter) { } else if (target instanceof
+		 * IChannelProvider) { addChannelConnections(connections,
+		 * (IChannelProvider) target, tile, cableType); }else if (target
+		 * instanceof ILogicTile) { connections.add(coord); } } if
+		 * (!cableType.hasUnlimitedConnections()) { return connections; } }
+		 */
 		return connections;
 	}
 

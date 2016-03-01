@@ -1,11 +1,13 @@
 package sonar.logistics.common.tileentity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.common.tileentity.TileEntitySonar;
 import sonar.core.utils.BlockCoords;
 import sonar.logistics.api.LogisticsAPI;
+import sonar.logistics.api.cache.CacheTypes;
 import sonar.logistics.api.connecting.CableType;
 import sonar.logistics.api.connecting.IDataCable;
 import cpw.mods.fml.relauncher.Side;
@@ -78,6 +80,11 @@ public class TileEntityChannelledCable extends TileEntitySonar implements IDataC
 	@Override
 	public boolean canConnect(ForgeDirection dir) {
 		return true;
+	}
+
+	@Override
+	public void getCacheTypes(ArrayList<CacheTypes> types){
+		types.add(CacheTypes.CABLE);
 	}
 
 }

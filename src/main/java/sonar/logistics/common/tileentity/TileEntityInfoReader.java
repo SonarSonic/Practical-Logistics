@@ -1,5 +1,7 @@
 package sonar.logistics.common.tileentity;
 
+import java.util.ArrayList;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.common.tileentity.TileEntityHandler;
@@ -9,6 +11,7 @@ import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.utils.BlockCoords;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.LogisticsAPI;
+import sonar.logistics.api.cache.CacheTypes;
 import sonar.logistics.api.connecting.IInfoEmitter;
 import sonar.logistics.api.connecting.IInfoReader;
 import sonar.logistics.common.handlers.InfoReaderHandler;
@@ -57,5 +60,11 @@ public class TileEntityInfoReader extends TileEntityHandler implements IInfoEmit
 	@Override
 	public void removeConnections() {
 		LogisticsAPI.getCableHelper().removeConnection(this, ForgeDirection.getOrientation(FMPHelper.getMeta(this)));
+	}
+
+	@Override
+	public void getCacheTypes(ArrayList<CacheTypes> types) {
+		types.add(CacheTypes.EMITTER);
+		
 	}
 }

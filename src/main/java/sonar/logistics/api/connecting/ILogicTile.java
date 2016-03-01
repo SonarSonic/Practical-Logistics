@@ -2,12 +2,10 @@ package sonar.logistics.api.connecting;
 
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.utils.BlockCoords;
+import sonar.logistics.api.cache.ICacheable;
 
 /** implemented by Tile Enties which can connect to Data Cables */
-public interface ILogicTile {
-
-	/**this tile entities's coordinates, for convenience and prevent the need to find the FMP Tile**/
-	public BlockCoords getCoords();
+public interface ILogicTile extends ICacheable {
 
 	/**can the Tile connect to cables on the given direction*/
 	public boolean canConnect(ForgeDirection dir);

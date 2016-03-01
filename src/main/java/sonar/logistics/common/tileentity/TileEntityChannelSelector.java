@@ -1,5 +1,7 @@
 package sonar.logistics.common.tileentity;
 
+import java.util.ArrayList;
+
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.common.tileentity.TileEntityHandler;
 import sonar.core.integration.fmp.FMPHelper;
@@ -8,6 +10,7 @@ import sonar.core.utils.BlockCoords;
 import sonar.logistics.api.IdentifiedCoords;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.LogisticsAPI;
+import sonar.logistics.api.cache.CacheTypes;
 import sonar.logistics.api.connecting.CableType;
 import sonar.logistics.api.connecting.IChannelProvider;
 import sonar.logistics.api.connecting.IInfoEmitter;
@@ -62,5 +65,10 @@ public class TileEntityChannelSelector extends TileEntityHandler implements IInf
 	@Override
 	public IdentifiedCoords getChannel() {
 		return handler.getChannel(this);
+	}
+
+	@Override
+	public void getCacheTypes(ArrayList<CacheTypes> types) {
+		types.add(CacheTypes.EMITTER);
 	}
 }

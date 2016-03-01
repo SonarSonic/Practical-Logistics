@@ -1,5 +1,6 @@
 package sonar.logistics.common.tileentity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraftforge.common.util.ForgeDirection;
@@ -10,6 +11,7 @@ import sonar.core.network.utils.ITextField;
 import sonar.core.utils.BlockCoords;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.LogisticsAPI;
+import sonar.logistics.api.cache.CacheTypes;
 import sonar.logistics.api.connecting.IInfoEmitter;
 import sonar.logistics.info.types.BlockCoordsInfo;
 import sonar.logistics.registries.EmitterRegistry;
@@ -101,6 +103,12 @@ public class TileEntityDataEmitter extends TileEntityNode implements IInfoEmitte
 	@Override
 	public Info currentInfo() {
 		return BlockCoordsInfo.createInfo("Data Emitter", getCoords());
+	}
+
+	@Override
+	public void getCacheTypes(ArrayList<CacheTypes> types) {
+		types.add(CacheTypes.EMITTER);
+		
 	}
 
 }

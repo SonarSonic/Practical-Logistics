@@ -3,6 +3,7 @@ package sonar.logistics.common.tileentity;
 import io.netty.buffer.ByteBuf;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -14,6 +15,7 @@ import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.LogisticsAPI;
+import sonar.logistics.api.cache.CacheTypes;
 import sonar.logistics.info.types.BlockCoordsInfo;
 import sonar.logistics.info.types.ProgressInfo;
 
@@ -187,5 +189,11 @@ public class TileEntityClock extends TileEntityConnection implements IByteBufTil
 		} else if (tickTime.getObject() > (1000 * 60 * 60 * 24)) {
 			tickTime.setObject((long) ((1000 * 60 * 60 * 24)-1));
 		}
+	}
+
+	@Override
+	public void getCacheTypes(ArrayList<CacheTypes> types) {
+		types.add(CacheTypes.EMITTER);
+		
 	}
 }

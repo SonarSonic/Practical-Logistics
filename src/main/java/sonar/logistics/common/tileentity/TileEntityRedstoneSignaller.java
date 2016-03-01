@@ -2,6 +2,7 @@ package sonar.logistics.common.tileentity;
 
 import io.netty.buffer.ByteBuf;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraftforge.common.util.ForgeDirection;
@@ -14,6 +15,7 @@ import sonar.core.network.utils.ITextField;
 import sonar.core.utils.BlockCoords;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.LogisticsAPI;
+import sonar.logistics.api.cache.CacheTypes;
 import sonar.logistics.api.connecting.IInfoEmitter;
 import sonar.logistics.api.connecting.ILogicTile;
 import sonar.logistics.common.blocks.BlockRedstoneSignaller;
@@ -37,7 +39,7 @@ public class TileEntityRedstoneSignaller extends TileEntitySonar implements ILog
 
 	public void addSyncParts(List<ISyncPart> parts) {
 		super.addSyncParts(parts);
-		parts.addAll(Lists.newArrayList(stringName,integerEmitType,integerTarget,dataType,errorFlag));
+		parts.addAll(Lists.newArrayList(stringName, integerEmitType, integerTarget, dataType, errorFlag));
 	}
 
 	public void updateEntity() {
@@ -133,7 +135,7 @@ public class TileEntityRedstoneSignaller extends TileEntitySonar implements ILog
 		case 1:
 			buf.writeInt(integerEmitType.getObject());
 			break;
-		}	
+		}
 	}
 
 	@Override
@@ -146,5 +148,11 @@ public class TileEntityRedstoneSignaller extends TileEntitySonar implements ILog
 			integerEmitType.setObject(buf.readInt());
 			break;
 		}
+	}
+
+	@Override
+	public void getCacheTypes(ArrayList<CacheTypes> types) {
+		types.add(CacheTypes.EMITTER);
+
 	}
 }
