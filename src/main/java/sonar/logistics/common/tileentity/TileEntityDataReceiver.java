@@ -251,10 +251,4 @@ public class TileEntityDataReceiver extends TileEntityNode implements IChannelPr
 		}
 	}
 
-	@Override
-	public void getCacheTypes(ArrayList<CacheTypes> types) {
-		types.add(CacheTypes.EMITTER);
-		types.add(CacheTypes.CHANNELLED);
-	}
-
 }

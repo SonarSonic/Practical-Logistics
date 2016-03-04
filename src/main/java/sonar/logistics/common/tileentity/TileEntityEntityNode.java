@@ -2,29 +2,34 @@ package sonar.logistics.common.tileentity;
 
 import io.netty.buffer.ByteBuf;
 
+import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+
+import com.google.common.collect.Lists;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.util.ForgeDirection;
-import scala.actors.threadpool.Arrays;
 import sonar.core.network.sync.ISyncPart;
 import sonar.core.network.sync.SyncTagType;
 import sonar.core.network.sync.SyncTagType.INT;
 import sonar.core.network.utils.IByteBufTile;
 import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.SonarHelper;
+import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.connecting.CableType;
+import sonar.logistics.api.connecting.IConnectionNode;
 import sonar.logistics.api.connecting.IEntityNode;
 import sonar.logistics.api.connecting.IInfoEmitter;
 import sonar.logistics.api.render.ICableRenderer;
 import sonar.logistics.info.types.BlockCoordsInfo;
-
-import com.google.common.collect.Lists;
 
 public class TileEntityEntityNode extends TileEntityChannelledCable implements IInfoEmitter, ICableRenderer, IEntityNode, IByteBufTile {
 
@@ -137,6 +142,6 @@ public class TileEntityEntityNode extends TileEntityChannelledCable implements I
 
 	@Override
 	public List<Entity> getEntities() {
-		return Arrays.asList(new Object[] { getNearestEntity() });
+		return Arrays.asList(getNearestEntity());
 	}
 }

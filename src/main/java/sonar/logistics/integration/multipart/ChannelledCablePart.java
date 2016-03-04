@@ -185,9 +185,4 @@ public class ChannelledCablePart extends SonarTilePart implements IDataCable {
 
 	}
 
-	@Override
-	public void getCacheTypes(ArrayList<CacheTypes> types) {
-		types.add(CacheTypes.CABLE);
-
-	}
 }

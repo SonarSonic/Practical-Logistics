@@ -51,10 +51,4 @@ public class TileEntityFluidReader extends TileEntityHandler implements IInfoEmi
 		LogisticsAPI.getCableHelper().removeConnection(this, ForgeDirection.getOrientation(FMPHelper.getMeta(this)));
 	}
 
-	@Override
-	public void getCacheTypes(ArrayList<CacheTypes> types) {
-		types.add(CacheTypes.EMITTER);
-		
-	}
-
 }

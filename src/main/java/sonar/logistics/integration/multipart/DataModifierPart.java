@@ -115,11 +115,4 @@ public class DataModifierPart extends ConnectionPart implements IInfoEmitter, IC
 			}
 		}
 	}
-
-	@Override
-	public void getCacheTypes(ArrayList<CacheTypes> types) {
-		types.add(CacheTypes.CABLE);
-		
-	}
-
 }

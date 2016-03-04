@@ -7,6 +7,8 @@ import java.util.Map;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.utils.BlockCoords;
+import sonar.logistics.api.cache.EmptyNetworkCache;
+import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.connecting.CableType;
 import sonar.logistics.api.connecting.IDataCable;
 
@@ -52,8 +54,8 @@ public class CablingWrapper {
 	 * @param dir {@link ForgeDirection} to check in
 	 * @return list of {@link BlockCoords}
 	 */
-	public List<BlockCoords> getConnections(TileEntity tile, ForgeDirection dir) {
-		return Collections.EMPTY_LIST;
+	public INetworkCache getNetwork(TileEntity tile, ForgeDirection dir) {
+		return new EmptyNetworkCache();
 	}
 
 	/**gets a map of all node connections (Tile Connections)
@@ -62,7 +64,17 @@ public class CablingWrapper {
 	 */
 	public Map<BlockCoords, ForgeDirection> getTileConnections(List<BlockCoords> network) {
 		return Collections.EMPTY_MAP;
+	}	
+
+	/**gets a list of all block connections in a given direction from the Tile
+	 * @param tile TileEntity to check from
+	 * @param dir {@link ForgeDirection} to check in
+	 * @return linked hash map of {@link BlockCoords} & {@link ForgeDirection} of corresponding Node Connections
+	 */
+	public Map<BlockCoords, ForgeDirection> getTileConnections(TileEntity tile, ForgeDirection dir) {
+		return Collections.EMPTY_MAP;		
 	}
+	
 	/**checks the given TileEntity for cable connections in a given direction
 	 * @param te TileEntity to check from
 	 * @param dir {@link ForgeDirection} to check in

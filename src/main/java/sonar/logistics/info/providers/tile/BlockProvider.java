@@ -47,8 +47,8 @@ public class BlockProvider extends TileProvider {
 		infoList.add(new StandardInfo(id, 2, 12, "" + target.getBlockHardness(world, x, y, z)));
 		infoList.add(new StandardInfo(id, 3, 13, "" + world.isBlockIndirectlyGettingPowered(x, y, z)));
 		if (target.canProvidePower()) {
-			infoList.add(new StandardInfo(id, 3, 14, target.isProvidingWeakPower(world, x, y, z, dir.flag)));
-			infoList.add(new StandardInfo(id, 3, 15, target.isProvidingStrongPower(world, x, y, z, dir.flag)));
+			infoList.add(new StandardInfo(id, 3, 14, target.isProvidingWeakPower(world, x, y, z, dir.ordinal())));
+			infoList.add(new StandardInfo(id, 3, 15, target.isProvidingStrongPower(world, x, y, z, dir.ordinal())));
 		}
 		if (target instanceof BlockFluidBase) {
 			BlockFluidBase fluid = (BlockFluidBase) target;

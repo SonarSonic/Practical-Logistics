@@ -38,8 +38,4 @@ public class TileEntityDisplayScreen extends TileEntityHandler implements IInfoT
 	public BlockCoords getCoords() {
 		return new BlockCoords(this);
 	}
-
-	@Override
-	public void getCacheTypes(ArrayList<CacheTypes> types) {}
-
 }

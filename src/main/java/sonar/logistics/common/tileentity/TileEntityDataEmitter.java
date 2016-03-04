@@ -105,10 +105,4 @@ public class TileEntityDataEmitter extends TileEntityNode implements IInfoEmitte
 		return BlockCoordsInfo.createInfo("Data Emitter", getCoords());
 	}
 
-	@Override
-	public void getCacheTypes(ArrayList<CacheTypes> types) {
-		types.add(CacheTypes.EMITTER);
-		
-	}
-
 }

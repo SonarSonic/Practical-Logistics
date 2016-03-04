@@ -171,7 +171,7 @@ public class ItemRouterHandler extends InventoryTileHandler implements ISidedInv
 		for (int i = 0; i < 6; i++) {
 			int config = sideConfigs[i].getObject();
 			if (config != 0) {
-				List<BlockCoords> connections = LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(i));
+				List<BlockCoords> connections = LogisticsAPI.getCableHelper().getNetwork(te, ForgeDirection.getOrientation(i));
 				if (!connections.isEmpty()) {
 					this.coords[i] = connections;
 				}else{

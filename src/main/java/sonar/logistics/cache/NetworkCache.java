@@ -1,32 +1,26 @@
-package sonar.logistics.api.cache;
-
-import gnu.trove.map.hash.THashMap;
+package sonar.logistics.cache;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
-
-import com.google.common.collect.Lists;
 
 import net.minecraft.block.Block;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.utils.BlockCoords;
-import sonar.logistics.api.LogisticsAPI;
+import sonar.logistics.api.cache.CacheTypes;
+import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.connecting.IChannelProvider;
 import sonar.logistics.api.connecting.IConnectionNode;
 import sonar.logistics.api.connecting.IEntityNode;
 import sonar.logistics.api.connecting.IInfoEmitter;
 import sonar.logistics.api.connecting.ILogicTile;
-import sonar.logistics.common.tileentity.TileEntityDataEmitter;
 import sonar.logistics.registries.CableRegistry;
 
-public class NetworkCache implements INetworkCache {
+public class NetworkCache implements IRefreshCache {
 
 	/** all {@link IEntityNode} */
 	private final ArrayList<BlockCoords> entityCache = new ArrayList<BlockCoords>();
@@ -40,7 +34,7 @@ public class NetworkCache implements INetworkCache {
 	private final LinkedHashMap<BlockCoords, ForgeDirection> blockCache = new LinkedHashMap<BlockCoords, ForgeDirection>();
 
 	@Override
-	public Entry<BlockCoords, ForgeDirection> getFirstConnection() {
+	public Entry<BlockCoords, ForgeDirection> getExternalBlock() {
 		for (Entry<BlockCoords, ForgeDirection> entry : blockCache.entrySet()) {
 			if (entry.getKey().getBlock(entry.getKey().getWorld()) != null) {
 				return entry;
@@ -50,13 +44,13 @@ public class NetworkCache implements INetworkCache {
 	}
 
 	@Override
-	public ArrayList<BlockCoords> getCacheList(CacheTypes type) {
+	public ArrayList<BlockCoords> getConnections(CacheTypes type) {
 		switch (type) {
 		case CHANNELLED:
 			return channelCache;
 		case EMITTER:
 			return emitterCache;
-		case ENTITY:
+		case ENTITY_NODES:
 			return entityCache;
 		case NETWORK:
 			return networkCache;
@@ -64,7 +58,7 @@ public class NetworkCache implements INetworkCache {
 		default:
 			break;
 		}
-		return (ArrayList<BlockCoords>) Collections.EMPTY_LIST;
+		return new ArrayList();
 	}
 
 	public ArrayList<BlockCoords> getChannelledConnections() {
@@ -81,7 +75,7 @@ public class NetworkCache implements INetworkCache {
 	}
 
 	@Override
-	public LinkedHashMap<BlockCoords, ForgeDirection> getChannelArray() {
+	public LinkedHashMap<BlockCoords, ForgeDirection> getExternalBlocks() {
 		return blockCache;
 	}
 
@@ -131,32 +125,10 @@ public class NetworkCache implements INetworkCache {
 							channelCache.add(coord);
 						}
 						/*
-						 * BlockCoords provided = channelProvider.getCoords();
-						 * if (!provided.equals(new BlockCoords(tile))) {
-						 * TileEntity channel = provided.getTileEntity(); if
-						 * (channel == null || !(channel instanceof
-						 * TileEntityDataEmitter)) { Block block =
-						 * provided.getBlock(provided.getWorld()); if (block !=
-						 * null) machinesCache.add(provided); } else {
-						 * List<BlockCoords> emitterConnections =
-						 * LogisticsAPI.getCableHelper().getConnections(channel,
-						 * ForgeDirection
-						 * .getOrientation(channel.getBlockMetadata
-						 * ()).getOpposite()); List<BlockCoords> toAdd = new
-						 * ArrayList(); for (BlockCoords coords :
-						 * emitterConnections) { boolean hasCoords = false; for
-						 * (BlockCoords currentCoords : (ArrayList<BlockCoords>)
-						 * connections.clone()) { if
-						 * (BlockCoords.equalCoords(currentCoords, coords)) {
-						 * hasCoords = true; } } if (!hasCoords) {
-						 * toAdd.add(coords); } } if
-						 * (cableType.hasUnlimitedConnections()) {
-						 * connections.addAll(toAdd); } else if
-						 * (!toAdd.isEmpty() && toAdd.get(0) != null) {
-						 * connections.add(toAdd.get(0)); } } }
+						 * BlockCoords provided = channelProvider.getCoords(); if (!provided.equals(new BlockCoords(tile))) { TileEntity channel = provided.getTileEntity(); if (channel == null || !(channel instanceof TileEntityDataEmitter)) { Block block = provided.getBlock(provided.getWorld()); if (block != null) machinesCache.add(provided); } else { List<BlockCoords> emitterConnections = LogisticsAPI.getCableHelper().getConnections(channel, ForgeDirection .getOrientation(channel.getBlockMetadata ()).getOpposite()); List<BlockCoords> toAdd = new ArrayList(); for (BlockCoords coords : emitterConnections) { boolean hasCoords = false; for (BlockCoords currentCoords : (ArrayList<BlockCoords>) connections.clone()) { if (BlockCoords.equalCoords(currentCoords, coords)) { hasCoords = true; } } if
+						 * (!hasCoords) { toAdd.add(coords); } } if (cableType.hasUnlimitedConnections()) { connections.addAll(toAdd); } else if (!toAdd.isEmpty() && toAdd.get(0) != null) { connections.add(toAdd.get(0)); } } }
 						 */
 						// channelCache.add(channel.getCoords());
-
 					}
 				}
 			}
@@ -171,5 +143,30 @@ public class NetworkCache implements INetworkCache {
 		this.networkCache.addAll(networkCache);
 		this.channelCache.clear();
 		this.channelCache.addAll(channelCache);
+	}
+
+	@Override
+	public BlockCoords getFirstConnection(CacheTypes type) {
+		try {
+			return this.getConnections(type).get(0);
+		} catch (Exception exception) {
+			return null;
+		}
+	}
+	@Override
+	public Block getFirstBlock(CacheTypes type) {
+		try {
+			return this.getConnections(type).get(0).getBlock();
+		} catch (Exception exception) {
+			return null;
+		}
+	}
+	@Override
+	public TileEntity getFirstTileEntity(CacheTypes type) {
+		try {
+			return this.getConnections(type).get(0).getTileEntity();
+		} catch (Exception exception) {
+			return null;
+		}
 	}
 }

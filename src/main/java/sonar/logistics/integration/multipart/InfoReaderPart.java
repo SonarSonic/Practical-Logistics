@@ -108,10 +108,4 @@ public class InfoReaderPart extends ConnectionPart implements IInfoEmitter, IInf
 	public void removeConnections() {
 		LogisticsAPI.getCableHelper().removeConnection(tile(), ForgeDirection.getOrientation(FMPHelper.getMeta(tile())));
 	}
-
-	@Override
-	public void getCacheTypes(ArrayList<CacheTypes> types) {
-		types.add(CacheTypes.EMITTER);
-		
-	}
 }

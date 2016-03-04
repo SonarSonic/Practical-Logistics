@@ -16,6 +16,7 @@ import sonar.core.utils.BlockCoords;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.cache.CacheTypes;
+import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.connecting.IInfoEmitter;
 import sonar.logistics.api.connecting.ILogicTile;
 import sonar.logistics.common.blocks.BlockRedstoneSignaller;
@@ -51,17 +52,17 @@ public class TileEntityRedstoneSignaller extends TileEntitySonar implements ILog
 				block.updateSignallerState(canEmit, worldObj, xCoord, yCoord, zCoord);
 			}
 			boolean setNull = true;
-			List<BlockCoords> connections = LogisticsAPI.getCableHelper().getConnections(this, ForgeDirection.getOrientation(this.getBlockMetadata()).getOpposite());
-			if (!connections.isEmpty()) {
-				Object object = FMPHelper.getTile(connections.get(0).getTileEntity());
-				if (object != null) {
-					if (object instanceof IInfoEmitter) {
-						IInfoEmitter infoNode = (IInfoEmitter) object;
-						this.currentInfo = infoNode.currentInfo();
-						setNull = false;
-					}
+			INetworkCache network = LogisticsAPI.getCableHelper().getNetwork(this, ForgeDirection.getOrientation(this.getBlockMetadata()).getOpposite());
+
+			Object object = FMPHelper.getTile(network.getFirstTileEntity(CacheTypes.EMITTER));
+			if (object != null) {
+				if (object instanceof IInfoEmitter) {
+					IInfoEmitter infoNode = (IInfoEmitter) object;
+					this.currentInfo = infoNode.currentInfo();
+					setNull = false;
 				}
 			}
+
 			if (setNull) {
 				this.currentInfo = null;
 			}
@@ -148,11 +149,5 @@ public class TileEntityRedstoneSignaller extends TileEntitySonar implements ILog
 			integerEmitType.setObject(buf.readInt());
 			break;
 		}
-	}
-
-	@Override
-	public void getCacheTypes(ArrayList<CacheTypes> types) {
-		types.add(CacheTypes.EMITTER);
-
 	}
 }

@@ -101,9 +101,4 @@ public class DisplayScreenPart extends SonarHandlerPart implements IInfoTile {
 		return new BlockCoords(tile());
 	}
 
-	@Override
-	public void getCacheTypes(ArrayList<CacheTypes> types) {
-		
-	}
-
 }

@@ -1,5 +1,6 @@
 package sonar.logistics.common.handlers;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.tileentity.TileEntity;
@@ -14,6 +15,8 @@ import sonar.logistics.Logistics;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.StandardInfo;
+import sonar.logistics.api.cache.CacheTypes;
+import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.connecting.CableType;
 import sonar.logistics.api.connecting.IInfoEmitter;
 
@@ -34,11 +37,12 @@ public class DataModifierHandler extends TileHandler {
 		if (te.getWorldObj().isRemote) {
 			return;
 		}
-		List<BlockCoords> connections = LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite());
-		if (connections.isEmpty() || connections.get(0) == null) {
+		INetworkCache network = LogisticsAPI.getCableHelper().getNetwork(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite());
+		ArrayList<BlockCoords> emitters = network.getConnections(CacheTypes.EMITTER);
+		if (emitters.isEmpty() || emitters.get(0) == null) {
 			return;
 		}
-		Object target = FMPHelper.getTile(connections.get(0).getTileEntity());
+		Object target = FMPHelper.getTile(emitters.get(0).getTileEntity());
 		if (target == null) {
 			return;
 		} else {

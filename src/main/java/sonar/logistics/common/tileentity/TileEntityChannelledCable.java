@@ -81,10 +81,4 @@ public class TileEntityChannelledCable extends TileEntitySonar implements IDataC
 	public boolean canConnect(ForgeDirection dir) {
 		return true;
 	}
-
-	@Override
-	public void getCacheTypes(ArrayList<CacheTypes> types){
-		types.add(CacheTypes.CABLE);
-	}
-
 }

@@ -21,6 +21,7 @@ import sonar.logistics.api.connecting.IConnectionNode;
 import sonar.logistics.api.providers.FluidHandler;
 import sonar.logistics.api.providers.InventoryHandler.StorageSize;
 import sonar.logistics.api.wrappers.FluidWrapper;
+import sonar.logistics.api.wrappers.FluidWrapper.StorageFluids;
 
 public class FluidHelper extends FluidWrapper {
 
@@ -50,7 +51,29 @@ public class FluidHelper extends FluidWrapper {
 				}
 			}
 		}
-		return new StorageFluids(fluidList,storage);
+		return new StorageFluids(fluidList, storage);
+	}
+
+	public StorageFluids getFluids(Map<BlockCoords, ForgeDirection> network) {
+		List<StoredFluidStack> fluidList = new ArrayList();
+		StorageSize storage = new StorageSize(0, 0);
+		List<FluidHandler> providers = Logistics.fluidProviders.getObjects();
+		for (FluidHandler provider : providers) {
+			for (Map.Entry<BlockCoords, ForgeDirection> entry : network.entrySet()) {
+				TileEntity fluidTile = entry.getKey().getTileEntity();
+				if (fluidTile != null && provider.canHandleFluids(fluidTile, entry.getValue())) {
+					List<StoredFluidStack> info = new ArrayList();
+					StorageSize size = provider.getFluids(info, fluidTile, entry.getValue());
+					storage.addItems(size.getStoredFluids());
+					storage.addStorage(size.getMaxFluids());
+					for (StoredFluidStack fluid : info) {
+						addFluidToList(fluidList, fluid);
+					}
+				}
+			}
+		}
+		return new StorageFluids(fluidList, storage);
+
 	}
 
 	public void addFluidToList(List<StoredFluidStack> list, StoredFluidStack stack) {
@@ -104,10 +127,7 @@ public class FluidHelper extends FluidWrapper {
 		return remove;
 	}
 
-	/**
-	 * if simulating your expected to pass copies of both the container and
-	 * stack to fill with
-	 */
+	/** if simulating your expected to pass copies of both the container and stack to fill with */
 	public ItemStack fillFluidItemStack(ItemStack container, StoredFluidStack fill, List<BlockCoords> network, ActionType action) {
 		if (FluidContainerRegistry.isContainer(container)) {
 			return fillFluidContainer(container, fill, network, action);
@@ -117,10 +137,7 @@ public class FluidHelper extends FluidWrapper {
 		return container;
 	}
 
-	/**
-	 * if simulating your expected to pass copies of both the container and
-	 * stack to fill with
-	 */
+	/** if simulating your expected to pass copies of both the container and stack to fill with */
 	public ItemStack drainFluidItemStack(ItemStack container, List<BlockCoords> network, ActionType action) {
 		if (FluidContainerRegistry.isContainer(container)) {
 			return drainFluidContainer(container, network, action);
@@ -212,7 +229,7 @@ public class FluidHelper extends FluidWrapper {
 		}
 		return handler;
 	}
-	
+
 	public StoredFluidStack getStackToAdd(long inputSize, StoredFluidStack stack, StoredItemStack returned) {
 		StoredFluidStack simulateStack = null;
 		if (returned == null || returned.stored == 0) {

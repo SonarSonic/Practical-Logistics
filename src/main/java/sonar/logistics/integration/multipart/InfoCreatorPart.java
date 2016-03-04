@@ -105,11 +105,4 @@ public class InfoCreatorPart extends ConnectionPart implements IInfoEmitter, ICa
 	public void removeConnections() {
 		LogisticsAPI.getCableHelper().removeConnection(tile(), ForgeDirection.getOrientation(FMPHelper.getMeta(tile())));
 	}
-
-	@Override
-	public void getCacheTypes(ArrayList<CacheTypes> types) {
-		types.add(CacheTypes.EMITTER);
-		
-	}
-
 }

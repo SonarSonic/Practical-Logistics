@@ -5,6 +5,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+
+import com.google.common.collect.Maps;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
@@ -22,6 +25,8 @@ import sonar.core.utils.ActionType;
 import sonar.core.utils.BlockCoords;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.LogisticsAPI;
+import sonar.logistics.api.cache.CacheTypes;
+import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.connecting.IConnectionNode;
 import sonar.logistics.api.connecting.IEntityNode;
 import sonar.logistics.api.providers.InventoryHandler;
@@ -30,41 +35,46 @@ import sonar.logistics.api.wrappers.ItemWrapper;
 
 public class ItemHelper extends ItemWrapper {
 
-	public StorageItems getStackList(List<BlockCoords> network) {
+	public StorageItems getStackList(INetworkCache network) {
 		List<StoredItemStack> storedStacks = new ArrayList();
 		StorageSize storage = new StorageSize(0, 0);
-		for (BlockCoords connect : network) {
-			Object tile = connect.getTileEntity();
-			if (tile != null) {
-				if (tile instanceof IConnectionNode) {
-					storage = getTileInventory(storedStacks, storage, (IConnectionNode) tile);
 
-				}
-				if (tile instanceof IEntityNode) {
-					storage = getEntityInventory(storedStacks, storage, (IEntityNode) tile);
-				}
+		Entry<BlockCoords, ForgeDirection> coord = network.getExternalBlock();
+		if (coord != null) {
+			storage = getTileInventory(storedStacks, storage, coord);
+		} else {
+			TileEntity tile = network.getFirstTileEntity(CacheTypes.ENTITY_NODES);
+			if (tile != null && tile instanceof IEntityNode) {
+				storage = getEntityInventory(storedStacks, storage, ((IEntityNode) tile).getEntities());
 			}
 		}
 		return new StorageItems(storedStacks, storage);
 	}
 
-	public StorageSize getTileInventory(List<StoredItemStack> storedStacks, StorageSize storage, IConnectionNode node) {
-		Map<BlockCoords, ForgeDirection> connections = node.getConnections();
+	public StorageSize getTileInventory(List<StoredItemStack> storedStacks, StorageSize storage, Map<BlockCoords, ForgeDirection> connections) {
 		for (Map.Entry<BlockCoords, ForgeDirection> entry : connections.entrySet()) {
-			TileEntity tile = entry.getKey().getTileEntity();
-			boolean specialProvider = false;
-			for (InventoryHandler provider : Logistics.inventoryProviders.getObjects()) {
-				if (tile != null && provider.canHandleItems(tile, entry.getValue())) {
-					if (!specialProvider) {
-						StorageSize size = provider.getItems(storedStacks, tile, entry.getValue());
-						if (size != StorageSize.EMPTY) {
-							specialProvider = true;
-							storage.addItems(size.getStoredFluids());
-							storage.addStorage(size.getMaxFluids());
-						}
-					} else {
-						continue;
+			storage = getTileInventory(storedStacks, storage, entry);
+		}
+		return storage;
+	}
+
+	public StorageSize getTileInventory(List<StoredItemStack> storedStacks, StorageSize storage, Entry<BlockCoords, ForgeDirection> entry) {
+		TileEntity tile = entry.getKey().getTileEntity();
+		if (tile == null) {
+			return storage;
+		}
+		boolean specialProvider = false;
+		for (InventoryHandler provider : Logistics.inventoryProviders.getObjects()) {
+			if (provider.canHandleItems(tile, entry.getValue())) {
+				if (!specialProvider) {
+					StorageSize size = provider.getItems(storedStacks, tile, entry.getValue());
+					if (size != StorageSize.EMPTY) {
+						specialProvider = true;
+						storage.addItems(size.getStoredFluids());
+						storage.addStorage(size.getMaxFluids());
 					}
+				} else {
+					continue;
 				}
 			}
 		}
@@ -72,8 +82,7 @@ public class ItemHelper extends ItemWrapper {
 		return storage;
 	}
 
-	public StorageSize getEntityInventory(List<StoredItemStack> storedStacks, StorageSize storage, IEntityNode tileNode) {
-		List<Entity> entityList = tileNode.getEntities();
+	public StorageSize getEntityInventory(List<StoredItemStack> storedStacks, StorageSize storage, List<Entity> entityList) {
 		for (Entity entity : entityList) {
 			if (entity instanceof EntityPlayer) {
 				EntityPlayer player = (EntityPlayer) entity;

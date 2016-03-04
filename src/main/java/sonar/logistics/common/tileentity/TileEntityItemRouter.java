@@ -67,12 +67,4 @@ public class TileEntityItemRouter extends TileEntityHandlerInventory implements 
 	public BlockCoords getCoords() {
 		return new BlockCoords(this);
 	}
-
-	@Override
-	public void getCacheTypes(ArrayList<CacheTypes> types) {
-		types.add(CacheTypes.EMITTER);
-		
-	}
-
-
 }

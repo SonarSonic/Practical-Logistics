@@ -113,7 +113,7 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 	}
 
 	public List<BlockCoords> getNetwork(TileEntity te) {
-		return LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite());
+		return LogisticsAPI.getCableHelper().getNetwork(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite());
 	}
 
 	public boolean canConnect(TileEntity te, ForgeDirection dir) {
@@ -142,7 +142,7 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 			}
 			break;
 		case 1:
-			StoredItemStack stack = LogisticsAPI.getItemHelper().getStack(LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite()), targetSlot.getObject());
+			StoredItemStack stack = LogisticsAPI.getItemHelper().getStack(LogisticsAPI.getCableHelper().getNetwork(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite()), targetSlot.getObject());
 			if (stack != null) {
 				return StoredStackInfo.createInfo(stack);
 			}
@@ -180,7 +180,7 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 			return null;
 		}
 		int extractSize = (int) Math.min(stack.getItemStack().getMaxStackSize(), Math.min(stack.stored, max));
-		StoredItemStack remainder = LogisticsAPI.getItemHelper().removeItems(stack.setStackSize(extractSize), LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite()), ActionType.PERFORM);
+		StoredItemStack remainder = LogisticsAPI.getItemHelper().removeItems(stack.setStackSize(extractSize), LogisticsAPI.getCableHelper().getNetwork(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite()), ActionType.PERFORM);
 		StoredItemStack storedStack = null;
 		if (remainder == null || remainder.stored == 0) {
 			storedStack = new StoredItemStack(stack.getItemStack(), extractSize);
@@ -196,7 +196,7 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 		if (add == null) {
 			return;
 		}
-		StoredItemStack stack = LogisticsAPI.getItemHelper().addItems(new StoredItemStack(add), LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite()), ActionType.PERFORM);
+		StoredItemStack stack = LogisticsAPI.getItemHelper().addItems(new StoredItemStack(add), LogisticsAPI.getCableHelper().getNetwork(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite()), ActionType.PERFORM);
 		if (stack == null || stack.stored == 0) {
 			add = null;
 		} else {
@@ -226,7 +226,7 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 				slots.add(i);
 			}
 		}
-		StoredItemStack remainder = LogisticsAPI.getItemHelper().addItems(stack.copy(), LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite()), ActionType.PERFORM);
+		StoredItemStack remainder = LogisticsAPI.getItemHelper().addItems(stack.copy(), LogisticsAPI.getCableHelper().getNetwork(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite()), ActionType.PERFORM);
 
 		long insertSize = 0;
 		if (remainder == null || remainder.stored == 0) {

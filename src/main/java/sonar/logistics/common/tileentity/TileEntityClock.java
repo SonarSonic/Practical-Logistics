@@ -190,10 +190,4 @@ public class TileEntityClock extends TileEntityConnection implements IByteBufTil
 			tickTime.setObject((long) ((1000 * 60 * 60 * 24)-1));
 		}
 	}
-
-	@Override
-	public void getCacheTypes(ArrayList<CacheTypes> types) {
-		types.add(CacheTypes.EMITTER);
-		
-	}
 }

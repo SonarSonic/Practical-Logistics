@@ -2,7 +2,9 @@ package sonar.logistics.api.wrappers;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.world.World;
@@ -10,6 +12,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.inventory.StoredItemStack;
 import sonar.core.utils.ActionType;
 import sonar.core.utils.BlockCoords;
+import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.connecting.IConnectionNode;
 import sonar.logistics.api.connecting.IEntityNode;
 import sonar.logistics.api.providers.InventoryHandler;
@@ -33,7 +36,7 @@ public class ItemWrapper {
 	 * @param network current coordinates of the network
 	 * @return list of {@link StoredItemStack} on the network
 	 */
-	public StorageItems getStackList(List<BlockCoords> network) {
+	public StorageItems getStackList(INetworkCache network) {
 		return StorageItems.EMPTY;
 	}
 
@@ -43,7 +46,7 @@ public class ItemWrapper {
 	 * @param node {@link IConnectionNode} to check from
 	 * @return list of {@link StoredItemStack} on the network
 	 */
-	public StorageSize getTileInventory(List<StoredItemStack> storedStacks, StorageSize storage, IConnectionNode node) {
+	public StorageSize getTileInventory(List<StoredItemStack> storedStacks, StorageSize storage, Map<BlockCoords, ForgeDirection> connections) {
 		return storage;
 	}
 	
@@ -52,7 +55,7 @@ public class ItemWrapper {
 	 * @param node {@link IEntityNode} to check from
 	 * @return list of {@link StoredItemStack} on the network
 	 */
-	public StorageSize getEntityInventory(List<StoredItemStack> storedStacks, StorageSize storage, IEntityNode tileNode) {
+	public StorageSize getEntityInventory(List<StoredItemStack> storedStacks, StorageSize storage, List<Entity> entityList) {
 		return storage;
 	}
 

@@ -93,7 +93,7 @@ public class LargeDisplayScreenHandler extends DisplayScreenHandler implements I
 		if (displays != null) {
 			for (BlockCoords coords : displays) {
 				if (coords != null && coords.getTileEntity() != null) {
-					List<BlockCoords> connections = LogisticsAPI.getCableHelper().getConnections(coords.getTileEntity(), dir.getOpposite());
+					List<BlockCoords> connections = LogisticsAPI.getCableHelper().getNetwork(coords.getTileEntity(), dir.getOpposite());
 					if (!connections.isEmpty()) {
 						return coords;
 					}

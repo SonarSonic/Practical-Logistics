@@ -27,6 +27,7 @@ import sonar.logistics.api.connecting.IEntityNode;
 import sonar.logistics.common.tileentity.TileEntityBlockNode;
 import sonar.logistics.common.tileentity.TileEntityEntityNode;
 import sonar.logistics.info.types.CategoryInfo;
+import sonar.logistics.registries.CacheRegistry;
 
 import com.google.common.collect.Lists;
 
@@ -68,11 +69,10 @@ public class InfoReaderHandler extends TileHandler implements IWailaInfo {
 	}
 
 	public void updateData(TileEntity te, ForgeDirection dir, boolean primary, boolean secondary) {
-
-		List<BlockCoords> connections = LogisticsAPI.getCableHelper().getConnections(te, dir.getOpposite());
+		List<BlockCoords> connections = LogisticsAPI.getCableHelper().getNetwork(te, dir.getOpposite());
 		List<IConnectionNode> nodes = new ArrayList();
 		List<IEntityNode> entityNodes = new ArrayList();
-		
+
 		for (BlockCoords connect : connections) {
 			Object tile = connect.getTileEntity();
 			if (tile instanceof IConnectionNode) {
@@ -163,9 +163,7 @@ public class InfoReaderHandler extends TileHandler implements IWailaInfo {
 
 			this.lastInfo = clientInfo;
 			List<Info> info = new ArrayList();
-			if (this.coords != null) {
-				info = LogisticsAPI.getInfoHelper().getInfoList(coords);
-			}
+			info = LogisticsAPI.getInfoHelper().getTileInfo(LogisticsAPI.getCableHelper().getTileConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite()));
 			List<Info> newInfo = new ArrayList();
 			Info lastInfo = null;
 			for (Info blockInfo : info) {

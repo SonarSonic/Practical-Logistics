@@ -62,10 +62,4 @@ public class TileEntityInventoryReader extends TileEntityHandlerInventory implem
 		LogisticsAPI.getCableHelper().removeConnection(this, ForgeDirection.getOrientation(FMPHelper.getMeta(this)));
 	}
 
-	@Override
-	public void getCacheTypes(ArrayList<CacheTypes> types) {
-		types.add(CacheTypes.EMITTER);
-		
-	}
-
 }

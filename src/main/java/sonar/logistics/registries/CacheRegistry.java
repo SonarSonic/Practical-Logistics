@@ -19,14 +19,17 @@ import sonar.core.inventory.StoredItemStack;
 import sonar.core.utils.BlockCoords;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.cache.CacheTypes;
+import sonar.logistics.api.cache.EmptyNetworkCache;
 import sonar.logistics.api.cache.INetworkCache;
-import sonar.logistics.api.cache.NetworkCache;
 import sonar.logistics.api.connecting.IChannelProvider;
 import sonar.logistics.api.connecting.IConnectionNode;
 import sonar.logistics.api.connecting.IInfoEmitter;
+import sonar.logistics.cache.NetworkCache;
 
 public final class CacheRegistry {
 
+	public static final EmptyNetworkCache EMPTY_CACHE = new EmptyNetworkCache();
+	
 	private static Map<Integer, INetworkCache> cache = new THashMap<Integer, INetworkCache>();
 
 	public static void removeAll() {
@@ -36,7 +39,7 @@ public final class CacheRegistry {
 	public static Entry<BlockCoords, ForgeDirection> getFirstConnection(int networkID) {
 		INetworkCache network = getCache(networkID);
 		if (network != null) {
-			return network.getFirstConnection();
+			return network.getExternalBlock();
 		} else
 			return (Entry<BlockCoords, ForgeDirection>) Collections.EMPTY_SET;
 	}
@@ -44,15 +47,15 @@ public final class CacheRegistry {
 	public static ArrayList<BlockCoords> getCacheList(CacheTypes type, int networkID) {
 		INetworkCache network = getCache(networkID);
 		if (network != null)
-			return network.getCacheList(type);
+			return network.getConnections(type);
 		else
-			return (ArrayList<BlockCoords>) Collections.EMPTY_LIST;
+			return new ArrayList();
 	}
 
 	public static LinkedHashMap<BlockCoords, ForgeDirection> getChannelArray(int networkID) {
 		INetworkCache network = getCache(networkID);
 		if (network != null)
-			return network.getChannelArray();
+			return network.getExternalBlocks();
 		else
 			return (LinkedHashMap<BlockCoords, ForgeDirection>) Collections.EMPTY_MAP;
 	}
@@ -63,8 +66,8 @@ public final class CacheRegistry {
 
 	public static void refreshCache(int networkID) {
 		INetworkCache networkCache = cache.get(networkID);
-		if (networkCache != null) {
-			networkCache.refreshCache(networkID);
+		if (networkCache != null && networkCache instanceof INetworkCache) {
+			((NetworkCache) networkCache).refreshCache(networkID);
 		}
 		NetworkCache network = new NetworkCache();
 		network.refreshCache(networkID);

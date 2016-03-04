@@ -65,7 +65,7 @@ public class FluidReaderHandler extends TileHandler implements IByteBufTile, IDe
 		if (te.getWorldObj().isRemote) {
 			return;
 		}
-		StorageFluids list = LogisticsAPI.getFluidHelper().getFluids(LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite()));
+		StorageFluids list = LogisticsAPI.getFluidHelper().getFluids(LogisticsAPI.getCableHelper().getTileConnections(LogisticsAPI.getCableHelper().getNetwork(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite())));
 		if (sortingType.getObject() == 0) {
 			Collections.sort(list.fluids, new Comparator<StoredFluidStack>() {
 				public int compare(StoredFluidStack str1, StoredFluidStack str2) {
@@ -115,7 +115,7 @@ public class FluidReaderHandler extends TileHandler implements IByteBufTile, IDe
 			return;
 		}
 		if (heldItem.stackSize == 1) {
-			List<BlockCoords> network = LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite());
+			List<BlockCoords> network = LogisticsAPI.getCableHelper().getNetwork(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite());
 			ItemStack simulate = LogisticsAPI.getFluidHelper().fillFluidItemStack(heldItem.copy(), storedStack.copy(), network, ActionType.SIMULATE);
 			if (!ItemStack.areItemStacksEqual(simulate, heldItem) || !ItemStack.areItemStackTagsEqual(simulate, heldItem)) {
 				player.inventory.setInventorySlotContents(player.inventory.currentItem, LogisticsAPI.getFluidHelper().fillFluidItemStack(heldItem, storedStack, network, ActionType.PERFORM));
@@ -124,7 +124,7 @@ public class FluidReaderHandler extends TileHandler implements IByteBufTile, IDe
 			ItemStack insert = heldItem.copy();
 			insert.stackSize = 1;
 
-			List<BlockCoords> network = LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite());
+			List<BlockCoords> network = LogisticsAPI.getCableHelper().getNetwork(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite());
 			ItemStack simulate = LogisticsAPI.getFluidHelper().fillFluidItemStack(insert.copy(), storedStack.copy(), network, ActionType.SIMULATE);
 			if (!ItemStack.areItemStacksEqual(simulate, insert) || !ItemStack.areItemStackTagsEqual(simulate, insert)) {
 				ItemStack toAdd = LogisticsAPI.getFluidHelper().fillFluidItemStack(insert, storedStack, network, ActionType.PERFORM);
@@ -141,7 +141,7 @@ public class FluidReaderHandler extends TileHandler implements IByteBufTile, IDe
 		}
 		ItemStack insert = heldItem.copy();
 		insert.stackSize = 1;
-		List<BlockCoords> network = LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite());
+		List<BlockCoords> network = LogisticsAPI.getCableHelper().getNetwork(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite());
 		ItemStack empty = LogisticsAPI.getFluidHelper().drainFluidItemStack(insert.copy(), network, ActionType.PERFORM);
 		if (!player.capabilities.isCreativeMode) {
 			if (insert.stackSize == heldItem.stackSize) {

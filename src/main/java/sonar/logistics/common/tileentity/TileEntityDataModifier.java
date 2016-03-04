@@ -74,10 +74,4 @@ public class TileEntityDataModifier extends TileEntityHandler implements IInfoEm
 			}
 		}
 	}
-
-	@Override
-	public void getCacheTypes(ArrayList<CacheTypes> types) {
-		types.add(CacheTypes.EMITTER);
-		
-	}
 }

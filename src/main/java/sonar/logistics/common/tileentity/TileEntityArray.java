@@ -121,10 +121,4 @@ public class TileEntityArray extends TileEntityHandlerInventory implements IConn
 		this.worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
 	}
 
-	@Override
-	public void getCacheTypes(ArrayList<CacheTypes> types) {
-		types.add(CacheTypes.CABLE);		
-		types.add(CacheTypes.EMITTER);		
-	}
-
 }

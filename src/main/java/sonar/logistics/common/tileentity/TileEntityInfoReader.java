@@ -61,10 +61,4 @@ public class TileEntityInfoReader extends TileEntityHandler implements IInfoEmit
 	public void removeConnections() {
 		LogisticsAPI.getCableHelper().removeConnection(this, ForgeDirection.getOrientation(FMPHelper.getMeta(this)));
 	}
-
-	@Override
-	public void getCacheTypes(ArrayList<CacheTypes> types) {
-		types.add(CacheTypes.EMITTER);
-		
-	}
 }

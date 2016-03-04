@@ -66,9 +66,4 @@ public class TileEntityChannelSelector extends TileEntityHandler implements IInf
 	public IdentifiedCoords getChannel() {
 		return handler.getChannel(this);
 	}
-
-	@Override
-	public void getCacheTypes(ArrayList<CacheTypes> types) {
-		types.add(CacheTypes.EMITTER);
-	}
 }

@@ -8,7 +8,7 @@ public enum CacheTypes {
 	 * unless they provide storage, energy or fluid*/
 	BLOCK,
 	/** for all {@link IEntityNode}s or anything else which can provider Entities*/
-	ENTITY, 
+	ENTITY_NODES, 
 	/**for all {@link IInfoEmitter}s and other custom blocks which can provide Info*/
 	EMITTER, 
 	/**for all {@link ILogicTile}s and other custom blocks which should be seen as a part of the Logistics Network*/

@@ -22,6 +22,8 @@ import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.core.utils.helpers.SonarHelper;
 import sonar.logistics.api.IdentifiedCoords;
 import sonar.logistics.api.LogisticsAPI;
+import sonar.logistics.api.cache.CacheTypes;
+import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.connecting.CableType;
 import sonar.logistics.api.connecting.IConnectionNode;
 import sonar.logistics.network.SyncIdentifiedCoords;
@@ -41,9 +43,9 @@ public class ChannelSelectorHandler extends TileHandler {
 		if (te.getWorldObj().isRemote) {
 			return;
 		}
-		List<BlockCoords> network = LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite());
+		INetworkCache network = LogisticsAPI.getCableHelper().getNetwork(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite());
 		channels = new ArrayList();
-		for (BlockCoords connect : network) {
+		for (BlockCoords connect : network.getConnections(CacheTypes.NETWORK)) {
 			TileEntity target = connect.getTileEntity();
 			if (target != null) {
 				String name = StatCollector.translateToLocal(target.getBlockType().getLocalizedName());
@@ -89,8 +91,8 @@ public class ChannelSelectorHandler extends TileHandler {
 		if (currentCoords == null) {
 			return null;
 		}
-		List<BlockCoords> coords = LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite());
-		for (BlockCoords coord : coords) {
+		INetworkCache network = LogisticsAPI.getCableHelper().getNetwork(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite());
+		for (BlockCoords coord : network.getConnections(CacheTypes.NETWORK)) {
 			if (coord.equals(currentCoords.blockCoords)) {
 				return currentCoords;
 			}

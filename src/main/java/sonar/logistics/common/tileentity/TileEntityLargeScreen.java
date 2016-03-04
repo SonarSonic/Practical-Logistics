@@ -73,7 +73,4 @@ public class TileEntityLargeScreen extends TileEntityHandler implements IInfoTil
 	public LargeScreenSizing getSizing() {
 		return handler.sizing;
 	}
-
-	@Override
-	public void getCacheTypes(ArrayList<CacheTypes> types) {}
 }

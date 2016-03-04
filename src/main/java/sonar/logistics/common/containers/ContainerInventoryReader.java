@@ -124,7 +124,7 @@ public class ContainerInventoryReader extends ContainerSync {
 				NetworkSlot slot = (NetworkSlot) targetSlot;
 				if (!tile.getWorldObj().isRemote) {
 					
-					List<BlockCoords> network = LogisticsAPI.getCableHelper().getConnections(tile, ForgeDirection.getOrientation(FMPHelper.getMeta(tile)).getOpposite());
+					List<BlockCoords> network = LogisticsAPI.getCableHelper().getNetwork(tile, ForgeDirection.getOrientation(FMPHelper.getMeta(tile)).getOpposite());
 					
 					if (flag == 1) {
 						StoredItemStack stack = slot.getStoredStack();

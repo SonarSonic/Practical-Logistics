@@ -2,8 +2,10 @@ package sonar.logistics.api.wrappers;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.fluid.StoredFluidStack;
 import sonar.core.inventory.StoredItemStack;
 import sonar.core.utils.ActionType;
@@ -28,9 +30,16 @@ public class FluidWrapper {
 	 * @param network current coordinates of the network
 	 * @return list of {@link StoredFluidStack} on the network
 	 */
-	public StorageFluids getFluids(List<BlockCoords> network) {
+	public StorageFluids getFluids(Map<BlockCoords, ForgeDirection> network) {
 		return StorageFluids.EMPTY;
 	}
+	/**used for getting the full list of Fluids on a given network
+	 * @param network current coordinates of the network
+	 * @return list of {@link StoredFluidStack} on the network
+	 */
+	//public StorageFluids getFluids(List<BlockCoords> network) {
+	//	return StorageFluids.EMPTY;
+	//}
 	/**convenient method, adds the given stack to the list, used by {@link FluidHandler}
 	 * @param list {@link StoredFluidStack} list to add to
 	 * @param stack {@link StoredFluidStack} to combine

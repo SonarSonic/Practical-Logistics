@@ -39,7 +39,7 @@ public class EnergyReaderHandler extends TileHandler {
 		if (te.getWorldObj().isRemote) {
 			return;
 		}
-		List<BlockCoords> coords = LogisticsAPI.getCableHelper().getConnections(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite());
+		List<BlockCoords> coords = LogisticsAPI.getCableHelper().getNetwork(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite());
 		stacks = LogisticsAPI.getEnergyHelper().getEnergyList(coords);
 		List<StoredEnergyStack> energyList = new ArrayList();
 		List<EnergyHandler> handlers = Logistics.energyProviders.getObjects();
