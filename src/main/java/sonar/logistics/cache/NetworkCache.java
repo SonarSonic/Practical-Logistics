@@ -113,7 +113,7 @@ public class NetworkCache implements IRefreshCache {
 						}
 					}
 					if (tile instanceof IConnectionNode) {
-						IConnectionNode node = (IConnectionNode) tile;
+						IConnectionNode node = (IConnectionNode) tile;				
 						for (Entry<BlockCoords, ForgeDirection> set : node.getConnections().entrySet()) {
 							if (!blockCache.containsKey(set.getKey())) {
 								blockCache.put(set.getKey(), set.getValue());

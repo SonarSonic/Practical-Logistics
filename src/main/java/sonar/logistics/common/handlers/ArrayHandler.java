@@ -32,7 +32,7 @@ public class ArrayHandler extends InventoryTileHandler {
 	public void updateCoordsList() {
 		Map<BlockCoords, ForgeDirection>coordList = new LinkedHashMap();
 		try {
-			for (int i = 0; i < 6; i++) {
+			for (int i = 0; i < 8; i++) {
 				ItemStack stack = slots[i];
 				if (stack != null && stack.getItem() instanceof ITransceiver && stack.hasTagCompound()) {
 					ITransceiver trans = (ITransceiver) stack.getItem();
@@ -43,7 +43,6 @@ public class ArrayHandler extends InventoryTileHandler {
 			SonarCore.logger.error("[Transceiver Array] Issues reading coord lists", exception);
 		}
 		this.coordList = coordList;
-		//CacheRegistry.refreshCache();
 	}
 
 	public boolean isItemValidForSlot(int slot, ItemStack stack) {

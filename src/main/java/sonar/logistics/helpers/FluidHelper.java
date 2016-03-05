@@ -1,6 +1,7 @@
 package sonar.logistics.helpers;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -17,6 +18,7 @@ import sonar.core.utils.ActionType;
 import sonar.core.utils.BlockCoords;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.LogisticsAPI;
+import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.connecting.IConnectionNode;
 import sonar.logistics.api.providers.FluidHandler;
 import sonar.logistics.api.providers.InventoryHandler.StorageSize;
@@ -25,6 +27,7 @@ import sonar.logistics.api.wrappers.FluidWrapper.StorageFluids;
 
 public class FluidHelper extends FluidWrapper {
 
+	/*
 	public StorageFluids getFluids(List<BlockCoords> network) {
 		List<StoredFluidStack> fluidList = new ArrayList();
 		StorageSize storage = new StorageSize(0, 0);
@@ -53,13 +56,14 @@ public class FluidHelper extends FluidWrapper {
 		}
 		return new StorageFluids(fluidList, storage);
 	}
-
-	public StorageFluids getFluids(Map<BlockCoords, ForgeDirection> network) {
+	*/
+	public StorageFluids getFluids(INetworkCache network) {
 		List<StoredFluidStack> fluidList = new ArrayList();
 		StorageSize storage = new StorageSize(0, 0);
 		List<FluidHandler> providers = Logistics.fluidProviders.getObjects();
+		LinkedHashMap<BlockCoords,ForgeDirection> blocks = network.getExternalBlocks();		
 		for (FluidHandler provider : providers) {
-			for (Map.Entry<BlockCoords, ForgeDirection> entry : network.entrySet()) {
+			for (Map.Entry<BlockCoords, ForgeDirection> entry : blocks.entrySet()) {
 				TileEntity fluidTile = entry.getKey().getTileEntity();
 				if (fluidTile != null && provider.canHandleFluids(fluidTile, entry.getValue())) {
 					List<StoredFluidStack> info = new ArrayList();
@@ -89,11 +93,11 @@ public class FluidHelper extends FluidWrapper {
 
 	}
 
-	public StoredFluidStack addFluids(StoredFluidStack add, List<BlockCoords> network, ActionType action) {
+	public StoredFluidStack addFluids(StoredFluidStack add, INetworkCache network, ActionType action) {
 		if (add.stored == 0) {
 			return add;
 		}
-		Map<BlockCoords, ForgeDirection> connections = LogisticsAPI.getCableHelper().getTileConnections(network);
+		Map<BlockCoords, ForgeDirection> connections = network.getExternalBlocks();
 		for (Map.Entry<BlockCoords, ForgeDirection> entry : connections.entrySet()) {
 			TileEntity tile = entry.getKey().getTileEntity();
 			for (FluidHandler provider : Logistics.fluidProviders.getObjects()) {
@@ -108,11 +112,11 @@ public class FluidHelper extends FluidWrapper {
 		return add;
 	}
 
-	public StoredFluidStack removeFluids(StoredFluidStack remove, List<BlockCoords> network, ActionType action) {
+	public StoredFluidStack removeFluids(StoredFluidStack remove, INetworkCache network, ActionType action) {
 		if (remove.stored == 0) {
 			return remove;
 		}
-		Map<BlockCoords, ForgeDirection> connections = LogisticsAPI.getCableHelper().getTileConnections(network);
+		Map<BlockCoords, ForgeDirection> connections = network.getExternalBlocks();
 		for (Map.Entry<BlockCoords, ForgeDirection> entry : connections.entrySet()) {
 			TileEntity tile = entry.getKey().getTileEntity();
 			for (FluidHandler provider : Logistics.fluidProviders.getObjects()) {
@@ -128,7 +132,7 @@ public class FluidHelper extends FluidWrapper {
 	}
 
 	/** if simulating your expected to pass copies of both the container and stack to fill with */
-	public ItemStack fillFluidItemStack(ItemStack container, StoredFluidStack fill, List<BlockCoords> network, ActionType action) {
+	public ItemStack fillFluidItemStack(ItemStack container, StoredFluidStack fill, INetworkCache network, ActionType action) {
 		if (FluidContainerRegistry.isContainer(container)) {
 			return fillFluidContainer(container, fill, network, action);
 		} else if ((container.getItem() instanceof IFluidContainerItem)) {
@@ -138,7 +142,7 @@ public class FluidHelper extends FluidWrapper {
 	}
 
 	/** if simulating your expected to pass copies of both the container and stack to fill with */
-	public ItemStack drainFluidItemStack(ItemStack container, List<BlockCoords> network, ActionType action) {
+	public ItemStack drainFluidItemStack(ItemStack container, INetworkCache network, ActionType action) {
 		if (FluidContainerRegistry.isContainer(container)) {
 			return drainFluidContainer(container, network, action);
 		} else if ((container.getItem() instanceof IFluidContainerItem)) {
@@ -147,7 +151,7 @@ public class FluidHelper extends FluidWrapper {
 		return container;
 	}
 
-	public ItemStack fillFluidContainer(ItemStack container, StoredFluidStack fill, List<BlockCoords> network, ActionType action) {
+	public ItemStack fillFluidContainer(ItemStack container, StoredFluidStack fill, INetworkCache network, ActionType action) {
 		FluidStack stack = FluidContainerRegistry.getFluidForFilledItem(container);
 		int extractSize = 0;
 		if (stack != null && stack.isFluidEqual(fill.fluid)) {
@@ -178,7 +182,7 @@ public class FluidHelper extends FluidWrapper {
 		return container;
 	}
 
-	public ItemStack drainFluidContainer(ItemStack container, List<BlockCoords> network, ActionType action) {
+	public ItemStack drainFluidContainer(ItemStack container, INetworkCache network, ActionType action) {
 		FluidStack stack = FluidContainerRegistry.getFluidForFilledItem(container);
 		if (stack != null) {
 			StoredFluidStack remainder = addFluids(new StoredFluidStack(stack), network, action);
@@ -189,7 +193,7 @@ public class FluidHelper extends FluidWrapper {
 		return container;
 	}
 
-	public ItemStack fillFluidHandler(ItemStack handler, StoredFluidStack fill, List<BlockCoords> network, ActionType action) {
+	public ItemStack fillFluidHandler(ItemStack handler, StoredFluidStack fill, INetworkCache network, ActionType action) {
 		IFluidContainerItem container = (IFluidContainerItem) handler.getItem();
 		FluidStack stack = container.getFluid(handler);
 		int extractSize = 0;
@@ -213,7 +217,7 @@ public class FluidHelper extends FluidWrapper {
 
 	}
 
-	public ItemStack drainFluidHandler(ItemStack handler, List<BlockCoords> network, ActionType action) {
+	public ItemStack drainFluidHandler(ItemStack handler, INetworkCache network, ActionType action) {
 		IFluidContainerItem container = (IFluidContainerItem) handler.getItem();
 		FluidStack stack = container.getFluid(handler);
 		if (stack != null) {

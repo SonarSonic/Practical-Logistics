@@ -3,6 +3,7 @@ package sonar.logistics.api.cache;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import net.minecraft.block.Block;
@@ -14,7 +15,7 @@ public class EmptyNetworkCache implements INetworkCache {
 
 	@Override
 	public Entry<BlockCoords, ForgeDirection> getExternalBlock() {
-		return (Entry<BlockCoords, ForgeDirection>) Collections.EMPTY_SET;
+		return null;
 	}
 
 	@Override

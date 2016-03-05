@@ -5,12 +5,14 @@ import java.util.List;
 
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.StatCollector;
+import net.minecraftforge.common.util.ForgeDirection;
 
 import org.lwjgl.opengl.GL11;
 
 import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.FontHelper;
 import sonar.logistics.Logistics;
+import sonar.logistics.api.ExternalCoords;
 import sonar.logistics.api.IdentifiedCoords;
 import sonar.logistics.common.containers.ContainerDataReceiver;
 import sonar.logistics.common.tileentity.TileEntityDataReceiver;
@@ -32,7 +34,7 @@ public class GuiDataReceiver extends GuiSelectionList<IdentifiedCoords> {
 
 	@Override
 	public IdentifiedCoords getCurrentSelection() {
-		return tile.getChannel();
+		return tile.getChannel().getIdentifiedCoords();
 	}
 
 	@Override
@@ -58,7 +60,7 @@ public class GuiDataReceiver extends GuiSelectionList<IdentifiedCoords> {
 
 	@Override
 	public void sendPacket(IdentifiedCoords selection) {
-		Logistics.network.sendToServer(new PacketCoordsSelection(tile.xCoord, tile.yCoord, tile.zCoord, selection));
+		Logistics.network.sendToServer(new PacketCoordsSelection(tile.xCoord, tile.yCoord, tile.zCoord, new ExternalCoords(selection, ForgeDirection.getOrientation(selection.blockCoords.getTileEntity().getBlockMetadata()))));
 
 	}
 

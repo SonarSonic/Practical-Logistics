@@ -1,24 +1,27 @@
 package sonar.logistics.common.tileentity;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.common.tileentity.TileEntityHandler;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.utils.BlockCoords;
-import sonar.logistics.api.IdentifiedCoords;
+import sonar.logistics.api.ExternalCoords;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.cache.CacheTypes;
 import sonar.logistics.api.connecting.CableType;
 import sonar.logistics.api.connecting.IChannelProvider;
+import sonar.logistics.api.connecting.IConnectionNode;
 import sonar.logistics.api.connecting.IInfoEmitter;
 import sonar.logistics.api.render.ICableRenderer;
 import sonar.logistics.common.handlers.ChannelSelectorHandler;
 import sonar.logistics.info.types.BlockCoordsInfo;
 
-public class TileEntityChannelSelector extends TileEntityHandler implements IInfoEmitter, ICableRenderer, IChannelProvider {
+public class TileEntityChannelSelector extends TileEntityHandler implements IInfoEmitter, ICableRenderer, IConnectionNode {
 
 	public ChannelSelectorHandler handler = new ChannelSelectorHandler(false, this);
 
@@ -63,7 +66,13 @@ public class TileEntityChannelSelector extends TileEntityHandler implements IInf
 	}
 
 	@Override
-	public IdentifiedCoords getChannel() {
-		return handler.getChannel(this);
+	public Map<BlockCoords, ForgeDirection> getConnections() {
+		LinkedHashMap<BlockCoords, ForgeDirection> map = new LinkedHashMap();
+		try {
+			ExternalCoords coords = handler.getChannel(this);
+			map.put(coords.blockCoords, coords.dir);
+		} catch (Exception exception) {
+		}
+		return map;
 	}
 }

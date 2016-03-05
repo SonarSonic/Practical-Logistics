@@ -9,8 +9,12 @@ import net.minecraft.block.Block;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.utils.BlockCoords;
+import sonar.logistics.api.ExternalCoords;
+import sonar.logistics.api.IdentifiedCoords;
+import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.cache.CacheTypes;
 import sonar.logistics.api.cache.INetworkCache;
+import sonar.logistics.api.connecting.IChannelProvider;
 import sonar.logistics.api.connecting.IConnectionNode;
 import sonar.logistics.api.connecting.ILogicTile;
 
@@ -31,6 +35,30 @@ public class LocalNetworkCache implements INetworkCache {
 					}
 				}
 			}
+			if (tile instanceof IChannelProvider) {
+				IChannelProvider provider = (IChannelProvider) tile;
+				final ExternalCoords coords = provider.getChannel();
+				if (coords != null) {
+					return new Entry<BlockCoords, ForgeDirection>() {
+
+						@Override
+						public BlockCoords getKey() {
+							return coords.blockCoords;
+						}
+
+						@Override
+						public ForgeDirection getValue() {
+							return coords.dir;
+						}
+
+						@Override
+						public ForgeDirection setValue(ForgeDirection dir) {
+							return null;
+						}
+
+					};
+				}
+			}
 		} catch (Exception exception) {
 		}
 		return null;
@@ -40,7 +68,14 @@ public class LocalNetworkCache implements INetworkCache {
 	public LinkedHashMap<BlockCoords, ForgeDirection> getExternalBlocks() {
 		LinkedHashMap map = new LinkedHashMap();
 		try {
-			map.putAll((((IConnectionNode) tile).getConnections()));
+			if (tile instanceof IConnectionNode) {
+				map.putAll(((IConnectionNode) tile).getConnections());
+			}
+			if (tile instanceof IChannelProvider) {
+				IChannelProvider provider = (IChannelProvider) tile;
+				ExternalCoords coords = provider.getChannel();
+				return LogisticsAPI.getCableHelper().getNetwork(coords.blockCoords.getTileEntity(), coords.dir).getExternalBlocks();
+			}
 		} catch (Exception exception) {
 			return new LinkedHashMap();
 		}

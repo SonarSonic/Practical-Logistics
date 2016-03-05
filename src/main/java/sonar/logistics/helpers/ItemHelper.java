@@ -134,8 +134,8 @@ public class ItemHelper extends ItemWrapper {
 		list.add(new StoredItemStack(stack));
 	}
 
-	public StoredItemStack addItems(StoredItemStack add, List<BlockCoords> network, ActionType action) {
-		Map<BlockCoords, ForgeDirection> connections = LogisticsAPI.getCableHelper().getTileConnections(network);
+	public StoredItemStack addItems(StoredItemStack add, INetworkCache network, ActionType action) {
+		Map<BlockCoords, ForgeDirection> connections = network.getExternalBlocks();
 		for (Map.Entry<BlockCoords, ForgeDirection> entry : connections.entrySet()) {
 			TileEntity tile = entry.getKey().getTileEntity();
 			for (InventoryHandler provider : Logistics.inventoryProviders.getObjects()) {
@@ -150,8 +150,8 @@ public class ItemHelper extends ItemWrapper {
 		return add;
 	}
 
-	public StoredItemStack removeItems(StoredItemStack remove, List<BlockCoords> network, ActionType action) {
-		Map<BlockCoords, ForgeDirection> connections = LogisticsAPI.getCableHelper().getTileConnections(network);
+	public StoredItemStack removeItems(StoredItemStack remove, INetworkCache network, ActionType action) {
+		Map<BlockCoords, ForgeDirection> connections = network.getExternalBlocks();
 		for (Map.Entry<BlockCoords, ForgeDirection> entry : connections.entrySet()) {
 			TileEntity tile = entry.getKey().getTileEntity();
 			for (InventoryHandler provider : Logistics.inventoryProviders.getObjects()) {
@@ -166,9 +166,18 @@ public class ItemHelper extends ItemWrapper {
 		return remove;
 	}
 
-	public StoredItemStack getStack(List<BlockCoords> connections, int slot) {
-		if (connections == null) {
-			return null;
+	public StoredItemStack getStack(INetworkCache network, int slot) {
+		Entry<BlockCoords, ForgeDirection> block = network.getExternalBlock();
+		StoredItemStack stack = getTileStack(network, slot);
+		if (stack == null) {
+			network.getFirstConnection(CacheTypes.EMITTER);
+		}
+		return stack;
+/*
+		if (block != null) {
+			return getTileStack(network, slot);
+		} else {
+			
 		}
 		for (BlockCoords connect : connections) {
 			Object tile = connect.getTileEntity();
@@ -183,6 +192,7 @@ public class ItemHelper extends ItemWrapper {
 		}
 
 		return null;
+		*/
 	}
 
 	public StoredItemStack getEntityStack(IEntityNode node, int slot) {
@@ -206,16 +216,16 @@ public class ItemHelper extends ItemWrapper {
 		return null;
 	}
 
-	public StoredItemStack getTileStack(IConnectionNode node, int slot) {
-		Map<BlockCoords, ForgeDirection> connections = node.getConnections();
-		for (InventoryHandler provider : Logistics.inventoryProviders.getObjects()) {
-			for (Map.Entry<BlockCoords, ForgeDirection> entry : connections.entrySet()) {
+	public StoredItemStack getTileStack(INetworkCache network, int slot) {
+		Map<BlockCoords, ForgeDirection> connections = network.getExternalBlocks();
+		for (Map.Entry<BlockCoords, ForgeDirection> entry : connections.entrySet()) {
+			for (InventoryHandler provider : Logistics.inventoryProviders.getObjects()) {
 				TileEntity tile = entry.getKey().getTileEntity();
 				if (tile != null && provider.canHandleItems(tile, entry.getValue())) {
 					return provider.getStack(slot, tile, entry.getValue());
 				}
-
 			}
+
 		}
 		return null;
 	}
@@ -352,7 +362,7 @@ public class ItemHelper extends ItemWrapper {
 		}
 	}
 
-	public StoredItemStack removeToPlayerInventory(StoredItemStack stack, long extractSize, List<BlockCoords> network, EntityPlayer player, ActionType type) {
+	public StoredItemStack removeToPlayerInventory(StoredItemStack stack, long extractSize, INetworkCache network, EntityPlayer player, ActionType type) {
 		StoredItemStack simulate = getStackToAdd(extractSize, stack, removeItems(stack.copy().setStackSize(extractSize), network, type));
 		if (simulate == null) {
 			return null;
@@ -362,7 +372,7 @@ public class ItemHelper extends ItemWrapper {
 
 	}
 
-	public StoredItemStack addFromPlayerInventory(StoredItemStack stack, long extractSize, List<BlockCoords> network, EntityPlayer player, ActionType type) {
+	public StoredItemStack addFromPlayerInventory(StoredItemStack stack, long extractSize, INetworkCache network, EntityPlayer player, ActionType type) {
 		StoredItemStack simulate = getStackToAdd(extractSize, stack, removeStackFromPlayer(stack.copy().setStackSize(extractSize), player, false, type));
 		if (simulate == null) {
 			return null;

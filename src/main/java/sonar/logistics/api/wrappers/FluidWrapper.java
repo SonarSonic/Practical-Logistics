@@ -2,14 +2,12 @@ package sonar.logistics.api.wrappers;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.fluid.StoredFluidStack;
 import sonar.core.inventory.StoredItemStack;
 import sonar.core.utils.ActionType;
-import sonar.core.utils.BlockCoords;
+import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.providers.FluidHandler;
 import sonar.logistics.api.providers.InventoryHandler.StorageSize;
 
@@ -30,7 +28,7 @@ public class FluidWrapper {
 	 * @param network current coordinates of the network
 	 * @return list of {@link StoredFluidStack} on the network
 	 */
-	public StorageFluids getFluids(Map<BlockCoords, ForgeDirection> network) {
+	public StorageFluids getFluids(INetworkCache network) {
 		return StorageFluids.EMPTY;
 	}
 	/**used for getting the full list of Fluids on a given network
@@ -51,7 +49,7 @@ public class FluidWrapper {
 	 * @param network current coordinates of the network
 	 * @return remaining {@link StoredFluidStack} (what wasn't added), can be null
 	 */
-	public StoredFluidStack addFluids(StoredFluidStack add, List<BlockCoords> network, ActionType action) {
+	public StoredFluidStack addFluids(StoredFluidStack add, INetworkCache network, ActionType action) {
 		return add;
 	}
 	/**used for removing Fluids from the network
@@ -59,15 +57,15 @@ public class FluidWrapper {
 	 * @param network current coordinates of the network
 	 * @return remaining {@link StoredFluidStack} (what wasn't removed), can be null
 	 */
-	public StoredFluidStack removeFluids(StoredFluidStack remove, List<BlockCoords> network, ActionType action) {
+	public StoredFluidStack removeFluids(StoredFluidStack remove, INetworkCache network, ActionType action) {
 		return remove;
 	}
 
-	public ItemStack fillFluidItemStack(ItemStack container, StoredFluidStack fill, List<BlockCoords> network, ActionType action){
+	public ItemStack fillFluidItemStack(ItemStack container, StoredFluidStack fill, INetworkCache network, ActionType action){
 		return container;
 	}
 	
-	public ItemStack drainFluidItemStack(ItemStack container, List<BlockCoords> network, ActionType action) {
+	public ItemStack drainFluidItemStack(ItemStack container, INetworkCache network, ActionType action) {
 		return container;
 	}
 

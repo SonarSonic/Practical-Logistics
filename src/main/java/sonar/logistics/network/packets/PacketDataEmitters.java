@@ -9,6 +9,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import sonar.core.network.PacketCoords;
 import sonar.core.network.PacketTileEntityHandler;
+import sonar.logistics.api.ExternalCoords;
 import sonar.logistics.api.IdentifiedCoords;
 import sonar.logistics.common.tileentity.TileEntityDataReceiver;
 import cpw.mods.fml.common.network.ByteBufUtils;

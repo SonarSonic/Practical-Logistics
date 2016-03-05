@@ -65,6 +65,9 @@ public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 
 	public void updateData(TileEntity te, TileEntity packetTile, ForgeDirection dir) {
 		INetworkCache network = LogisticsAPI.getCableHelper().getNetwork(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite());
+		if (network == null) {
+			return;
+		}
 		Object target = FMPHelper.getTile(network.getFirstTileEntity(CacheTypes.EMITTER));
 		if (target == null) {
 			return;
@@ -154,29 +157,31 @@ public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 			}
 		}
 		INetworkCache network = LogisticsAPI.getCableHelper().getNetwork(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite());
-		Object target = FMPHelper.getTile(network.getFirstTileEntity(CacheTypes.NETWORK));
-			if (target == null) {
-				return;
-			}
-			ScreenType screenType = ScreenType.NORMAL;
-			if (te instanceof ILargeDisplay) {
-				screenType = ScreenType.LARGE;
-				if (((ILargeDisplay) te).getSizing() != null) {
-					screenType = ScreenType.CONNECTED;
-				}
-			}
-			InfoInteractionHandler handler = Logistics.infoInteraction.getInteractionHandler(screenInfo, screenType, te, target);
-			if (handler != null) {
-				handler.handleInteraction(screenInfo, screenType, te, target, player, x, y, z, interact, doubleClick);
-			} else {
-				Object reader = FMPHelper.getHandler(target);
-				if (reader != null && reader instanceof IDefaultInteraction) {
-					IDefaultInteraction interaction = (IDefaultInteraction) reader;
-					interaction.handleInteraction(screenInfo, screenType, te, target, player, x, y, z, interact, doubleClick);
-				}
+		System.out.print(network);
+		if(network==null){
+			return;
+		}
+		TileEntity target = network.getFirstTileEntity(CacheTypes.NETWORK);
+		if (target == null) {
+			return;
+		}
+		ScreenType screenType = ScreenType.NORMAL;
+		if (te instanceof ILargeDisplay) {
+			screenType = ScreenType.LARGE;
+			if (((ILargeDisplay) te).getSizing() != null) {
+				screenType = ScreenType.CONNECTED;
 			}
 		}
-
+		InfoInteractionHandler handler = Logistics.infoInteraction.getInteractionHandler(screenInfo, screenType, te, target);
+		if (handler != null) {
+			handler.handleInteraction(screenInfo, screenType, te, target, player, x, y, z, interact, doubleClick);
+		} else {
+			Object reader = FMPHelper.getHandler(target);
+			if (reader != null && reader instanceof IDefaultInteraction) {
+				IDefaultInteraction interaction = (IDefaultInteraction) reader;
+				interaction.handleInteraction(screenInfo, screenType, te, target, player, x, y, z, interact, doubleClick);
+			}
+		}
 	}
 
 	public Info currentInfo() {

@@ -7,6 +7,7 @@ import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.network.PacketCoords;
 import sonar.core.network.PacketTileEntityHandler;
+import sonar.logistics.api.ExternalCoords;
 import sonar.logistics.api.IdentifiedCoords;
 import sonar.logistics.common.handlers.ChannelSelectorHandler;
 import sonar.logistics.common.tileentity.TileEntityDataReceiver;
@@ -15,12 +16,12 @@ import cpw.mods.fml.common.network.simpleimpl.IMessage;
 
 public class PacketCoordsSelection extends PacketCoords {
 
-	public IdentifiedCoords coords;
+	public ExternalCoords coords;
 
 	public PacketCoordsSelection() {
 	}
 
-	public PacketCoordsSelection(int x, int y, int z, IdentifiedCoords info) {
+	public PacketCoordsSelection(int x, int y, int z, ExternalCoords info) {
 		super(x, y, z);
 		this.coords = info;
 	}
@@ -28,14 +29,14 @@ public class PacketCoordsSelection extends PacketCoords {
 	@Override
 	public void fromBytes(ByteBuf buf) {
 		super.fromBytes(buf);
-		this.coords = IdentifiedCoords.readFromNBT(ByteBufUtils.readTag(buf));
+		this.coords = ExternalCoords.readFromNBT(ByteBufUtils.readTag(buf));
 	}
 
 	@Override
 	public void toBytes(ByteBuf buf) {
 		super.toBytes(buf);
 		NBTTagCompound tag = new NBTTagCompound();
-		IdentifiedCoords.writeToNBT(tag, coords);
+		ExternalCoords.writeToNBT(tag, coords);
 		ByteBufUtils.writeTag(buf, tag);
 
 	}
@@ -46,7 +47,7 @@ public class PacketCoordsSelection extends PacketCoords {
 		public IMessage processMessage(PacketCoordsSelection message, TileEntity target) {
 			if (!target.getWorldObj().isRemote) {
 				if (target != null && target instanceof TileEntityDataReceiver) {
-					((TileEntityDataReceiver) target).emitter.setCoords(message.coords);
+					((TileEntityDataReceiver) target).emitter.setCoords(message.coords.getIdentifiedCoords());
 				} else {
 					TileHandler handler = FMPHelper.getHandler(target);
 					if (handler != null && handler instanceof ChannelSelectorHandler) {

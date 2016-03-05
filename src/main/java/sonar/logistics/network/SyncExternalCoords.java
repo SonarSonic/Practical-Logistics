@@ -8,14 +8,14 @@ import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.api.ExternalCoords;
 import sonar.logistics.api.IdentifiedCoords;
 
-public class SyncIdentifiedCoords extends SyncPart {
-	private IdentifiedCoords c;
-	private IdentifiedCoords last;
+public class SyncExternalCoords extends SyncPart {
+	private ExternalCoords c;
+	private ExternalCoords last;
 
-	public SyncIdentifiedCoords(int id) {
+	public SyncExternalCoords(int id) {
 		super(id);
 	}
-	public SyncIdentifiedCoords(String name) {
+	public SyncExternalCoords(String name) {
 		super(name);
 	}
 	@Override
@@ -29,11 +29,11 @@ public class SyncIdentifiedCoords extends SyncPart {
 		return BlockCoords.equalCoords(c.blockCoords, last.blockCoords) && c.coordString.equals(last.coordString);
 	}
 
-	public void setCoords(IdentifiedCoords value) {
+	public void setCoords(ExternalCoords value) {
 		c = value;
 	}
 
-	public IdentifiedCoords getCoords() {
+	public ExternalCoords getCoords() {
 		return c;
 	}
 
@@ -49,24 +49,24 @@ public class SyncIdentifiedCoords extends SyncPart {
 
 	@Override
 	public void writeObject(ByteBuf buf) {
-		IdentifiedCoords.writeCoords(buf, c);		
+		ExternalCoords.writeCoords(buf, c);		
 	}
 
 	@Override
 	public void readObject(ByteBuf buf) {
-		this.c = IdentifiedCoords.readCoords(buf);		
+		this.c = ExternalCoords.readCoords(buf);		
 	}
 
 	@Override
 	public void writeObject(NBTTagCompound nbt, SyncType type) {
 		NBTTagCompound infoTag = new NBTTagCompound();
-		IdentifiedCoords.writeToNBT(infoTag, c);
+		ExternalCoords.writeToNBT(infoTag, c);
 		nbt.setTag(this.getTagName(), infoTag);		
 	}
 
 	@Override
 	public void readObject(NBTTagCompound nbt, SyncType type) {
-		this.c = IdentifiedCoords.readFromNBT(nbt.getCompoundTag(this.getTagName()));		
+		this.c = ExternalCoords.readFromNBT(nbt.getCompoundTag(this.getTagName()));		
 	}
 
 }

@@ -9,6 +9,7 @@ import java.util.Map;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import sonar.core.utils.BlockCoords;
+import sonar.logistics.api.ExternalCoords;
 import sonar.logistics.api.IdentifiedCoords;
 import sonar.logistics.common.tileentity.TileEntityDataEmitter;
 
@@ -41,7 +42,7 @@ public class EmitterRegistry {
 
 		return emitterList;
 	}
-
+	
 	public static void addEmitters(String playerName, BlockCoords emitter) {
 		if (emitter != null || playerName != null) {
 			if (emitters.get(playerName) == null) {

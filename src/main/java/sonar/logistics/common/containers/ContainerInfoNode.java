@@ -27,9 +27,7 @@ public class ContainerInfoNode extends ContainerSync {
 						}
 					}
 				}
-
 			}
-
 		}
 	}
 

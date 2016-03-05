@@ -17,6 +17,8 @@ import sonar.core.network.utils.IByteBufTile;
 import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.api.LogisticsAPI;
+import sonar.logistics.api.cache.CacheTypes;
+import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.connecting.ILargeDisplay;
 import sonar.logistics.api.render.LargeScreenSizing;
 import sonar.logistics.helpers.DisplayHelper;
@@ -93,8 +95,8 @@ public class LargeDisplayScreenHandler extends DisplayScreenHandler implements I
 		if (displays != null) {
 			for (BlockCoords coords : displays) {
 				if (coords != null && coords.getTileEntity() != null) {
-					List<BlockCoords> connections = LogisticsAPI.getCableHelper().getNetwork(coords.getTileEntity(), dir.getOpposite());
-					if (!connections.isEmpty()) {
+					INetworkCache network = LogisticsAPI.getCableHelper().getNetwork(coords.getTileEntity(), dir.getOpposite());
+					if (!network.getConnections(CacheTypes.EMITTER).isEmpty()) {
 						return coords;
 					}
 				}

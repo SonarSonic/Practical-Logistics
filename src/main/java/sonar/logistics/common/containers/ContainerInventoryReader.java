@@ -20,6 +20,7 @@ import sonar.core.utils.ActionType;
 import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.api.LogisticsAPI;
+import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.common.containers.slots.NetworkSlot;
 import sonar.logistics.common.handlers.InventoryReaderHandler;
 
@@ -124,9 +125,8 @@ public class ContainerInventoryReader extends ContainerSync {
 				NetworkSlot slot = (NetworkSlot) targetSlot;
 				if (!tile.getWorldObj().isRemote) {
 					
-					List<BlockCoords> network = LogisticsAPI.getCableHelper().getNetwork(tile, ForgeDirection.getOrientation(FMPHelper.getMeta(tile)).getOpposite());
-					
-					if (flag == 1) {
+					INetworkCache network = LogisticsAPI.getCableHelper().getNetwork(tile, ForgeDirection.getOrientation(FMPHelper.getMeta(tile)).getOpposite());
+								if (flag == 1) {
 						StoredItemStack stack = slot.getStoredStack();
 
 						if (stack == null || stack.stored == 0) {

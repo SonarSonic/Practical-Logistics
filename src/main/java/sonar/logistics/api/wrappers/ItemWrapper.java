@@ -81,7 +81,7 @@ public class ItemWrapper {
 	 * @param action what type of action should be carried out
 	 * @return remaining {@link StoredItemStack} (what wasn't added), can be null
 	 */
-	public StoredItemStack addItems(StoredItemStack add, List<BlockCoords> network, ActionType action) {
+	public StoredItemStack addItems(StoredItemStack add, INetworkCache network, ActionType action) {
 		return add;
 	}
 	
@@ -91,7 +91,7 @@ public class ItemWrapper {
 	 * @param action what type of action should be carried out
 	 * @return remaining {@link StoredItemStack} (what wasn't removed), can be null
 	 */
-	public StoredItemStack removeItems(StoredItemStack remove, List<BlockCoords> network, ActionType action) {
+	public StoredItemStack removeItems(StoredItemStack remove, INetworkCache network, ActionType action) {
 		return remove;
 	}
 	/**gets the {@link StoredItemStack} in the given slot of the first valid inventory on the network, used by the Inventory Reader
@@ -99,7 +99,7 @@ public class ItemWrapper {
 	 * @param slot id of the slot to look for the stack in
 	 * @return {@link StoredItemStack} of the ItemStack in the slot
 	 */
-	public StoredItemStack getStack(List<BlockCoords> network, int slot) {
+	public StoredItemStack getStack(INetworkCache network, int slot) {
 		return null;
 	}
 	/**gets the {@link StoredItemStack} in the given slot of the entity connected to the {@link IEntityNode}
@@ -115,7 +115,7 @@ public class ItemWrapper {
 	 * @param slot id of the slot to look for the stack in
 	 * @return {@link StoredItemStack} of the ItemStack in the slot
 	 */
-	public StoredItemStack getTileStack(IConnectionNode node, int slot) {
+	public StoredItemStack getTileStack(INetworkCache network, int slot) {
 		return null;
 	}
 	/**should NEVER be called on client, adds a StoredItemStack to a player inventory and sends changes with client
@@ -155,7 +155,7 @@ public class ItemWrapper {
 	 * @param player
 	 * @return the {@link StoredItemStack} to add to the player
 	 */
-	public StoredItemStack removeToPlayerInventory(StoredItemStack stack, long extractSize, List<BlockCoords> network, EntityPlayer player, ActionType type) {
+	public StoredItemStack removeToPlayerInventory(StoredItemStack stack, long extractSize, INetworkCache network, EntityPlayer player, ActionType type) {
 		return null;		
 	}
 	/** convenience method, removes the given stack to the player's inventory and returns what was/can be added.
@@ -165,7 +165,7 @@ public class ItemWrapper {
 	 * @param player
 	 * @return the {@link StoredItemStack} to add to the player
 	 */
-	public StoredItemStack addFromPlayerInventory(StoredItemStack stack, long extractSize, List<BlockCoords> network, EntityPlayer player, ActionType type) {
+	public StoredItemStack addFromPlayerInventory(StoredItemStack stack, long extractSize, INetworkCache network, EntityPlayer player, ActionType type) {
 		return null;
 	}
 	/** convenience method, gets the stack to be added to the inventory from the remainder, can return null.

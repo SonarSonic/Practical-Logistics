@@ -29,7 +29,7 @@ import sonar.logistics.cache.NetworkCache;
 public final class CacheRegistry {
 
 	public static final EmptyNetworkCache EMPTY_CACHE = new EmptyNetworkCache();
-	
+
 	private static Map<Integer, INetworkCache> cache = new THashMap<Integer, INetworkCache>();
 
 	public static void removeAll() {
@@ -41,7 +41,7 @@ public final class CacheRegistry {
 		if (network != null) {
 			return network.getExternalBlock();
 		} else
-			return (Entry<BlockCoords, ForgeDirection>) Collections.EMPTY_SET;
+			return null;
 	}
 
 	public static ArrayList<BlockCoords> getCacheList(CacheTypes type, int networkID) {
@@ -61,7 +61,11 @@ public final class CacheRegistry {
 	}
 
 	public static INetworkCache getCache(int networkID) {
-		return cache.get(networkID);
+		INetworkCache networkCache = cache.get(networkID);
+		if (networkCache == null) {
+			return EMPTY_CACHE;
+		}
+		return networkCache;
 	}
 
 	public static void refreshCache(int networkID) {

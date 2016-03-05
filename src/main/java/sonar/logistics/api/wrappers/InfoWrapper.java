@@ -2,11 +2,10 @@ package sonar.logistics.api.wrappers;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
-import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.utils.BlockCoords;
 import sonar.logistics.api.Info;
+import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.connecting.IConnectionNode;
 import sonar.logistics.api.connecting.IEntityNode;
 
@@ -16,14 +15,14 @@ public class InfoWrapper {
 	 * @param coords {@link BlockCoords} to check at
 	 * @return list of {@link Info}
 	 */
-	public List<Info> getInfoList(BlockCoords coords) {
-		return Collections.EMPTY_LIST;
-	}
+	//public List<Info> getInfoList(BlockCoords coords) {
+	//	return Collections.EMPTY_LIST;
+	//}
 	/**gets a list of all Info available at a given {@link IConnectionNode}, used by getInfoList(), here if the need should arise
 	 * @param coordList the map containing coords and directions.
 	 * @return list of {@link Info}
 	 */
-	public List<Info> getTileInfo(Map<BlockCoords, ForgeDirection> coordList) {
+	public List<Info> getTileInfo(INetworkCache coordList) {
 		return Collections.EMPTY_LIST;
 	}
 
@@ -36,10 +35,10 @@ public class InfoWrapper {
 	}
 	/**for updating {@link Info}, used by the Info Reader
 	 * @param tileInfo tile {@link Info} in need of updating
-	 * @param tileNode the {@link IConnectionNode} to check at
+	 * @param network the {@link IConnectionNode} to check at
 	 * @return the latest {@link Info}
 	 */
-	public Info getLatestTileInfo(Info tileInfo, IConnectionNode tileNode) {
+	public Info getLatestTileInfo(Info tileInfo, INetworkCache network) {
 		return tileInfo;
 	}
 	/**for updating {@link Info}, used by the Info Reader

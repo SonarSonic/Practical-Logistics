@@ -14,12 +14,13 @@ import org.lwjgl.opengl.GL11;
 import sonar.core.utils.helpers.FontHelper;
 import sonar.core.utils.helpers.RenderHelper;
 import sonar.logistics.Logistics;
+import sonar.logistics.api.ExternalCoords;
 import sonar.logistics.api.IdentifiedCoords;
 import sonar.logistics.common.containers.ContainerEmptySync;
 import sonar.logistics.common.handlers.ChannelSelectorHandler;
 import sonar.logistics.network.packets.PacketCoordsSelection;
 
-public class GuiChannelSelector extends GuiSelectionList<IdentifiedCoords> {
+public class GuiChannelSelector extends GuiSelectionList<ExternalCoords> {
 
 	public static final ResourceLocation bground = new ResourceLocation("PracticalLogistics:textures/gui/channelSelection.png");
 
@@ -33,17 +34,17 @@ public class GuiChannelSelector extends GuiSelectionList<IdentifiedCoords> {
 	}
 
 	@Override
-	public List<IdentifiedCoords> getSelectionList() {
+	public List<ExternalCoords> getSelectionList() {
 		return handler.channels;
 	}
 
 	@Override
-	public IdentifiedCoords getCurrentSelection() {
+	public ExternalCoords getCurrentSelection() {
 		return handler.channel.getCoords();
 	}
 
 	@Override
-	public boolean isEqualSelection(IdentifiedCoords selection, IdentifiedCoords current) {
+	public boolean isEqualSelection(ExternalCoords selection, ExternalCoords current) {
 		return selection.equals(current);
 	}
 
@@ -54,7 +55,7 @@ public class GuiChannelSelector extends GuiSelectionList<IdentifiedCoords> {
 	}
 
 	@Override
-	public void renderSelection(IdentifiedCoords selection, boolean isSelected, int pos) {
+	public void renderSelection(ExternalCoords selection, boolean isSelected, int pos) {
 		String string = (selection.block != null ? (selection.block.getTooltip(this.mc.thePlayer, this.mc.gameSettings.advancedItemTooltips)).get(0).toString() : selection.coordString);
 
 		int offsetTop = 29;
@@ -76,7 +77,7 @@ public class GuiChannelSelector extends GuiSelectionList<IdentifiedCoords> {
 	}
 
 	@Override
-	public void sendPacket(IdentifiedCoords selection) {
+	public void sendPacket(ExternalCoords selection) {
 		Logistics.network.sendToServer(new PacketCoordsSelection(tile.xCoord, tile.yCoord, tile.zCoord, selection));
 	}
 

@@ -18,6 +18,8 @@ import sonar.logistics.Logistics;
 import sonar.logistics.api.Info;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.StandardInfo;
+import sonar.logistics.api.cache.CacheTypes;
+import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.providers.EnergyHandler;
 import sonar.logistics.common.tileentity.TileEntityBlockNode;
 import sonar.logistics.info.types.StoredEnergyInfo;
@@ -39,32 +41,8 @@ public class EnergyReaderHandler extends TileHandler {
 		if (te.getWorldObj().isRemote) {
 			return;
 		}
-		List<BlockCoords> coords = LogisticsAPI.getCableHelper().getNetwork(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite());
-		stacks = LogisticsAPI.getEnergyHelper().getEnergyList(coords);
-		List<StoredEnergyStack> energyList = new ArrayList();
-		List<EnergyHandler> handlers = Logistics.energyProviders.getObjects();
-
-		for (BlockCoords coord : coords) {
-			boolean completed = false;
-			for (EnergyHandler handler : handlers) {
-				if (!completed) {
-					TileEntity target = coord.getTileEntity();
-					if (target != null && target instanceof TileEntityBlockNode) {
-						TileEntityBlockNode node = (TileEntityBlockNode) target;
-						ForgeDirection dir = ForgeDirection.getOrientation(SonarHelper.invertMetadata(node.getBlockMetadata())).getOpposite();
-						TileEntity energyTile = node.getWorldObj().getTileEntity(node.xCoord + dir.offsetX, node.yCoord + dir.offsetY, node.zCoord + dir.offsetZ);
-
-						// if (energyTile != null &&
-						// handler.canProvideInfo(energyTile, dir)) {
-						// handler.removeEnergy(10000000, energyTile, dir);
-						// handler.addEnergy(10000001, energyTile, dir);
-						completed = true;
-
-						// }
-					}
-				}
-			}
-		}
+		INetworkCache network = LogisticsAPI.getCableHelper().getNetwork(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite());
+		stacks = LogisticsAPI.getEnergyHelper().getEnergyList(network);
 	}
 
 	public boolean canConnect(TileEntity te, ForgeDirection dir) {

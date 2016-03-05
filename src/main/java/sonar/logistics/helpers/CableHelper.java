@@ -17,6 +17,7 @@ import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.SonarHelper;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.LogisticsAPI;
+import sonar.logistics.api.cache.EmptyNetworkCache;
 import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.connecting.CableType;
 import sonar.logistics.api.connecting.IChannelProvider;
@@ -135,7 +136,7 @@ public class CableHelper extends CablingWrapper {
 			if (adjacent instanceof IDataCable) {
 				IDataCable cable = ((IDataCable) adjacent);
 				if (cable.isBlocked(dir.getOpposite())) {
-					return CacheRegistry.EMPTY_CACHE;
+					return new EmptyNetworkCache();
 				}
 				registryID = cable.registryID();
 				cableType = cable.getCableType();
@@ -143,9 +144,7 @@ public class CableHelper extends CablingWrapper {
 				// help needed probably
 				// addChannelConnections(connections, (IChannelProvider) adjacent, tile, cableType);
 			} else if (adjacent instanceof ILogicTile) {
-				
-				//YOU NEED TO REWRITE THE WHOLE MOD, GIVING EVERY SINGLE BLOCK IT'S OWN ID :O, OR YOU COULD MAKE A PRIVATE CACHE SYSTEM, RETRIEVING THE CACHE FROM A TILE
-				
+
 				return new LocalNetworkCache((ILogicTile) adjacent);
 			}
 		}
@@ -169,7 +168,7 @@ public class CableHelper extends CablingWrapper {
 		/*
 		 * for (BlockCoords coord : (ArrayList<BlockCoords>) CableRegistry.getConnections(registryID).clone()) { TileEntity target = coord.getTileEntity(); if (target != null) { if (target instanceof TileEntityDataEmitter) { } else if (target instanceof IChannelProvider) { addChannelConnections(connections, (IChannelProvider) target, tile, cableType); }else if (target instanceof ILogicTile) { connections.add(coord); } } if (!cableType.hasUnlimitedConnections()) { return connections; } }
 		 */
-		return CacheRegistry.EMPTY_CACHE ;
+		return new EmptyNetworkCache() ;
 	}
 
 	/*

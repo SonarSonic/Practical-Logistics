@@ -27,6 +27,8 @@ import sonar.core.utils.helpers.SonarHelper;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.ItemFilter;
 import sonar.logistics.api.LogisticsAPI;
+import sonar.logistics.api.cache.CacheTypes;
+import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.common.tileentity.TileEntityBlockNode;
 import sonar.logistics.info.filters.items.ItemStackFilter;
 import sonar.logistics.info.filters.items.OreDictionaryFilter;
@@ -171,13 +173,10 @@ public class ItemRouterHandler extends InventoryTileHandler implements ISidedInv
 		for (int i = 0; i < 6; i++) {
 			int config = sideConfigs[i].getObject();
 			if (config != 0) {
-				List<BlockCoords> connections = LogisticsAPI.getCableHelper().getNetwork(te, ForgeDirection.getOrientation(i));
-				if (!connections.isEmpty()) {
-					this.coords[i] = connections;
-				}else{
-					this.coords[i]=new ArrayList();
-					this.coords[i].add(BlockCoords.translateCoords(new BlockCoords(te), ForgeDirection.getOrientation(i)));
-				}
+				INetworkCache connections = LogisticsAPI.getCableHelper().getNetwork(te, ForgeDirection.getOrientation(i));
+				/*
+				 * if (!connections) { this.coords[i] = connections.getConnections(CacheTypes.BLOCK); }else{ this.coords[i]=new ArrayList(); this.coords[i].add(BlockCoords.translateCoords(new BlockCoords(te), ForgeDirection.getOrientation(i))); }
+				 */
 			}
 		}
 	}
@@ -235,12 +234,12 @@ public class ItemRouterHandler extends InventoryTileHandler implements ISidedInv
 			}
 		}
 	}
-	
+
 	public void addSyncParts(List<ISyncPart> parts) {
 		super.addSyncParts(parts);
 		parts.addAll(Lists.newArrayList(listType, side, filterPos));
 	}
-	
+
 	@Override
 	public int[] getAccessibleSlotsFromSide(int side) {
 		return new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 };

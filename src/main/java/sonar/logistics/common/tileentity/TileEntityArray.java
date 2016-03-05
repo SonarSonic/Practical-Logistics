@@ -21,6 +21,7 @@ import sonar.logistics.api.connecting.IDataCable;
 import sonar.logistics.api.connecting.ITransceiver;
 import sonar.logistics.common.handlers.DisplayScreenHandler;
 import sonar.logistics.common.handlers.ArrayHandler;
+import sonar.logistics.registries.CacheRegistry;
 
 public class TileEntityArray extends TileEntityHandlerInventory implements IConnectionArray, IDataCable {
 
@@ -76,6 +77,7 @@ public class TileEntityArray extends TileEntityHandlerInventory implements IConn
 			addCable();
 		}
 		handler.updateCoordsList();
+		CacheRegistry.refreshCache(registryID);
 	}
 
 	public void invalidate() {
@@ -112,13 +114,15 @@ public class TileEntityArray extends TileEntityHandlerInventory implements IConn
 
 	@Override
 	public CableType getCableType() {
-		return CableType.CHANNELLED_CABLE;
+		return CableType.BLOCK_CONNECTION;
 	}
 
 	@Override
 	public void setInventorySlotContents(int i, ItemStack itemstack) {
 		super.setInventorySlotContents(i, itemstack);
 		this.worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+		handler.updateCoordsList();
+		CacheRegistry.refreshCache(registryID);
 	}
 
 }

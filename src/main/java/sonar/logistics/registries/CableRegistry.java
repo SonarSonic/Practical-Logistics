@@ -92,6 +92,7 @@ public class CableRegistry {
 			if (connections.get(registryID) == null) {
 				connections.put(registryID, new ArrayList());
 				connections.get(registryID).add(connection);
+				CacheRegistry.refreshCache(registryID);
 				return;
 			}
 			ArrayList<BlockCoords> removeList = new ArrayList();
