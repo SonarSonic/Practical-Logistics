@@ -1,27 +1,20 @@
 package sonar.logistics.common.tileentity;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.util.ForgeDirection;
-import sonar.core.SonarCore;
 import sonar.core.common.tileentity.TileEntityHandlerInventory;
 import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.utils.BlockCoords;
 import sonar.logistics.api.LogisticsAPI;
-import sonar.logistics.api.cache.CacheTypes;
 import sonar.logistics.api.connecting.CableType;
 import sonar.logistics.api.connecting.IConnectionArray;
 import sonar.logistics.api.connecting.IDataCable;
-import sonar.logistics.api.connecting.ITransceiver;
-import sonar.logistics.common.handlers.DisplayScreenHandler;
 import sonar.logistics.common.handlers.ArrayHandler;
-import sonar.logistics.registries.CacheRegistry;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 public class TileEntityArray extends TileEntityHandlerInventory implements IConnectionArray, IDataCable {
 
@@ -50,8 +43,8 @@ public class TileEntityArray extends TileEntityHandlerInventory implements IConn
 	}
 
 	@Override
-	public Map<BlockCoords, ForgeDirection> getConnections() {
-		return handler.coordList;
+	public void addConnections(Map<BlockCoords, ForgeDirection> connections) {
+		connections.putAll(handler.coordList);
 	}
 
 
@@ -77,7 +70,7 @@ public class TileEntityArray extends TileEntityHandlerInventory implements IConn
 			addCable();
 		}
 		handler.updateCoordsList();
-		CacheRegistry.refreshCache(registryID);
+		//CacheRegistry.refreshCache(registryID);
 	}
 
 	public void invalidate() {
@@ -122,7 +115,7 @@ public class TileEntityArray extends TileEntityHandlerInventory implements IConn
 		super.setInventorySlotContents(i, itemstack);
 		this.worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
 		handler.updateCoordsList();
-		CacheRegistry.refreshCache(registryID);
+		//CacheRegistry.refreshCache(registryID);
 	}
 
 }

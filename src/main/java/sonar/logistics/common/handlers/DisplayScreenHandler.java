@@ -2,7 +2,6 @@ package sonar.logistics.common.handlers;
 
 import io.netty.buffer.ByteBuf;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -19,14 +18,14 @@ import sonar.core.utils.BlockCoords;
 import sonar.core.utils.BlockInteraction;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.Logistics;
-import sonar.logistics.api.Info;
 import sonar.logistics.api.LogisticsAPI;
-import sonar.logistics.api.StandardInfo;
 import sonar.logistics.api.cache.CacheTypes;
 import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.connecting.IInfoEmitter;
 import sonar.logistics.api.connecting.IInfoReader;
 import sonar.logistics.api.connecting.ILargeDisplay;
+import sonar.logistics.api.info.Info;
+import sonar.logistics.api.info.StandardInfo;
 import sonar.logistics.api.interaction.IDefaultInteraction;
 import sonar.logistics.api.render.InfoInteractionHandler;
 import sonar.logistics.api.render.ScreenType;
@@ -157,7 +156,6 @@ public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 			}
 		}
 		INetworkCache network = LogisticsAPI.getCableHelper().getNetwork(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite());
-		System.out.print(network);
 		if(network==null){
 			return;
 		}

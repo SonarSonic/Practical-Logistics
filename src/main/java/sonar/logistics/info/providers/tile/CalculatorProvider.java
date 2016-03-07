@@ -10,8 +10,8 @@ import sonar.calculator.mod.api.flux.IFlux;
 import sonar.calculator.mod.api.flux.IFluxPoint;
 import sonar.calculator.mod.api.machines.ITeleport;
 import sonar.calculator.mod.utils.FluxRegistry;
-import sonar.logistics.api.Info;
-import sonar.logistics.api.StandardInfo;
+import sonar.logistics.api.info.Info;
+import sonar.logistics.api.info.StandardInfo;
 import sonar.logistics.api.providers.TileProvider;
 import cpw.mods.fml.common.Loader;
 

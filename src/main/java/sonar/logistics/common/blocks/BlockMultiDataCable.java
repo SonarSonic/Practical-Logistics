@@ -11,7 +11,6 @@ import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.common.block.SonarMachineBlock;
 import sonar.core.common.block.SonarMaterials;
 import sonar.core.utils.BlockInteraction;
-import sonar.core.utils.helpers.FontHelper;
 import sonar.logistics.api.connecting.CableType;
 import sonar.logistics.common.tileentity.TileEntityChannelledCable;
 import cpw.mods.fml.relauncher.Side;

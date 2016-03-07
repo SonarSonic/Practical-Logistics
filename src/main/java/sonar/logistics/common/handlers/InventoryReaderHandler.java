@@ -26,10 +26,10 @@ import sonar.core.utils.BlockCoords;
 import sonar.core.utils.BlockInteraction;
 import sonar.core.utils.helpers.FontHelper;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
-import sonar.logistics.api.Info;
 import sonar.logistics.api.LogisticsAPI;
-import sonar.logistics.api.StandardInfo;
 import sonar.logistics.api.cache.INetworkCache;
+import sonar.logistics.api.info.Info;
+import sonar.logistics.api.info.StandardInfo;
 import sonar.logistics.api.interaction.IDefaultInteraction;
 import sonar.logistics.api.providers.InventoryHandler.StorageSize;
 import sonar.logistics.api.render.ScreenType;
@@ -68,7 +68,7 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 		if (te.getWorldObj().isRemote) {
 			return;
 		}
-		StorageItems list = LogisticsAPI.getItemHelper().getStackList(getNetwork(te));
+		StorageItems list = LogisticsAPI.getItemHelper().getItems(getNetwork(te));
 		if (sortingType.getObject() == 0) {
 			Collections.sort(list.items, new Comparator<StoredItemStack>() {
 				public int compare(StoredItemStack str1, StoredItemStack str2) {

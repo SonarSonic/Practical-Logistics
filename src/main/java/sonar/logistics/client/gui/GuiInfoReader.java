@@ -20,7 +20,7 @@ import sonar.core.inventory.GuiSonar;
 import sonar.core.inventory.SonarButtons;
 import sonar.core.utils.helpers.FontHelper;
 import sonar.logistics.Logistics;
-import sonar.logistics.api.Info;
+import sonar.logistics.api.info.Info;
 import sonar.logistics.common.containers.ContainerInfoNode;
 import sonar.logistics.common.handlers.InfoReaderHandler;
 import sonar.logistics.info.types.CategoryInfo;

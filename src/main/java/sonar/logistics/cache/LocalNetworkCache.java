@@ -1,7 +1,6 @@
 package sonar.logistics.cache;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 
@@ -9,16 +8,16 @@ import net.minecraft.block.Block;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.utils.BlockCoords;
-import sonar.logistics.api.ExternalCoords;
-import sonar.logistics.api.IdentifiedCoords;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.cache.CacheTypes;
-import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.connecting.IChannelProvider;
 import sonar.logistics.api.connecting.IConnectionNode;
 import sonar.logistics.api.connecting.ILogicTile;
+import sonar.logistics.api.utils.ExternalCoords;
+import sonar.logistics.api.wrappers.FluidWrapper.StorageFluids;
+import sonar.logistics.api.wrappers.ItemWrapper.StorageItems;
 
-public class LocalNetworkCache implements INetworkCache {
+public class LocalNetworkCache extends StorageCache {
 	public final ILogicTile tile;
 
 	public LocalNetworkCache(ILogicTile tile) {
@@ -26,10 +25,12 @@ public class LocalNetworkCache implements INetworkCache {
 	}
 
 	@Override
-	public Entry<BlockCoords, ForgeDirection> getExternalBlock() {
+	public Entry<BlockCoords, ForgeDirection> getExternalBlock(boolean includeChannels) {
 		try {
 			if (tile instanceof IConnectionNode) {
-				for (Entry<BlockCoords, ForgeDirection> entry : ((IConnectionNode) tile).getConnections().entrySet()) {
+				LinkedHashMap<BlockCoords, ForgeDirection> map = new LinkedHashMap();
+				((IConnectionNode) tile).addConnections(map);
+				for (Entry<BlockCoords, ForgeDirection> entry : map.entrySet()) {
 					if (entry.getKey().getBlock(entry.getKey().getWorld()) != null) {
 						return entry;
 					}
@@ -38,26 +39,8 @@ public class LocalNetworkCache implements INetworkCache {
 			if (tile instanceof IChannelProvider) {
 				IChannelProvider provider = (IChannelProvider) tile;
 				final ExternalCoords coords = provider.getChannel();
-				if (coords != null) {
-					return new Entry<BlockCoords, ForgeDirection>() {
-
-						@Override
-						public BlockCoords getKey() {
-							return coords.blockCoords;
-						}
-
-						@Override
-						public ForgeDirection getValue() {
-							return coords.dir;
-						}
-
-						@Override
-						public ForgeDirection setValue(ForgeDirection dir) {
-							return null;
-						}
-
-					};
-				}
+				TileEntity channel = coords.blockCoords.getTileEntity();
+				return LogisticsAPI.getCableHelper().getNetwork(channel, ForgeDirection.getOrientation(channel.getBlockMetadata()).getOpposite()).getExternalBlock(true);
 			}
 		} catch (Exception exception) {
 		}
@@ -65,16 +48,23 @@ public class LocalNetworkCache implements INetworkCache {
 	}
 
 	@Override
-	public LinkedHashMap<BlockCoords, ForgeDirection> getExternalBlocks() {
+	public LinkedHashMap<BlockCoords, ForgeDirection> getExternalBlocks(boolean includeChannels) {
 		LinkedHashMap map = new LinkedHashMap();
 		try {
 			if (tile instanceof IConnectionNode) {
-				map.putAll(((IConnectionNode) tile).getConnections());
+				LinkedHashMap<BlockCoords, ForgeDirection> connections = new LinkedHashMap();
+				((IConnectionNode) tile).addConnections(connections);
+				for (Entry<BlockCoords, ForgeDirection> set : connections.entrySet()) {
+					if (!map.containsKey(set.getKey())) {
+						map.put(set.getKey(), set.getValue());
+					}
+				}
 			}
 			if (tile instanceof IChannelProvider) {
 				IChannelProvider provider = (IChannelProvider) tile;
-				ExternalCoords coords = provider.getChannel();
-				return LogisticsAPI.getCableHelper().getNetwork(coords.blockCoords.getTileEntity(), coords.dir).getExternalBlocks();
+				final ExternalCoords coords = provider.getChannel();
+				TileEntity channel = coords.blockCoords.getTileEntity();
+				return LogisticsAPI.getCableHelper().getNetwork(channel, ForgeDirection.getOrientation(channel.getBlockMetadata()).getOpposite()).getExternalBlocks(true);
 			}
 		} catch (Exception exception) {
 			return new LinkedHashMap();
@@ -113,5 +103,35 @@ public class LocalNetworkCache implements INetworkCache {
 		} catch (Exception exception) {
 		}
 		return null;
+	}
+
+	@Override
+	public int getNetworkID() {
+		if (tile instanceof IChannelProvider) {
+			try {
+				IChannelProvider provider = (IChannelProvider) tile;
+				final ExternalCoords coords = provider.getChannel();
+				TileEntity channel = coords.blockCoords.getTileEntity();
+				return LogisticsAPI.getCableHelper().getNetwork(channel, ForgeDirection.getOrientation(channel.getBlockMetadata()).getOpposite()).getNetworkID();
+			} catch (Exception exception) {
+			}
+
+		}
+		return -1;
+	}
+
+	@Override
+	public ArrayList<Integer> getConnectedNetworks(ArrayList<Integer> networks) {
+		return networks;
+	}
+
+	@Override
+	public StorageItems getStoredItems() {
+		return this.getStoredItems();
+	}
+
+	@Override
+	public StorageFluids getStoredFluids() {
+		return this.getStoredFluids();
 	}
 }

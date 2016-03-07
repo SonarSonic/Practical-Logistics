@@ -1,4 +1,4 @@
-package sonar.logistics.api;
+package sonar.logistics.api.utils;
 
 import java.util.List;
 
@@ -6,6 +6,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import sonar.core.utils.IBufObject;
 import sonar.core.utils.INBTObject;
+import sonar.logistics.api.LogisticsAPI;
 
 /** used for filtering Item Router */
 public abstract class ItemFilter<T extends ItemFilter> implements INBTObject, IBufObject {

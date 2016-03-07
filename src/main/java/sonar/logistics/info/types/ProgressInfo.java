@@ -10,8 +10,8 @@ import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 
 import sonar.core.utils.helpers.RenderHelper;
-import sonar.logistics.api.Info;
 import sonar.logistics.api.LogisticsAPI;
+import sonar.logistics.api.info.Info;
 import sonar.logistics.api.render.ScreenType;
 import sonar.logistics.client.renderers.RenderHandlers;
 import cpw.mods.fml.common.network.ByteBufUtils;

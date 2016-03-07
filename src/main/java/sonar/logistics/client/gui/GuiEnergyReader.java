@@ -71,7 +71,7 @@ public class GuiEnergyReader extends GuiSelectionList<StoredEnergyInfo> {
 			if (getViewableSize() == 7) {
 				offsetTop = offsetTop + 2;
 			}
-			FontHelper.text(string + ": " + selection.stack.stored + " RF", 28, offsetTop + 5 + (getSelectionHeight() * pos), Color.WHITE.getRGB());
+			FontHelper.text(string + ": " + selection.stack.stored + " " + selection.stack.energyType.getStorageSuffix(), 28, offsetTop + 5 + (getSelectionHeight() * pos), Color.WHITE.getRGB());
 			if (selection.coords.block != null) {
 				GL11.glEnable(GL11.GL_DEPTH_TEST);
 				RenderItem.getInstance().renderItemAndEffectIntoGUI(fontRendererObj, this.mc.getTextureManager(), selection.coords.block, 8, offsetTop + 1 + (getSelectionHeight() * pos));

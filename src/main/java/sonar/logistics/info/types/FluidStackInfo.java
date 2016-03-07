@@ -12,7 +12,7 @@ import net.minecraft.util.IIcon;
 import org.lwjgl.opengl.GL11;
 
 import sonar.core.fluid.StoredFluidStack;
-import sonar.logistics.api.Info;
+import sonar.logistics.api.info.Info;
 import sonar.logistics.api.render.ScreenType;
 import cpw.mods.fml.common.network.ByteBufUtils;
 

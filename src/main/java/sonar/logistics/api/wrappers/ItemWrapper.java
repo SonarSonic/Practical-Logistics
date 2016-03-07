@@ -36,7 +36,7 @@ public class ItemWrapper {
 	 * @param network current coordinates of the network
 	 * @return list of {@link StoredItemStack} on the network
 	 */
-	public StorageItems getStackList(INetworkCache network) {
+	public StorageItems getItems(INetworkCache network) {
 		return StorageItems.EMPTY;
 	}
 

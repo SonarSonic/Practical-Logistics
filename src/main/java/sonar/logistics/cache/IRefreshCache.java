@@ -5,4 +5,6 @@ import sonar.logistics.api.cache.INetworkCache;
 public interface IRefreshCache extends INetworkCache {
 	
 	public void refreshCache(int networkID);
+	
+	public void updateNetwork(int networkID);
 }

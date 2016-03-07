@@ -11,8 +11,8 @@ import sonar.calculator.mod.api.machines.IGreenhouse;
 import sonar.calculator.mod.api.machines.IProcessMachine;
 import sonar.calculator.mod.api.nutrition.IHealthProcessor;
 import sonar.calculator.mod.api.nutrition.IHungerProcessor;
-import sonar.logistics.api.Info;
-import sonar.logistics.api.StandardInfo;
+import sonar.logistics.api.info.Info;
+import sonar.logistics.api.info.StandardInfo;
 import sonar.logistics.api.providers.TileProvider;
 import cpw.mods.fml.common.Loader;
 

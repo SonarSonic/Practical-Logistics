@@ -13,29 +13,27 @@ import sonar.logistics.api.providers.InventoryHandler.StorageSize;
 /** used for providing information on Fluids stored in Block/TileEntities for the Fluid Reader to read, the Provider must be registered in the {@link LogisticsAPI} to be used */
 public abstract class FluidHandler implements IRegistryObject {
 
-	public int getID(){
+	public int getID() {
 		return LogisticsAPI.getRegistry().getFluidHandlerID(getName());
 	}
-	
+
 	/** the name the info helper will be registered too */
 	public abstract String getName();
 
-	/**
-	 * @param tile The World
+	/** @param tile The World
 	 * @param dir The direction of the Node to the Block
-	 * @return can this provider give info for the block/tile in the world at x,y,z
-	 */
+	 * @return can this provider give info for the block/tile in the world at x,y,z */
 	public abstract boolean canHandleFluids(TileEntity tile, ForgeDirection dir);
 
-	/**only called if canProvideFluids is true*/
-	public abstract StorageSize getFluids(List<StoredFluidStack> fluids, TileEntity tile, ForgeDirection dir);	
+	/** only called if canProvideFluids is true */
+	public abstract StorageSize getFluids(List<StoredFluidStack> fluids, TileEntity tile, ForgeDirection dir);
 
-	/**returns what wasn't added*/
+	/** returns what wasn't added */
 	public abstract StoredFluidStack addStack(StoredFluidStack add, TileEntity tile, ForgeDirection dir, ActionType action);
 
-	/**returns what wasn't extracted*/
+	/** returns what wasn't extracted */
 	public abstract StoredFluidStack removeStack(StoredFluidStack remove, TileEntity tile, ForgeDirection dir, ActionType action);
-	
+
 	/** used when the provider is loaded normally used to check if relevant mods are loaded for APIs to work */
 	public boolean isLoadable() {
 		return true;

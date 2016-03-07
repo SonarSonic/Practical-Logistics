@@ -8,7 +8,7 @@ import java.util.List;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.oredict.OreDictionary;
-import sonar.logistics.api.ItemFilter;
+import sonar.logistics.api.utils.ItemFilter;
 import cpw.mods.fml.common.network.ByteBufUtils;
 
 public class OreDictionaryFilter extends ItemFilter<OreDictionaryFilter> {

@@ -1,7 +1,5 @@
 package sonar.logistics.common.tileentity;
 
-import java.util.ArrayList;
-
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.common.tileentity.TileEntityHandler;
@@ -9,10 +7,9 @@ import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.ITileHandler;
 import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.utils.BlockCoords;
-import sonar.logistics.api.Info;
 import sonar.logistics.api.LogisticsAPI;
-import sonar.logistics.api.cache.CacheTypes;
 import sonar.logistics.api.connecting.IInfoEmitter;
+import sonar.logistics.api.info.Info;
 import sonar.logistics.common.handlers.EnergyReaderHandler;
 
 public class TileEntityEnergyReader extends TileEntityHandler implements IInfoEmitter, ITileHandler {

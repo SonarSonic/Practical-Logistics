@@ -1,16 +1,18 @@
 package sonar.logistics.registries;
 
 import sonar.core.utils.helpers.NBTRegistryHelper;
-import sonar.logistics.api.EntityInfo;
-import sonar.logistics.api.Info;
-import sonar.logistics.api.StandardInfo;
+import sonar.logistics.api.info.EntityInfo;
+import sonar.logistics.api.info.Info;
+import sonar.logistics.api.info.StandardInfo;
 import sonar.logistics.info.types.BlockCoordsInfo;
+import sonar.logistics.info.types.BlockNameInfo;
 import sonar.logistics.info.types.CategoryInfo;
 import sonar.logistics.info.types.FluidInfo;
 import sonar.logistics.info.types.FluidInventoryInfo;
 import sonar.logistics.info.types.FluidStackInfo;
 import sonar.logistics.info.types.InventoryInfo;
 import sonar.logistics.info.types.ManaInfo;
+import sonar.logistics.info.types.ModidInfo;
 import sonar.logistics.info.types.ProgressInfo;
 import sonar.logistics.info.types.StoredEnergyInfo;
 import sonar.logistics.info.types.StoredStackInfo;
@@ -33,6 +35,8 @@ public class InfoTypeRegistry extends NBTRegistryHelper.Buf<Info> {
 		registerObject(new InventoryInfo());
 		registerObject(new StoredEnergyInfo());
 		registerObject(new FluidInventoryInfo());
+		registerObject(new BlockNameInfo());
+		registerObject(new ModidInfo());
 
 	}
 

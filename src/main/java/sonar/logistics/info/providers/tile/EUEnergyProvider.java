@@ -11,8 +11,8 @@ import mekanism.api.energy.IStrictEnergyStorage;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
-import sonar.logistics.api.Info;
-import sonar.logistics.api.StandardInfo;
+import sonar.logistics.api.info.Info;
+import sonar.logistics.api.info.StandardInfo;
 import sonar.logistics.api.providers.TileProvider;
 import cpw.mods.fml.common.Loader;
 

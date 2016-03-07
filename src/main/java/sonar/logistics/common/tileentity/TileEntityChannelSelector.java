@@ -1,7 +1,5 @@
 package sonar.logistics.common.tileentity;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 import net.minecraftforge.common.util.ForgeDirection;
@@ -9,15 +7,13 @@ import sonar.core.common.tileentity.TileEntityHandler;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.utils.BlockCoords;
-import sonar.logistics.api.ExternalCoords;
-import sonar.logistics.api.Info;
 import sonar.logistics.api.LogisticsAPI;
-import sonar.logistics.api.cache.CacheTypes;
 import sonar.logistics.api.connecting.CableType;
-import sonar.logistics.api.connecting.IChannelProvider;
 import sonar.logistics.api.connecting.IConnectionNode;
 import sonar.logistics.api.connecting.IInfoEmitter;
+import sonar.logistics.api.info.Info;
 import sonar.logistics.api.render.ICableRenderer;
+import sonar.logistics.api.utils.ExternalCoords;
 import sonar.logistics.common.handlers.ChannelSelectorHandler;
 import sonar.logistics.info.types.BlockCoordsInfo;
 
@@ -56,23 +52,29 @@ public class TileEntityChannelSelector extends TileEntityHandler implements IInf
 
 	@Override
 	public void addConnections() {
-		LogisticsAPI.getCableHelper().addConnection(this, ForgeDirection.getOrientation(FMPHelper.getMeta(this)));
-
+		for (int i = 0; i < 6; i++) {
+			ForgeDirection dir = ForgeDirection.getOrientation(i);
+			if (dir != ForgeDirection.getOrientation(FMPHelper.getMeta(this)).getOpposite()) {
+				LogisticsAPI.getCableHelper().addConnection(this, dir);
+			}
+		}
 	}
 
 	@Override
 	public void removeConnections() {
-		LogisticsAPI.getCableHelper().addConnection(this, ForgeDirection.getOrientation(FMPHelper.getMeta(this)));
+		for (int i = 0; i < 6; i++) {
+			ForgeDirection dir = ForgeDirection.getOrientation(i);
+			if (dir != ForgeDirection.getOrientation(FMPHelper.getMeta(this)).getOpposite()) {
+				LogisticsAPI.getCableHelper().removeConnection(this, dir);
+			}
+		}
 	}
 
 	@Override
-	public Map<BlockCoords, ForgeDirection> getConnections() {
-		LinkedHashMap<BlockCoords, ForgeDirection> map = new LinkedHashMap();
+	public void addConnections(Map<BlockCoords, ForgeDirection> connections) {
 		try {
 			ExternalCoords coords = handler.getChannel(this);
-			map.put(coords.blockCoords, coords.dir);
-		} catch (Exception exception) {
-		}
-		return map;
+			connections.put(coords.blockCoords, coords.dir);
+		} catch (Exception exception) {}
 	}
 }

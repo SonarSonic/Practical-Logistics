@@ -5,7 +5,7 @@ import net.minecraft.client.gui.FontRenderer;
 
 import org.lwjgl.opengl.GL11;
 
-import sonar.logistics.api.Info;
+import sonar.logistics.api.info.Info;
 import sonar.logistics.api.render.ScreenType;
 import sonar.logistics.api.wrappers.RenderWrapper;
 

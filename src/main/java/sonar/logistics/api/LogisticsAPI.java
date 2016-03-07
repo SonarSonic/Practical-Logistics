@@ -13,7 +13,9 @@ import cpw.mods.fml.common.Loader;
  * This will be initilized by Practical Logistics if it is loaded. Make sure you only register stuff once Practical Logistics is loaded thefore in the FMLPostInitializationEvent*/
 public final class LogisticsAPI {
 
-	public static final String VERSION = "1.1";
+	public static final String MODID = "PracticalLogistics";
+	public static final String NAME = "PracticalLogisticsAPI";	
+	public static final String VERSION = "1.2";
 	
 	private static RegistryWrapper registry = new RegistryWrapper();	
 	private static CablingWrapper cables = new CablingWrapper();

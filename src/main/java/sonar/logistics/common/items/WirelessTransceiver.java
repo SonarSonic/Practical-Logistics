@@ -2,8 +2,6 @@ package sonar.logistics.common.items;
 
 import java.util.List;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -17,6 +15,8 @@ import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.FontHelper;
 import sonar.core.utils.helpers.SonarHelper;
 import sonar.logistics.api.connecting.ITransceiver;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 public class WirelessTransceiver extends SonarItem implements ITransceiver {
 

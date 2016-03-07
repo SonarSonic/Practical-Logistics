@@ -6,15 +6,14 @@ import java.util.Map;
 
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
-import sonar.core.energy.StoredEnergyStack;
 import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.SonarHelper;
 import sonar.logistics.Logistics;
-import sonar.logistics.api.IdentifiedCoords;
-import sonar.logistics.api.cache.CacheTypes;
 import sonar.logistics.api.cache.INetworkCache;
-import sonar.logistics.api.connecting.IConnectionNode;
-import sonar.logistics.api.providers.EnergyHandler;
+import sonar.logistics.api.providers.EnergyProvider;
+import sonar.logistics.api.utils.EnergyType;
+import sonar.logistics.api.utils.IdentifiedCoords;
+import sonar.logistics.api.utils.StoredEnergyStack;
 import sonar.logistics.api.wrappers.EnergyWrapper;
 import sonar.logistics.info.types.StoredEnergyInfo;
 
@@ -22,28 +21,38 @@ public class EnergyHelper extends EnergyWrapper {
 
 	public List<StoredEnergyInfo> getEnergyList(INetworkCache network) {
 		List<StoredEnergyInfo> energyList = new ArrayList();
-		List<EnergyHandler> handlers = Logistics.energyProviders.getObjects();
-		/*
-		for (BlockCoords coord : network.getConnections(CacheTypes.BLOCK)) {
-			TileEntity target = coord.getTileEntity();
-			if (target != null && target instanceof IConnectionNode) {
-				IConnectionNode node = (IConnectionNode) target;
-				
-			}
-		}
-		*/
-		Map<BlockCoords, ForgeDirection> connections = network.getExternalBlocks();
+		Map<BlockCoords, ForgeDirection> connections = network.getExternalBlocks(true);
 		for (Map.Entry<BlockCoords, ForgeDirection> entry : connections.entrySet()) {
 			TileEntity energyTile = entry.getKey().getTileEntity();
 			if (energyTile != null) {
-				StoredEnergyStack stack = new StoredEnergyStack();
-				for (EnergyHandler handler : handlers) {
-					handler.getEnergyInfo(stack, energyTile, entry.getValue());
+				for (EnergyType type : Logistics.energyTypes.getObjects()) {
+					StoredEnergyStack stack = new StoredEnergyStack(type);
+					boolean provided = false;
+					for (EnergyProvider handler : getProviders(type)) {
+						if (handler.canProvideInfo(energyTile, entry.getValue())) {
+							handler.getEnergyInfo(stack, energyTile, entry.getValue());
+							provided = true;
+						}
+					}
+					if (provided) {
+						IdentifiedCoords iCoords = new IdentifiedCoords("", SonarHelper.createStackedBlock(energyTile.getBlockType(), energyTile.getBlockMetadata()), entry.getKey());
+						energyList.add(StoredEnergyInfo.createInfo(iCoords, stack));
+						break;
+					}
 				}
-				IdentifiedCoords iCoords = new IdentifiedCoords("", SonarHelper.createStackedBlock(energyTile.getBlockType(), energyTile.getBlockMetadata()), entry.getKey());
-				energyList.add(StoredEnergyInfo.createInfo(iCoords, stack));
 			}
 		}
 		return energyList;
+	}
+
+	public List<EnergyProvider> getProviders(EnergyType type) {
+		List<EnergyProvider> providers = new ArrayList();
+		List<EnergyProvider> handlers = Logistics.energyProviders.getObjects();
+		for (EnergyProvider provider : handlers) {
+			if (provider.getProvidedType().getName().equals(type.getName())) {
+				providers.add(provider);
+			}
+		}
+		return providers;
 	}
 }

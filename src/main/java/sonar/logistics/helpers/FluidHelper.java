@@ -1,7 +1,5 @@
 package sonar.logistics.helpers;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -19,64 +17,28 @@ import sonar.core.utils.BlockCoords;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.cache.INetworkCache;
-import sonar.logistics.api.connecting.IConnectionNode;
 import sonar.logistics.api.providers.FluidHandler;
-import sonar.logistics.api.providers.InventoryHandler.StorageSize;
 import sonar.logistics.api.wrappers.FluidWrapper;
-import sonar.logistics.api.wrappers.FluidWrapper.StorageFluids;
+import sonar.logistics.cache.IStorageCache;
 
 public class FluidHelper extends FluidWrapper {
 
 	/*
-	public StorageFluids getFluids(List<BlockCoords> network) {
-		List<StoredFluidStack> fluidList = new ArrayList();
-		StorageSize storage = new StorageSize(0, 0);
-		List<FluidHandler> providers = Logistics.fluidProviders.getObjects();
-
-		for (FluidHandler provider : providers) {
-			for (BlockCoords coord : network) {
-				TileEntity target = coord.getTileEntity();
-				if (target != null && target instanceof IConnectionNode) {
-					IConnectionNode node = (IConnectionNode) target;
-					Map<BlockCoords, ForgeDirection> connections = node.getConnections();
-					for (Map.Entry<BlockCoords, ForgeDirection> entry : connections.entrySet()) {
-						TileEntity fluidTile = entry.getKey().getTileEntity(target.getWorldObj());
-						if (provider.canHandleFluids(fluidTile, entry.getValue())) {
-							List<StoredFluidStack> info = new ArrayList();
-							StorageSize size = provider.getFluids(info, fluidTile, entry.getValue());
-							storage.addItems(size.getStoredFluids());
-							storage.addStorage(size.getMaxFluids());
-							for (StoredFluidStack fluid : info) {
-								addFluidToList(fluidList, fluid);
-							}
-						}
-					}
-				}
-			}
-		}
-		return new StorageFluids(fluidList, storage);
-	}
-	*/
+	 * public StorageFluids getFluids(List<BlockCoords> network) { List<StoredFluidStack> fluidList = new ArrayList(); StorageSize storage = new StorageSize(0, 0); List<FluidHandler> providers = Logistics.fluidProviders.getObjects();
+	 * 
+	 * for (FluidHandler provider : providers) { for (BlockCoords coord : network) { TileEntity target = coord.getTileEntity(); if (target != null && target instanceof IConnectionNode) { IConnectionNode node = (IConnectionNode) target; Map<BlockCoords, ForgeDirection> connections = node.getConnections(); for (Map.Entry<BlockCoords, ForgeDirection> entry : connections.entrySet()) { TileEntity fluidTile = entry.getKey().getTileEntity(target.getWorldObj()); if (provider.canHandleFluids(fluidTile, entry.getValue())) { List<StoredFluidStack> info = new ArrayList(); StorageSize size = provider.getFluids(info, fluidTile, entry.getValue()); storage.addItems(size.getStoredFluids()); storage.addStorage(size.getMaxFluids()); for (StoredFluidStack fluid : info) { addFluidToList(fluidList, fluid); } }
+	 * } } } } return new StorageFluids(fluidList, storage); }
+	 */
 	public StorageFluids getFluids(INetworkCache network) {
-		List<StoredFluidStack> fluidList = new ArrayList();
-		StorageSize storage = new StorageSize(0, 0);
-		List<FluidHandler> providers = Logistics.fluidProviders.getObjects();
-		LinkedHashMap<BlockCoords,ForgeDirection> blocks = network.getExternalBlocks();		
-		for (FluidHandler provider : providers) {
-			for (Map.Entry<BlockCoords, ForgeDirection> entry : blocks.entrySet()) {
-				TileEntity fluidTile = entry.getKey().getTileEntity();
-				if (fluidTile != null && provider.canHandleFluids(fluidTile, entry.getValue())) {
-					List<StoredFluidStack> info = new ArrayList();
-					StorageSize size = provider.getFluids(info, fluidTile, entry.getValue());
-					storage.addItems(size.getStoredFluids());
-					storage.addStorage(size.getMaxFluids());
-					for (StoredFluidStack fluid : info) {
-						addFluidToList(fluidList, fluid);
-					}
-				}
-			}
+		/*
+		 * List<StoredFluidStack> fluidList = new ArrayList(); StorageSize storage = new StorageSize(0, 0); List<FluidHandler> providers = Logistics.fluidProviders.getObjects(); LinkedHashMap<BlockCoords,ForgeDirection> blocks = network.getExternalBlocks(true); for (FluidHandler provider : providers) { for (Map.Entry<BlockCoords, ForgeDirection> entry : blocks.entrySet()) { TileEntity fluidTile = entry.getKey().getTileEntity(); if (fluidTile != null && provider.canHandleFluids(fluidTile, entry.getValue())) { List<StoredFluidStack> info = new ArrayList(); StorageSize size = provider.getFluids(info, fluidTile, entry.getValue()); storage.addItems(size.getStoredFluids()); storage.addStorage(size.getMaxFluids()); for (StoredFluidStack fluid : info) { addFluidToList(fluidList, fluid); } } } }
+		 * return new StorageFluids(fluidList, storage);
+		 */
+		if (network instanceof IStorageCache) {
+			StorageFluids stored = ((IStorageCache) network).getStoredFluids();
+			return stored;
 		}
-		return new StorageFluids(fluidList, storage);
+		return StorageFluids.EMPTY;
 
 	}
 
@@ -97,7 +59,7 @@ public class FluidHelper extends FluidWrapper {
 		if (add.stored == 0) {
 			return add;
 		}
-		Map<BlockCoords, ForgeDirection> connections = network.getExternalBlocks();
+		Map<BlockCoords, ForgeDirection> connections = network.getExternalBlocks(true);
 		for (Map.Entry<BlockCoords, ForgeDirection> entry : connections.entrySet()) {
 			TileEntity tile = entry.getKey().getTileEntity();
 			for (FluidHandler provider : Logistics.fluidProviders.getObjects()) {
@@ -116,7 +78,7 @@ public class FluidHelper extends FluidWrapper {
 		if (remove.stored == 0) {
 			return remove;
 		}
-		Map<BlockCoords, ForgeDirection> connections = network.getExternalBlocks();
+		Map<BlockCoords, ForgeDirection> connections = network.getExternalBlocks(true);
 		for (Map.Entry<BlockCoords, ForgeDirection> entry : connections.entrySet()) {
 			TileEntity tile = entry.getKey().getTileEntity();
 			for (FluidHandler provider : Logistics.fluidProviders.getObjects()) {

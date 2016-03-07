@@ -26,7 +26,7 @@ import sonar.core.inventory.SonarButtons;
 import sonar.core.network.PacketByteBufServer;
 import sonar.core.utils.helpers.FontHelper;
 import sonar.logistics.Logistics;
-import sonar.logistics.api.ItemFilter;
+import sonar.logistics.api.utils.ItemFilter;
 import sonar.logistics.common.containers.ContainerItemRouter;
 import sonar.logistics.common.handlers.ItemRouterHandler;
 import sonar.logistics.common.tileentity.TileEntityItemRouter;

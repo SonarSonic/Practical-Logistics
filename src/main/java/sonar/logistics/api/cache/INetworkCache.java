@@ -2,8 +2,6 @@ package sonar.logistics.api.cache;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 
 import net.minecraft.block.Block;
@@ -15,11 +13,13 @@ import sonar.core.utils.BlockCoords;
 public interface INetworkCache {
 
 	/** used to get the first external block connected to the network.
+	 * @param includeChannels normally true, false if you are retrieving blocks from multiple connected networks, which have already been logged
 	 * @return a {@link Entry} of {@link BlockCoords} paired with {@link ForgeDirection} */
-	public Entry<BlockCoords, ForgeDirection> getExternalBlock();
+	public Entry<BlockCoords, ForgeDirection> getExternalBlock(boolean includeChannels);
 
-	/** @return the {@link LinkedHashMap} of {@link BlockCoords} paired with {@link ForgeDirection} */
-	public LinkedHashMap<BlockCoords, ForgeDirection> getExternalBlocks();
+	/** @param includeChannels normally true, false if you are retrieving blocks from multiple connected networks, which have already been logged
+	 * @return the {@link LinkedHashMap} of {@link BlockCoords} paired with {@link ForgeDirection} */
+	public LinkedHashMap<BlockCoords, ForgeDirection> getExternalBlocks(boolean includeChannels);
 
 	/** gets the full list of Cached Coordinates for a given {@link CacheType}.
 	 * @param type the {@link CacheType} you wish to retrieve.
@@ -35,10 +35,15 @@ public interface INetworkCache {
 	 * @param type the {@link CacheType} you wish to retrieve.
 	 * @return the {@link Block} requested, may be null */
 	public Block getFirstBlock(CacheTypes type);
-	
+
 	/** convenience method for getting the {@link TileEntity} of the first connection from the given {@link CacheType}
 	 * @param type the {@link CacheType} you wish to retrieve.
 	 * @return the {@link TileEntity} requested, may be null */
 	public TileEntity getFirstTileEntity(CacheTypes type);
 
+	/** @return the networkID */
+	public int getNetworkID();
+	
+	public ArrayList<Integer> getConnectedNetworks(ArrayList<Integer> networks);
+	
 }

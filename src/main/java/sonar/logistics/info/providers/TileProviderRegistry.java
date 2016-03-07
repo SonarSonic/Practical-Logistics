@@ -1,6 +1,5 @@
 package sonar.logistics.info.providers;
 
-import cpw.mods.fml.common.Loader;
 import sonar.core.utils.helpers.RegistryHelper;
 import sonar.logistics.api.providers.TileProvider;
 import sonar.logistics.info.providers.tile.AE2CraftingProvider;
@@ -24,6 +23,7 @@ import sonar.logistics.info.providers.tile.RFEnergyProvider;
 import sonar.logistics.info.providers.tile.RotaryCraftProvider;
 import sonar.logistics.info.providers.tile.ThaumcraftProvider;
 import sonar.logistics.info.providers.tile.VanillaTileEntityProvider;
+import cpw.mods.fml.common.Loader;
 
 public class TileProviderRegistry extends RegistryHelper<TileProvider> {
 

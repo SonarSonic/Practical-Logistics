@@ -4,11 +4,13 @@ import mekanism.api.energy.IStrictEnergyAcceptor;
 import mekanism.api.energy.IStrictEnergyStorage;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
-import sonar.core.energy.StoredEnergyStack;
-import sonar.logistics.api.providers.EnergyHandler;
+import sonar.core.utils.ActionType;
+import sonar.logistics.api.providers.EnergyProvider;
+import sonar.logistics.api.utils.EnergyType;
+import sonar.logistics.api.utils.StoredEnergyStack;
 import cpw.mods.fml.common.Loader;
 
-public class MekanismProvider extends EnergyHandler {
+public class MekanismProvider extends EnergyProvider {
 
 	public static String name = "Mekanism-Provider";
 
@@ -32,7 +34,7 @@ public class MekanismProvider extends EnergyHandler {
 	}
 
 	@Override
-	public double addEnergy(double transfer, TileEntity tile, ForgeDirection dir) {
+	public double addEnergy(long transfer, TileEntity tile, ForgeDirection dir, ActionType action) {
 		if (tile instanceof IStrictEnergyAcceptor) {
 			IStrictEnergyAcceptor acceptor = (IStrictEnergyAcceptor) tile;
 			if (acceptor.canReceiveEnergy(dir)) {
@@ -43,7 +45,7 @@ public class MekanismProvider extends EnergyHandler {
 	}
 
 	@Override
-	public double removeEnergy(double transfer, TileEntity tile, ForgeDirection dir) {
+	public double removeEnergy(long transfer, TileEntity tile, ForgeDirection dir, ActionType action) {
 		if (tile instanceof IStrictEnergyStorage) {
 			IStrictEnergyStorage storage = (IStrictEnergyStorage) tile;
 			double maxRemove = Math.min(transfer / 10, storage.getEnergy());
@@ -55,6 +57,11 @@ public class MekanismProvider extends EnergyHandler {
 
 	public boolean isLoadable() {
 		return Loader.isModLoaded("Mekanism");
+	}
+
+	@Override
+	public EnergyType getProvidedType() {
+		return EnergyType.MJ;
 	}
 
 }

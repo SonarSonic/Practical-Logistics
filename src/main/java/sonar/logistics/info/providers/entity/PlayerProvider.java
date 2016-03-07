@@ -4,8 +4,8 @@ import java.util.List;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
-import sonar.logistics.api.EntityInfo;
-import sonar.logistics.api.Info;
+import sonar.logistics.api.info.EntityInfo;
+import sonar.logistics.api.info.Info;
 import sonar.logistics.api.providers.EntityProvider;
 
 public class PlayerProvider extends EntityProvider {

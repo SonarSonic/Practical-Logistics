@@ -12,8 +12,8 @@ import org.lwjgl.opengl.GL11;
 import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.FontHelper;
 import sonar.logistics.Logistics;
-import sonar.logistics.api.ExternalCoords;
-import sonar.logistics.api.IdentifiedCoords;
+import sonar.logistics.api.utils.ExternalCoords;
+import sonar.logistics.api.utils.IdentifiedCoords;
 import sonar.logistics.common.containers.ContainerDataReceiver;
 import sonar.logistics.common.tileentity.TileEntityDataReceiver;
 import sonar.logistics.network.packets.PacketCoordsSelection;
@@ -34,7 +34,11 @@ public class GuiDataReceiver extends GuiSelectionList<IdentifiedCoords> {
 
 	@Override
 	public IdentifiedCoords getCurrentSelection() {
-		return tile.getChannel().getIdentifiedCoords();
+		ExternalCoords channel = tile.getChannel();
+		if (channel != null) {
+			return tile.getChannel().getIdentifiedCoords();
+		}
+		return null;
 	}
 
 	@Override

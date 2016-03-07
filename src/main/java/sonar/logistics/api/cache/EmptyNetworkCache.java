@@ -1,9 +1,7 @@
 package sonar.logistics.api.cache;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Map.Entry;
 
 import net.minecraft.block.Block;
@@ -14,12 +12,12 @@ import sonar.core.utils.BlockCoords;
 public class EmptyNetworkCache implements INetworkCache {
 
 	@Override
-	public Entry<BlockCoords, ForgeDirection> getExternalBlock() {
+	public Entry<BlockCoords, ForgeDirection> getExternalBlock(boolean includeChannels) {
 		return null;
 	}
 
 	@Override
-	public LinkedHashMap<BlockCoords, ForgeDirection> getExternalBlocks() {
+	public LinkedHashMap<BlockCoords, ForgeDirection> getExternalBlocks(boolean includeChannels) {
 		return new LinkedHashMap();
 	}
 
@@ -41,6 +39,16 @@ public class EmptyNetworkCache implements INetworkCache {
 	@Override
 	public TileEntity getFirstTileEntity(CacheTypes type) {
 		return null;
+	}
+
+	@Override
+	public int getNetworkID() {
+		return -1;
+	}
+
+	@Override
+	public ArrayList<Integer> getConnectedNetworks(ArrayList<Integer> networks) {
+		return networks;
 	}
 
 }

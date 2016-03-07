@@ -10,7 +10,7 @@ import net.minecraft.tileentity.TileEntity;
 import org.lwjgl.opengl.GL11;
 
 import sonar.logistics.api.LogisticsAPI;
-import sonar.logistics.api.StandardInfo;
+import sonar.logistics.api.info.StandardInfo;
 import sonar.logistics.api.render.ScreenType;
 import thaumcraft.api.aspects.Aspect;
 import cpw.mods.fml.common.network.ByteBufUtils;

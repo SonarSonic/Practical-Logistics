@@ -14,15 +14,13 @@ import sonar.core.SonarCore;
 import sonar.core.network.PacketTileSync;
 import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
-import sonar.logistics.api.ExternalCoords;
-import sonar.logistics.api.IdentifiedCoords;
-import sonar.logistics.api.Info;
 import sonar.logistics.api.LogisticsAPI;
-import sonar.logistics.api.StandardInfo;
-import sonar.logistics.api.cache.CacheTypes;
 import sonar.logistics.api.connecting.IChannelProvider;
 import sonar.logistics.api.connecting.IInfoEmitter;
-import sonar.logistics.network.SyncExternalCoords;
+import sonar.logistics.api.info.Info;
+import sonar.logistics.api.info.StandardInfo;
+import sonar.logistics.api.utils.ExternalCoords;
+import sonar.logistics.api.utils.IdentifiedCoords;
 import sonar.logistics.network.SyncIdentifiedCoords;
 import sonar.logistics.registries.BlockRegistry;
 import sonar.logistics.registries.EmitterRegistry;
@@ -35,8 +33,10 @@ public class TileEntityDataReceiver extends TileEntityNode implements IChannelPr
 	public SyncIdentifiedCoords emitter = new SyncIdentifiedCoords(0);
 
 	@Override
-	public ExternalCoords getChannel() {		
-		return new ExternalCoords(emitter.getCoords(), ForgeDirection.getOrientation(this.getBlockMetadata()));
+	public ExternalCoords getChannel() {
+		if (emitter.getCoords() != null)
+			return new ExternalCoords(emitter.getCoords(), ForgeDirection.getOrientation(this.getBlockMetadata()));
+		return null;
 	}
 
 	@Override

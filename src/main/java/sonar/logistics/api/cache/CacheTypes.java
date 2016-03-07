@@ -1,5 +1,12 @@
 package sonar.logistics.api.cache;
 
+import sonar.logistics.api.connecting.IChannelProvider;
+import sonar.logistics.api.connecting.IConnectionNode;
+import sonar.logistics.api.connecting.IDataCable;
+import sonar.logistics.api.connecting.IEntityNode;
+import sonar.logistics.api.connecting.IInfoEmitter;
+import sonar.logistics.api.connecting.ILogicTile;
+
 public enum CacheTypes {
 	
 	/**any type of {@link IDataCable}*/
@@ -9,6 +16,8 @@ public enum CacheTypes {
 	BLOCK,
 	/** for all {@link IEntityNode}s or anything else which can provider Entities*/
 	ENTITY_NODES, 
+	/** for all {@link IConnectionNode}s or anything else which can provide Blocks*/
+	NODES, 
 	/**for all {@link IInfoEmitter}s and other custom blocks which can provide Info*/
 	EMITTER, 
 	/**for all {@link ILogicTile}s and other custom blocks which should be seen as a part of the Logistics Network*/

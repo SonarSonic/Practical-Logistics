@@ -19,7 +19,7 @@ import org.lwjgl.opengl.GL12;
 import sonar.core.inventory.StoredItemStack;
 import sonar.core.utils.helpers.FontHelper;
 import sonar.core.utils.helpers.RenderHelper;
-import sonar.logistics.api.Info;
+import sonar.logistics.api.info.Info;
 import sonar.logistics.api.render.ScreenType;
 import cpw.mods.fml.common.network.ByteBufUtils;
 
@@ -196,6 +196,7 @@ public class InventoryInfo extends Info<InventoryInfo> {
 	public void writeUpdate(InventoryInfo currentInfo, NBTTagCompound tag) {
 		if (currentInfo.stacks == null) {
 			currentInfo.stacks = new ArrayList();
+			
 		}
 		if (stacks == null) {
 			stacks = new ArrayList();

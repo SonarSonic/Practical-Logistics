@@ -1,7 +1,7 @@
 package sonar.logistics.api.signals;
 
 import net.minecraft.nbt.NBTTagCompound;
-import sonar.logistics.api.Info;
+import sonar.logistics.api.info.Info;
 
 public abstract class SignallerStatement {
 

@@ -23,6 +23,7 @@ import sonar.logistics.registries.CableRegistry;
 import sonar.logistics.registries.CacheRegistry;
 import sonar.logistics.registries.CraftingRegistry;
 import sonar.logistics.registries.EmitterRegistry;
+import sonar.logistics.registries.EnergyTypeRegistry;
 import sonar.logistics.registries.EventRegistry;
 import sonar.logistics.registries.InfoInteractionRegistry;
 import sonar.logistics.registries.InfoTypeRegistry;
@@ -44,19 +45,21 @@ import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import cpw.mods.fml.common.registry.GameRegistry;
 
-@Mod(modid = Logistics.modid, name = "Practical Logistics", version = Logistics.version)
+@Mod(modid = Logistics.MODID, name = Logistics.NAME, version = Logistics.VERSION)
 public class Logistics {
 
 	@SidedProxy(clientSide = "sonar.logistics.network.LogisticsClient", serverSide = "sonar.logistics.network.LogisticsCommon")
 	public static LogisticsCommon proxy;
 
-	public static final String modid = "PracticalLogistics";
-	public static final String version = "0.1.3";
+	public static final String MODID = "PracticalLogistics";
+	public static final String NAME = "Practical Logistics";
+	public static final String VERSION = "0.1.3";
 
 	public static SimpleNetworkWrapper network;
-	public static Logger logger = (Logger) LogManager.getLogger(modid);
+	public static Logger logger = (Logger) LogManager.getLogger(MODID);
 
 	public static InfoTypeRegistry infoTypes = new InfoTypeRegistry();
+	public static EnergyTypeRegistry energyTypes = new EnergyTypeRegistry();
 	public static InfoInteractionRegistry infoInteraction = new InfoInteractionRegistry();
 	public static ItemFilterRegistry itemFilters = new ItemFilterRegistry();
 	public static TileProviderRegistry tileProviders = new TileProviderRegistry();
@@ -65,7 +68,7 @@ public class Logistics {
 	public static FluidProviderRegistry fluidProviders = new FluidProviderRegistry();
 	public static EnergyProviderRegistry energyProviders = new EnergyProviderRegistry();
 	
-	@Instance(modid)
+	@Instance(MODID)
 	public static Logistics instance;
 
 	public static CreativeTabs creativeTab = new CreativeTabs("Practical Logistics") {
@@ -86,7 +89,7 @@ public class Logistics {
 		LogisticsAPI.init();
 		logger.info("Initilised API");
 		
-		network = NetworkRegistry.INSTANCE.newSimpleChannel(modid);
+		network = NetworkRegistry.INSTANCE.newSimpleChannel(MODID);
 		logger.info("Registered Network");
 
 		SonarCore.registerPackets();
@@ -134,11 +137,8 @@ public class Logistics {
 		proxy.registerRenderThings();
 		logger.info("Registered Renderers");
 
-	}
-
-	@EventHandler
-	public void postLoad(FMLPostInitializationEvent evt) {
 		infoTypes.register();
+		energyTypes.register();		
 		infoInteraction.register();
 		itemFilters.register();
 		tileProviders.register();
@@ -146,7 +146,12 @@ public class Logistics {
 		inventoryProviders.register();
 		fluidProviders.register();
 		energyProviders.register();
+	}
+
+	@EventHandler
+	public void postLoad(FMLPostInitializationEvent evt) {
 		logger.info("Registered " + infoTypes.getObjects().size() + " Info Types");
+		logger.info("Registered " + energyTypes.getObjects().size() + " Energy Types");
 		logger.info("Registered " + infoInteraction.getObjects().size() + " Info Interactions");
 		logger.info("Registered " + itemFilters.getObjects().size() + " Item Filters");
 		logger.info("Registered " + tileProviders.getObjects().size() + " Tile Providers");

@@ -1,13 +1,9 @@
 package sonar.logistics.helpers;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import com.google.common.collect.Maps;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
@@ -24,31 +20,21 @@ import sonar.core.network.PacketInvUpdate;
 import sonar.core.utils.ActionType;
 import sonar.core.utils.BlockCoords;
 import sonar.logistics.Logistics;
-import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.cache.CacheTypes;
 import sonar.logistics.api.cache.INetworkCache;
-import sonar.logistics.api.connecting.IConnectionNode;
 import sonar.logistics.api.connecting.IEntityNode;
 import sonar.logistics.api.providers.InventoryHandler;
 import sonar.logistics.api.providers.InventoryHandler.StorageSize;
 import sonar.logistics.api.wrappers.ItemWrapper;
+import sonar.logistics.cache.IStorageCache;
 
 public class ItemHelper extends ItemWrapper {
 
-	public StorageItems getStackList(INetworkCache network) {
-		List<StoredItemStack> storedStacks = new ArrayList();
-		StorageSize storage = new StorageSize(0, 0);
-
-		Entry<BlockCoords, ForgeDirection> coord = network.getExternalBlock();
-		if (coord != null) {
-			storage = getTileInventory(storedStacks, storage, coord);
-		} else {
-			TileEntity tile = network.getFirstTileEntity(CacheTypes.ENTITY_NODES);
-			if (tile != null && tile instanceof IEntityNode) {
-				storage = getEntityInventory(storedStacks, storage, ((IEntityNode) tile).getEntities());
-			}
+	public StorageItems getItems(INetworkCache network) {
+		if(network instanceof IStorageCache){
+			return ((IStorageCache) network).getStoredItems();
 		}
-		return new StorageItems(storedStacks, storage);
+		return StorageItems.EMPTY;
 	}
 
 	public StorageSize getTileInventory(List<StoredItemStack> storedStacks, StorageSize storage, Map<BlockCoords, ForgeDirection> connections) {
@@ -135,7 +121,7 @@ public class ItemHelper extends ItemWrapper {
 	}
 
 	public StoredItemStack addItems(StoredItemStack add, INetworkCache network, ActionType action) {
-		Map<BlockCoords, ForgeDirection> connections = network.getExternalBlocks();
+		Map<BlockCoords, ForgeDirection> connections = network.getExternalBlocks(true);
 		for (Map.Entry<BlockCoords, ForgeDirection> entry : connections.entrySet()) {
 			TileEntity tile = entry.getKey().getTileEntity();
 			for (InventoryHandler provider : Logistics.inventoryProviders.getObjects()) {
@@ -151,7 +137,7 @@ public class ItemHelper extends ItemWrapper {
 	}
 
 	public StoredItemStack removeItems(StoredItemStack remove, INetworkCache network, ActionType action) {
-		Map<BlockCoords, ForgeDirection> connections = network.getExternalBlocks();
+		Map<BlockCoords, ForgeDirection> connections = network.getExternalBlocks(true);
 		for (Map.Entry<BlockCoords, ForgeDirection> entry : connections.entrySet()) {
 			TileEntity tile = entry.getKey().getTileEntity();
 			for (InventoryHandler provider : Logistics.inventoryProviders.getObjects()) {
@@ -167,7 +153,7 @@ public class ItemHelper extends ItemWrapper {
 	}
 
 	public StoredItemStack getStack(INetworkCache network, int slot) {
-		Entry<BlockCoords, ForgeDirection> block = network.getExternalBlock();
+		Entry<BlockCoords, ForgeDirection> block = network.getExternalBlock(true);
 		StoredItemStack stack = getTileStack(network, slot);
 		if (stack == null) {
 			network.getFirstConnection(CacheTypes.EMITTER);
@@ -217,7 +203,7 @@ public class ItemHelper extends ItemWrapper {
 	}
 
 	public StoredItemStack getTileStack(INetworkCache network, int slot) {
-		Map<BlockCoords, ForgeDirection> connections = network.getExternalBlocks();
+		Map<BlockCoords, ForgeDirection> connections = network.getExternalBlocks(true);
 		for (Map.Entry<BlockCoords, ForgeDirection> entry : connections.entrySet()) {
 			for (InventoryHandler provider : Logistics.inventoryProviders.getObjects()) {
 				TileEntity tile = entry.getKey().getTileEntity();

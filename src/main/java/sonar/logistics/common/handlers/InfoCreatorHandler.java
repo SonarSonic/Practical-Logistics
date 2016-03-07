@@ -10,10 +10,10 @@ import sonar.core.network.sync.ISyncPart;
 import sonar.core.network.sync.SyncGeneric;
 import sonar.core.network.sync.SyncTagType;
 import sonar.logistics.Logistics;
-import sonar.logistics.api.Info;
 import sonar.logistics.api.LogisticsAPI;
-import sonar.logistics.api.StandardInfo;
 import sonar.logistics.api.connecting.CableType;
+import sonar.logistics.api.info.Info;
+import sonar.logistics.api.info.StandardInfo;
 
 import com.google.common.collect.Lists;
 

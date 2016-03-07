@@ -3,18 +3,24 @@ package sonar.logistics.info.providers.tile;
 import java.util.List;
 
 import net.minecraft.block.Block;
+import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.BlockFluidBase;
-import sonar.logistics.api.Info;
-import sonar.logistics.api.StandardInfo;
+import sonar.core.utils.helpers.SonarHelper;
+import sonar.logistics.api.info.Info;
+import sonar.logistics.api.info.StandardInfo;
 import sonar.logistics.api.providers.TileProvider;
+import sonar.logistics.info.types.BlockNameInfo;
+import sonar.logistics.info.types.ModidInfo;
+import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.common.registry.GameRegistry.UniqueIdentifier;
 
 public class BlockProvider extends TileProvider {
 
 	public static String name = "Block-Helper";
 	public String[] categories = new String[] { "GENERAL", "WORLD", "PROPERTIES", "REDSTONE", "FLUID" };
-	public String[] subcategories = new String[] { "Metadata", "X Coord", "Y Coord", "Z Coord", "Direction", "Is Raining", "Is Thundering", "Save Name", "Dimension", "Dimension Name", "Light", "Is Side Solid", "Hardness", "Signal", "Weak Power", "Strong Power", "Temperature", "Density", "Viscosity" };
+	public String[] subcategories = new String[] { "Metadata", "X Coord", "Y Coord", "Z Coord", "Direction", "Is Raining", "Is Thundering", "Save Name", "Dimension", "Dimension Name", "Light", "Is Side Solid", "Hardness", "Signal", "Weak Power", "Strong Power", "Temperature", "Density", "Viscosity", "Block Name", "Mod" };
 
 	@Override
 	public String getName() {
@@ -32,6 +38,12 @@ public class BlockProvider extends TileProvider {
 		int id = this.getID();
 		Block target = world.getBlock(x, y, z);
 		int meta = world.getBlockMetadata(x, y, z);
+		ItemStack block = SonarHelper.createStackedBlock(target, meta);
+		if (block != null)
+			infoList.add(new BlockNameInfo(id, 0, 19, meta, block));
+		UniqueIdentifier unique = GameRegistry.findUniqueIdentifierFor(target);
+		if (unique != null)
+			infoList.add(new ModidInfo(id, 0, 20, meta, unique));
 		infoList.add(new StandardInfo(id, 0, 0, meta));
 		infoList.add(new StandardInfo(id, 0, 1, x));
 		infoList.add(new StandardInfo(id, 0, 2, y));

@@ -7,21 +7,16 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
-import sonar.core.energy.StoredEnergyStack;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.network.sync.SyncGeneric;
 import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
-import sonar.core.utils.helpers.SonarHelper;
 import sonar.logistics.Logistics;
-import sonar.logistics.api.Info;
 import sonar.logistics.api.LogisticsAPI;
-import sonar.logistics.api.StandardInfo;
-import sonar.logistics.api.cache.CacheTypes;
 import sonar.logistics.api.cache.INetworkCache;
-import sonar.logistics.api.providers.EnergyHandler;
-import sonar.logistics.common.tileentity.TileEntityBlockNode;
+import sonar.logistics.api.info.Info;
+import sonar.logistics.api.info.StandardInfo;
 import sonar.logistics.info.types.StoredEnergyInfo;
 
 public class EnergyReaderHandler extends TileHandler {

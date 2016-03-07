@@ -1,8 +1,8 @@
 package sonar.logistics.api.wrappers;
 
 import net.minecraft.client.gui.FontRenderer;
-import sonar.logistics.api.Info;
-import sonar.logistics.api.StandardInfo;
+import sonar.logistics.api.info.Info;
+import sonar.logistics.api.info.StandardInfo;
 import sonar.logistics.api.render.ScreenType;
 
 public class RenderWrapper {

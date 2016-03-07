@@ -6,7 +6,6 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import sonar.core.common.block.SonarMaterials;
 import sonar.logistics.Logistics;
-import sonar.logistics.common.tileentity.TileEntityEntityNode;
 import sonar.logistics.common.tileentity.TileEntityArray;
 import sonar.logistics.network.LogisticsGui;
 

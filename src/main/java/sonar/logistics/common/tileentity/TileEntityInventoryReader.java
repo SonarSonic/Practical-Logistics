@@ -1,17 +1,14 @@
 package sonar.logistics.common.tileentity;
 
-import java.util.ArrayList;
-
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.common.tileentity.TileEntityHandlerInventory;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.inventory.IDropInventory;
 import sonar.core.utils.BlockCoords;
-import sonar.logistics.api.Info;
 import sonar.logistics.api.LogisticsAPI;
-import sonar.logistics.api.cache.CacheTypes;
 import sonar.logistics.api.connecting.IInfoEmitter;
+import sonar.logistics.api.info.Info;
 import sonar.logistics.common.handlers.InventoryReaderHandler;
 
 public class TileEntityInventoryReader extends TileEntityHandlerInventory implements IInfoEmitter, IDropInventory {

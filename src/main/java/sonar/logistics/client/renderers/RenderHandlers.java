@@ -46,7 +46,7 @@ import sonar.logistics.registries.BlockRegistry;
 
 public class RenderHandlers {
 
-	public final static String modelFolder = Logistics.modid + ":textures/model/";
+	public final static String modelFolder = Logistics.MODID + ":textures/model/";
 	public final static ModelDataCable modelCable = new ModelDataCable();
 	public final static String textureCable = modelFolder + "dataCable.png";
 

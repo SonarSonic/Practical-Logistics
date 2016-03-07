@@ -5,7 +5,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import sonar.core.network.PacketCoords;
-import sonar.logistics.api.Info;
+import sonar.logistics.api.info.Info;
 import sonar.logistics.common.containers.ContainerItemRouter;
 import sonar.logistics.common.tileentity.TileEntityItemRouter;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;

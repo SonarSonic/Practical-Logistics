@@ -1,7 +1,5 @@
 package sonar.logistics.integration.multipart;
 
-import java.util.ArrayList;
-
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -11,10 +9,9 @@ import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.utils.BlockCoords;
 import sonar.logistics.Logistics;
-import sonar.logistics.api.Info;
 import sonar.logistics.api.LogisticsAPI;
-import sonar.logistics.api.cache.CacheTypes;
 import sonar.logistics.api.connecting.IInfoEmitter;
+import sonar.logistics.api.info.Info;
 import sonar.logistics.client.renderers.RenderHandlers;
 import sonar.logistics.common.handlers.FluidReaderHandler;
 import sonar.logistics.network.LogisticsGui;

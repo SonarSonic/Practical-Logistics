@@ -1,7 +1,7 @@
 package sonar.logistics.api.signals;
 
 import sonar.core.network.sync.SyncTagType;
-import sonar.logistics.api.Info;
+import sonar.logistics.api.info.Info;
 
 public class IntegerStatement extends SignallerStatement {
 

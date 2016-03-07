@@ -5,8 +5,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import sonar.core.network.sync.SyncPart;
 import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
-import sonar.logistics.api.ExternalCoords;
-import sonar.logistics.api.IdentifiedCoords;
+import sonar.logistics.api.utils.ExternalCoords;
 
 public class SyncExternalCoords extends SyncPart {
 	private ExternalCoords c;

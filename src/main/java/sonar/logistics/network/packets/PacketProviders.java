@@ -12,7 +12,7 @@ import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.network.PacketCoords;
 import sonar.core.network.PacketTileEntityHandler;
 import sonar.logistics.Logistics;
-import sonar.logistics.api.Info;
+import sonar.logistics.api.info.Info;
 import sonar.logistics.common.handlers.InfoReaderHandler;
 import sonar.logistics.info.types.CategoryInfo;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;

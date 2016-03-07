@@ -1,7 +1,8 @@
-package sonar.logistics.api;
+package sonar.logistics.api.info;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.nbt.NBTTagCompound;
+import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.providers.TileProvider;
 import cpw.mods.fml.common.network.ByteBufUtils;
 

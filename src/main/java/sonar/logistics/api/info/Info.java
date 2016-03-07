@@ -1,4 +1,4 @@
-package sonar.logistics.api;
+package sonar.logistics.api.info;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
@@ -7,6 +7,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import sonar.core.utils.IBufObject;
 import sonar.core.utils.INBTObject;
+import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.render.ScreenType;
 
 public abstract class Info<T extends Info> implements INBTObject, IBufObject {

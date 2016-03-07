@@ -13,7 +13,7 @@ import org.lwjgl.opengl.GL11;
 
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.utils.helpers.RenderHelper;
-import sonar.logistics.api.Info;
+import sonar.logistics.api.info.Info;
 import sonar.logistics.api.render.LargeScreenSizing;
 import sonar.logistics.api.render.ScreenType;
 import sonar.logistics.client.models.ModelLargeDisplay;

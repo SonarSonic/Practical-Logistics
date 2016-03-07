@@ -1,11 +1,8 @@
 package sonar.logistics.common.containers;
 
-import java.util.List;
-
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -17,7 +14,6 @@ import sonar.core.inventory.StoredItemStack;
 import sonar.core.inventory.slots.SlotList;
 import sonar.core.network.PacketStackUpdate;
 import sonar.core.utils.ActionType;
-import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.cache.INetworkCache;

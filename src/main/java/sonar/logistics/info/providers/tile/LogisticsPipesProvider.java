@@ -6,7 +6,7 @@ import logisticspipes.api.IProgressProvider;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
-import sonar.logistics.api.Info;
+import sonar.logistics.api.info.Info;
 import sonar.logistics.api.providers.TileProvider;
 import sonar.logistics.info.types.ProgressInfo;
 import cpw.mods.fml.common.Loader;

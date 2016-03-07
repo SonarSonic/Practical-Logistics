@@ -11,7 +11,6 @@ import sonar.core.common.tileentity.TileEntitySonar;
 import sonar.core.utils.BlockInteraction;
 import sonar.core.utils.helpers.FontHelper;
 import sonar.logistics.common.tileentity.TileEntityBlockNode;
-import sonar.logistics.common.tileentity.TileEntityChannelledCable;
 import sonar.logistics.common.tileentity.TileEntityNode;
 
 public abstract class BaseNode extends SonarMachineBlock {

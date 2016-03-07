@@ -1,11 +1,8 @@
 package sonar.logistics.common.containers.slots;
 
-import sonar.logistics.common.handlers.ArrayHandler;
-import sonar.logistics.common.tileentity.TileEntityArray;
-import sonar.logistics.registries.CacheRegistry;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
+import sonar.logistics.common.handlers.ArrayHandler;
 
 public class ArraySlot extends Slot {
 
@@ -20,7 +17,7 @@ public class ArraySlot extends Slot {
 		super.onSlotChanged();
 		if (!handler.tile.getWorldObj().isRemote) {
 			handler.updateCoordsList();
-			CacheRegistry.refreshCache(((TileEntityArray) handler.tile).registryID);
+			//CacheRegistry.refreshCache(((TileEntityArray) handler.tile).registryID);
 		}
 	}
 

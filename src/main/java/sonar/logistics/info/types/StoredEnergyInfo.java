@@ -12,13 +12,13 @@ import net.minecraft.util.ResourceLocation;
 
 import org.lwjgl.opengl.GL11;
 
-import sonar.core.energy.StoredEnergyStack;
 import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.RenderHelper;
-import sonar.logistics.api.IdentifiedCoords;
-import sonar.logistics.api.Info;
 import sonar.logistics.api.LogisticsAPI;
+import sonar.logistics.api.info.Info;
 import sonar.logistics.api.render.ScreenType;
+import sonar.logistics.api.utils.IdentifiedCoords;
+import sonar.logistics.api.utils.StoredEnergyStack;
 import sonar.logistics.client.renderers.RenderHandlers;
 
 public class StoredEnergyInfo extends Info<StoredEnergyInfo> {
@@ -97,7 +97,7 @@ public class StoredEnergyInfo extends Info<StoredEnergyInfo> {
 		GL11.glTranslated(0, 0, zOffset + 0.002);
 		float width = stack.stored * (maxX - minX) / stack.capacity;
 		Minecraft.getMinecraft().renderEngine.bindTexture(progress);
-		GL11.glColor4f(1.0F, 0.0F, 1.0F, 1.0F);
+		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 		RenderHelper.drawTexturedModalRect(minX, minY, maxY, width, (maxY - minY));	
 		GL11.glTranslated(0, 0, -zOffset - 0.002);	
 		FontRenderer rend = Minecraft.getMinecraft().fontRenderer;
@@ -108,21 +108,20 @@ public class StoredEnergyInfo extends Info<StoredEnergyInfo> {
 		GL11.glScaled(1.0f / itemScale, 1.0f / itemScale, 1.0f / itemScale);
 		String coordString = coords.block.getDisplayName();
 		rend.drawString(EnumChatFormatting.UNDERLINE + coordString, -rend.getStringWidth(coordString) / 2, -20, -1);
-		
-		String stored = "Stored: " + String.valueOf(stack.stored) + " RF";
-		String capacity = "Capacity: " + String.valueOf(stack.capacity) + " RF";		
+		String stored = "Stored: " + String.valueOf(stack.stored) + " " + stack.energyType.getStorageSuffix();
+		String capacity = "Capacity: " + String.valueOf(stack.capacity) + " " + stack.energyType.getStorageSuffix();		
 		rend.drawString(stored, -rend.getStringWidth(stored) / 2, -8, -1);
 		rend.drawString(capacity, -rend.getStringWidth(capacity) / 2, 4, -1);
 		if (stack.hasInput) {
-			String input = "Max Input: " + String.valueOf(stack.input) + " RF";
+			String input = "Max Input: " + String.valueOf(stack.input) + " " + stack.energyType.getStorageSuffix();
 			rend.drawString(input, -rend.getStringWidth(input) / 2, 16, -1);
 		}
 		if (stack.hasOutput) {
-			String output = "Max Output: " + String.valueOf(stack.output) + " RF";
+			String output = "Max Output: " + String.valueOf(stack.output) + " " + stack.energyType.getStorageSuffix();
 			rend.drawString(output, -rend.getStringWidth(output) / 2, 28, -1);
 		}
 		if (stack.hasUsage) {
-			String usage = "Usage: " + String.valueOf(stack.usage) + " RF";
+			String usage = "Usage: " + String.valueOf(stack.usage) + " " + stack.energyType.getUsageSuffix();
 			rend.drawString(usage, -rend.getStringWidth(usage) / 2, 28, -1);
 		}
 	}
@@ -178,6 +177,10 @@ public class StoredEnergyInfo extends Info<StoredEnergyInfo> {
 			stack.usage = currentInfo.stack.usage;
 			tag.setLong("u", stack.usage);
 		}
+		if (!currentInfo.stack.energyType.getStorageSuffix().equals(stack.energyType.getStorageSuffix())) {
+			stack.energyType = currentInfo.stack.energyType;
+			tag.setString("energyType", stack.energyType.getStorageSuffix());
+		}
 		if (!currentInfo.coords.blockCoords.equals(coords.blockCoords)) {
 			coords.blockCoords = currentInfo.coords.blockCoords;
 			BlockCoords.writeToNBT(tag, coords.blockCoords);
@@ -220,6 +223,9 @@ public class StoredEnergyInfo extends Info<StoredEnergyInfo> {
 		}
 		if (tag.hasKey("u")) {
 			stack.usage = tag.getLong("u");
+		}
+		if (tag.hasKey("energyType")) {
+			stack.energyType = LogisticsAPI.getRegistry().getEnergyType(tag.getString("energyType"));
 		}
 		if (tag.hasKey("x")) {
 			coords.blockCoords = BlockCoords.readFromNBT(tag);

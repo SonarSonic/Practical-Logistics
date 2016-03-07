@@ -1,7 +1,7 @@
 package sonar.logistics.registries;
 
 import sonar.core.utils.helpers.NBTRegistryHelper;
-import sonar.logistics.api.ItemFilter;
+import sonar.logistics.api.utils.ItemFilter;
 import sonar.logistics.info.filters.items.ItemStackFilter;
 import sonar.logistics.info.filters.items.OreDictionaryFilter;
 

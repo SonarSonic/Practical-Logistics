@@ -27,10 +27,10 @@ import sonar.core.utils.BlockCoords;
 import sonar.core.utils.BlockInteraction;
 import sonar.core.utils.helpers.FontHelper;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
-import sonar.logistics.api.Info;
 import sonar.logistics.api.LogisticsAPI;
-import sonar.logistics.api.StandardInfo;
 import sonar.logistics.api.cache.INetworkCache;
+import sonar.logistics.api.info.Info;
+import sonar.logistics.api.info.StandardInfo;
 import sonar.logistics.api.interaction.IDefaultInteraction;
 import sonar.logistics.api.providers.InventoryHandler.StorageSize;
 import sonar.logistics.api.render.ScreenType;
@@ -40,9 +40,6 @@ import sonar.logistics.info.types.FluidStackInfo;
 import sonar.logistics.info.types.ProgressInfo;
 
 import com.google.common.collect.Lists;
-
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.common.registry.GameRegistry.UniqueIdentifier;
 
 public class FluidReaderHandler extends TileHandler implements IByteBufTile, IDefaultInteraction {
 

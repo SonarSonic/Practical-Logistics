@@ -1,6 +1,6 @@
 package sonar.logistics.api.connecting;
 
-import sonar.logistics.api.Info;
+import sonar.logistics.api.info.Info;
 
 /**implemented by any TileEntity which can provide info, blocks which connect to cables should implement this.*/
 public interface IInfoTile extends ILogicTile {

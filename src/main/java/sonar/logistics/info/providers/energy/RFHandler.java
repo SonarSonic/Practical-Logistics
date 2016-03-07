@@ -2,13 +2,15 @@ package sonar.logistics.info.providers.energy;
 
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
-import sonar.core.energy.StoredEnergyStack;
-import sonar.logistics.api.providers.EnergyHandler;
+import sonar.core.utils.ActionType;
+import sonar.logistics.api.providers.EnergyProvider;
+import sonar.logistics.api.utils.EnergyType;
+import sonar.logistics.api.utils.StoredEnergyStack;
 import cofh.api.energy.IEnergyProvider;
 import cofh.api.energy.IEnergyReceiver;
 import cofh.api.tileentity.IEnergyInfo;
 
-public class RFHandler extends EnergyHandler {
+public class RFHandler extends EnergyProvider {
 
 	public static String name = "RF-Provider";
 
@@ -47,7 +49,7 @@ public class RFHandler extends EnergyHandler {
 	}
 
 	@Override
-	public double addEnergy(double transfer, TileEntity tile, ForgeDirection dir) {
+	public double addEnergy(long transfer, TileEntity tile, ForgeDirection dir, ActionType action) {
 		if (tile instanceof IEnergyReceiver) {
 			IEnergyReceiver receiver = (IEnergyReceiver) tile;
 			if (receiver.canConnectEnergy(dir.getOpposite())) {
@@ -59,7 +61,7 @@ public class RFHandler extends EnergyHandler {
 	}
 
 	@Override
-	public double removeEnergy(double transfer, TileEntity tile, ForgeDirection dir) {
+	public double removeEnergy(long transfer, TileEntity tile, ForgeDirection dir, ActionType action) {
 		if (tile instanceof IEnergyProvider) {
 			IEnergyProvider receiver = (IEnergyProvider) tile;
 			if (receiver.canConnectEnergy(dir.getOpposite())) {
@@ -67,5 +69,10 @@ public class RFHandler extends EnergyHandler {
 			}
 		}
 		return 0;
+	}
+
+	@Override
+	public EnergyType getProvidedType() {
+		return EnergyType.RF;
 	}
 }

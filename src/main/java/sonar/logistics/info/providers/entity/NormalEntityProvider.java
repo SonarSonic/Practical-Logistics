@@ -8,8 +8,8 @@ import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.player.EntityPlayer;
-import sonar.logistics.api.EntityInfo;
-import sonar.logistics.api.Info;
+import sonar.logistics.api.info.EntityInfo;
+import sonar.logistics.api.info.Info;
 import sonar.logistics.api.providers.EntityProvider;
 
 public class NormalEntityProvider extends EntityProvider {

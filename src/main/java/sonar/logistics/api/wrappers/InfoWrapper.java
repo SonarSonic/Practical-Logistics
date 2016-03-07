@@ -3,11 +3,10 @@ package sonar.logistics.api.wrappers;
 import java.util.Collections;
 import java.util.List;
 
-import sonar.core.utils.BlockCoords;
-import sonar.logistics.api.Info;
 import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.connecting.IConnectionNode;
 import sonar.logistics.api.connecting.IEntityNode;
+import sonar.logistics.api.info.Info;
 
 public class InfoWrapper {
 

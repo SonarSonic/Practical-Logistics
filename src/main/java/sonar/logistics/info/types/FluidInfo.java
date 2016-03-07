@@ -12,7 +12,7 @@ import net.minecraftforge.fluids.FluidRegistry;
 
 import org.lwjgl.opengl.GL11;
 
-import sonar.logistics.api.StandardInfo;
+import sonar.logistics.api.info.StandardInfo;
 import sonar.logistics.api.render.ScreenType;
 
 public class FluidInfo extends StandardInfo {

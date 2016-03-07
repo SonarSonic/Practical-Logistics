@@ -1,6 +1,6 @@
 package sonar.logistics.api.connecting;
 
-import sonar.logistics.api.Info;
+import sonar.logistics.api.info.Info;
 
 /**implemented on blocks which can provide two bits of info (they must be emitters) namely the Info Reader itself*/
 public interface IInfoReader extends IInfoEmitter {

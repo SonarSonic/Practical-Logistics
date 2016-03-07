@@ -2,7 +2,6 @@ package sonar.logistics.common.tileentity;
 
 import io.netty.buffer.ByteBuf;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraftforge.common.util.ForgeDirection;
@@ -13,12 +12,12 @@ import sonar.core.network.sync.SyncTagType;
 import sonar.core.network.utils.IByteBufTile;
 import sonar.core.network.utils.ITextField;
 import sonar.core.utils.BlockCoords;
-import sonar.logistics.api.Info;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.cache.CacheTypes;
 import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.connecting.IInfoEmitter;
 import sonar.logistics.api.connecting.ILogicTile;
+import sonar.logistics.api.info.Info;
 import sonar.logistics.common.blocks.BlockRedstoneSignaller;
 import sonar.logistics.registries.BlockRegistry;
 

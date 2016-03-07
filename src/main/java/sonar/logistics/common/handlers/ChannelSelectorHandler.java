@@ -3,7 +3,6 @@ package sonar.logistics.common.handlers;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
@@ -12,7 +11,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.StatCollector;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.SonarCore;
 import sonar.core.integration.fmp.FMPHelper;
@@ -21,13 +19,10 @@ import sonar.core.network.PacketTileSync;
 import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.core.utils.helpers.SonarHelper;
-import sonar.logistics.api.ExternalCoords;
-import sonar.logistics.api.IdentifiedCoords;
 import sonar.logistics.api.LogisticsAPI;
-import sonar.logistics.api.cache.CacheTypes;
 import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.connecting.CableType;
-import sonar.logistics.api.connecting.IConnectionNode;
+import sonar.logistics.api.utils.ExternalCoords;
 import sonar.logistics.network.SyncExternalCoords;
 
 public class ChannelSelectorHandler extends TileHandler {
@@ -47,7 +42,7 @@ public class ChannelSelectorHandler extends TileHandler {
 		}
 		INetworkCache network = LogisticsAPI.getCableHelper().getNetwork(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite());
 		channels = new ArrayList();
-		for (Map.Entry<BlockCoords, ForgeDirection> entry : network.getExternalBlocks().entrySet()) {
+		for (Map.Entry<BlockCoords, ForgeDirection> entry : network.getExternalBlocks(true).entrySet()) {
 			BlockCoords coords = entry.getKey();
 			
 			Block target = coords.getBlock();
@@ -107,13 +102,15 @@ public class ChannelSelectorHandler extends TileHandler {
 		if (currentCoords == null) {
 			return null;
 		}
-		INetworkCache network = LogisticsAPI.getCableHelper().getNetwork(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite());
+		//INetworkCache network = LogisticsAPI.getCableHelper().getNetwork(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite());
+		/*
 		for(Entry<BlockCoords,ForgeDirection> entry : network.getExternalBlocks().entrySet()){
 			if (currentCoords.blockCoords.equals(entry.getKey())) {
 				return currentCoords;
 			}
 		}
-		return null;
+		*/
+		return currentCoords;
 	}
 
 	public void readData(NBTTagCompound nbt, SyncType type) {

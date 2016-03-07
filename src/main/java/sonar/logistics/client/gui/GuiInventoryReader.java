@@ -3,8 +3,6 @@ package sonar.logistics.client.gui;
 import java.util.ArrayList;
 import java.util.List;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
@@ -21,13 +19,13 @@ import sonar.core.network.PacketByteBufServer;
 import sonar.core.utils.helpers.FontHelper;
 import sonar.core.utils.helpers.RenderHelper;
 import sonar.logistics.Logistics;
-import sonar.logistics.client.gui.GuiItemRouter.SideButton;
 import sonar.logistics.common.containers.ContainerInventoryReader;
 import sonar.logistics.common.handlers.InventoryReaderHandler;
-import sonar.logistics.info.filters.items.ItemStackFilter;
 import sonar.logistics.network.LogisticsGui;
 import sonar.logistics.network.packets.PacketGuiChange;
 import sonar.logistics.network.packets.PacketInventoryReader;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 public class GuiInventoryReader extends GuiSelectionGrid<StoredItemStack> {
 

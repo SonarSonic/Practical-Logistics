@@ -1,9 +1,7 @@
 package sonar.logistics.common.handlers;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 import net.minecraft.item.ItemStack;
@@ -12,9 +10,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.SonarCore;
 import sonar.core.integration.fmp.handlers.InventoryTileHandler;
 import sonar.core.utils.BlockCoords;
-import sonar.logistics.api.connecting.IConnectionArray;
 import sonar.logistics.api.connecting.ITransceiver;
-import sonar.logistics.registries.CacheRegistry;
 
 public class ArrayHandler extends InventoryTileHandler {
 

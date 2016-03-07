@@ -56,22 +56,23 @@ public class IInventoryProvider extends InventoryHandler {
 		if (tile instanceof ISidedInventory) {
 			ISidedInventory sidedInv = (ISidedInventory) tile;
 			slots = sidedInv.getAccessibleSlotsFromSide(dir.ordinal());
-			// need to add other sided inv methods
 			invSize = slots.length;
 		}
 		for (int i = 0; i < invSize; i++) {
 			int slot = slots != null ? slots[i] : i;
 			ItemStack stack = inv.getStackInSlot(slot);
-			if (!(tile instanceof ISidedInventory) || ((ISidedInventory) tile).canInsertItem(slot, add.item, dir.ordinal())) {
+			if (inv.isItemValidForSlot(slot, add.item) && (!(tile instanceof ISidedInventory) || ((ISidedInventory) tile).canInsertItem(slot, add.item, dir.ordinal()))) {
 				if (stack != null) {
 					if (add.equalStack(stack) && stack.stackSize < inv.getInventoryStackLimit()) {
-						long used = (long) Math.min(add.stored, inv.getInventoryStackLimit() - stack.stackSize);
-						stack.stackSize += used;
-						add.stored -= used;
-						if (!action.shouldSimulate())
-							inv.setInventorySlotContents(slot, stack);
-						if (add.stored == 0) {
-							return null;
+						long used = Math.min(add.item.getMaxStackSize() - stack.stackSize, Math.min(add.stored, inv.getInventoryStackLimit() - stack.stackSize));
+						if (used != 0) {
+							stack.stackSize += used;
+							add.stored -= used;
+							if (!action.shouldSimulate())
+								inv.setInventorySlotContents(slot, stack);
+							if (add.stored == 0) {
+								return null;
+							}
 						}
 					}
 				} else {
@@ -81,13 +82,16 @@ public class IInventoryProvider extends InventoryHandler {
 		}
 		for (Integer slot : empty) {
 			ItemStack stack = add.item.copy();
-			int used = (int) Math.min(add.stored, inv.getInventoryStackLimit());
-			stack.stackSize = used;
-			add.stored -= used;
-			if (!action.shouldSimulate())
-				inv.setInventorySlotContents(slot, stack);
-			if (add.stored == 0) {
-				return null;
+			int used = (int) Math.min(add.item.getMaxStackSize(), Math.min(add.stored, inv.getInventoryStackLimit()));
+			
+			if (used != 0) {
+				stack.stackSize = used;
+				add.stored -= used;
+				if (!action.shouldSimulate())
+					inv.setInventorySlotContents(slot, stack);
+				if (add.stored == 0) {
+					return null;
+				}
 			}
 		}
 		return add;
@@ -113,7 +117,7 @@ public class IInventoryProvider extends InventoryHandler {
 						long used = (long) Math.min(remove.stored, Math.min(inv.getInventoryStackLimit(), stack.stackSize));
 						stack.stackSize -= used;
 						remove.stored -= used;
-						if (!action.shouldSimulate()){
+						if (!action.shouldSimulate()) {
 							if (stack.stackSize == 0) {
 								stack = null;
 							}

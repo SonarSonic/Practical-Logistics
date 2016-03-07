@@ -5,7 +5,7 @@ import java.lang.reflect.Type;
 
 import net.minecraft.tileentity.TileEntity;
 import sonar.core.utils.helpers.RegistryHelper;
-import sonar.logistics.api.Info;
+import sonar.logistics.api.info.Info;
 import sonar.logistics.api.render.InfoInteractionHandler;
 import sonar.logistics.api.render.ScreenType;
 import sonar.logistics.info.interaction.FluidInventoryInteraction;

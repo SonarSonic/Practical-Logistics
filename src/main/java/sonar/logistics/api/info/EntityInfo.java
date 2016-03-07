@@ -1,5 +1,6 @@
-package sonar.logistics.api;
+package sonar.logistics.api.info;
 
+import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.providers.EntityProvider;
 
 public class EntityInfo extends StandardInfo {

@@ -17,20 +17,19 @@ import net.minecraftforge.fluids.FluidStack;
 
 import org.lwjgl.opengl.GL11;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import sonar.core.SonarCore;
 import sonar.core.fluid.StoredFluidStack;
 import sonar.core.inventory.SonarButtons;
 import sonar.core.network.PacketByteBufServer;
 import sonar.core.utils.helpers.FontHelper;
 import sonar.logistics.Logistics;
-import sonar.logistics.client.gui.GuiInventoryReader.FilterButton;
 import sonar.logistics.common.containers.ContainerFluidReader;
 import sonar.logistics.common.handlers.FluidReaderHandler;
 import sonar.logistics.network.LogisticsGui;
 import sonar.logistics.network.packets.PacketFluidReader;
 import sonar.logistics.network.packets.PacketGuiChange;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 public class GuiFluidReader extends GuiSelectionGrid<StoredFluidStack> {
 

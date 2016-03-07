@@ -24,11 +24,11 @@ public class NEILogisticsConfig implements IConfigureNEI {
 
 	@Override
 	public String getName() {
-		return Logistics.modid;
+		return Logistics.MODID;
 	}
 
 	@Override
 	public String getVersion() {
-		return Logistics.version;
+		return Logistics.VERSION;
 	}
 }

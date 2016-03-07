@@ -8,16 +8,13 @@ import java.util.List;
 import java.util.Map;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.utils.BlockCoords;
 import sonar.logistics.Logistics;
-import sonar.logistics.api.Info;
-import sonar.logistics.api.StandardInfo;
 import sonar.logistics.api.cache.INetworkCache;
-import sonar.logistics.api.connecting.IConnectionArray;
-import sonar.logistics.api.connecting.IConnectionNode;
 import sonar.logistics.api.connecting.IEntityNode;
+import sonar.logistics.api.info.Info;
+import sonar.logistics.api.info.StandardInfo;
 import sonar.logistics.api.providers.EntityProvider;
 import sonar.logistics.api.providers.TileProvider;
 import sonar.logistics.api.wrappers.InfoWrapper;
@@ -27,15 +24,10 @@ import sonar.logistics.info.types.ProgressInfo;
 
 public class InfoHelper extends InfoWrapper {
 
-	/*
-	 * public List<Info> getInfoList(BlockCoords coords) { List<Info> infoList = new ArrayList(); TileEntity tile = coords.getTileEntity(); if (tile == null) { return infoList; } if (tile instanceof IConnectionNode) { infoList = getTileInfo(((IConnectionNode) tile).getConnections()); } else if (tile instanceof IEntityNode) { infoList = getEntityInfo((IEntityNode) tile); } return infoList;
-	 * 
-	 * }
-	 */
 	public List<Info> getTileInfo(INetworkCache connections) {
 		List<TileProvider> providers = Logistics.tileProviders.getObjects();
 		List<Info> providerInfo = new ArrayList();
-		LinkedHashMap<BlockCoords, ForgeDirection> map = connections.getExternalBlocks();
+		LinkedHashMap<BlockCoords, ForgeDirection> map = connections.getExternalBlocks(true);
 		for (TileProvider provider : providers) {
 			for (Map.Entry<BlockCoords, ForgeDirection> entry : map.entrySet()) {
 				BlockCoords coords = entry.getKey();
@@ -46,10 +38,8 @@ public class InfoHelper extends InfoWrapper {
 						providerInfo.add(blockInfo);
 					}
 				}
-				break; // currently info readers only support one input
-
+				break;
 			}
-			//break;
 		}
 		Collections.sort(providerInfo, new Comparator<Info>() {
 			public int compare(Info str1, Info str2) {
@@ -100,7 +90,7 @@ public class InfoHelper extends InfoWrapper {
 		if (provider == null) {
 			return null;
 		}
-		Map<BlockCoords, ForgeDirection> connections = network.getExternalBlocks();
+		Map<BlockCoords, ForgeDirection> connections = network.getExternalBlocks(true);
 		for (Map.Entry<BlockCoords, ForgeDirection> entry : connections.entrySet()) {
 			BlockCoords coords = entry.getKey();
 			if (provider.canProvideInfo(coords.getWorld(), coords.getX(), coords.getY(), coords.getZ(), entry.getValue())) {
@@ -112,6 +102,7 @@ public class InfoHelper extends InfoWrapper {
 					}
 				}
 			}
+			break;
 		}
 
 		return null;
@@ -128,13 +119,13 @@ public class InfoHelper extends InfoWrapper {
 				if (entity != null && provider.canProvideInfo(entity)) {
 					List<Info> info = new ArrayList();
 					provider.getHelperInfo(info, entity);
-
 					for (Info currentInfo : info) {
 						if (currentInfo.equals(entityInfo)) {
 							return currentInfo;
 						}
 					}
 				}
+				break;
 			}
 		}
 		return null;

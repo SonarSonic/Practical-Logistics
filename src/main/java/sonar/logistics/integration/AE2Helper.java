@@ -5,7 +5,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.fluid.StoredFluidStack;
 import sonar.core.inventory.StoredItemStack;
 import sonar.core.utils.ActionType;
-import sonar.logistics.api.StandardInfo;
+import sonar.logistics.api.info.StandardInfo;
 import appeng.api.AEApi;
 import appeng.api.config.Actionable;
 import appeng.api.networking.security.BaseActionSource;

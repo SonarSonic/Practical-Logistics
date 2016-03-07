@@ -3,7 +3,6 @@ package sonar.logistics.common.tileentity;
 import io.netty.buffer.ByteBuf;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -13,9 +12,8 @@ import sonar.core.network.sync.SyncTagType;
 import sonar.core.network.utils.IByteBufTile;
 import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
-import sonar.logistics.api.Info;
 import sonar.logistics.api.LogisticsAPI;
-import sonar.logistics.api.cache.CacheTypes;
+import sonar.logistics.api.info.Info;
 import sonar.logistics.info.types.BlockCoordsInfo;
 import sonar.logistics.info.types.ProgressInfo;
 

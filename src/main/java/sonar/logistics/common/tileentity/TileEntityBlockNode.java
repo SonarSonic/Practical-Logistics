@@ -1,16 +1,15 @@
 package sonar.logistics.common.tileentity;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.SonarHelper;
-import sonar.logistics.api.Info;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.connecting.CableType;
 import sonar.logistics.api.connecting.IConnectionNode;
 import sonar.logistics.api.connecting.IInfoEmitter;
+import sonar.logistics.api.info.Info;
 import sonar.logistics.api.render.ICableRenderer;
 import sonar.logistics.info.types.BlockCoordsInfo;
 
@@ -51,12 +50,10 @@ public class TileEntityBlockNode extends TileEntityChannelledCable implements II
 	}
 
 	@Override
-	public Map<BlockCoords, ForgeDirection> getConnections() {
-		Map<BlockCoords, ForgeDirection> map = new LinkedHashMap();
+	public void addConnections(Map<BlockCoords, ForgeDirection> connections) {
 		ForgeDirection dir = ForgeDirection.getOrientation(SonarHelper.invertMetadata(getBlockMetadata())).getOpposite();
 		BlockCoords tileCoords = new BlockCoords(xCoord + dir.offsetX, yCoord + dir.offsetY, zCoord + dir.offsetZ, worldObj.provider.dimensionId);
-		map.put(tileCoords, dir);
-		return map;
+		connections.put(tileCoords, dir);
 	}
 
 	@Override
