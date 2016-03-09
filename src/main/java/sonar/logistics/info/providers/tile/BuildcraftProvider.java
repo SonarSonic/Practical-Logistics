@@ -5,8 +5,8 @@ import java.util.List;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
-import sonar.logistics.api.info.Info;
-import sonar.logistics.api.info.StandardInfo;
+import sonar.logistics.api.info.ILogicInfo;
+import sonar.logistics.api.info.LogicInfo;
 import sonar.logistics.api.providers.TileProvider;
 import buildcraft.api.power.ILaserTarget;
 import buildcraft.api.tiles.IHasWork;
@@ -31,7 +31,7 @@ public class BuildcraftProvider extends TileProvider {
 	}
 
 	@Override
-	public void getHelperInfo(List<Info> infoList, World world, int x, int y, int z, ForgeDirection dir) {
+	public void getTileInfo(List<ILogicInfo> infoList, World world, int x, int y, int z, ForgeDirection dir) {
 		int id = this.getID();
 		TileEntity te = world.getTileEntity(x, y, z);
 		if (te == null) {
@@ -39,19 +39,19 @@ public class BuildcraftProvider extends TileProvider {
 		}
 		if (te instanceof IHasWork) {
 			IHasWork worker = (IHasWork) te;
-			infoList.add(new StandardInfo(id, 0, 0, worker.hasWork()));
+			infoList.add(new LogicInfo(id, 0, 0, worker.hasWork()));
 		}
 		if (te instanceof IHeatable) {
 			IHeatable heat = (IHeatable) te;
-			infoList.add(new StandardInfo(id, 0, 1, (int)heat.getCurrentHeatValue()).addSuffix("degrees"));
-			infoList.add(new StandardInfo(id, 0, 2, (int)heat.getMinHeatValue()).addSuffix("degrees"));
-			infoList.add(new StandardInfo(id, 0, 3, (int)heat.getMaxHeatValue()).addSuffix("degrees"));
-			infoList.add(new StandardInfo(id, 0, 4, (int)heat.getIdealHeatValue()).addSuffix("degrees"));
+			infoList.add(new LogicInfo(id, 0, 1, (int)heat.getCurrentHeatValue()).addSuffix("degrees"));
+			infoList.add(new LogicInfo(id, 0, 2, (int)heat.getMinHeatValue()).addSuffix("degrees"));
+			infoList.add(new LogicInfo(id, 0, 3, (int)heat.getMaxHeatValue()).addSuffix("degrees"));
+			infoList.add(new LogicInfo(id, 0, 4, (int)heat.getIdealHeatValue()).addSuffix("degrees"));
 		}
 		if (te instanceof ILaserTarget) {
 			ILaserTarget laser = (ILaserTarget) te;
-			infoList.add(new StandardInfo(id, 1, 5, laser.requiresLaserEnergy()));
-			infoList.add(new StandardInfo(id, 1, 6, laser.isInvalidTarget()));
+			infoList.add(new LogicInfo(id, 1, 5, laser.requiresLaserEnergy()));
+			infoList.add(new LogicInfo(id, 1, 6, laser.isInvalidTarget()));
 		}
 
 	}

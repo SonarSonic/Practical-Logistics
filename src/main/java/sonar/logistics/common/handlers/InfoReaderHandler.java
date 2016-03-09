@@ -22,8 +22,8 @@ import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.cache.CacheTypes;
 import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.connecting.IEntityNode;
-import sonar.logistics.api.info.Info;
-import sonar.logistics.api.info.StandardInfo;
+import sonar.logistics.api.info.ILogicInfo;
+import sonar.logistics.api.info.LogicInfo;
 import sonar.logistics.info.types.CategoryInfo;
 
 import com.google.common.collect.Lists;
@@ -34,13 +34,13 @@ public class InfoReaderHandler extends TileHandler implements IWailaInfo {
 		super(isMultipart, tile);
 	}
 
-	public List<Info> clientInfo;
-	public List<Info> lastInfo;
+	public List<ILogicInfo> clientInfo;
+	public List<ILogicInfo> lastInfo;
 
 	private int primaryUpdate = 0;
 	private int secondaryUpdate = 0;
-	public SyncGeneric<Info> primaryInfo = (SyncGeneric<Info>) new SyncGeneric(Logistics.infoTypes, 0).addSyncType(SyncType.SPECIAL);
-	public SyncGeneric<Info> secondaryInfo = (SyncGeneric<Info>) new SyncGeneric(Logistics.infoTypes, 1).addSyncType(SyncType.SPECIAL);
+	public SyncGeneric<ILogicInfo> primaryInfo = (SyncGeneric<ILogicInfo>) new SyncGeneric(Logistics.infoTypes, 0).addSyncType(SyncType.SPECIAL);
+	public SyncGeneric<ILogicInfo> secondaryInfo = (SyncGeneric<ILogicInfo>) new SyncGeneric(Logistics.infoTypes, 1).addSyncType(SyncType.SPECIAL);
 	public boolean emptyPrimary = false, emptySecondary = false;
 
 	@Override
@@ -77,11 +77,11 @@ public class InfoReaderHandler extends TileHandler implements IWailaInfo {
 			TileEntity target = network.getFirstTileEntity(CacheTypes.ENTITY_NODES);
 			if (target != null && target instanceof IEntityNode) {
 				if (primary) {
-					Info info = LogisticsAPI.getInfoHelper().getLatestEntityInfo(primaryInfo.getObject(), (IEntityNode) target);
+					ILogicInfo info = LogisticsAPI.getInfoHelper().getLatestEntityInfo(primaryInfo.getObject(), (IEntityNode) target);
 					this.setData(te, info, true);
 				}
 				if (secondary) {
-					Info info = LogisticsAPI.getInfoHelper().getLatestEntityInfo(secondaryInfo.getObject(), (IEntityNode) target);
+					ILogicInfo info = LogisticsAPI.getInfoHelper().getLatestEntityInfo(secondaryInfo.getObject(), (IEntityNode) target);
 					this.setData(te, info, false);
 				}
 
@@ -93,37 +93,37 @@ public class InfoReaderHandler extends TileHandler implements IWailaInfo {
 		return dir.equals(ForgeDirection.getOrientation(FMPHelper.getMeta(te))) || dir.equals(ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite());
 	}
 
-	public Info currentInfo(TileEntity te) {
+	public ILogicInfo currentInfo(TileEntity te) {
 
 		if (secondaryInfo.getObject() == null || !te.getWorldObj().isBlockIndirectlyGettingPowered(te.xCoord, te.yCoord, te.zCoord)) {
 
 			if (primaryInfo.getObject() == null || emptyPrimary) {
-				return new StandardInfo((byte) -1, "", "", "NO DATA");
+				return new LogicInfo((byte) -1, "", "", "NO DATA");
 			}
 			return primaryInfo.getObject();
 		} else {
 			if (secondaryInfo.getObject() == null || emptySecondary) {
-				return new StandardInfo((byte) -1, "", "", "NO DATA");
+				return new LogicInfo((byte) -1, "", "", "NO DATA");
 			}
 			return secondaryInfo.getObject();
 		}
 	}
 
-	public Info getSecondaryInfo(TileEntity te) {
+	public ILogicInfo getSecondaryInfo(TileEntity te) {
 		if (primaryInfo.getObject() == null || !te.getWorldObj().isBlockIndirectlyGettingPowered(te.xCoord, te.yCoord, te.zCoord)) {
 			if (secondaryInfo.getObject() == null || emptySecondary) {
-				return new StandardInfo((byte) -1, "", "", "NO DATA");
+				return new LogicInfo((byte) -1, "", "", "NO DATA");
 			}
 			return secondaryInfo.getObject();
 		} else {
 			if (primaryInfo.getObject() == null || emptyPrimary) {
-				return new StandardInfo((byte) -1, "", "", "NO DATA");
+				return new LogicInfo((byte) -1, "", "", "NO DATA");
 			}
 			return primaryInfo.getObject();
 		}
 	}
 
-	public void setData(TileEntity te, Info info, boolean primary) {
+	public void setData(TileEntity te, ILogicInfo info, boolean primary) {
 		if (info != null) {
 			if (primary) {
 				this.primaryInfo.setObject(info);
@@ -143,7 +143,7 @@ public class InfoReaderHandler extends TileHandler implements IWailaInfo {
 	public void sendAvailableData(TileEntity te, EntityPlayer player) {
 		if (player != null && player instanceof EntityPlayerMP) {
 			INetworkCache network = LogisticsAPI.getCableHelper().getNetwork(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite());
-			List<Info> info = new ArrayList();
+			List<ILogicInfo> info = new ArrayList();
 			if (!network.getExternalBlocks(true).isEmpty()) {
 				info = LogisticsAPI.getInfoHelper().getTileInfo(network);
 			} else {
@@ -153,9 +153,9 @@ public class InfoReaderHandler extends TileHandler implements IWailaInfo {
 				}
 			}
 			this.lastInfo = clientInfo;
-			List<Info> newInfo = new ArrayList();
-			Info lastInfo = null;
-			for (Info blockInfo : info) {
+			List<ILogicInfo> newInfo = new ArrayList();
+			ILogicInfo lastInfo = null;
+			for (ILogicInfo blockInfo : info) {
 				if (lastInfo == null || !lastInfo.getCategory().equals(blockInfo.getCategory())) {
 					newInfo.add(CategoryInfo.createInfo(blockInfo.getCategory()));
 				}
@@ -230,8 +230,8 @@ public class InfoReaderHandler extends TileHandler implements IWailaInfo {
 			NBTTagList list = new NBTTagList();
 			int size = Math.max(this.clientInfo.size(), this.lastInfo.size());
 			for (int i = 0; i < size; ++i) {
-				Info current = null;
-				Info last = null;
+				ILogicInfo current = null;
+				ILogicInfo last = null;
 				if (i < this.clientInfo.size()) {
 					current = this.clientInfo.get(i);
 				}
@@ -241,7 +241,7 @@ public class InfoReaderHandler extends TileHandler implements IWailaInfo {
 				NBTTagCompound compound = new NBTTagCompound();
 				if (current != null) {
 					if (last != null) {
-						if (!current.areTypesEqual(last) || !current.equals(last) || (current != null && current instanceof StandardInfo && last instanceof StandardInfo && !((StandardInfo) last).data.equals(((StandardInfo) current).data))) {
+						if (!current.areTypesEqual(last) || !current.equals(last) || (current != null && current instanceof LogicInfo && last instanceof LogicInfo && !((LogicInfo) last).data.equals(((LogicInfo) current).data))) {
 							compound.setByte("f", (byte) 0);
 							this.lastInfo.set(i, current);
 							Logistics.infoTypes.writeToNBT(compound, this.clientInfo.get(i));

@@ -17,9 +17,9 @@ import sonar.core.utils.BlockCoords;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.cache.INetworkCache;
+import sonar.logistics.api.cache.IStorageCache;
 import sonar.logistics.api.providers.FluidHandler;
 import sonar.logistics.api.wrappers.FluidWrapper;
-import sonar.logistics.cache.IStorageCache;
 
 public class FluidHelper extends FluidWrapper {
 

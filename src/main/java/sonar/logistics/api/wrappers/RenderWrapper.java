@@ -1,13 +1,13 @@
 package sonar.logistics.api.wrappers;
 
 import net.minecraft.client.gui.FontRenderer;
-import sonar.logistics.api.info.Info;
-import sonar.logistics.api.info.StandardInfo;
+import sonar.logistics.api.info.ILogicInfo;
+import sonar.logistics.api.info.LogicInfo;
 import sonar.logistics.api.render.ScreenType;
 
 public class RenderWrapper {
 
-	/**used for rendering {@link StandardInfo} and sometimes for other Info Types to
+	/**used for rendering {@link LogicInfo} and sometimes for other Info Types to
 	 * @param info the {@Info info} to render
 	 * @param rend the Minecraft {@list FontRenderer}
 	 * @param minX screen start X
@@ -17,7 +17,7 @@ public class RenderWrapper {
 	 * @param zOffset screen offset
 	 * @param type screen scaling
 	 */
-	public void renderStandardInfo(Info info, FontRenderer rend, float minX, float minY, float maxX, float maxY, float zOffset, ScreenType type) {}
+	public void renderStandardInfo(ILogicInfo info, FontRenderer rend, float minX, float minY, float maxX, float maxY, float zOffset, ScreenType type) {}
 
 	/**renders a string in the centre of the screen
 	 * @param string {@link String} to render

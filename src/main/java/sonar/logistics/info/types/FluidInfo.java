@@ -12,10 +12,10 @@ import net.minecraftforge.fluids.FluidRegistry;
 
 import org.lwjgl.opengl.GL11;
 
-import sonar.logistics.api.info.StandardInfo;
+import sonar.logistics.api.info.LogicInfo;
 import sonar.logistics.api.render.ScreenType;
 
-public class FluidInfo extends StandardInfo {
+public class FluidInfo extends LogicInfo {
 
 	public int fluidID = -1;
 

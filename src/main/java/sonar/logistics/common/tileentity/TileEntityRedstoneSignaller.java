@@ -17,7 +17,7 @@ import sonar.logistics.api.cache.CacheTypes;
 import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.connecting.IInfoEmitter;
 import sonar.logistics.api.connecting.ILogicTile;
-import sonar.logistics.api.info.Info;
+import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.common.blocks.BlockRedstoneSignaller;
 import sonar.logistics.registries.BlockRegistry;
 
@@ -25,7 +25,7 @@ import com.google.common.collect.Lists;
 
 public class TileEntityRedstoneSignaller extends TileEntitySonar implements ILogicTile, IByteBufTile, ITextField {
 
-	public Info currentInfo;
+	public ILogicInfo currentInfo;
 	public SyncTagType.INT integerEmitType = new SyncTagType.INT(0);
 	public SyncTagType.INT integerTarget = new SyncTagType.INT(1);
 	public SyncTagType.INT dataType = new SyncTagType.INT(2);

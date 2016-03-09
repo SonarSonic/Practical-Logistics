@@ -2,10 +2,10 @@ package sonar.logistics.info.types;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.nbt.NBTTagCompound;
-import sonar.logistics.api.info.Info;
+import sonar.logistics.api.info.ILogicInfo;
 import cpw.mods.fml.common.network.ByteBufUtils;
 
-public class CategoryInfo extends Info<CategoryInfo> {
+public class CategoryInfo extends ILogicInfo<CategoryInfo> {
 
 	public String category;
 

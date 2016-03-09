@@ -5,8 +5,8 @@ import java.util.List;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
-import sonar.logistics.api.info.Info;
-import sonar.logistics.api.info.StandardInfo;
+import sonar.logistics.api.info.ILogicInfo;
+import sonar.logistics.api.info.LogicInfo;
 import sonar.logistics.api.providers.TileProvider;
 import cpw.mods.fml.common.Loader;
 import erogenousbeef.bigreactors.common.interfaces.IReactorFuelInfo;
@@ -34,45 +34,45 @@ public class BigReactorsProvider extends TileProvider {
 	}
 
 	@Override
-	public void getHelperInfo(List<Info> infoList, World world, int x, int y, int z, ForgeDirection dir) {
+	public void getTileInfo(List<ILogicInfo> infoList, World world, int x, int y, int z, ForgeDirection dir) {
 		int id = this.getID();
 		TileEntity target = world.getTileEntity(x, y, z);
 		if (target instanceof IMultiblockPart) {
 			IMultiblockPart part = (IMultiblockPart) target;
 			MultiblockControllerBase controller = part.getMultiblockController();			
-			infoList.add(new StandardInfo(id, 0, 0, controller.getNumConnectedBlocks()));
+			infoList.add(new LogicInfo(id, 0, 0, controller.getNumConnectedBlocks()));
 			
 			if(controller instanceof IActivateable){
 				IActivateable activate = (IActivateable) controller;
-				infoList.add(new StandardInfo(id, 0, 1, activate.getActive()));
+				infoList.add(new LogicInfo(id, 0, 1, activate.getActive()));
 			}
 			
 			if(controller instanceof MultiblockReactor){
 				MultiblockReactor reactor = (MultiblockReactor) controller;
-				infoList.add(new StandardInfo(id, 0, 2, (long)reactor.getEnergyGeneratedLastTick()).addSuffix("RF"));
-				infoList.add(new StandardInfo(id, 1, 3, (long)reactor.getFuelHeat()).addSuffix("C"));
-				infoList.add(new StandardInfo(id, 0, 4, (long)reactor.getReactorHeat()).addSuffix("C"));
+				infoList.add(new LogicInfo(id, 0, 2, (long)reactor.getEnergyGeneratedLastTick()).addSuffix("RF"));
+				infoList.add(new LogicInfo(id, 1, 3, (long)reactor.getFuelHeat()).addSuffix("C"));
+				infoList.add(new LogicInfo(id, 0, 4, (long)reactor.getReactorHeat()).addSuffix("C"));
 				
 			}
 			
 			if(controller instanceof MultiblockTurbine){
 				MultiblockTurbine turbine = (MultiblockTurbine) controller;
-				infoList.add(new StandardInfo(id, 0, 2, (long)turbine.getEnergyGeneratedLastTick()).addSuffix("RF"));
-				infoList.add(new StandardInfo(id, 0, 5, turbine.getFluidConsumedLastTick()).addSuffix("mB"));
-				infoList.add(new StandardInfo(id, 0, 6, turbine.getMaxIntakeRate()).addSuffix("mB/T"));
-				infoList.add(new StandardInfo(id, 0, 7, turbine.getMaxIntakeRateMax()).addSuffix("mB/T"));
-				infoList.add(new StandardInfo(id, 0, 8, (long)turbine.getRotorSpeed()).addSuffix("RPM"));
-				infoList.add(new StandardInfo(id, 0, 9, (long)turbine.getMaxRotorSpeed()).addSuffix("RPM"));
-				infoList.add(new StandardInfo(id, 0, 10, turbine.getRotorMass()));
-				infoList.add(new StandardInfo(id, 0, 11, turbine.getNumRotorBlades()));
+				infoList.add(new LogicInfo(id, 0, 2, (long)turbine.getEnergyGeneratedLastTick()).addSuffix("RF"));
+				infoList.add(new LogicInfo(id, 0, 5, turbine.getFluidConsumedLastTick()).addSuffix("mB"));
+				infoList.add(new LogicInfo(id, 0, 6, turbine.getMaxIntakeRate()).addSuffix("mB/T"));
+				infoList.add(new LogicInfo(id, 0, 7, turbine.getMaxIntakeRateMax()).addSuffix("mB/T"));
+				infoList.add(new LogicInfo(id, 0, 8, (long)turbine.getRotorSpeed()).addSuffix("RPM"));
+				infoList.add(new LogicInfo(id, 0, 9, (long)turbine.getMaxRotorSpeed()).addSuffix("RPM"));
+				infoList.add(new LogicInfo(id, 0, 10, turbine.getRotorMass()));
+				infoList.add(new LogicInfo(id, 0, 11, turbine.getNumRotorBlades()));
 			}
 			
 			if(controller instanceof IReactorFuelInfo){
 				IReactorFuelInfo fuelInfo = (IReactorFuelInfo) controller;
-				infoList.add(new StandardInfo(id, 1, 12, fuelInfo.getFuelAmount()).addSuffix("mB"));
-				infoList.add(new StandardInfo(id, 1, 13, fuelInfo.getWasteAmount()).addSuffix("mB"));
-				infoList.add(new StandardInfo(id, 1, 14, fuelInfo.getCapacity()).addSuffix("mB"));
-				infoList.add(new StandardInfo(id, 1, 15, fuelInfo.getFuelRodCount()));
+				infoList.add(new LogicInfo(id, 1, 12, fuelInfo.getFuelAmount()).addSuffix("mB"));
+				infoList.add(new LogicInfo(id, 1, 13, fuelInfo.getWasteAmount()).addSuffix("mB"));
+				infoList.add(new LogicInfo(id, 1, 14, fuelInfo.getCapacity()).addSuffix("mB"));
+				infoList.add(new LogicInfo(id, 1, 15, fuelInfo.getFuelRodCount()));
 			}
 		}
 	}

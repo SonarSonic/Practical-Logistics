@@ -12,7 +12,7 @@ import sonar.logistics.Logistics;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.connecting.IInfoEmitter;
 import sonar.logistics.api.connecting.IInfoReader;
-import sonar.logistics.api.info.Info;
+import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.client.renderers.RenderHandlers;
 import sonar.logistics.common.handlers.InfoReaderHandler;
 import sonar.logistics.network.LogisticsGui;
@@ -42,12 +42,12 @@ public class InfoReaderPart extends ConnectionPart implements IInfoEmitter, IInf
 	}
 
 	@Override
-	public Info getSecondaryInfo() {
+	public ILogicInfo getSecondaryInfo() {
 		return handler.getSecondaryInfo(tile());
 	}
 
 	@Override
-	public Info currentInfo() {
+	public ILogicInfo currentInfo() {
 		return handler.currentInfo(tile());
 	}
 

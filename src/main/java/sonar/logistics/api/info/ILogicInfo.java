@@ -10,7 +10,7 @@ import sonar.core.utils.INBTObject;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.render.ScreenType;
 
-public abstract class Info<T extends Info> implements INBTObject, IBufObject {
+public abstract class ILogicInfo<T extends ILogicInfo> implements INBTObject, IBufObject {
 
 	public String providerID = "";
 
@@ -42,12 +42,12 @@ public abstract class Info<T extends Info> implements INBTObject, IBufObject {
 
 	public abstract boolean matches(T currentInfo);
 
-	public boolean areTypesEqual(Info info) {
+	public boolean areTypesEqual(ILogicInfo info) {
 		return info == null ? false : info.getName().equals(this.getName()) && getProviderID() == info.getProviderID();
 	}
 
 	public boolean equals(Object obj) {
-		if (obj instanceof Info<?>) {
+		if (obj instanceof ILogicInfo<?>) {
 			T target = (T) obj;
 			if (areTypesEqual(target)) {
 				return matches(target);

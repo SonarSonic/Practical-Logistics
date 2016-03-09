@@ -13,7 +13,7 @@ import org.lwjgl.opengl.GL11;
 
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.utils.helpers.RenderHelper;
-import sonar.logistics.api.info.Info;
+import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.api.render.LargeScreenSizing;
 import sonar.logistics.api.render.ScreenType;
 import sonar.logistics.client.models.ModelLargeDisplay;
@@ -184,7 +184,7 @@ public class RenderLargeDisplay extends RenderDisplayScreen {
 
 	}
 
-	public void renderInfo(Tessellator tess, TileEntity tile, ForgeDirection side, Info info) {
+	public void renderInfo(Tessellator tess, TileEntity tile, ForgeDirection side, ILogicInfo info) {
 		LargeScreenSizing sizing = null;
 		Object target = FMPHelper.getHandler(FMPHelper.checkObject(tile));
 		if (target instanceof LargeDisplayScreenHandler) {

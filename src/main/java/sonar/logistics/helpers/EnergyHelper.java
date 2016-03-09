@@ -29,8 +29,8 @@ public class EnergyHelper extends EnergyWrapper {
 					StoredEnergyStack stack = new StoredEnergyStack(type);
 					boolean provided = false;
 					for (EnergyProvider handler : getProviders(type)) {
-						if (handler.canProvideInfo(energyTile, entry.getValue())) {
-							handler.getEnergyInfo(stack, energyTile, entry.getValue());
+						if (handler.canProvideEnergy(energyTile, entry.getValue())) {
+							handler.getEnergy(stack, energyTile, entry.getValue());
 							provided = true;
 						}
 					}

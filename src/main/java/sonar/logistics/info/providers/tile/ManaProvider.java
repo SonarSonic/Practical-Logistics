@@ -5,8 +5,8 @@ import java.util.List;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
-import sonar.logistics.api.info.Info;
-import sonar.logistics.api.info.StandardInfo;
+import sonar.logistics.api.info.ILogicInfo;
+import sonar.logistics.api.info.LogicInfo;
 import sonar.logistics.api.providers.TileProvider;
 import sonar.logistics.info.types.ManaInfo;
 import vazkii.botania.api.mana.IManaBlock;
@@ -33,7 +33,7 @@ public class ManaProvider extends TileProvider {
 	}
 
 	@Override
-	public void getHelperInfo(List<Info> infoList, World world, int x, int y, int z, ForgeDirection dir) {
+	public void getTileInfo(List<ILogicInfo> infoList, World world, int x, int y, int z, ForgeDirection dir) {
 		int id = this.getID();
 		TileEntity te = world.getTileEntity(x, y, z);
 		if (te == null) {
@@ -46,11 +46,11 @@ public class ManaProvider extends TileProvider {
 		
 		if (te instanceof IManaReceiver) {
 			IManaReceiver manaReceiver = (IManaReceiver) te;
-			infoList.add(new StandardInfo(id, 0, 1, manaReceiver.isFull()));
+			infoList.add(new LogicInfo(id, 0, 1, manaReceiver.isFull()));
 		}
 		if (te instanceof IManaPool) {
 			IManaPool manaPool = (IManaPool) te;
-			infoList.add(new StandardInfo(id, 0, 3, manaPool.isOutputtingPower()));
+			infoList.add(new LogicInfo(id, 0, 3, manaPool.isOutputtingPower()));
 			
 		}
 	}

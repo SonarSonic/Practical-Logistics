@@ -1,9 +1,8 @@
 package sonar.logistics.registries;
 
 import sonar.core.utils.helpers.NBTRegistryHelper;
-import sonar.logistics.api.info.EntityInfo;
-import sonar.logistics.api.info.Info;
-import sonar.logistics.api.info.StandardInfo;
+import sonar.logistics.api.info.ILogicInfo;
+import sonar.logistics.api.info.LogicInfo;
 import sonar.logistics.info.types.BlockCoordsInfo;
 import sonar.logistics.info.types.BlockNameInfo;
 import sonar.logistics.info.types.CategoryInfo;
@@ -18,14 +17,13 @@ import sonar.logistics.info.types.StoredEnergyInfo;
 import sonar.logistics.info.types.StoredStackInfo;
 import sonar.logistics.info.types.ThaumcraftAspectInfo;
 
-public class InfoTypeRegistry extends NBTRegistryHelper.Buf<Info> {
+public class InfoTypeRegistry extends NBTRegistryHelper.Buf<ILogicInfo> {
 
 	@Override
 	public void register() {
 		registerObject(new BlockCoordsInfo());
 		registerObject(new CategoryInfo());
-		registerObject(new StandardInfo());
-		registerObject(new EntityInfo());
+		registerObject(new LogicInfo());
 		registerObject(new StoredStackInfo());
 		registerObject(new ProgressInfo());
 		registerObject(new FluidInfo());
@@ -46,7 +44,7 @@ public class InfoTypeRegistry extends NBTRegistryHelper.Buf<Info> {
 	}
 
 	@Override
-	public boolean areTypesEqual(Info target, Info current) {
+	public boolean areTypesEqual(ILogicInfo target, ILogicInfo current) {
 		if (target == null && current == null) {
 			return true;
 		}

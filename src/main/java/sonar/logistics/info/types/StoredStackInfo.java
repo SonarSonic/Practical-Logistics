@@ -13,10 +13,10 @@ import org.lwjgl.opengl.GL12;
 import sonar.core.inventory.StoredItemStack;
 import sonar.core.utils.helpers.FontHelper;
 import sonar.core.utils.helpers.RenderHelper;
-import sonar.logistics.api.info.Info;
+import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.api.render.ScreenType;
 
-public class StoredStackInfo extends Info<StoredStackInfo> {
+public class StoredStackInfo extends ILogicInfo<StoredStackInfo> {
 
 	public StoredItemStack stack;
 	public String rend = "ITEMREND";

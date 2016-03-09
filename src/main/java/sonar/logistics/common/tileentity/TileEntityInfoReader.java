@@ -10,7 +10,7 @@ import sonar.core.utils.BlockCoords;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.connecting.IInfoEmitter;
 import sonar.logistics.api.connecting.IInfoReader;
-import sonar.logistics.api.info.Info;
+import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.common.handlers.InfoReaderHandler;
 
 public class TileEntityInfoReader extends TileEntityHandler implements IInfoEmitter, IInfoReader, ITileHandler {
@@ -28,12 +28,12 @@ public class TileEntityInfoReader extends TileEntityHandler implements IInfoEmit
 	}
 
 	@Override
-	public Info getSecondaryInfo() {
+	public ILogicInfo getSecondaryInfo() {
 		return handler.getSecondaryInfo(this);
 	}
 
 	@Override
-	public Info currentInfo() {
+	public ILogicInfo currentInfo() {
 		return handler.currentInfo(this);
 	}
 

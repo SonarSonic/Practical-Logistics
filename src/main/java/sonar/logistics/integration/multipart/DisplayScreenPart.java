@@ -10,7 +10,7 @@ import sonar.core.integration.fmp.SonarHandlerPart;
 import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.utils.BlockCoords;
 import sonar.logistics.api.connecting.IInfoTile;
-import sonar.logistics.api.info.Info;
+import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.client.renderers.RenderDisplayScreen;
 import sonar.logistics.common.handlers.DisplayScreenHandler;
 import sonar.logistics.registries.BlockRegistry;
@@ -40,7 +40,7 @@ public class DisplayScreenPart extends SonarHandlerPart implements IInfoTile {
 	}
 
 	@Override
-	public Info currentInfo() {
+	public ILogicInfo currentInfo() {
 		return handler.currentInfo();
 	}
 

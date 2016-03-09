@@ -5,8 +5,8 @@ import java.util.List;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
-import sonar.logistics.api.info.Info;
-import sonar.logistics.api.info.StandardInfo;
+import sonar.logistics.api.info.ILogicInfo;
+import sonar.logistics.api.info.LogicInfo;
 import sonar.logistics.api.providers.TileProvider;
 import sonar.logistics.info.types.ThaumcraftAspectInfo;
 import thaumcraft.api.aspects.Aspect;
@@ -40,7 +40,7 @@ public class ThaumcraftProvider extends TileProvider {
 	}
 
 	@Override
-	public void getHelperInfo(List<Info> infoList, World world, int x, int y, int z, ForgeDirection dir) {
+	public void getTileInfo(List<ILogicInfo> infoList, World world, int x, int y, int z, ForgeDirection dir) {
 		int id = this.getID();
 		TileEntity target = world.getTileEntity(x, y, z);
 		if (target != null) {
@@ -67,16 +67,16 @@ public class ThaumcraftProvider extends TileProvider {
 							infoList.add(new ThaumcraftAspectInfo(id, "THAUMCRAFT ASPECTS", aspect.getName(), contains, aspect.getTag()));
 						}
 					}
-					infoList.add(new StandardInfo(id, 0, 0, hasPrimal));
+					infoList.add(new LogicInfo(id, 0, 0, hasPrimal));
 				}
 			}
 			if (target instanceof INode) {
 				INode node = (INode) target;
 				if (node.getNodeModifier() != null) {
-					infoList.add(new StandardInfo(id, 1, 1, node.getNodeModifier().name()));
+					infoList.add(new LogicInfo(id, 1, 1, node.getNodeModifier().name()));
 				}
 				if (node.getNodeType() != null) {
-					infoList.add(new StandardInfo(id, 1, 2, node.getNodeType().name()));
+					infoList.add(new LogicInfo(id, 1, 2, node.getNodeType().name()));
 				}
 			}
 		}

@@ -3,10 +3,10 @@ package sonar.logistics.info.types;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import sonar.logistics.api.info.StandardInfo;
+import sonar.logistics.api.info.LogicInfo;
 import cpw.mods.fml.common.network.ByteBufUtils;
 
-public class BlockNameInfo extends StandardInfo<BlockNameInfo> {
+public class BlockNameInfo extends LogicInfo<BlockNameInfo> {
 
 	public ItemStack block = null;
 

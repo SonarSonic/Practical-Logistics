@@ -20,7 +20,7 @@ import sonar.core.inventory.GuiSonar;
 import sonar.core.inventory.SonarButtons;
 import sonar.core.utils.helpers.FontHelper;
 import sonar.logistics.Logistics;
-import sonar.logistics.api.info.Info;
+import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.common.containers.ContainerInfoNode;
 import sonar.logistics.common.handlers.InfoReaderHandler;
 import sonar.logistics.info.types.CategoryInfo;
@@ -78,7 +78,7 @@ public class GuiInfoReader extends GuiSonar {
 		int finish = Math.min(start + 11, infoSize());
 		for (int i = start; i < finish; i++) {
 			if (getInfo().get(i) != null) {
-				Info info = getInfo().get(i);
+				ILogicInfo info = getInfo().get(i);
 				if (info != null) {
 					if (info.equals(getPrimaryInfo())) {
 						return i - start;
@@ -100,7 +100,7 @@ public class GuiInfoReader extends GuiSonar {
 		int finish = Math.min(start + 11, infoSize());
 		for (int i = start; i < finish; i++) {
 			if (getInfo().get(i) != null) {
-				Info info = getInfo().get(i);
+				ILogicInfo info = getInfo().get(i);
 				if (info != null) {
 					if (info.equals(getSecondInfo())) {
 						return i - start;
@@ -120,7 +120,7 @@ public class GuiInfoReader extends GuiSonar {
 		int finish = Math.min(start + 11, infoSize());
 		for (int i = start; i < finish; i++) {
 			if (getInfo().get(i) != null) {
-				Info info = getInfo().get(i);
+				ILogicInfo info = getInfo().get(i);
 				if (info instanceof CategoryInfo) {
 					positions.add(i - start);
 
@@ -139,7 +139,7 @@ public class GuiInfoReader extends GuiSonar {
 			int start = (int) (infoSize() * this.currentScroll);
 			int finish = Math.min(start + 11, infoSize());
 			for (int i = start; i < finish; i++) {
-				Info info = getInfo().get(i);
+				ILogicInfo info = getInfo().get(i);
 				if (info != null) {
 					boolean isSelected = info.equals(getPrimaryInfo());
 					if (!(info instanceof CategoryInfo)) {
@@ -251,7 +251,7 @@ public class GuiInfoReader extends GuiSonar {
 					int start = (int) (infoSize() * this.currentScroll);
 					int network = start + button.id - 10;
 					if (network < infoSize()) {
-						Info info = getInfo().get(network);
+						ILogicInfo info = getInfo().get(network);
 						if (info == null || (info instanceof CategoryInfo)) {
 							return;
 						}
@@ -336,15 +336,15 @@ public class GuiInfoReader extends GuiSonar {
 		return getInfo() == null ? 0 : getInfo().size();
 	}
 
-	public List<Info> getInfo() {
+	public List<ILogicInfo> getInfo() {
 		return handler.clientInfo;
 	}
 
-	public Info getPrimaryInfo(){
+	public ILogicInfo getPrimaryInfo(){
 		return handler.primaryInfo.getObject();
 	}
 
-	public Info getSecondInfo(){
+	public ILogicInfo getSecondInfo(){
 		return handler.secondaryInfo.getObject();
 	}
 

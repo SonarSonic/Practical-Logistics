@@ -13,6 +13,7 @@ import sonar.core.utils.BlockCoords;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.cache.CacheTypes;
+import sonar.logistics.api.cache.IStorageCache;
 import sonar.logistics.api.connecting.IEntityNode;
 import sonar.logistics.api.providers.FluidHandler;
 import sonar.logistics.api.providers.InventoryHandler.StorageSize;

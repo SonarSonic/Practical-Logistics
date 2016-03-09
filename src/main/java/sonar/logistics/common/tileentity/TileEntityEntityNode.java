@@ -2,6 +2,7 @@ package sonar.logistics.common.tileentity;
 
 import io.netty.buffer.ByteBuf;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -20,7 +21,7 @@ import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.connecting.CableType;
 import sonar.logistics.api.connecting.IEntityNode;
 import sonar.logistics.api.connecting.IInfoEmitter;
-import sonar.logistics.api.info.Info;
+import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.api.render.ICableRenderer;
 import sonar.logistics.info.types.BlockCoordsInfo;
 
@@ -78,7 +79,7 @@ public class TileEntityEntityNode extends TileEntityChannelledCable implements I
 	}
 
 	@Override
-	public Info currentInfo() {
+	public ILogicInfo currentInfo() {
 		return BlockCoordsInfo.createInfo("Entity Node", new BlockCoords(this));
 	}
 
@@ -136,7 +137,7 @@ public class TileEntityEntityNode extends TileEntityChannelledCable implements I
 	}
 
 	@Override
-	public List<Entity> getEntities() {
-		return Arrays.asList(getNearestEntity());
+	public ArrayList<Entity> getEntities() {
+		return (ArrayList<Entity>) Arrays.asList(getNearestEntity());
 	}
 }

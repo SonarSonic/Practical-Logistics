@@ -3,16 +3,16 @@ package sonar.logistics.info.types;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.nbt.NBTTagCompound;
 import sonar.core.utils.BlockCoords;
-import sonar.logistics.api.info.Info;
+import sonar.logistics.api.info.ILogicInfo;
 import cpw.mods.fml.common.network.ByteBufUtils;
 
-public class BlockCoordsInfo extends Info<BlockCoordsInfo> {
+public class BlockCoordsInfo extends ILogicInfo<BlockCoordsInfo> {
 
 	public boolean emptyData;
 	public String name;
 	public BlockCoords coords;
 
-	public static Info createInfo(String name, BlockCoords coords) {
+	public static ILogicInfo createInfo(String name, BlockCoords coords) {
 		BlockCoordsInfo info = new BlockCoordsInfo();
 		info.name = name;
 		info.coords = coords;

@@ -9,7 +9,7 @@ import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.utils.BlockCoords;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.connecting.IInfoEmitter;
-import sonar.logistics.api.info.Info;
+import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.common.handlers.EnergyReaderHandler;
 
 public class TileEntityEnergyReader extends TileEntityHandler implements IInfoEmitter, ITileHandler {
@@ -26,7 +26,7 @@ public class TileEntityEnergyReader extends TileEntityHandler implements IInfoEm
 		return handler.canConnect(this, dir);
 	}
 	@Override
-	public Info currentInfo() {
+	public ILogicInfo currentInfo() {
 		return handler.currentInfo(this);
 	}
 

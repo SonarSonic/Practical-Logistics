@@ -1,7 +1,7 @@
 package sonar.logistics.api.signals;
 
 import sonar.core.network.sync.SyncTagType;
-import sonar.logistics.api.info.Info;
+import sonar.logistics.api.info.ILogicInfo;
 
 public class IntegerStatement extends SignallerStatement {
 
@@ -27,7 +27,7 @@ public class IntegerStatement extends SignallerStatement {
 	}
 
 	@Override
-	public boolean canSignal(Info info) {
+	public boolean canSignal(ILogicInfo info) {
 		boolean statement = false;
 		if (info.getDataType() == this.getType()) {
 			int integer = Integer.parseInt(info.getData());

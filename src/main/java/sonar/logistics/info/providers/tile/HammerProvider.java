@@ -5,8 +5,8 @@ import java.util.List;
 import net.minecraft.block.Block;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
-import sonar.logistics.api.info.Info;
-import sonar.logistics.api.info.StandardInfo;
+import sonar.logistics.api.info.ILogicInfo;
+import sonar.logistics.api.info.LogicInfo;
 import sonar.logistics.api.providers.TileProvider;
 import sonar.logistics.common.tileentity.TileEntityHammer;
 import sonar.logistics.registries.BlockRegistry;
@@ -28,7 +28,7 @@ public class HammerProvider extends TileProvider {
 	}
 
 	@Override
-	public void getHelperInfo(List<Info> infoList, World world, int x, int y, int z, ForgeDirection dir) {
+	public void getTileInfo(List<ILogicInfo> infoList, World world, int x, int y, int z, ForgeDirection dir) {
 		int id = this.getID();
 		TileEntityHammer hammer = null;
 		Block block = world.getBlock(x, y, z);
@@ -42,10 +42,10 @@ public class HammerProvider extends TileProvider {
 			}
 		}
 		if (hammer != null) {
-			infoList.add(new StandardInfo(id, 0, 0, hammer.progress.getObject()).addSuffix("ticks"));
-			infoList.add(new StandardInfo(id, 0, 1, hammer.speed).addSuffix("ticks"));
-			infoList.add(new StandardInfo(id, 0, 2, hammer.coolDown.getObject()).addSuffix("ticks"));
-			infoList.add(new StandardInfo(id, 0, 3, hammer.speed * 2).addSuffix("ticks"));
+			infoList.add(new LogicInfo(id, 0, 0, hammer.progress.getObject()).addSuffix("ticks"));
+			infoList.add(new LogicInfo(id, 0, 1, hammer.speed).addSuffix("ticks"));
+			infoList.add(new LogicInfo(id, 0, 2, hammer.coolDown.getObject()).addSuffix("ticks"));
+			infoList.add(new LogicInfo(id, 0, 3, hammer.speed * 2).addSuffix("ticks"));
 		}
 	}
 

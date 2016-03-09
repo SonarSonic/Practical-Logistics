@@ -8,8 +8,8 @@ import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.player.EntityPlayer;
-import sonar.logistics.api.info.EntityInfo;
-import sonar.logistics.api.info.Info;
+import sonar.logistics.api.info.ILogicInfo;
+import sonar.logistics.api.info.LogicInfo;
 import sonar.logistics.api.providers.EntityProvider;
 
 public class NormalEntityProvider extends EntityProvider {
@@ -29,29 +29,29 @@ public class NormalEntityProvider extends EntityProvider {
 	}
 
 	@Override
-	public void getHelperInfo(List<Info> infoList, Entity entity) {
+	public void getHelperInfo(List<ILogicInfo> infoList, Entity entity) {
 		int id = this.getID();
 		if (entity instanceof EntityLivingBase) {
 			EntityLivingBase living = (EntityLivingBase) entity;
 			if (!(entity instanceof EntityPlayer)) {
 				String name = EntityList.getEntityString(entity);
 				if (name != null) {
-					infoList.add(new EntityInfo(id, 0, 0, name));
+					infoList.add(new LogicInfo(id, 0, 0, name).isEntityData(true));
 				}
 			}
-			infoList.add(new EntityInfo(id, 0, 1, living.getAge()));
+			infoList.add(new LogicInfo(id, 0, 1, living.getAge()).isEntityData(true));
 
-			infoList.add(new EntityInfo(id, 0, 2, (int) living.getHealth()).addSuffix("HP"));
-			infoList.add(new EntityInfo(id, 0, 3, (int) living.getMaxHealth()).addSuffix("HP"));
+			infoList.add(new LogicInfo(id, 0, 2, (int) living.getHealth()).addSuffix("HP").isEntityData(true));
+			infoList.add(new LogicInfo(id, 0, 3, (int) living.getMaxHealth()).addSuffix("HP").isEntityData(true));
 			if (entity instanceof EntityMob) {
-				infoList.add(new EntityInfo(id, 0, 4, true));
+				infoList.add(new LogicInfo(id, 0, 4, true).isEntityData(true));
 			} else {
-				infoList.add(new EntityInfo(id, 0, 4, false));
+				infoList.add(new LogicInfo(id, 0, 4, false).isEntityData(true));
 			}
 		}
 		if (entity instanceof EntityAgeable) {
 			EntityAgeable living = (EntityAgeable) entity;
-			infoList.add(new EntityInfo(id, 0, 5, living.getGrowingAge()));
+			infoList.add(new LogicInfo(id, 0, 5, living.getGrowingAge()).isEntityData(true));
 		}
 
 	}

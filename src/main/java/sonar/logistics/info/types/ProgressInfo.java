@@ -11,12 +11,12 @@ import org.lwjgl.opengl.GL11;
 
 import sonar.core.utils.helpers.RenderHelper;
 import sonar.logistics.api.LogisticsAPI;
-import sonar.logistics.api.info.Info;
+import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.api.render.ScreenType;
 import sonar.logistics.client.renderers.RenderHandlers;
 import cpw.mods.fml.common.network.ByteBufUtils;
 
-public class ProgressInfo extends Info<ProgressInfo> {
+public class ProgressInfo extends ILogicInfo<ProgressInfo> {
 
 	private static final ResourceLocation progress = new ResourceLocation(RenderHandlers.modelFolder + "progressBar.png");
 	public String data;

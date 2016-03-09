@@ -11,7 +11,7 @@ import sonar.core.utils.BlockCoords;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.connecting.IInfoEmitter;
-import sonar.logistics.api.info.Info;
+import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.client.renderers.RenderHandlers;
 import sonar.logistics.common.handlers.FluidReaderHandler;
 import sonar.logistics.network.LogisticsGui;
@@ -41,7 +41,7 @@ public class FluidReaderPart extends ConnectionPart implements IInfoEmitter{
 	}
 
 	@Override
-	public Info currentInfo() {
+	public ILogicInfo currentInfo() {
 		return handler.currentInfo(tile());
 	}
 

@@ -9,7 +9,7 @@ import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.connecting.CableType;
 import sonar.logistics.api.connecting.IConnectionNode;
 import sonar.logistics.api.connecting.IInfoEmitter;
-import sonar.logistics.api.info.Info;
+import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.api.render.ICableRenderer;
 import sonar.logistics.info.types.BlockCoordsInfo;
 
@@ -45,7 +45,7 @@ public class TileEntityBlockNode extends TileEntityChannelledCable implements II
 	}
 
 	@Override
-	public Info currentInfo() {
+	public ILogicInfo currentInfo() {
 		return BlockCoordsInfo.createInfo("Node", new BlockCoords(this));
 	}
 

@@ -5,8 +5,8 @@ import java.util.List;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
-import sonar.logistics.api.info.Info;
-import sonar.logistics.api.info.StandardInfo;
+import sonar.logistics.api.info.ILogicInfo;
+import sonar.logistics.api.info.LogicInfo;
 import sonar.logistics.api.providers.TileProvider;
 import WayofTime.alchemicalWizardry.api.alchemy.energy.IReagentHandler;
 import WayofTime.alchemicalWizardry.api.alchemy.energy.ISegmentedReagentHandler;
@@ -33,7 +33,7 @@ public class BloodMagicProvider extends TileProvider {
 	}
 
 	@Override
-	public void getHelperInfo(List<Info> infoList, World world, int x, int y, int z, ForgeDirection dir) {
+	public void getTileInfo(List<ILogicInfo> infoList, World world, int x, int y, int z, ForgeDirection dir) {
 		int id = this.getID();
 		TileEntity te = world.getTileEntity(x, y, z);
 		if (te == null) {
@@ -41,12 +41,12 @@ public class BloodMagicProvider extends TileProvider {
 		}
 		if (te instanceof IBloodAltar) {
 			IBloodAltar altar = (IBloodAltar) te;
-			infoList.add(new StandardInfo(id, 0, 0, altar.getTier()));
-			infoList.add(new StandardInfo(id, 0, 1, altar.getCurrentBlood()).addSuffix("LP"));
-			infoList.add(new StandardInfo(id, 0, 2, altar.getCapacity()).addSuffix("LP"));
-			infoList.add(new StandardInfo(id, 0, 3, altar.getBufferCapacity()).addSuffix("LP"));
-			infoList.add(new StandardInfo(id, 0, 4, altar.getProgress()));
-			infoList.add(new StandardInfo(id, 0, 5, altar.hasDemonBlood()));
+			infoList.add(new LogicInfo(id, 0, 0, altar.getTier()));
+			infoList.add(new LogicInfo(id, 0, 1, altar.getCurrentBlood()).addSuffix("LP"));
+			infoList.add(new LogicInfo(id, 0, 2, altar.getCapacity()).addSuffix("LP"));
+			infoList.add(new LogicInfo(id, 0, 3, altar.getBufferCapacity()).addSuffix("LP"));
+			infoList.add(new LogicInfo(id, 0, 4, altar.getProgress()));
+			infoList.add(new LogicInfo(id, 0, 5, altar.hasDemonBlood()));
 		}
 		if (te instanceof IReagentHandler) {
 			IReagentHandler handler = (IReagentHandler) te;
@@ -60,13 +60,13 @@ public class BloodMagicProvider extends TileProvider {
 						prefix = "Tank " + tankID + ": ";
 					}
 					String category = getCategory((byte)1);
-					infoList.add(new StandardInfo(id, category, prefix + "Capacity", info.capacity));
+					infoList.add(new LogicInfo(id, category, prefix + "Capacity", info.capacity));
 					if (info.reagent != null) {
-						infoList.add(new StandardInfo(id, category, prefix + "Stored", info.reagent.amount));
-						infoList.add(new StandardInfo(id, category, prefix + "Reagent", info.reagent.reagent.name));
+						infoList.add(new LogicInfo(id, category, prefix + "Stored", info.reagent.amount));
+						infoList.add(new LogicInfo(id, category, prefix + "Reagent", info.reagent.reagent.name));
 					} else {
-						infoList.add(new StandardInfo(id, category, prefix + "Stored", 0));
-						infoList.add(new StandardInfo(id, category, prefix + "Reagent", "NONE"));
+						infoList.add(new LogicInfo(id, category, prefix + "Stored", 0));
+						infoList.add(new LogicInfo(id, category, prefix + "Reagent", "NONE"));
 					}
 				}
 			}
@@ -74,13 +74,13 @@ public class BloodMagicProvider extends TileProvider {
 
 		if (te instanceof ISegmentedReagentHandler) {
 			ISegmentedReagentHandler handler = (ISegmentedReagentHandler) te;
-			infoList.add(new StandardInfo(id, 1, 6, handler.getNumberOfTanks()));
+			infoList.add(new LogicInfo(id, 1, 6, handler.getNumberOfTanks()));
 		}
 		if (te instanceof IMasterRitualStone) {
 			IMasterRitualStone stone = (IMasterRitualStone) te;
-			infoList.add(new StandardInfo(id, 2, 7, stone.getOwner()));
-			infoList.add(new StandardInfo(id, 2, 8, stone.getCooldown()));
-			infoList.add(new StandardInfo(id, 2, 9, stone.areTanksEmpty()));
+			infoList.add(new LogicInfo(id, 2, 7, stone.getOwner()));
+			infoList.add(new LogicInfo(id, 2, 8, stone.getCooldown()));
+			infoList.add(new LogicInfo(id, 2, 9, stone.areTanksEmpty()));
 		}
 	}
 

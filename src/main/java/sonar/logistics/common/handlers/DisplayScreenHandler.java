@@ -24,8 +24,8 @@ import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.connecting.IInfoEmitter;
 import sonar.logistics.api.connecting.IInfoReader;
 import sonar.logistics.api.connecting.ILargeDisplay;
-import sonar.logistics.api.info.Info;
-import sonar.logistics.api.info.StandardInfo;
+import sonar.logistics.api.info.ILogicInfo;
+import sonar.logistics.api.info.LogicInfo;
 import sonar.logistics.api.interaction.IDefaultInteraction;
 import sonar.logistics.api.render.InfoInteractionHandler;
 import sonar.logistics.api.render.ScreenType;
@@ -36,8 +36,8 @@ import cpw.mods.fml.relauncher.SideOnly;
 
 public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 
-	public Info info;
-	public Info updateInfo;
+	public ILogicInfo info;
+	public ILogicInfo updateInfo;
 
 	public int updateTicks, updateTime = 20;
 
@@ -71,19 +71,19 @@ public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 		if (target == null) {
 			return;
 		}
-		Info current = null;
+		ILogicInfo current = null;
 		boolean shouldUpdate = true;
 		if (target instanceof IInfoReader) {
 			IInfoReader infoReader = (IInfoReader) target;
 			if (infoReader.currentInfo() != null && infoReader.getSecondaryInfo() != null) {
-				Info progress = LogisticsAPI.getInfoHelper().combineData(infoReader.currentInfo(), infoReader.getSecondaryInfo());
-				if (!progress.equals(info) || (info != null && info instanceof StandardInfo && progress instanceof StandardInfo && !((StandardInfo) progress).data.equals(((StandardInfo) info).data))) {
+				ILogicInfo progress = LogisticsAPI.getInfoHelper().combineData(infoReader.currentInfo(), infoReader.getSecondaryInfo());
+				if (!progress.equals(info) || (info != null && info instanceof LogicInfo && progress instanceof LogicInfo && !((LogicInfo) progress).data.equals(((LogicInfo) info).data))) {
 					current = progress;
 				} else {
 					shouldUpdate = false;
 				}
 			} else if (infoReader.currentInfo() != null) {
-				if (!infoReader.currentInfo().equals(info) || (info != null && info instanceof StandardInfo && infoReader.currentInfo() instanceof StandardInfo && !((StandardInfo) infoReader.currentInfo()).data.equals(((StandardInfo) info).data))) {
+				if (!infoReader.currentInfo().equals(info) || (info != null && info instanceof LogicInfo && infoReader.currentInfo() instanceof LogicInfo && !((LogicInfo) infoReader.currentInfo()).data.equals(((LogicInfo) info).data))) {
 					current = infoReader.currentInfo();
 				} else {
 					shouldUpdate = false;
@@ -93,7 +93,7 @@ public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 		} else if (target instanceof IInfoEmitter) {
 			IInfoEmitter infoNode = (IInfoEmitter) target;
 			if (infoNode.currentInfo() != null) {
-				if (!infoNode.currentInfo().equals(info) || (info != null && info instanceof StandardInfo && infoNode.currentInfo() instanceof StandardInfo && !((StandardInfo) infoNode.currentInfo()).data.equals(((StandardInfo) info).data))) {
+				if (!infoNode.currentInfo().equals(info) || (info != null && info instanceof LogicInfo && infoNode.currentInfo() instanceof LogicInfo && !((LogicInfo) infoNode.currentInfo()).data.equals(((LogicInfo) info).data))) {
 					current = infoNode.currentInfo();
 				} else {
 					shouldUpdate = false;
@@ -110,7 +110,7 @@ public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 			} else {
 				if (updateInfo != null) {
 					if (updateInfo.areTypesEqual(info)) {
-						if (updateInfo instanceof StandardInfo) {
+						if (updateInfo instanceof LogicInfo) {
 							info = updateInfo;
 							SonarCore.sendPacketAround(packetTile, 64, 0);
 						} else {
@@ -140,7 +140,7 @@ public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 		lastClickTime = world.getTotalWorldTime();
 		lastClickUUID = player.getPersistentID();
 		TileEntity connectTe = te;
-		Info screenInfo = info;
+		ILogicInfo screenInfo = info;
 		if (te instanceof ILargeDisplay) {
 			List<BlockCoords> displays = DisplayRegistry.getScreens(((ILargeDisplay) te).registryID());
 			if (!displays.isEmpty()) {
@@ -182,7 +182,7 @@ public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 		}
 	}
 
-	public Info currentInfo() {
+	public ILogicInfo currentInfo() {
 		return info;
 	}
 
@@ -236,7 +236,7 @@ public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 			}
 		}
 		if (id == 1) {
-			StandardInfo standardInfo = (StandardInfo) info;
+			LogicInfo standardInfo = (LogicInfo) info;
 			standardInfo.setData(ByteBufUtils.readUTF8String(buf));
 		}
 		if (id == 2) {

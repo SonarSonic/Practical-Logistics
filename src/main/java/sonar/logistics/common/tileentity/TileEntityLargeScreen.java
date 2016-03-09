@@ -6,7 +6,7 @@ import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.utils.BlockCoords;
 import sonar.logistics.api.connecting.IInfoTile;
 import sonar.logistics.api.connecting.ILargeDisplay;
-import sonar.logistics.api.info.Info;
+import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.api.render.LargeScreenSizing;
 import sonar.logistics.common.handlers.LargeDisplayScreenHandler;
 import sonar.logistics.helpers.DisplayHelper;
@@ -26,7 +26,7 @@ public class TileEntityLargeScreen extends TileEntityHandler implements IInfoTil
 	}
 
 	@Override
-	public Info currentInfo() {
+	public ILogicInfo currentInfo() {
 		return handler.currentInfo();
 	}
 

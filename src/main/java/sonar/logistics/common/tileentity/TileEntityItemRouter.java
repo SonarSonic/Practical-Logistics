@@ -8,7 +8,7 @@ import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.inventory.IFilteredInventory;
 import sonar.core.utils.BlockCoords;
 import sonar.logistics.api.connecting.IInfoTile;
-import sonar.logistics.api.info.Info;
+import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.common.handlers.ItemRouterHandler;
 import sonar.logistics.info.types.BlockCoordsInfo;
 
@@ -27,7 +27,7 @@ public class TileEntityItemRouter extends TileEntityHandlerInventory implements 
 	}
 
 	@Override
-	public Info currentInfo() {
+	public ILogicInfo currentInfo() {
 		return BlockCoordsInfo.createInfo("Item Router", new BlockCoords(this));
 	}
 

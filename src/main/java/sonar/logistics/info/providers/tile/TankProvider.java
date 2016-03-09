@@ -9,8 +9,8 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidHandler;
 import net.minecraftforge.fluids.IFluidTank;
-import sonar.logistics.api.info.Info;
-import sonar.logistics.api.info.StandardInfo;
+import sonar.logistics.api.info.ILogicInfo;
+import sonar.logistics.api.info.LogicInfo;
 import sonar.logistics.api.providers.TileProvider;
 import sonar.logistics.info.types.FluidInfo;
 
@@ -32,18 +32,18 @@ public class TankProvider extends TileProvider {
 	}
 
 	@Override
-	public void getHelperInfo(List<Info> infoList, World world, int x, int y, int z, ForgeDirection dir) {
+	public void getTileInfo(List<ILogicInfo> infoList, World world, int x, int y, int z, ForgeDirection dir) {
 		int id = this.getID();
 		TileEntity target = world.getTileEntity(x, y, z);
 		if (target instanceof IFluidTank) {
 			IFluidTank tank = (IFluidTank) target;
 			int capacity = tank.getCapacity();
 			int currentStored = tank.getFluidAmount();
-			infoList.add(new StandardInfo(id, 0, 0, tank.getCapacity()).addSuffix("MB"));
-			infoList.add(new StandardInfo(id, 0, 1, tank.getFluidAmount()).addSuffix("MB"));
+			infoList.add(new LogicInfo(id, 0, 0, tank.getCapacity()).addSuffix("MB"));
+			infoList.add(new LogicInfo(id, 0, 1, tank.getFluidAmount()).addSuffix("MB"));
 			if (tank.getFluid() != null) {
 				FluidStack fluid = tank.getFluid();
-				infoList.add(new StandardInfo(id, 0, 2, fluid.getLocalizedName()));
+				infoList.add(new LogicInfo(id, 0, 2, fluid.getLocalizedName()));
 
 			}
 		} else if (target instanceof IFluidHandler) {

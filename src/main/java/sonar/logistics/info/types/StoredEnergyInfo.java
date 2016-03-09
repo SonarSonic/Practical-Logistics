@@ -15,13 +15,13 @@ import org.lwjgl.opengl.GL11;
 import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.RenderHelper;
 import sonar.logistics.api.LogisticsAPI;
-import sonar.logistics.api.info.Info;
+import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.api.render.ScreenType;
 import sonar.logistics.api.utils.IdentifiedCoords;
 import sonar.logistics.api.utils.StoredEnergyStack;
 import sonar.logistics.client.renderers.RenderHandlers;
 
-public class StoredEnergyInfo extends Info<StoredEnergyInfo> {
+public class StoredEnergyInfo extends ILogicInfo<StoredEnergyInfo> {
 
 	private static final ResourceLocation progress = new ResourceLocation(RenderHandlers.modelFolder + "progressBar.png");
 	public StoredEnergyStack stack;

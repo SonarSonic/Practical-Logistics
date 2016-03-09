@@ -6,8 +6,8 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockCrops;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
-import sonar.logistics.api.info.Info;
-import sonar.logistics.api.info.StandardInfo;
+import sonar.logistics.api.info.ILogicInfo;
+import sonar.logistics.api.info.LogicInfo;
 import sonar.logistics.api.providers.TileProvider;
 
 public class GrowableProvider extends TileProvider {
@@ -28,12 +28,12 @@ public class GrowableProvider extends TileProvider {
 	}
 
 	@Override
-	public void getHelperInfo(List<Info> infoList, World world, int x, int y, int z, ForgeDirection dir) {
+	public void getTileInfo(List<ILogicInfo> infoList, World world, int x, int y, int z, ForgeDirection dir) {
 		int id = this.getID();
 		Block target = world.getBlock(x, y, z);
 		if (target instanceof BlockCrops) {
 			BlockCrops crop = (BlockCrops) target;
-			infoList.add(new StandardInfo(id, 0, 0, "" + crop.func_149851_a(world, x, y, z, false)));
+			infoList.add(new LogicInfo(id, 0, 0, "" + crop.func_149851_a(world, x, y, z, false)));
 		}
 
 	}

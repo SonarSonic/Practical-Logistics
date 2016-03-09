@@ -10,7 +10,7 @@ import sonar.core.network.utils.ITextField;
 import sonar.core.utils.BlockCoords;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.connecting.IInfoEmitter;
-import sonar.logistics.api.info.Info;
+import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.info.types.BlockCoordsInfo;
 import sonar.logistics.registries.EmitterRegistry;
 
@@ -99,7 +99,7 @@ public class TileEntityDataEmitter extends TileEntityNode implements IInfoEmitte
 	}
 
 	@Override
-	public Info currentInfo() {
+	public ILogicInfo currentInfo() {
 		return BlockCoordsInfo.createInfo("Data Emitter", getCoords());
 	}
 

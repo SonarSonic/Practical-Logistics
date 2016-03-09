@@ -28,8 +28,8 @@ import sonar.core.utils.helpers.FontHelper;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.cache.INetworkCache;
-import sonar.logistics.api.info.Info;
-import sonar.logistics.api.info.StandardInfo;
+import sonar.logistics.api.info.ILogicInfo;
+import sonar.logistics.api.info.LogicInfo;
 import sonar.logistics.api.interaction.IDefaultInteraction;
 import sonar.logistics.api.providers.InventoryHandler.StorageSize;
 import sonar.logistics.api.render.ScreenType;
@@ -127,7 +127,7 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 		}
 	}
 
-	public Info currentInfo(TileEntity te) {
+	public ILogicInfo currentInfo(TileEntity te) {
 
 		switch (setting.getObject()) {
 		case 0:
@@ -147,7 +147,7 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 			if (stack != null) {
 				return StoredStackInfo.createInfo(stack);
 			}
-			return new StandardInfo((byte) -1, "ITEMREND", " ", " ");
+			return new LogicInfo((byte) -1, "ITEMREND", " ", " ");
 
 		case 2:
 			if (posSlot.getObject() < stacks.size()) {
@@ -162,11 +162,11 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 		case 4:
 			return new ProgressInfo(maxStorage.getStoredFluids(), maxStorage.getMaxFluids(), FontHelper.formatStackSize(maxStorage.getStoredFluids()) + " / " + FontHelper.formatStackSize(maxStorage.getMaxFluids()));
 		}
-		return new StandardInfo((byte) -1, "ITEMREND", " ", "NO DATA");
+		return new LogicInfo((byte) -1, "ITEMREND", " ", "NO DATA");
 	}
 
 	@Override
-	public void handleInteraction(Info info, ScreenType type, TileEntity screen, TileEntity reader, EntityPlayer player, int x, int y, int z, BlockInteraction interact, boolean doubleClick) {
+	public void handleInteraction(ILogicInfo info, ScreenType type, TileEntity screen, TileEntity reader, EntityPlayer player, int x, int y, int z, BlockInteraction interact, boolean doubleClick) {
 		if (player.getHeldItem() != null) {
 			if (!doubleClick) {
 				insertItem(player, reader, player.inventory.currentItem);

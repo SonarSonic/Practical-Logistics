@@ -7,7 +7,7 @@ import net.minecraft.world.World;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.network.PacketCoords;
-import sonar.logistics.api.info.Info;
+import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.common.containers.ContainerFluidReader;
 import sonar.logistics.common.containers.ContainerInventoryReader;
 import sonar.logistics.common.handlers.FluidReaderHandler;
@@ -19,7 +19,7 @@ import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 
 public class PacketGuiChange extends PacketCoords {
 
-	public Info info;
+	public ILogicInfo info;
 	public boolean state;
 	public int guiType;
 

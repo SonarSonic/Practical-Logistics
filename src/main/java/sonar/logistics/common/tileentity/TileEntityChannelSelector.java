@@ -11,7 +11,7 @@ import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.connecting.CableType;
 import sonar.logistics.api.connecting.IConnectionNode;
 import sonar.logistics.api.connecting.IInfoEmitter;
-import sonar.logistics.api.info.Info;
+import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.api.render.ICableRenderer;
 import sonar.logistics.api.utils.ExternalCoords;
 import sonar.logistics.common.handlers.ChannelSelectorHandler;
@@ -32,7 +32,7 @@ public class TileEntityChannelSelector extends TileEntityHandler implements IInf
 	}
 
 	@Override
-	public Info currentInfo() {
+	public ILogicInfo currentInfo() {
 		return BlockCoordsInfo.createInfo("Channel Selector", new BlockCoords(this));
 	}
 

@@ -20,12 +20,12 @@ public class MekanismProvider extends EnergyProvider {
 	}
 
 	@Override
-	public boolean canProvideInfo(TileEntity tile, ForgeDirection dir) {
+	public boolean canProvideEnergy(TileEntity tile, ForgeDirection dir) {
 		return tile instanceof IStrictEnergyStorage;
 	}
 
 	@Override
-	public void getEnergyInfo(StoredEnergyStack energyStack, TileEntity tile, ForgeDirection dir) {
+	public void getEnergy(StoredEnergyStack energyStack, TileEntity tile, ForgeDirection dir) {
 		if (tile instanceof IStrictEnergyStorage) {
 			IStrictEnergyStorage storage = (IStrictEnergyStorage) tile;
 			energyStack.setStorageValues((long) (storage.getEnergy() / 10), (long) (storage.getMaxEnergy() / 10));
@@ -34,25 +34,27 @@ public class MekanismProvider extends EnergyProvider {
 	}
 
 	@Override
-	public double addEnergy(long transfer, TileEntity tile, ForgeDirection dir, ActionType action) {
+	public StoredEnergyStack addEnergy(StoredEnergyStack transfer, TileEntity tile, ForgeDirection dir, ActionType action) {
 		if (tile instanceof IStrictEnergyAcceptor) {
 			IStrictEnergyAcceptor acceptor = (IStrictEnergyAcceptor) tile;
 			if (acceptor.canReceiveEnergy(dir)) {
-				return acceptor.transferEnergyToAcceptor(dir, transfer / 10);
+				transfer.stored -= acceptor.transferEnergyToAcceptor(dir, transfer.stored);
 			}
 		}
-		return 0;
+		if (transfer.stored == 0)
+			transfer = null;
+		return transfer;
 	}
 
 	@Override
-	public double removeEnergy(long transfer, TileEntity tile, ForgeDirection dir, ActionType action) {
+	public StoredEnergyStack removeEnergy(StoredEnergyStack transfer, TileEntity tile, ForgeDirection dir, ActionType action) {
 		if (tile instanceof IStrictEnergyStorage) {
 			IStrictEnergyStorage storage = (IStrictEnergyStorage) tile;
-			double maxRemove = Math.min(transfer / 10, storage.getEnergy());
+			double maxRemove = Math.min(transfer.stored, storage.getEnergy());
+			transfer.stored -= maxRemove;
 			storage.setEnergy(storage.getEnergy() - maxRemove);
-			return maxRemove;
 		}
-		return 0;
+		return transfer;
 	}
 
 	public boolean isLoadable() {

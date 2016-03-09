@@ -2,13 +2,13 @@ package sonar.logistics.info.types;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.nbt.NBTTagCompound;
-import sonar.logistics.api.info.StandardInfo;
+import sonar.logistics.api.info.LogicInfo;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.ModContainer;
 import cpw.mods.fml.common.network.ByteBufUtils;
 import cpw.mods.fml.common.registry.GameRegistry.UniqueIdentifier;
 
-public class ModidInfo extends StandardInfo<ModidInfo> {
+public class ModidInfo extends LogicInfo<ModidInfo> {
 
 	public UniqueIdentifier block = null;
 

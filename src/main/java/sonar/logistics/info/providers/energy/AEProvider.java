@@ -22,12 +22,12 @@ public class AEProvider extends EnergyProvider {
 	}
 
 	@Override
-	public boolean canProvideInfo(TileEntity tile, ForgeDirection dir) {
+	public boolean canProvideEnergy(TileEntity tile, ForgeDirection dir) {
 		return (tile instanceof IAEPowerStorage || tile instanceof IEnergyGrid);
 	}
 
 	@Override
-	public void getEnergyInfo(StoredEnergyStack energyStack, TileEntity tile, ForgeDirection dir) {
+	public void getEnergy(StoredEnergyStack energyStack, TileEntity tile, ForgeDirection dir) {
 		if (tile instanceof IEnergyGrid) {
 			IEnergyGrid grid = (IEnergyGrid) tile;
 			energyStack.setUsage((long) grid.getAvgPowerUsage());
@@ -39,33 +39,31 @@ public class AEProvider extends EnergyProvider {
 	}
 
 	@Override
-	public double addEnergy(long transfer, TileEntity tile, ForgeDirection dir, ActionType action) {
+	public StoredEnergyStack addEnergy(StoredEnergyStack transfer, TileEntity tile, ForgeDirection dir, ActionType action) {
 		if (tile instanceof IEnergyGrid) {
 			IEnergyGrid grid = (IEnergyGrid) tile;
-			transfer -= grid.injectPower(Math.min(transfer, 10000), AE2Helper.getActionable(action));
-			return transfer;
-		}
-		if (tile instanceof IAEPowerStorage) {
+			transfer.stored = (long) grid.injectPower(Math.min(transfer.stored, 10000), AE2Helper.getActionable(action));
+		} else if (tile instanceof IAEPowerStorage) {
 			IAEPowerStorage grid = (IAEPowerStorage) tile;
-			transfer -= grid.injectAEPower(Math.min(transfer, 10000), AE2Helper.getActionable(action));
-			return transfer;
+			transfer.stored = (long) grid.injectAEPower(Math.min(transfer.stored, 10000), AE2Helper.getActionable(action));
 		}
-		return 0;
+		if(transfer.stored==0)
+			transfer=null;
+		return transfer;
 	}
 
 	@Override
-	public double removeEnergy(long transfer, TileEntity tile, ForgeDirection dir, ActionType action) {
+	public StoredEnergyStack removeEnergy(StoredEnergyStack transfer, TileEntity tile, ForgeDirection dir, ActionType action) {
 		if (tile instanceof IEnergyGrid) {
 			IEnergyGrid grid = (IEnergyGrid) tile;
-			transfer = (long) grid.extractAEPower((double)Math.min(transfer, 10000), AE2Helper.getActionable(action), PowerMultiplier.CONFIG);
-			return transfer;
-		}
-		if (tile instanceof IAEPowerStorage) {
+			transfer.stored -= grid.extractAEPower((double) Math.min(transfer.stored, 10000), AE2Helper.getActionable(action), PowerMultiplier.CONFIG);
+		} else if (tile instanceof IAEPowerStorage) {
 			IAEPowerStorage grid = (IAEPowerStorage) tile;
-			transfer = (long) grid.extractAEPower(Math.min(transfer, 10000), AE2Helper.getActionable(action), PowerMultiplier.CONFIG);
-			return transfer;
+			transfer.stored -= grid.extractAEPower(Math.min(transfer.stored, 10000), AE2Helper.getActionable(action), PowerMultiplier.CONFIG);
 		}
-		return 0;
+		if(transfer.stored==0)
+			transfer=null;
+		return transfer;
 	}
 
 	public boolean isLoadable() {

@@ -9,7 +9,7 @@ import sonar.core.utils.BlockCoords;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.connecting.CableType;
 import sonar.logistics.api.connecting.IInfoEmitter;
-import sonar.logistics.api.info.Info;
+import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.api.render.ICableRenderer;
 import sonar.logistics.common.handlers.InfoCreatorHandler;
 
@@ -28,7 +28,7 @@ public class TileEntityInfoCreator extends TileEntityHandler implements IInfoEmi
 	}
 
 	@Override
-	public Info currentInfo() {
+	public ILogicInfo currentInfo() {
 		return handler.currentInfo();
 	}
 

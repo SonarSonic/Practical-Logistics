@@ -19,11 +19,11 @@ import org.lwjgl.opengl.GL12;
 import sonar.core.inventory.StoredItemStack;
 import sonar.core.utils.helpers.FontHelper;
 import sonar.core.utils.helpers.RenderHelper;
-import sonar.logistics.api.info.Info;
+import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.api.render.ScreenType;
 import cpw.mods.fml.common.network.ByteBufUtils;
 
-public class InventoryInfo extends Info<InventoryInfo> {
+public class InventoryInfo extends ILogicInfo<InventoryInfo> {
 
 	public List<StoredItemStack> stacks = new ArrayList();
 	public String rend = "ITEMINV";

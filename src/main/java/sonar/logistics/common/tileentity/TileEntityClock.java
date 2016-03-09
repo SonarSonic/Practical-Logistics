@@ -13,7 +13,7 @@ import sonar.core.network.utils.IByteBufTile;
 import sonar.core.utils.BlockCoords;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.api.LogisticsAPI;
-import sonar.logistics.api.info.Info;
+import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.info.types.BlockCoordsInfo;
 import sonar.logistics.info.types.ProgressInfo;
 
@@ -75,7 +75,7 @@ public class TileEntityClock extends TileEntityConnection implements IByteBufTil
 	}
 
 	@Override
-	public Info currentInfo() {
+	public ILogicInfo currentInfo() {
 		if (!(tickTime.getObject() < 10)) {
 			long start = currentMillis - lastMillis;
 			String timeString = new SimpleDateFormat("HH:mm:ss:SSS").format((start) - (60 * 60 * 1000)).substring(0, 11);

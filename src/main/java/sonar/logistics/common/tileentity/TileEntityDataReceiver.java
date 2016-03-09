@@ -17,8 +17,8 @@ import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.connecting.IChannelProvider;
 import sonar.logistics.api.connecting.IInfoEmitter;
-import sonar.logistics.api.info.Info;
-import sonar.logistics.api.info.StandardInfo;
+import sonar.logistics.api.info.ILogicInfo;
+import sonar.logistics.api.info.LogicInfo;
 import sonar.logistics.api.utils.ExternalCoords;
 import sonar.logistics.api.utils.IdentifiedCoords;
 import sonar.logistics.network.SyncIdentifiedCoords;
@@ -40,11 +40,11 @@ public class TileEntityDataReceiver extends TileEntityNode implements IChannelPr
 	}
 
 	@Override
-	public Info currentInfo() {
+	public ILogicInfo currentInfo() {
 		if (emitter.getCoords() != null) {
-			return new StandardInfo((byte) -1, "DEFAULT", "Connected: ", emitter.getCoords().blockCoords.toString());
+			return new LogicInfo((byte) -1, "DEFAULT", "Connected: ", emitter.getCoords().blockCoords.toString());
 		} else {
-			return new StandardInfo((byte) -1, "DEFAULT", "Connection: ", "NOT CONNECTED");
+			return new LogicInfo((byte) -1, "DEFAULT", "Connection: ", "NOT CONNECTED");
 		}
 	}
 

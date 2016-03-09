@@ -4,8 +4,8 @@ import java.util.List;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
-import sonar.logistics.api.info.EntityInfo;
-import sonar.logistics.api.info.Info;
+import sonar.logistics.api.info.ILogicInfo;
+import sonar.logistics.api.info.LogicInfo;
 import sonar.logistics.api.providers.EntityProvider;
 
 public class PlayerProvider extends EntityProvider {
@@ -25,28 +25,28 @@ public class PlayerProvider extends EntityProvider {
 	}
 
 	@Override
-	public void getHelperInfo(List<Info> infoList, Entity entity) {
+	public void getHelperInfo(List<ILogicInfo> infoList, Entity entity) {
 		int id = this.getID();
 		if (entity instanceof EntityPlayer) {
 			EntityPlayer player = (EntityPlayer) entity;
-			infoList.add(new EntityInfo(id, 0, 0, player.getGameProfile().getName()));
+			infoList.add(new LogicInfo(id, 0, 0, player.getGameProfile().getName()).isEntityData(true));
 			if (player.getTeam() != null) {
-				infoList.add(new EntityInfo(id, 0, 1, player.getTeam().getRegisteredName()));
+				infoList.add(new LogicInfo(id, 0, 1, player.getTeam().getRegisteredName()));
 			}
 
-			infoList.add(new EntityInfo(id, 1, 2, player.capabilities.getFlySpeed()));
-			infoList.add(new EntityInfo(id, 1, 3, player.capabilities.getWalkSpeed()));
-			infoList.add(new EntityInfo(id, 1, 4, player.capabilities.isCreativeMode));
+			infoList.add(new LogicInfo(id, 1, 2, player.capabilities.getFlySpeed()).isEntityData(true));
+			infoList.add(new LogicInfo(id, 1, 3, player.capabilities.getWalkSpeed()).isEntityData(true));
+			infoList.add(new LogicInfo(id, 1, 4, player.capabilities.isCreativeMode).isEntityData(true));
 
 			// infoList.add(new StandardInfo(id, 2, 0, player.getHealth()));
 			// infoList.add(new StandardInfo(id, 2, 0, player.getMaxHealth()));
-			infoList.add(new EntityInfo(id, 2, 5, player.getFoodStats().needFood()));
-			infoList.add(new EntityInfo(id, 2, 6, player.getFoodStats().getFoodLevel()));
-			infoList.add(new EntityInfo(id, 2, 7, player.getFoodStats().getSaturationLevel()));
-			infoList.add(new EntityInfo(id, 2, 8, player.getAbsorptionAmount()));
-			infoList.add(new EntityInfo(id, 3, 9, player.experience));
-			infoList.add(new EntityInfo(id, 3, 10, player.experienceLevel));
-			infoList.add(new EntityInfo(id, 3, 11, player.experienceTotal));
+			infoList.add(new LogicInfo(id, 2, 5, player.getFoodStats().needFood()).isEntityData(true));
+			infoList.add(new LogicInfo(id, 2, 6, player.getFoodStats().getFoodLevel()).isEntityData(true));
+			infoList.add(new LogicInfo(id, 2, 7, player.getFoodStats().getSaturationLevel()).isEntityData(true));
+			infoList.add(new LogicInfo(id, 2, 8, player.getAbsorptionAmount()).isEntityData(true));
+			infoList.add(new LogicInfo(id, 3, 9, player.experience).isEntityData(true));
+			infoList.add(new LogicInfo(id, 3, 10, player.experienceLevel).isEntityData(true));
+			infoList.add(new LogicInfo(id, 3, 11, player.experienceTotal).isEntityData(true));
 		}
 	}
 

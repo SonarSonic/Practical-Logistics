@@ -9,6 +9,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.utils.BlockCoords;
 
+/** an implementation of {@link INetworkCache} that acts as an Empty Network, when working with networks an instance of this should be returned instead of null */
 public class EmptyNetworkCache implements INetworkCache {
 
 	@Override

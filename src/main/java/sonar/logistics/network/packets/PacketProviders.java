@@ -12,19 +12,19 @@ import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.network.PacketCoords;
 import sonar.core.network.PacketTileEntityHandler;
 import sonar.logistics.Logistics;
-import sonar.logistics.api.info.Info;
+import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.common.handlers.InfoReaderHandler;
 import sonar.logistics.info.types.CategoryInfo;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 
 public class PacketProviders extends PacketCoords {
 
-	public List<Info> info;
+	public List<ILogicInfo> info;
 
 	public PacketProviders() {
 	}
 
-	public PacketProviders(int x, int y, int z, List<Info> info) {
+	public PacketProviders(int x, int y, int z, List<ILogicInfo> info) {
 		super(x, y, z);
 		this.info = info;
 	}
@@ -66,9 +66,9 @@ public class PacketProviders extends PacketCoords {
 				if (handler != null && handler instanceof InfoReaderHandler) {
 					InfoReaderHandler reader = (InfoReaderHandler) handler;
 					if (message.info != null) {
-						List<Info> newInfo = new ArrayList();
-						Info lastInfo = null;
-						for (Info blockInfo : message.info) {
+						List<ILogicInfo> newInfo = new ArrayList();
+						ILogicInfo lastInfo = null;
+						for (ILogicInfo blockInfo : message.info) {
 							if (lastInfo == null || !lastInfo.getCategory().equals(blockInfo.getCategory())) {
 								newInfo.add(CategoryInfo.createInfo(blockInfo.getCategory()));
 							}

@@ -1,23 +1,30 @@
 package sonar.logistics.api.wrappers;
 
-import sonar.logistics.api.info.Info;
+import net.minecraft.tileentity.TileEntity;
+import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.api.providers.EnergyProvider;
 import sonar.logistics.api.providers.EntityProvider;
 import sonar.logistics.api.providers.FluidHandler;
 import sonar.logistics.api.providers.InventoryHandler;
 import sonar.logistics.api.providers.TileProvider;
+import sonar.logistics.api.render.InfoInteractionHandler;
+import sonar.logistics.api.render.ScreenType;
 import sonar.logistics.api.utils.EnergyType;
 
 public class RegistryWrapper {
 
 	/** used for registering Info Types, this should have a unique id!
-	 * @param info {@link Info} to register */
-	public void registerInfoType(Info info) {}
+	 * @param info {@link ILogicInfo} to register */
+	public void registerInfoType(ILogicInfo info) {}
 
 	/** used for registering Energy Types, this should have a unique storage suffix!
 	 * @param info {@link EnergyType} to register */
-	public void registerEnergyType(EnergyType info) {}
+	public void registerEnergyType(EnergyType type) {}
 
+	/** used for registering Interaction Handlers, this should have a unique id!
+	 * @param info {@link InfoInteractionHandler} to register */
+	public void registerInteractionHandler(InfoInteractionHandler handler) {}
+	
 	/** used for registering Tile Entity providers, this should have a unique id!
 	 * @param provider {@link TileProvider} to register */
 	public void registerTileProvider(TileProvider provider) {}
@@ -48,7 +55,7 @@ public class RegistryWrapper {
 	public EnergyType getEnergyType(String storage) {
 		return null;
 	}
-	
+		
 	/** gets the {@link TileProvider} for the given id
 	 * @param id the id to check
 	 * @return the {@link TileProvider}, can be null */

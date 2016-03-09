@@ -11,7 +11,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 import org.lwjgl.opengl.GL11;
 
 import sonar.core.utils.helpers.RenderHelper;
-import sonar.logistics.api.info.Info;
+import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.api.render.ScreenType;
 import sonar.logistics.client.models.ModelHolographicDisplay;
 
@@ -103,7 +103,7 @@ public class RenderHolographicDisplay extends RenderDisplayScreen {
 
 	}
 
-	public void renderInfo(Tessellator tess, TileEntity tile, ForgeDirection side, Info info) {
+	public void renderInfo(Tessellator tess, TileEntity tile, ForgeDirection side, ILogicInfo info) {
 		float pixel = 1.0F / 16F;
 		info.renderInfo(tess, tile, -pixel * 4.5F, -0.1850F, (1.0f - (pixel) * 11.5F), (pixel * 6), -0.207F, ScreenType.HOLOGRAPHIC);
 

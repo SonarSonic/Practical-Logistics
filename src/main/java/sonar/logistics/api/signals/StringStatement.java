@@ -1,7 +1,7 @@
 package sonar.logistics.api.signals;
 
 import sonar.core.network.sync.SyncTagType;
-import sonar.logistics.api.info.Info;
+import sonar.logistics.api.info.ILogicInfo;
 
 public class StringStatement extends SignallerStatement {
 
@@ -21,7 +21,7 @@ public class StringStatement extends SignallerStatement {
 	}
 
 	@Override
-	public boolean canSignal(Info info) {
+	public boolean canSignal(ILogicInfo info) {
 		if (info.getDataType() == string) {
 			boolean signal = info.getData().equals(target.getObject());
 			return invert ? !signal : signal;

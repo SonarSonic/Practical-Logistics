@@ -10,8 +10,8 @@ import sonar.calculator.mod.api.flux.IFlux;
 import sonar.calculator.mod.api.flux.IFluxPoint;
 import sonar.calculator.mod.api.machines.ITeleport;
 import sonar.calculator.mod.utils.FluxRegistry;
-import sonar.logistics.api.info.Info;
-import sonar.logistics.api.info.StandardInfo;
+import sonar.logistics.api.info.ILogicInfo;
+import sonar.logistics.api.info.LogicInfo;
 import sonar.logistics.api.providers.TileProvider;
 import cpw.mods.fml.common.Loader;
 
@@ -33,25 +33,25 @@ public class CalculatorProvider extends TileProvider {
 	}
 
 	@Override
-	public void getHelperInfo(List<Info> infoList, World world, int x, int y, int z, ForgeDirection dir) {
+	public void getTileInfo(List<ILogicInfo> infoList, World world, int x, int y, int z, ForgeDirection dir) {
 		int id = this.getID();
 		TileEntity target = world.getTileEntity(x, y, z);
 		if (target != null) {
 			if (target instanceof IFlux) {
 				IFlux flux = (IFlux) target;
-				infoList.add(new StandardInfo(id, 0, 1, flux.networkID()));
-				infoList.add(new StandardInfo(id, 0, 2, FluxRegistry.getNetwork(flux.networkID())));
-				infoList.add(new StandardInfo(id, 0, 3, flux.masterName()));
+				infoList.add(new LogicInfo(id, 0, 1, flux.networkID()));
+				infoList.add(new LogicInfo(id, 0, 2, FluxRegistry.getNetwork(flux.networkID())));
+				infoList.add(new LogicInfo(id, 0, 3, flux.masterName()));
 				if (target instanceof IFluxPoint) {
 					IFluxPoint plug = (IFluxPoint) target;
-					infoList.add(new StandardInfo(id, 0, 4, plug.maxTransfer()));
-					infoList.add(new StandardInfo(id, 0, 5, plug.priority()));
+					infoList.add(new LogicInfo(id, 0, 4, plug.maxTransfer()));
+					infoList.add(new LogicInfo(id, 0, 5, plug.priority()));
 				}
 			}
 			if (target instanceof ITeleport) {
 				ITeleport teleporter = (ITeleport) target;
-				infoList.add(new StandardInfo(id, 0, 6, teleporter.teleporterID()));
-				infoList.add(new StandardInfo(id, 0, 7, teleporter.name()));
+				infoList.add(new LogicInfo(id, 0, 6, teleporter.teleporterID()));
+				infoList.add(new LogicInfo(id, 0, 7, teleporter.name()));
 			}
 		}
 

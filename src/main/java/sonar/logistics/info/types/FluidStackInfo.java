@@ -12,11 +12,11 @@ import net.minecraft.util.IIcon;
 import org.lwjgl.opengl.GL11;
 
 import sonar.core.fluid.StoredFluidStack;
-import sonar.logistics.api.info.Info;
+import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.api.render.ScreenType;
 import cpw.mods.fml.common.network.ByteBufUtils;
 
-public class FluidStackInfo extends Info<FluidStackInfo> {
+public class FluidStackInfo extends ILogicInfo<FluidStackInfo> {
 
 	public StoredFluidStack stack;
 	public String rend = "FLUIDSTACK";

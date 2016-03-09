@@ -11,8 +11,8 @@ import mekanism.api.energy.IStrictEnergyStorage;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
-import sonar.logistics.api.info.Info;
-import sonar.logistics.api.info.StandardInfo;
+import sonar.logistics.api.info.ILogicInfo;
+import sonar.logistics.api.info.LogicInfo;
 import sonar.logistics.api.providers.TileProvider;
 import cpw.mods.fml.common.Loader;
 
@@ -34,24 +34,24 @@ public class EUEnergyProvider extends TileProvider {
 	}
 
 	@Override
-	public void getHelperInfo(List<Info> infoList, World world, int x, int y, int z, ForgeDirection dir) {
+	public void getTileInfo(List<ILogicInfo> infoList, World world, int x, int y, int z, ForgeDirection dir) {
 		int id = this.getID();
 		TileEntity target = world.getTileEntity(x, y, z);
 		if (target instanceof IEnergyStorage) {
 			IEnergyStorage energy = (IEnergyStorage) target;
-			infoList.add(new StandardInfo(id, 0, 4, (long) energy.getStored()).addSuffix("EU"));
-			infoList.add(new StandardInfo(id, 0, 5, (long) energy.getCapacity()).addSuffix("EU"));
-			infoList.add(new StandardInfo(id, 0, 6, (long) energy.getOutput()).addSuffix("EU/t"));;
+			infoList.add(new LogicInfo(id, 0, 4, (long) energy.getStored()).addSuffix("EU"));
+			infoList.add(new LogicInfo(id, 0, 5, (long) energy.getCapacity()).addSuffix("EU"));
+			infoList.add(new LogicInfo(id, 0, 6, (long) energy.getOutput()).addSuffix("EU/t"));;
 		}
 		if (target instanceof IEnergySink) {
 			IEnergySink energy = (IEnergySink) target;
-			infoList.add(new StandardInfo(id, 0, 0, (long) energy.getSinkTier()));
-			infoList.add(new StandardInfo(id, 0, 1, (long) energy.getDemandedEnergy()).addSuffix("EU"));
+			infoList.add(new LogicInfo(id, 0, 0, (long) energy.getSinkTier()));
+			infoList.add(new LogicInfo(id, 0, 1, (long) energy.getDemandedEnergy()).addSuffix("EU"));
 		}
 		if (target instanceof IEnergySource) {
 			IEnergySource energy = (IEnergySource) target;
-			infoList.add(new StandardInfo(id, 0, 2, (long) energy.getSourceTier()));
-			infoList.add(new StandardInfo(id, 0, 3, (long) energy.getOfferedEnergy()).addSuffix("EU"));
+			infoList.add(new LogicInfo(id, 0, 2, (long) energy.getSourceTier()));
+			infoList.add(new LogicInfo(id, 0, 3, (long) energy.getOfferedEnergy()).addSuffix("EU"));
 		}
 	}
 

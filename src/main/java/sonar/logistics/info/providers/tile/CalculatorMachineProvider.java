@@ -11,8 +11,8 @@ import sonar.calculator.mod.api.machines.IGreenhouse;
 import sonar.calculator.mod.api.machines.IProcessMachine;
 import sonar.calculator.mod.api.nutrition.IHealthProcessor;
 import sonar.calculator.mod.api.nutrition.IHungerProcessor;
-import sonar.logistics.api.info.Info;
-import sonar.logistics.api.info.StandardInfo;
+import sonar.logistics.api.info.ILogicInfo;
+import sonar.logistics.api.info.LogicInfo;
 import sonar.logistics.api.providers.TileProvider;
 import cpw.mods.fml.common.Loader;
 
@@ -34,34 +34,34 @@ public class CalculatorMachineProvider extends TileProvider {
 	}
 
 	@Override
-	public void getHelperInfo(List<Info> infoList, World world, int x, int y, int z, ForgeDirection dir) {
+	public void getTileInfo(List<ILogicInfo> infoList, World world, int x, int y, int z, ForgeDirection dir) {
 		int id = this.getID();
 		TileEntity target = world.getTileEntity(x, y, z);
 		if (target != null) {
 			if (target instanceof IHealthProcessor) {
 				IHealthProcessor health = (IHealthProcessor) target;
-				infoList.add(new StandardInfo(id, 0, 0, health.getHealthPoints()));
+				infoList.add(new LogicInfo(id, 0, 0, health.getHealthPoints()));
 			}
 			if (target instanceof IHungerProcessor) {
 				IHungerProcessor hunger = (IHungerProcessor) target;
-				infoList.add(new StandardInfo(id, 0, 1, hunger.getHungerPoints()));
+				infoList.add(new LogicInfo(id, 0, 1, hunger.getHungerPoints()));
 			}
 			if (target instanceof IGreenhouse) {
 				IGreenhouse greenhouse = (IGreenhouse) target;
-				infoList.add(new StandardInfo(id, 1, 2, greenhouse.getCarbon()));
-				infoList.add(new StandardInfo(id, 1, 3, greenhouse.getOxygen()));
-				infoList.add(new StandardInfo(id, 1, 4, greenhouse.maxGasLevel()));
+				infoList.add(new LogicInfo(id, 1, 2, greenhouse.getCarbon()));
+				infoList.add(new LogicInfo(id, 1, 3, greenhouse.getOxygen()));
+				infoList.add(new LogicInfo(id, 1, 4, greenhouse.maxGasLevel()));
 				if (target instanceof IFlawlessGreenhouse) {
 					IFlawlessGreenhouse flawless = (IFlawlessGreenhouse) target;
-					infoList.add(new StandardInfo(id, 1, 5, flawless.getPlantsGrown()));
-					infoList.add(new StandardInfo(id, 1, 6, flawless.getPlantsHarvested()));
+					infoList.add(new LogicInfo(id, 1, 5, flawless.getPlantsGrown()));
+					infoList.add(new LogicInfo(id, 1, 6, flawless.getPlantsHarvested()));
 				}
 			}
 			if (target instanceof IProcessMachine) {
 				IProcessMachine greenhouse = (IProcessMachine) target;
-				infoList.add(new StandardInfo(id, 2, 7, greenhouse.getCurrentProcessTime()).addSuffix("ticks"));
-				infoList.add(new StandardInfo(id, 2, 8, greenhouse.getProcessTime()).addSuffix("ticks"));
-				infoList.add(new StandardInfo(id, 2, 9, (int) greenhouse.getEnergyUsage()).addSuffix("rf/t"));
+				infoList.add(new LogicInfo(id, 2, 7, greenhouse.getCurrentProcessTime()).addSuffix("ticks"));
+				infoList.add(new LogicInfo(id, 2, 8, greenhouse.getProcessTime()).addSuffix("ticks"));
+				infoList.add(new LogicInfo(id, 2, 9, (int) greenhouse.getEnergyUsage()).addSuffix("rf/t"));
 			}
 		}
 

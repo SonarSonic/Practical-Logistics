@@ -12,8 +12,8 @@ import sonar.core.network.sync.SyncTagType;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.connecting.CableType;
-import sonar.logistics.api.info.Info;
-import sonar.logistics.api.info.StandardInfo;
+import sonar.logistics.api.info.ILogicInfo;
+import sonar.logistics.api.info.LogicInfo;
 
 import com.google.common.collect.Lists;
 
@@ -25,7 +25,7 @@ public class InfoCreatorHandler extends TileHandler {
 
 	public SyncTagType.STRING subCategory = new SyncTagType.STRING(0);
 	public SyncTagType.STRING data = new SyncTagType.STRING(1);
-	public SyncGeneric<Info> info = new SyncGeneric(Logistics.infoTypes, "currentInfo");
+	public SyncGeneric<ILogicInfo> info = new SyncGeneric(Logistics.infoTypes, "currentInfo");
 
 	public void update(TileEntity te) {
 		if (te.getWorldObj().isRemote) {
@@ -51,7 +51,7 @@ public class InfoCreatorHandler extends TileHandler {
 		return dir == ForgeDirection.getOrientation(FMPHelper.getMeta(te));
 	}
 
-	public Info currentInfo() {
+	public ILogicInfo currentInfo() {
 		return this.info.getObject();
 	}
 
@@ -65,7 +65,7 @@ public class InfoCreatorHandler extends TileHandler {
 			this.data.setObject(string);
 			break;
 		}
-		this.info.setObject(new StandardInfo((byte) -1, "CREATOR", this.subCategory.getObject(), this.data.getObject()));
+		this.info.setObject(new LogicInfo((byte) -1, "CREATOR", this.subCategory.getObject(), this.data.getObject()));
 	}
 
 }

@@ -21,46 +21,49 @@ public class EUProvider extends EnergyProvider {
 	}
 
 	@Override
-	public boolean canProvideInfo(TileEntity tile, ForgeDirection dir) {
+	public boolean canProvideEnergy(TileEntity tile, ForgeDirection dir) {
 		return tile instanceof IEnergySink || tile instanceof IEnergySource || tile instanceof IEnergyStorage;
 	}
 
 	@Override
-	public void getEnergyInfo(StoredEnergyStack energyStack, TileEntity tile, ForgeDirection dir) {
+	public void getEnergy(StoredEnergyStack energyStack, TileEntity tile, ForgeDirection dir) {
 		if (tile instanceof IEnergyStorage) {
 			IEnergyStorage storage = (IEnergyStorage) tile;
 			energyStack.setStorageValues(storage.getStored() * 4, storage.getCapacity() * 4);
-			energyStack.setMaxOutput((long)(storage.getOutputEnergyUnitsPerTick() * 4));
+			energyStack.setMaxOutput((long) (storage.getOutputEnergyUnitsPerTick() * 4));
 		}
 		if (tile instanceof IEnergySink) {
 			IEnergySink sink = (IEnergySink) tile;
-			energyStack.setMaxInput((long)(sink.getDemandedEnergy() * 4));
+			energyStack.setMaxInput((long) (sink.getDemandedEnergy() * 4));
 		}
 		if (tile instanceof IEnergySource) {
 			IEnergySource source = (IEnergySource) tile;
-			energyStack.setMaxOutput((long)(source.getOfferedEnergy() * 4));
+			energyStack.setMaxOutput((long) (source.getOfferedEnergy() * 4));
 		}
 	}
 
 	@Override
-	public double addEnergy(long transfer, TileEntity tile, ForgeDirection dir, ActionType action) {
+	public StoredEnergyStack addEnergy(StoredEnergyStack transfer, TileEntity tile, ForgeDirection dir, ActionType action) {
 		if (tile instanceof IEnergySink) {
 			IEnergySink sink = (IEnergySink) tile;
-			double transferEU = transfer / 4;
-			return (transferEU - sink.injectEnergy(dir, transferEU, getVoltage(sink.getSinkTier()))) * 4;
+			transfer.stored = (long) (transfer.stored - sink.injectEnergy(dir, transfer.stored, getVoltage(sink.getSinkTier())));
 		}
-		return 0;
+		if (transfer.stored == 0)
+			transfer = null;
+		return transfer;
 	}
 
 	@Override
-	public double removeEnergy(long transfer, TileEntity tile, ForgeDirection dir, ActionType action) {
+	public StoredEnergyStack removeEnergy(StoredEnergyStack transfer, TileEntity tile, ForgeDirection dir, ActionType action) {
 		if (tile instanceof IEnergySource) {
 			IEnergySource source = (IEnergySource) tile;
-			double amount = Math.min(transfer / 4, source.getOfferedEnergy());
+			double amount = Math.min(transfer.stored, source.getOfferedEnergy());
 			source.drawEnergy(amount);
-			return amount;
+			transfer.stored -= amount;
 		}
-		return 0;
+		if (transfer.stored == 0)
+			transfer = null;
+		return transfer;
 	}
 
 	public double getVoltage(int tier) {

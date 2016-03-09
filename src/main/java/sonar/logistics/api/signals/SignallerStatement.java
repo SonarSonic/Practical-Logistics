@@ -1,7 +1,7 @@
 package sonar.logistics.api.signals;
 
 import net.minecraft.nbt.NBTTagCompound;
-import sonar.logistics.api.info.Info;
+import sonar.logistics.api.info.ILogicInfo;
 
 public abstract class SignallerStatement {
 
@@ -11,7 +11,7 @@ public abstract class SignallerStatement {
 
 	public abstract int getType();
 
-	public abstract boolean canSignal(Info info);
+	public abstract boolean canSignal(ILogicInfo info);
 
 	public void invertSignal(){
 		invert=!invert;

@@ -9,7 +9,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.utils.BlockCoords;
 
-/** implemented on Logistics Network Caches */
+/** implemented on Logistics Network Caches, used for retrieving info about  */
 public interface INetworkCache {
 
 	/** used to get the first external block connected to the network.
@@ -41,9 +41,13 @@ public interface INetworkCache {
 	 * @return the {@link TileEntity} requested, may be null */
 	public TileEntity getFirstTileEntity(CacheTypes type);
 
-	/** @return the networkID */
+	/** @return the networkID, related to the id of the Cable Network */
 	public int getNetworkID();
 	
+	/**used when getting full list of networks associated with this one, via {@link IChannelProvider}}
+	 * @param networks an ArrayList containing all current network IDs, IDs shouldn't be removed - unless in very rare circumstances
+	 * @return same ArrayList with the Networks associated with this network added
+	 */
 	public ArrayList<Integer> getConnectedNetworks(ArrayList<Integer> networks);
 	
 }

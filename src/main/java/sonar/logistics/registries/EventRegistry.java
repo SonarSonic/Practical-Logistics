@@ -5,7 +5,7 @@ import java.util.Map.Entry;
 
 import sonar.logistics.Logistics;
 import sonar.logistics.api.cache.INetworkCache;
-import sonar.logistics.cache.IRefreshCache;
+import sonar.logistics.api.cache.IRefreshCache;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.Phase;

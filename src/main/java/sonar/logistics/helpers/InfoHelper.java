@@ -13,8 +13,8 @@ import sonar.core.utils.BlockCoords;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.connecting.IEntityNode;
-import sonar.logistics.api.info.Info;
-import sonar.logistics.api.info.StandardInfo;
+import sonar.logistics.api.info.ILogicInfo;
+import sonar.logistics.api.info.LogicInfo;
 import sonar.logistics.api.providers.EntityProvider;
 import sonar.logistics.api.providers.TileProvider;
 import sonar.logistics.api.wrappers.InfoWrapper;
@@ -24,25 +24,25 @@ import sonar.logistics.info.types.ProgressInfo;
 
 public class InfoHelper extends InfoWrapper {
 
-	public List<Info> getTileInfo(INetworkCache connections) {
+	public List<ILogicInfo> getTileInfo(INetworkCache connections) {
 		List<TileProvider> providers = Logistics.tileProviders.getObjects();
-		List<Info> providerInfo = new ArrayList();
+		List<ILogicInfo> providerInfo = new ArrayList();
 		LinkedHashMap<BlockCoords, ForgeDirection> map = connections.getExternalBlocks(true);
 		for (TileProvider provider : providers) {
 			for (Map.Entry<BlockCoords, ForgeDirection> entry : map.entrySet()) {
 				BlockCoords coords = entry.getKey();
 				if (provider.canProvideInfo(coords.getWorld(), coords.getX(), coords.getY(), coords.getZ(), entry.getValue())) {
-					List<Info> info = new ArrayList();
-					provider.getHelperInfo(info, coords.getWorld(), coords.getX(), coords.getY(), coords.getZ(), entry.getValue());
-					for (Info blockInfo : info) {
+					List<ILogicInfo> info = new ArrayList();
+					provider.getTileInfo(info, coords.getWorld(), coords.getX(), coords.getY(), coords.getZ(), entry.getValue());
+					for (ILogicInfo blockInfo : info) {
 						providerInfo.add(blockInfo);
 					}
 				}
 				break;
 			}
 		}
-		Collections.sort(providerInfo, new Comparator<Info>() {
-			public int compare(Info str1, Info str2) {
+		Collections.sort(providerInfo, new Comparator<ILogicInfo>() {
+			public int compare(ILogicInfo str1, ILogicInfo str2) {
 				int res = String.CASE_INSENSITIVE_ORDER.compare(str1.getCategory(), str2.getCategory());
 				if (res == 0) {
 					res = str1.getCategory().compareTo(str2.getCategory());
@@ -53,24 +53,24 @@ public class InfoHelper extends InfoWrapper {
 		return providerInfo;
 	}
 
-	public List<Info> getEntityInfo(IEntityNode tileNode) {
+	public List<ILogicInfo> getEntityInfo(IEntityNode tileNode) {
 		List<EntityProvider> providers = Logistics.entityProviders.getObjects();
-		List<Info> providerInfo = new ArrayList();
+		List<ILogicInfo> providerInfo = new ArrayList();
 
 		List<Entity> entityList = tileNode.getEntities();
 		for (EntityProvider provider : providers) {
 			for (Entity entity : entityList) {
 				if (entity != null && provider.canProvideInfo(entity)) {
-					List<Info> info = new ArrayList();
+					List<ILogicInfo> info = new ArrayList();
 					provider.getHelperInfo(info, entity);
-					for (Info blockInfo : info) {
+					for (ILogicInfo blockInfo : info) {
 						providerInfo.add(blockInfo);
 					}
 				}
 			}
 		}
-		Collections.sort(providerInfo, new Comparator<Info>() {
-			public int compare(Info str1, Info str2) {
+		Collections.sort(providerInfo, new Comparator<ILogicInfo>() {
+			public int compare(ILogicInfo str1, ILogicInfo str2) {
 				int res = String.CASE_INSENSITIVE_ORDER.compare(str1.getCategory(), str2.getCategory());
 				if (res == 0) {
 					res = str1.getCategory().compareTo(str2.getCategory());
@@ -82,7 +82,7 @@ public class InfoHelper extends InfoWrapper {
 		return providerInfo;
 	}
 
-	public Info getLatestTileInfo(Info tileInfo, INetworkCache network) {
+	public ILogicInfo getLatestTileInfo(ILogicInfo tileInfo, INetworkCache network) {
 		if (network == null || tileInfo == null) {
 			return null;
 		}
@@ -94,9 +94,9 @@ public class InfoHelper extends InfoWrapper {
 		for (Map.Entry<BlockCoords, ForgeDirection> entry : connections.entrySet()) {
 			BlockCoords coords = entry.getKey();
 			if (provider.canProvideInfo(coords.getWorld(), coords.getX(), coords.getY(), coords.getZ(), entry.getValue())) {
-				List<Info> info = new ArrayList();
-				provider.getHelperInfo(info, coords.getWorld(), coords.getX(), coords.getY(), coords.getZ(), entry.getValue());
-				for (Info currentInfo : info) {
+				List<ILogicInfo> info = new ArrayList();
+				provider.getTileInfo(info, coords.getWorld(), coords.getX(), coords.getY(), coords.getZ(), entry.getValue());
+				for (ILogicInfo currentInfo : info) {
 					if (currentInfo.equals(tileInfo)) {
 						return currentInfo;
 					}
@@ -108,7 +108,7 @@ public class InfoHelper extends InfoWrapper {
 		return null;
 	}
 
-	public Info getLatestEntityInfo(Info entityInfo, IEntityNode entityNode) {
+	public ILogicInfo getLatestEntityInfo(ILogicInfo entityInfo, IEntityNode entityNode) {
 		if (entityInfo == null) {
 			return null;
 		}
@@ -117,9 +117,9 @@ public class InfoHelper extends InfoWrapper {
 		if (provider != null) {
 			for (Entity entity : entityList) {
 				if (entity != null && provider.canProvideInfo(entity)) {
-					List<Info> info = new ArrayList();
+					List<ILogicInfo> info = new ArrayList();
 					provider.getHelperInfo(info, entity);
-					for (Info currentInfo : info) {
+					for (ILogicInfo currentInfo : info) {
 						if (currentInfo.equals(entityInfo)) {
 							return currentInfo;
 						}
@@ -131,7 +131,7 @@ public class InfoHelper extends InfoWrapper {
 		return null;
 	}
 
-	public Info combineData(Info primary, Info secondary) {
+	public ILogicInfo combineData(ILogicInfo primary, ILogicInfo secondary) {
 		if (!(primary instanceof CategoryInfo) && !(secondary instanceof CategoryInfo)) {
 			if (primary.getDataType() == 0 && secondary.getDataType() == 0) {
 				long stored = Long.parseLong(secondary.getData());
@@ -157,7 +157,7 @@ public class InfoHelper extends InfoWrapper {
 				return primary;
 			}
 		} else {
-			return new StandardInfo((byte) -1, primary.getCategory(), "Combined Data", primary.getDisplayableData() + secondary.getDisplayableData());
+			return new LogicInfo((byte) -1, primary.getCategory(), "Combined Data", primary.getDisplayableData() + secondary.getDisplayableData());
 
 		}
 		return primary;

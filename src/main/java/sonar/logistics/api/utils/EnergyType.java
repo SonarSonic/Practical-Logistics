@@ -2,6 +2,9 @@ package sonar.logistics.api.utils;
 
 import sonar.core.utils.IRegistryObject;
 
+/**used for the various energy types created by different mods
+ * You can create one yourself for custom energy systems and register it with {@link RegistryWrapper}
+ * NOTE: this may not accommodate for all as some have far more to them*/
 public abstract class EnergyType implements IRegistryObject {
 	
 	public static final RedstoneFlux RF = new RedstoneFlux();

@@ -1,23 +1,28 @@
 package sonar.logistics;
 
-import sonar.logistics.api.info.Info;
+import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.api.providers.EnergyProvider;
 import sonar.logistics.api.providers.EntityProvider;
 import sonar.logistics.api.providers.FluidHandler;
 import sonar.logistics.api.providers.InventoryHandler;
 import sonar.logistics.api.providers.TileProvider;
+import sonar.logistics.api.render.InfoInteractionHandler;
 import sonar.logistics.api.utils.EnergyType;
 import sonar.logistics.api.wrappers.RegistryWrapper;
 import sonar.logistics.utils.HammerRecipes;
 
 public class LogisticsRegistry extends RegistryWrapper {
 
-	public void registerInfoType(Info type) {
-		Logistics.infoTypes.registerObject(type);
+	public void registerInfoType(ILogicInfo info) {
+		Logistics.infoTypes.registerObject(info);
 	}
 	
 	public void registerEnergyType(EnergyType type) {
 		Logistics.energyTypes.registerObject(type);
+	}
+	
+	public void registerInteractionHandler(InfoInteractionHandler handler) {
+		Logistics.infoInteraction.registerObject(handler);
 	}
 	
 	public void registerTileProvider(TileProvider provider) {

@@ -7,7 +7,7 @@ import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.network.PacketCoords;
 import sonar.core.network.PacketTileEntityHandler;
 import sonar.logistics.Logistics;
-import sonar.logistics.api.info.Info;
+import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.common.handlers.EnergyReaderHandler;
 import sonar.logistics.common.handlers.InfoReaderHandler;
 import sonar.logistics.info.types.StoredEnergyInfo;
@@ -15,7 +15,7 @@ import cpw.mods.fml.common.network.simpleimpl.IMessage;
 
 public class PacketInfoBlock extends PacketCoords {
 
-	public Info info;
+	public ILogicInfo info;
 	public boolean primary, setNull;
 
 	public PacketInfoBlock() {
@@ -27,7 +27,7 @@ public class PacketInfoBlock extends PacketCoords {
 		this.setNull = true;
 	}
 
-	public PacketInfoBlock(int x, int y, int z, Info info, boolean primary) {
+	public PacketInfoBlock(int x, int y, int z, ILogicInfo info, boolean primary) {
 		super(x, y, z);
 		this.info = info;
 		this.primary = primary;

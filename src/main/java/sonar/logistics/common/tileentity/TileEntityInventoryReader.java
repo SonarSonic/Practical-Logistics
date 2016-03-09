@@ -8,7 +8,7 @@ import sonar.core.inventory.IDropInventory;
 import sonar.core.utils.BlockCoords;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.connecting.IInfoEmitter;
-import sonar.logistics.api.info.Info;
+import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.common.handlers.InventoryReaderHandler;
 
 public class TileEntityInventoryReader extends TileEntityHandlerInventory implements IInfoEmitter, IDropInventory {
@@ -26,7 +26,7 @@ public class TileEntityInventoryReader extends TileEntityHandlerInventory implem
 	}
 
 	@Override
-	public Info currentInfo() {
+	public ILogicInfo currentInfo() {
 		return handler.currentInfo(this);
 	}
 

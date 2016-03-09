@@ -17,8 +17,8 @@ import sonar.logistics.api.cache.CacheTypes;
 import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.connecting.CableType;
 import sonar.logistics.api.connecting.IInfoEmitter;
-import sonar.logistics.api.info.Info;
-import sonar.logistics.api.info.StandardInfo;
+import sonar.logistics.api.info.ILogicInfo;
+import sonar.logistics.api.info.LogicInfo;
 
 import com.google.common.collect.Lists;
 
@@ -27,7 +27,7 @@ public class DataModifierHandler extends TileHandler {
 	public SyncTagType.STRING subCategory = new SyncTagType.STRING(0);
 	public SyncTagType.STRING prefix = new SyncTagType.STRING(1);
 	public SyncTagType.STRING suffix = new SyncTagType.STRING(2);
-	public SyncGeneric<Info> info = new SyncGeneric(Logistics.infoTypes, "currentInfo");
+	public SyncGeneric<ILogicInfo> info = new SyncGeneric(Logistics.infoTypes, "currentInfo");
 
 	public DataModifierHandler(boolean isMultipart, TileEntity tile) {
 		super(isMultipart, tile);
@@ -74,7 +74,7 @@ public class DataModifierHandler extends TileHandler {
 		return true;
 	}
 
-	public Info currentInfo() {
+	public ILogicInfo currentInfo() {
 		if (this.info == null) {
 			return null;
 		}
@@ -87,7 +87,7 @@ public class DataModifierHandler extends TileHandler {
 		String subCat = (currentSub == null || currentSub.isEmpty() || currentSub.equals("")) ? info.getObject().getSubCategory() : currentSub;
 		String prefix = (currentPre == null || currentPre.isEmpty() || currentPre.equals("")) ? "" : currentPre;
 		String suffix = (currentSuf == null || currentSuf.isEmpty() || currentSuf.equals("")) ? "" : currentSuf;
-		Info modifiedInfo = new StandardInfo((byte) -1, info.getObject().getCategory(), subCat, prefix + " " + info.getObject().getDisplayableData() + " " + suffix);
+		ILogicInfo modifiedInfo = new LogicInfo((byte) -1, info.getObject().getCategory(), subCat, prefix + " " + info.getObject().getDisplayableData() + " " + suffix);
 		return modifiedInfo;
 	}
 

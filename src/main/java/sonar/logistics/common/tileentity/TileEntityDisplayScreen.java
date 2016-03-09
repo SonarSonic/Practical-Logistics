@@ -5,7 +5,7 @@ import sonar.core.common.tileentity.TileEntityHandler;
 import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.utils.BlockCoords;
 import sonar.logistics.api.connecting.IInfoTile;
-import sonar.logistics.api.info.Info;
+import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.common.handlers.DisplayScreenHandler;
 
 public class TileEntityDisplayScreen extends TileEntityHandler implements IInfoTile {
@@ -23,7 +23,7 @@ public class TileEntityDisplayScreen extends TileEntityHandler implements IInfoT
 	}
 
 	@Override
-	public Info currentInfo() {
+	public ILogicInfo currentInfo() {
 		return handler.currentInfo();
 	}
 

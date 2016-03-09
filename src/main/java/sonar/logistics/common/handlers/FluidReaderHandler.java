@@ -29,8 +29,8 @@ import sonar.core.utils.helpers.FontHelper;
 import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.cache.INetworkCache;
-import sonar.logistics.api.info.Info;
-import sonar.logistics.api.info.StandardInfo;
+import sonar.logistics.api.info.ILogicInfo;
+import sonar.logistics.api.info.LogicInfo;
 import sonar.logistics.api.interaction.IDefaultInteraction;
 import sonar.logistics.api.providers.InventoryHandler.StorageSize;
 import sonar.logistics.api.render.ScreenType;
@@ -101,7 +101,7 @@ public class FluidReaderHandler extends TileHandler implements IByteBufTile, IDe
 	}
 
 	@Override
-	public void handleInteraction(Info info, ScreenType type, TileEntity screen, TileEntity reader, EntityPlayer player, int x, int y, int z, BlockInteraction interact, boolean doubleClick) {
+	public void handleInteraction(ILogicInfo info, ScreenType type, TileEntity screen, TileEntity reader, EntityPlayer player, int x, int y, int z, BlockInteraction interact, boolean doubleClick) {
 		if (player.getHeldItem() != null) {
 			emptyFluid(player, reader, player.getHeldItem());
 		}
@@ -163,7 +163,7 @@ public class FluidReaderHandler extends TileHandler implements IByteBufTile, IDe
 		}
 	}
 
-	public Info currentInfo(TileEntity te) {
+	public ILogicInfo currentInfo(TileEntity te) {
 
 		switch (setting.getObject()) {
 		case 0:
@@ -191,7 +191,7 @@ public class FluidReaderHandler extends TileHandler implements IByteBufTile, IDe
 		case 3:
 			return new ProgressInfo(maxStorage.getStoredFluids(), maxStorage.getMaxFluids(), FontHelper.formatFluidSize(maxStorage.getStoredFluids()) + " / " + FontHelper.formatFluidSize(maxStorage.getMaxFluids()));
 		}
-		return new StandardInfo((byte) -1, "ITEMREND", " ", "NO DATA");
+		return new LogicInfo((byte) -1, "ITEMREND", " ", "NO DATA");
 	}
 
 	public void readData(NBTTagCompound nbt, SyncType type) {

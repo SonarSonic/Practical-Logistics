@@ -5,13 +5,13 @@ import net.minecraft.client.gui.FontRenderer;
 
 import org.lwjgl.opengl.GL11;
 
-import sonar.logistics.api.info.Info;
+import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.api.render.ScreenType;
 import sonar.logistics.api.wrappers.RenderWrapper;
 
 public class InfoRenderer extends RenderWrapper {
 
-	public void renderStandardInfo(Info info, FontRenderer rend, float minX, float minY, float maxX, float maxY, float zOffset, ScreenType type) {
+	public void renderStandardInfo(ILogicInfo info, FontRenderer rend, float minX, float minY, float maxX, float maxY, float zOffset, ScreenType type) {
 
 		GL11.glTranslatef(minX + (maxX - minX) / 2, minY + (maxY - minY) / 2, 0.01f);
 		int sizing = Math.round(Math.min((maxX - minX), (maxY - minY) * 3));

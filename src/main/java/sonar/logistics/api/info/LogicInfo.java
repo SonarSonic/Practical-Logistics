@@ -2,22 +2,24 @@ package sonar.logistics.api.info;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.nbt.NBTTagCompound;
+import sonar.core.utils.IRegistryObject;
 import sonar.logistics.api.LogisticsAPI;
+import sonar.logistics.api.providers.EntityProvider;
+import sonar.logistics.api.providers.ICategoryProvider;
 import sonar.logistics.api.providers.TileProvider;
 import cpw.mods.fml.common.network.ByteBufUtils;
 
-public class StandardInfo<T extends StandardInfo> extends Info<T> {
+public class LogicInfo<T extends LogicInfo> extends ILogicInfo<T> {
 
 	public boolean emptyData;
+	public boolean entity = false;
 	public String category = "ERROR", subCategory = "ERROR", data = "", suffix = "";
 	public int dataType;
 	public int providerID = -1, catID = -1, subCatID = -1;
 
-	public StandardInfo() {
+	public LogicInfo() {}
 
-	}
-
-	public StandardInfo(int providerID, int category, int subCategory, Object data) {
+	public LogicInfo(int providerID, int category, int subCategory, Object data) {
 		this.providerID = providerID;
 		this.catID = category;
 		this.subCatID = subCategory;
@@ -25,7 +27,7 @@ public class StandardInfo<T extends StandardInfo> extends Info<T> {
 		this.dataType = data instanceof Long || data instanceof Integer || data instanceof Short ? 0 : 1;
 	}
 
-	public StandardInfo(int providerID, String category, String subCategory, Object data) {
+	public LogicInfo(int providerID, String category, String subCategory, Object data) {
 		this.providerID = providerID;
 		this.category = category;
 		this.subCategory = subCategory;
@@ -33,8 +35,13 @@ public class StandardInfo<T extends StandardInfo> extends Info<T> {
 		this.dataType = data instanceof Long || data instanceof Integer || data instanceof Short ? 0 : 1;
 	}
 
-	public StandardInfo addSuffix(String suffix) {
+	public LogicInfo addSuffix(String suffix) {
 		this.suffix = suffix;
+		return this;
+	}
+
+	public LogicInfo isEntityData(boolean bool) {
+		this.entity = bool;
 		return this;
 	}
 
@@ -50,7 +57,7 @@ public class StandardInfo<T extends StandardInfo> extends Info<T> {
 
 	@Override
 	public String getCategory() {
-		TileProvider provider = LogisticsAPI.getRegistry().getTileProvider(providerID);
+		ICategoryProvider provider = getRegistryObject();
 		if (providerID != -1 && provider == null) {
 			return "UNLOADED MOD";
 		}
@@ -59,11 +66,18 @@ public class StandardInfo<T extends StandardInfo> extends Info<T> {
 
 	@Override
 	public String getSubCategory() {
-		TileProvider provider = LogisticsAPI.getRegistry().getTileProvider(providerID);
+		ICategoryProvider provider = getRegistryObject();
 		if (providerID != -1 && provider == null) {
 			return "ERROR";
 		}
 		return (subCatID == -1 || providerID == -1) ? subCategory : provider.getSubCategory(subCatID);
+	}
+
+	public ICategoryProvider getRegistryObject() {
+		if(entity){
+			return LogisticsAPI.getRegistry().getEntityProvider(providerID);
+		}
+		return LogisticsAPI.getRegistry().getTileProvider(providerID);
 	}
 
 	@Override
@@ -87,6 +101,7 @@ public class StandardInfo<T extends StandardInfo> extends Info<T> {
 
 	@Override
 	public void readFromBuf(ByteBuf buf) {
+		this.entity = buf.readBoolean();
 		this.providerID = buf.readInt();
 		if (buf.readBoolean()) {
 			this.catID = buf.readInt();
@@ -108,6 +123,7 @@ public class StandardInfo<T extends StandardInfo> extends Info<T> {
 
 	@Override
 	public void writeToBuf(ByteBuf buf) {
+		buf.writeBoolean(entity);
 		buf.writeInt(providerID);
 		if (catID != -1) {
 			buf.writeBoolean(true);
@@ -135,6 +151,7 @@ public class StandardInfo<T extends StandardInfo> extends Info<T> {
 	}
 
 	public void readFromNBT(NBTTagCompound tag) {
+		this.entity = tag.getBoolean("e");
 		this.providerID = tag.getInteger("prov");
 		if (tag.getBoolean("BcatID")) {
 			this.catID = tag.getInteger("catID");
@@ -156,6 +173,7 @@ public class StandardInfo<T extends StandardInfo> extends Info<T> {
 	}
 
 	public void writeToNBT(NBTTagCompound tag) {
+		tag.setBoolean("e", entity);
 		tag.setInteger("prov", providerID);
 		if (catID != -1) {
 			tag.setBoolean("BcatID", true);
@@ -183,8 +201,8 @@ public class StandardInfo<T extends StandardInfo> extends Info<T> {
 	}
 
 	@Override
-	public StandardInfo instance() {
-		return new StandardInfo();
+	public LogicInfo instance() {
+		return new LogicInfo();
 	}
 
 	public void setData(String string) {
@@ -192,7 +210,11 @@ public class StandardInfo<T extends StandardInfo> extends Info<T> {
 	}
 
 	@Override
-	public void writeUpdate(StandardInfo currentInfo, NBTTagCompound tag) {
+	public void writeUpdate(LogicInfo currentInfo, NBTTagCompound tag) {
+		if (currentInfo.entity != this.entity) {
+			entity = currentInfo.entity;
+			tag.setBoolean("e", entity);
+		}
 		if (currentInfo.providerID != this.providerID) {
 			providerID = currentInfo.providerID;
 			tag.setInteger("id", providerID);
@@ -211,7 +233,7 @@ public class StandardInfo<T extends StandardInfo> extends Info<T> {
 		if (currentInfo.subCatID == -1 && !currentInfo.subCategory.equals(this.subCategory)) {
 			subCategory = currentInfo.subCategory;
 			tag.setString("sC", subCategory);
-			
+
 		} else if (currentInfo.subCatID != -1 && currentInfo.subCatID != this.subCatID) {
 			subCatID = currentInfo.subCatID;
 			tag.setInteger("sCI", subCatID);
@@ -228,6 +250,9 @@ public class StandardInfo<T extends StandardInfo> extends Info<T> {
 
 	@Override
 	public void readUpdate(NBTTagCompound tag) {
+		if (tag.hasKey("e")) {
+			entity = tag.getBoolean("e");
+		}
 		if (tag.hasKey("id")) {
 			providerID = tag.getInteger("id");
 		}
@@ -255,7 +280,7 @@ public class StandardInfo<T extends StandardInfo> extends Info<T> {
 	}
 
 	@Override
-	public boolean matches(StandardInfo currentInfo) {
+	public boolean matches(LogicInfo currentInfo) {
 		return currentInfo.getProviderID() == this.providerID && currentInfo.dataType == dataType && currentInfo.category.equals(category) && currentInfo.subCategory.equals(subCategory) && currentInfo.suffix.equals(suffix) && currentInfo.catID == catID && currentInfo.subCatID == subCatID;
 	}
 }

@@ -6,54 +6,45 @@ import java.util.List;
 import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.connecting.IConnectionNode;
 import sonar.logistics.api.connecting.IEntityNode;
-import sonar.logistics.api.info.Info;
+import sonar.logistics.api.info.ILogicInfo;
 
 public class InfoWrapper {
 
-	/**gets a list of all Info available at a given {@link BlockCoords}
-	 * @param coords {@link BlockCoords} to check at
-	 * @return list of {@link Info}
-	 */
-	//public List<Info> getInfoList(BlockCoords coords) {
-	//	return Collections.EMPTY_LIST;
-	//}
-	/**gets a list of all Info available at a given {@link IConnectionNode}, used by getInfoList(), here if the need should arise
-	 * @param coordList the map containing coords and directions.
-	 * @return list of {@link Info}
-	 */
-	public List<Info> getTileInfo(INetworkCache coordList) {
+	/** gets a list of all Info available at a given {@link IConnectionNode}, used by getInfoList(), here if the need should arise
+	 * @param network the {@link INetworkCache} to get info from
+	 * @return list of {@link ILogicInfo} */
+	public List<ILogicInfo> getTileInfo(INetworkCache network) {
 		return Collections.EMPTY_LIST;
 	}
 
-	/**gets a list of all Info available at a given {@link IEntityNode}, useg by getInfoList(), here if the need should arise
-	 * @param coords {@link IEntityNode} to check at
-	 * @return list of {@link Info}
-	 */
-	public List<Info> getEntityInfo(IEntityNode tileNode) {
+	/** gets a list of all Info available at a given {@link IEntityNode}, useg by getInfoList(), here if the need should arise
+	 * @param network the {@link INetworkCache} to get info from
+	 * @return list of {@link ILogicInfo} */
+	public List<ILogicInfo> getEntityInfo(IEntityNode tileNode) {
 		return Collections.EMPTY_LIST;
 	}
-	/**for updating {@link Info}, used by the Info Reader
-	 * @param tileInfo tile {@link Info} in need of updating
-	 * @param network the {@link IConnectionNode} to check at
-	 * @return the latest {@link Info}
-	 */
-	public Info getLatestTileInfo(Info tileInfo, INetworkCache network) {
+
+	/** for updating {@link ILogicInfo}, used by the Info Reader
+	 * @param tileInfo tile {@link ILogicInfo} in need of updating
+	 * @param network the {@link INetworkCache} to get info from
+	 * @return the latest {@link ILogicInfo} */
+	public ILogicInfo getLatestTileInfo(ILogicInfo tileInfo, INetworkCache network) {
 		return tileInfo;
 	}
-	/**for updating {@link Info}, used by the Info Reader
-	 * @param entityInfo entity {@link Info} in need of updating
+
+	/** for updating {@link ILogicInfo}, used by the Info Reader
+	 * @param entityInfo entity {@link ILogicInfo} in need of updating
 	 * @param entityNode the {@link IEntityNode} to check at
-	 * @return the latest {@link Info}
-	 */
-	public Info getLatestEntityInfo(Info entityInfo, IEntityNode entityNode) {
+	 * @return the latest {@link ILogicInfo} */
+	public ILogicInfo getLatestEntityInfo(ILogicInfo entityInfo, IEntityNode entityNode) {
 		return entityInfo;
 	}
-	/** used for combining two bits of {@link Info}, used by the Info Reader to create progress bars
-	 * @param primary first {@link Info}
-	 * @param secondary second {@link Info}
-	 * @return progress bar info, or default {@link Info}
-	 */
-	public Info combineData(Info primary, Info secondary) {
+
+	/** used for combining two bits of {@link ILogicInfo}, used by the Info Reader to create progress bars
+	 * @param primary first {@link ILogicInfo}
+	 * @param secondary second {@link ILogicInfo}
+	 * @return progress bar info, or default {@link ILogicInfo} */
+	public ILogicInfo combineData(ILogicInfo primary, ILogicInfo secondary) {
 		return primary;
 	}
 }

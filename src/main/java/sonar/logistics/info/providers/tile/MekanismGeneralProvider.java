@@ -10,8 +10,8 @@ import mekanism.api.lasers.ILaserReceptor;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
-import sonar.logistics.api.info.Info;
-import sonar.logistics.api.info.StandardInfo;
+import sonar.logistics.api.info.ILogicInfo;
+import sonar.logistics.api.info.LogicInfo;
 import sonar.logistics.api.providers.TileProvider;
 import cpw.mods.fml.common.Loader;
 
@@ -33,29 +33,29 @@ public class MekanismGeneralProvider extends TileProvider {
 	}
 
 	@Override
-	public void getHelperInfo(List<Info> infoList, World world, int x, int y, int z, ForgeDirection dir) {
+	public void getTileInfo(List<ILogicInfo> infoList, World world, int x, int y, int z, ForgeDirection dir) {
 		int id = this.getID();
 		TileEntity target = world.getTileEntity(x, y, z);
 		if (target instanceof IHeatTransfer) {
 			IHeatTransfer block = (IHeatTransfer) target;
-			infoList.add(new StandardInfo(id, 0, 0, (int) block.getTemp()).addSuffix("degrees"));
+			infoList.add(new LogicInfo(id, 0, 0, (int) block.getTemp()).addSuffix("degrees"));
 		}
 		if (target instanceof ISalinationSolar) {
 			ISalinationSolar block = (ISalinationSolar) target;
-			infoList.add(new StandardInfo(id, 0, 1, block.seesSun()));
+			infoList.add(new LogicInfo(id, 0, 1, block.seesSun()));
 		}
 		if (target instanceof ILaserReceptor) {
 			ILaserReceptor block = (ILaserReceptor) target;
-			infoList.add(new StandardInfo(id, 0, 2, block.canLasersDig()));
+			infoList.add(new LogicInfo(id, 0, 2, block.canLasersDig()));
 		}
 		if (target instanceof IStrictEnergyStorage) {
 			IStrictEnergyStorage block = (IStrictEnergyStorage) target;
-			infoList.add(new StandardInfo(id, 1, 3, (long) block.getEnergy()).addSuffix("J"));;
-			infoList.add(new StandardInfo(id, 1, 4, (long) block.getMaxEnergy()).addSuffix("J"));
+			infoList.add(new LogicInfo(id, 1, 3, (long) block.getEnergy()).addSuffix("J"));;
+			infoList.add(new LogicInfo(id, 1, 4, (long) block.getMaxEnergy()).addSuffix("J"));
 		}
 		if (target instanceof IStrictEnergyAcceptor) {
 			IStrictEnergyAcceptor block = (IStrictEnergyAcceptor) target;
-			infoList.add(new StandardInfo(id, 1, 5, block.canReceiveEnergy(dir)));
+			infoList.add(new LogicInfo(id, 1, 5, block.canReceiveEnergy(dir)));
 		}
 	}
 

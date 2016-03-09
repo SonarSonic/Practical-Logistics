@@ -4,9 +4,10 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import sonar.core.utils.BlockInteraction;
 import sonar.core.utils.IRegistryObject;
-import sonar.logistics.api.info.Info;
+import sonar.logistics.api.info.ILogicInfo;
 
-public abstract class InfoInteractionHandler<T extends Info> implements IRegistryObject {
+/** used for Interactions with Display Screens, these can be registered with the {@link RegistryWrapper}, the generic T being the Info Type it provides for */
+public abstract class InfoInteractionHandler<T extends ILogicInfo> implements IRegistryObject {
 
 	public abstract boolean canHandle(ScreenType type, TileEntity te, TileEntity object);
 
