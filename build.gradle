@@ -17,7 +17,7 @@ buildscript {
 
 apply plugin: 'forge'
 
-version = "0.1.3"
+version = "0.1.4"
 group= "sonar.logistics.modid"
 archivesBaseName = "Practical-Logistics-1.7.10"
 
@@ -39,7 +39,7 @@ repositories {
 }
 
 dependencies {
-compile files('lib/SonarCore-1.7.10-1.0.6-dev.jar')
+compile files('lib/SonarCore-1.7.10-1.0.8-dev.jar')
 compile files('lib/Waila-1.5.10_1.7.10.jar')
 compile files('lib/NotEnoughItems-1.7.10-1.0.5.120-dev.jar')
 compile files('lib/ForgeMultipart-1.7.10-1.2.0.345-dev.jar')
@@ -56,6 +56,7 @@ compile files('lib/appliedenergistics2-rv3-beta-5-dev.jar')
 compile files('lib/Mekanism-1.7.10-8.1.8.261.jar')
 compile files('lib/RotaryCraft 1.7.10 V10d.jar')
 compile files('lib/BigReactors-0.4.3A.jar')
+compile files('lib/SolarFlux-1.7.10-0.8b.jar')
 }
 
 processResources
@@ -64,8 +65,7 @@ processResources
     inputs.property "mcversion", project.minecraft.version
 
     from(sourceSets.main.resources.srcDirs) {
-        include 'mcmod.info'
-                
+        include 'mcmod.info'                
         expand 'version':project.version, 'mcversion':project.minecraft.version
     }
         

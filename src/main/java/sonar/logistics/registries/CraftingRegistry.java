@@ -24,15 +24,16 @@ public class CraftingRegistry extends Logistics {
 		addShapedOre(new ItemStack(BlockRegistry.infoReader, 1), new Object[] { "PIP", "RDS", "PIP", 'R', "dustRedstone", 'I', Items.iron_ingot, 'P', ItemRegistry.stone_plate, 'D', BlockRegistry.dataCable, 'S', "dustSapphire" });
 		addShapelessOre(new ItemStack(BlockRegistry.inventoryReader, 1), new Object[] { BlockRegistry.infoReader, Blocks.chest });
 		addShapelessOre(new ItemStack(BlockRegistry.fluidReader, 1), new Object[] { BlockRegistry.infoReader, Items.bucket });
+		addShapelessOre(new ItemStack(BlockRegistry.energyReader, 1), new Object[] { BlockRegistry.infoReader, "gemSapphire" });
 		addShapedOre(new ItemStack(BlockRegistry.node, 1), new Object[] { "   ", " C ", "PDP", 'P', ItemRegistry.stone_plate, 'D', "dustSapphire", 'C', BlockRegistry.dataCable });
 		addShapedOre(new ItemStack(BlockRegistry.hammer, 1), new Object[] { "ADA", "B B", "ACA", 'A', "logWood", 'B', "stickWood", 'C', "stone", 'D', "slabWood" });
 		addShapelessOre(new ItemStack(BlockRegistry.entityNode, 1), new Object[] { ItemRegistry.stone_plate, "gemSapphire", BlockRegistry.dataCable });
 		addShapedOre(new ItemStack(BlockRegistry.itemRouter, 1), new Object[] { "SIS", "IMI", "SIS", 'S', "gemSapphire", 'I', BlockRegistry.inventoryReader, 'M', BlockRegistry.dataModifier });
-		addShapedOre(new ItemStack(BlockRegistry.channelledCable, 6), new Object[] { "CCC", "SSS", "CCC", 'C', BlockRegistry.dataCable, 'S', "dustSapphire"});
+		addShapedOre(new ItemStack(BlockRegistry.channelledCable, 6), new Object[] { "CCC", "SSS", "CCC", 'C', BlockRegistry.dataCable, 'S', "dustSapphire" });
 		addShapedOre(new ItemStack(BlockRegistry.channelSelector, 1), new Object[] { "CDC", "PCD", "CDC", 'P', ItemRegistry.stone_plate, 'D', "dustSapphire", 'C', BlockRegistry.channelledCable });
 		addShapedOre(new ItemStack(BlockRegistry.clock, 1), new Object[] { "   ", "DCR", "PPP", 'P', ItemRegistry.stone_plate, 'D', "dustSapphire", 'C', Items.clock, 'R', "dustRedstone" });
-		addShapedOre(new ItemStack(BlockRegistry.transceiverArray, 1), new Object[] { "PPP", "RCE", "   ", 'P', ItemRegistry.stone_plate, 'C', BlockRegistry.channelledCable, 'E', BlockRegistry.dataEmitter, 'R', BlockRegistry.dataReceiver});
-		addShapedOre(new ItemStack(ItemRegistry.transceiver, 1), new Object[] { "SPD", "RBE", "SPD", 'P', ItemRegistry.stone_plate, 'B', Items.ender_pearl, 'S', "dustSapphire", 'D', "dustRedstone", 'E', BlockRegistry.dataEmitter, 'R', BlockRegistry.dataReceiver});
+		addShapedOre(new ItemStack(BlockRegistry.transceiverArray, 1), new Object[] { "PPP", "RCE", "   ", 'P', ItemRegistry.stone_plate, 'C', BlockRegistry.channelledCable, 'E', BlockRegistry.dataEmitter, 'R', BlockRegistry.dataReceiver });
+		addShapedOre(new ItemStack(ItemRegistry.transceiver, 1), new Object[] { "SPD", "RBE", "SPD", 'P', ItemRegistry.stone_plate, 'B', Items.ender_pearl, 'S', "dustSapphire", 'D', "dustRedstone", 'E', BlockRegistry.dataEmitter, 'R', BlockRegistry.dataReceiver });
 
 	}
 

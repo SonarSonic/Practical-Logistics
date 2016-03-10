@@ -1,6 +1,7 @@
 package sonar.logistics.api.connecting;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import net.minecraft.entity.Entity;
 
@@ -8,5 +9,5 @@ import net.minecraft.entity.Entity;
 public interface IEntityNode {
 
 	/** gets the full list of Entities this Entity Node is connected to */
-	public ArrayList<Entity> getEntities();
+	public List<Entity> getEntities();
 }

@@ -17,36 +17,30 @@ public class CablingWrapper {
 	/** should be called on validate() method in your TileEntity class: for adding a the TileEntity to a Network
 	 * @param connection TileEntity to connect
 	 * @param side {@link ForgeDirection} it should connect via (cable side) */
-	public void addConnection(TileEntity connection, ForgeDirection side) {
-	}
+	public void addConnection(TileEntity connection, ForgeDirection side) {}
 
 	/** adds a connection to the given RegistryID
 	 * @param registryID the registryID to connect to
 	 * @param coords the coordinates of the connection */
-	public void addConnection(int registryID, BlockCoords coords) {
-	}
+	public void addConnection(int registryID, BlockCoords coords) {}
 
 	/** should be called on invalidate() method in your TileEntity class: for removing a TileEntity from a Network
 	 * @param connection TileEntity to remove
 	 * @param side {@link ForgeDirection} it was connected via (cable side) */
-	public void removeConnection(TileEntity connection, ForgeDirection side) {
-	}
+	public void removeConnection(TileEntity connection, ForgeDirection side) {}
 
 	/** removes a connection to the given RegistryID
 	 * @param registryID the registryID to remove to
 	 * @param coords the coordinates of the connection */
-	public void removeConnection(int registryID, BlockCoords coords) {
-	}
+	public void removeConnection(int registryID, BlockCoords coords) {}
 
 	/** should be called on the {@code validate()} method in your TileEntity class: for adding a {@link IDataCable} to a network
 	 * @param cable {@link IDataCable} to be added */
-	public void addCable(IDataCable cable) {
-	}
+	public void addCable(IDataCable cable) {}
 
 	/** should be called on the {@code invalidate()} method in your TileEntity class: for removing a {@link IDataCable} from a network
 	 * @param cable {@link IDataCable} to be removed */
-	public void removeCable(IDataCable cable) {
-	}
+	public void removeCable(IDataCable cable) {}
 
 	/** returns the {@link INetworkCache} on a given side of a tile
 	 * @param tile TileEntity to check from

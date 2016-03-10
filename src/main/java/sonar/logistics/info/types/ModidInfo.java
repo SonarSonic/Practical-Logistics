@@ -8,7 +8,7 @@ import cpw.mods.fml.common.ModContainer;
 import cpw.mods.fml.common.network.ByteBufUtils;
 import cpw.mods.fml.common.registry.GameRegistry.UniqueIdentifier;
 
-public class ModidInfo extends LogicInfo<ModidInfo> {
+public class ModidInfo extends LogicInfo {
 
 	public UniqueIdentifier block = null;
 
@@ -18,13 +18,13 @@ public class ModidInfo extends LogicInfo<ModidInfo> {
 	public ModidInfo(int providerID, int category, int subCategory, Object data, UniqueIdentifier block) {
 		super(providerID, category, subCategory, data);
 		this.block = block;
-		this.dataType=1;
+		this.dataType = 1;
 	}
 
 	public ModidInfo(int providerID, String category, String subCategory, Object data, UniqueIdentifier block) {
 		super(providerID, category, subCategory, data);
 		this.block = block;
-		this.dataType=1;
+		this.dataType = 1;
 	}
 
 	@Override
@@ -77,13 +77,16 @@ public class ModidInfo extends LogicInfo<ModidInfo> {
 	}
 
 	@Override
-	public void writeUpdate(ModidInfo currentInfo, NBTTagCompound tag) {
+	public void writeUpdate(LogicInfo currentInfo, NBTTagCompound tag) {
 		super.writeUpdate(currentInfo, tag);
-		if (!currentInfo.block.modId.equals(block.modId) || !currentInfo.block.name.equals(block.name)) {
-			NBTTagCompound blockTag = new NBTTagCompound();
-			blockTag.setString("modId", block.modId);
-			blockTag.setString("name", block.name);
-			tag.setTag("block", blockTag);
+		if (currentInfo instanceof ModidInfo) {
+			ModidInfo info = (ModidInfo) currentInfo;
+			if (!info.block.modId.equals(block.modId) || !info.block.name.equals(block.name)) {
+				NBTTagCompound blockTag = new NBTTagCompound();
+				blockTag.setString("modId", block.modId);
+				blockTag.setString("name", block.name);
+				tag.setTag("block", blockTag);
+			}
 		}
 	}
 
@@ -97,7 +100,7 @@ public class ModidInfo extends LogicInfo<ModidInfo> {
 	}
 
 	@Override
-	public boolean matches(ModidInfo currentInfo) {
+	public boolean matches(LogicInfo currentInfo) {
 		return currentInfo.getProviderID() == this.providerID && currentInfo.dataType == dataType && currentInfo.category.equals(category) && currentInfo.subCategory.equals(subCategory) && currentInfo.suffix.equals(suffix) && currentInfo.catID == catID && currentInfo.subCatID == subCatID;
 	}
 

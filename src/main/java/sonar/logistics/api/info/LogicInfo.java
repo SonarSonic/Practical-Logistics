@@ -17,7 +17,8 @@ public class LogicInfo<T extends LogicInfo> extends ILogicInfo<T> {
 	public int dataType;
 	public int providerID = -1, catID = -1, subCatID = -1;
 
-	public LogicInfo() {}
+	public LogicInfo() {
+	}
 
 	public LogicInfo(int providerID, int category, int subCategory, Object data) {
 		this.providerID = providerID;
@@ -74,7 +75,7 @@ public class LogicInfo<T extends LogicInfo> extends ILogicInfo<T> {
 	}
 
 	public ICategoryProvider getRegistryObject() {
-		if(entity){
+		if (entity) {
 			return LogisticsAPI.getRegistry().getEntityProvider(providerID);
 		}
 		return LogisticsAPI.getRegistry().getTileProvider(providerID);

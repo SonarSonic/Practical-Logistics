@@ -21,6 +21,7 @@ import sonar.logistics.info.providers.tile.MekanismGeneralProvider;
 import sonar.logistics.info.providers.tile.MekanismReactorProvider;
 import sonar.logistics.info.providers.tile.RFEnergyProvider;
 import sonar.logistics.info.providers.tile.RotaryCraftProvider;
+import sonar.logistics.info.providers.tile.SolarFluxProvider;
 import sonar.logistics.info.providers.tile.ThaumcraftProvider;
 import sonar.logistics.info.providers.tile.VanillaTileEntityProvider;
 import cpw.mods.fml.common.Loader;
@@ -54,6 +55,7 @@ public class TileProviderRegistry extends RegistryHelper<TileProvider> {
 		registerObject(new RotaryCraftProvider());
 		registerObject(new CalculatorMachineProvider());
 		registerObject(new BigReactorsProvider());
+		registerObject(new SolarFluxProvider());
 
 	}
 

@@ -10,9 +10,15 @@ import sonar.core.utils.INBTObject;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.render.ScreenType;
 
-public abstract class ILogicInfo<T extends ILogicInfo> implements INBTObject, IBufObject {
+public abstract class ILogicInfo<T> implements INBTObject, IBufObject {
 
 	public String providerID = "";
+	public int updateTime = 1;
+
+	public ILogicInfo setUpdateTime(int time) {
+		this.updateTime = time;
+		return this;
+	}
 
 	public abstract String getName();
 
@@ -49,7 +55,7 @@ public abstract class ILogicInfo<T extends ILogicInfo> implements INBTObject, IB
 	public boolean equals(Object obj) {
 		if (obj instanceof ILogicInfo<?>) {
 			T target = (T) obj;
-			if (areTypesEqual(target)) {
+			if (target instanceof ILogicInfo && areTypesEqual((ILogicInfo)target)) {
 				return matches(target);
 			}
 		}
@@ -61,7 +67,7 @@ public abstract class ILogicInfo<T extends ILogicInfo> implements INBTObject, IB
 	}
 
 	public int updateTicks() {
-		return 1;
+		return updateTime;
 	}
 
 	public boolean isLoadable() {

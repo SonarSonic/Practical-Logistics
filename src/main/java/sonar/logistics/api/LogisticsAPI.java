@@ -10,7 +10,7 @@ import sonar.logistics.api.wrappers.RenderWrapper;
 import cpw.mods.fml.common.Loader;
 
 /**Use this for all your interaction with the mod.
- * This will be initilized by Practical Logistics if it is loaded. Make sure you only register stuff once Practical Logistics is loaded thefore in the FMLPostInitializationEvent*/
+ * This will be initilized by Practical Logistics if it is loaded. Make sure you only register stuff once Practical Logistics is loaded therefore in the FMLPostInitializationEvent*/
 public final class LogisticsAPI {
 
 	public static final String MODID = "PracticalLogistics";

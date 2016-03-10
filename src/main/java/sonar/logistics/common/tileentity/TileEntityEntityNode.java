@@ -137,7 +137,7 @@ public class TileEntityEntityNode extends TileEntityChannelledCable implements I
 	}
 
 	@Override
-	public ArrayList<Entity> getEntities() {
-		return (ArrayList<Entity>) Arrays.asList(getNearestEntity());
+	public List<Entity> getEntities() {
+		return Arrays.asList(getNearestEntity());
 	}
 }

@@ -113,7 +113,7 @@ public class FluidInventoryInfo extends ILogicInfo<FluidInventoryInfo> {
 			int xSlots = Math.round(maxX - minX);
 			int ySlots = (int) (Math.round(maxY - minY));
 			if (type.isNormalSize()) {
-				if (stacks != null && stacks.get(0) != null) {
+				if (stacks != null && !stacks.isEmpty() && stacks.get(0) != null) {
 					FluidStackInfo.createInfo(stacks.get(0)).renderInfo(tess, tile, minX, minY, maxX, maxY, zOffset, type);
 				}
 
