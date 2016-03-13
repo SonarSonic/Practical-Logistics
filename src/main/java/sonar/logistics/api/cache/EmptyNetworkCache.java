@@ -23,7 +23,7 @@ public class EmptyNetworkCache implements INetworkCache {
 	}
 
 	@Override
-	public ArrayList<BlockCoords> getConnections(CacheTypes type) {
+	public ArrayList<BlockCoords> getConnections(CacheTypes type, boolean includeChannels) {
 		return new ArrayList();
 	}
 

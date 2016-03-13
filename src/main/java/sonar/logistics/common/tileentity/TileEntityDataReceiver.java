@@ -73,7 +73,7 @@ public class TileEntityDataReceiver extends TileEntityNode implements IChannelPr
 
 	public void sendAvailableData(TileEntity te, EntityPlayer player) {
 		if (player != null && player instanceof EntityPlayerMP) {
-			emitters = EmitterRegistry.getEmitters(playerName);
+			this.emitters = EmitterRegistry.getEmitters(playerName, isPrivate.getObject());
 			NBTTagCompound syncData = new NBTTagCompound();
 			writeData(syncData, SyncType.SPECIAL);
 			SonarCore.network.sendTo(new PacketTileSync(te.xCoord, te.yCoord, te.zCoord, syncData, SyncType.SPECIAL), (EntityPlayerMP) player);
@@ -99,7 +99,7 @@ public class TileEntityDataReceiver extends TileEntityNode implements IChannelPr
 			}
 			for (int i = 0; i < list.tagCount(); i++) {
 				NBTTagCompound compound = list.getCompoundTagAt(i);
-				byte slot = compound.getByte("Slot");
+				int slot = compound.getInteger("Slot");
 				boolean set = slot < emitters.size();
 				switch (compound.getByte("f")) {
 				case 0:
@@ -191,7 +191,7 @@ public class TileEntityDataReceiver extends TileEntityNode implements IChannelPr
 					compound.setByte("f", (byte) 2);
 				}
 				if (!compound.hasNoTags()) {
-					compound.setByte("Slot", (byte) i);
+					compound.setInteger("Slot", i);
 					list.appendTag(compound);
 				}
 
@@ -210,7 +210,7 @@ public class TileEntityDataReceiver extends TileEntityNode implements IChannelPr
 			for (int i = 0; i < this.emitters.size(); i++) {
 				if (this.emitters.get(i) != null) {
 					NBTTagCompound compound = new NBTTagCompound();
-					compound.setByte("Slot", (byte) i);
+					compound.setInteger("Slot", i);
 					IdentifiedCoords.writeToNBT(compound, this.emitters.get(i));
 					list.appendTag(compound);
 				}

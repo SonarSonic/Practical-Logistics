@@ -20,8 +20,7 @@ public class ManaInfo extends ProgressInfo {
 	private static final ResourceLocation progress = new ResourceLocation(RenderHandlers.modelFolder + "progressBar.png");
 	public int providerID = -1;
 
-	public ManaInfo() {
-	}
+	public ManaInfo() {}
 
 	public ManaInfo(int providerID, long stored, long max) {
 		this.stored = stored;
@@ -98,7 +97,7 @@ public class ManaInfo extends ProgressInfo {
 		float width = stored * (maxX - minX) / max;
 		Minecraft.getMinecraft().renderEngine.bindTexture(progress);
 		RenderHelper.drawTexturedModalRect(minX, minY, maxY, width, (maxY - minY));
-		LogisticsAPI.getInfoRenderer().renderCenteredString(getSubCategory(), minX, minY, maxX, maxY, type);
+		LogisticsAPI.getInfoRenderer().renderCenteredString(getSubCategory() + getData(), minX, minY, maxX, maxY, type);
 	}
 
 	@Override
@@ -109,8 +108,10 @@ public class ManaInfo extends ProgressInfo {
 	@Override
 	public boolean matches(ProgressInfo currentInfo) {
 		if (currentInfo instanceof ManaInfo) {
-			return currentInfo.max == max && currentInfo.stored == stored;
+			//return currentInfo.max == max && currentInfo.stored == stored;
+			return true;
 		} else {
+			//System.out.print("mana");
 			return false;
 		}
 	}

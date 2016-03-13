@@ -34,6 +34,7 @@ public class BlockDataReceiver extends BaseNode {
 		TileEntity target = world.getTileEntity(x, y, z);
 		if (target != null && target instanceof TileEntityDataReceiver) {
 			TileEntityDataReceiver sonar = (TileEntityDataReceiver) target;
+			sonar.sendSyncPacket(player);
 			sonar.sendAvailableData(target, player);
 		}
 		player.openGui(Logistics.instance, LogisticsGui.dataReceiver, world, x, y, z);

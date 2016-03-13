@@ -61,28 +61,45 @@ public class NetworkCache extends StorageCache implements IRefreshCache {
 			} catch (Exception exception) {
 			}
 		}
-
 		return null;
 	}
 
 	@Override
-	public ArrayList<BlockCoords> getConnections(CacheTypes type) {
+	public ArrayList<BlockCoords> getConnections(CacheTypes type, boolean includeChannels) {
+		ArrayList<BlockCoords> list = new ArrayList();
 		switch (type) {
 		case CHANNELLED:
-			return channelCache;
+			list = channelCache;
+			break;
 		case EMITTER:
-			return emitterCache;
+			list = emitterCache;
+			break;
 		case ENTITY_NODES:
-			return entityCache;
+			list = entityCache;
+			break;
 		case NODES:
-			return nodeCache;
+			list = nodeCache;
+			break;
 		case NETWORK:
-			return networkCache;
+			list = networkCache;
+			break;
 		case CABLE:
 		default:
 			break;
 		}
-		return new ArrayList();
+		if (includeChannels) {
+			ArrayList<Integer> networks = getFinalNetworkList();
+			for (Integer id : networks) {
+				INetworkCache network = CacheRegistry.getCache(id);
+				ArrayList<BlockCoords> blocks = ((ArrayList<BlockCoords>) network.getConnections(type, false));
+				for (BlockCoords coord : blocks) {
+					if(!coord.contains(list)){
+						list.add(coord);
+					}
+				}
+			}
+		}
+		return list;
 	}
 
 	@Override
@@ -90,12 +107,6 @@ public class NetworkCache extends StorageCache implements IRefreshCache {
 		if (includeChannels) {
 			return networkedCache;
 		}
-		/*
-		 * LinkedHashMap map = new LinkedHashMap(); for (BlockCoords coords : nodeCache) { try { Object tile = FMPHelper.checkObject(coords.getTileEntity()); if (tile instanceof IConnectionNode) { LinkedHashMap<BlockCoords, ForgeDirection> connections = new LinkedHashMap(); ((IConnectionNode) tile).addConnections(connections); for (Entry<BlockCoords, ForgeDirection> set : connections.entrySet()) { if (!set.getKey().contains(map)) { map.put(set.getKey(), set.getValue()); } } } } catch (Exception exception) { } } if (includeChannels) { ArrayList<Integer> networks = getFinalNetworkList(); for (Integer id : networks) { INetworkCache network = CacheRegistry.getCache(id); LinkedHashMap<BlockCoords, ForgeDirection> blocks = ((LinkedHashMap<BlockCoords, ForgeDirection>)
-		 * network.getExternalBlocks(false).clone()); for (Entry<BlockCoords, ForgeDirection> set : blocks.entrySet()) { if (!set.getKey().contains(map)) { map.put(set.getKey(), set.getValue()); } }
-		 * 
-		 * } }
-		 */
 		return blockCache;
 	}
 
@@ -119,28 +130,30 @@ public class NetworkCache extends StorageCache implements IRefreshCache {
 			if (target != null && !target.isAir(world, coord.getX(), coord.getY(), coord.getZ())) {
 				TileEntity tile = coord.getTileEntity();
 				if (tile != null) {
-					if (tile instanceof ILogicTile) {
-						if (!coord.contains(networkCache)) {
-							networkCache.add(coord);
-						}
-					}
-					if (tile instanceof IInfoEmitter) {
-						if (!coord.contains(emitterCache)) {
-							emitterCache.add(coord);
-						}
-					}
-					if (tile instanceof IEntityNode) {
-						if (!coord.contains(entityCache)) {
-							entityCache.add(coord);
-						}
-					}
-					if (tile instanceof IConnectionNode) {
-						if (!coord.contains(nodeCache)) {
-							nodeCache.add(coord);
-						}
-					} else if (tile instanceof IChannelProvider) {
+					if (tile instanceof IChannelProvider) {
 						if (!coord.contains(channelCache)) {
 							channelCache.add(coord);
+						}
+					} else {
+						if (tile instanceof ILogicTile) {
+							if (!coord.contains(networkCache)) {
+								networkCache.add(coord);
+							}
+						}
+						if (tile instanceof IInfoEmitter) {
+							if (!coord.contains(emitterCache)) {
+								emitterCache.add(coord);
+							}
+						}
+						if (tile instanceof IEntityNode) {
+							if (!coord.contains(entityCache)) {
+								entityCache.add(coord);
+							}
+						}
+						if (tile instanceof IConnectionNode) {
+							if (!coord.contains(nodeCache)) {
+								nodeCache.add(coord);
+							}
 						}
 					}
 				}
@@ -161,7 +174,7 @@ public class NetworkCache extends StorageCache implements IRefreshCache {
 	@Override
 	public BlockCoords getFirstConnection(CacheTypes type) {
 		try {
-			return this.getConnections(type).get(0);
+			return this.getConnections(type, true).get(0);
 		} catch (Exception exception) {
 			return null;
 		}
@@ -170,7 +183,7 @@ public class NetworkCache extends StorageCache implements IRefreshCache {
 	@Override
 	public Block getFirstBlock(CacheTypes type) {
 		try {
-			return this.getConnections(type).get(0).getBlock();
+			return this.getConnections(type, true).get(0).getBlock();
 		} catch (Exception exception) {
 			return null;
 		}
@@ -179,7 +192,7 @@ public class NetworkCache extends StorageCache implements IRefreshCache {
 	@Override
 	public TileEntity getFirstTileEntity(CacheTypes type) {
 		try {
-			return this.getConnections(type).get(0).getTileEntity();
+			return this.getConnections(type, true).get(0).getTileEntity();
 		} catch (Exception exception) {
 			return null;
 		}

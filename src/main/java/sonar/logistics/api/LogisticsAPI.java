@@ -15,7 +15,7 @@ public final class LogisticsAPI {
 
 	public static final String MODID = "PracticalLogistics";
 	public static final String NAME = "PracticalLogisticsAPI";	
-	public static final String VERSION = "1.2";
+	public static final String VERSION = "1.3";
 	
 	private static RegistryWrapper registry = new RegistryWrapper();	
 	private static CablingWrapper cables = new CablingWrapper();

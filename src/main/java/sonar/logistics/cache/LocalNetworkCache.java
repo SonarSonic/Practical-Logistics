@@ -12,6 +12,8 @@ import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.cache.CacheTypes;
 import sonar.logistics.api.connecting.IChannelProvider;
 import sonar.logistics.api.connecting.IConnectionNode;
+import sonar.logistics.api.connecting.IEntityNode;
+import sonar.logistics.api.connecting.IInfoEmitter;
 import sonar.logistics.api.connecting.ILogicTile;
 import sonar.logistics.api.utils.ExternalCoords;
 import sonar.logistics.api.wrappers.FluidWrapper.StorageFluids;
@@ -73,36 +75,70 @@ public class LocalNetworkCache extends StorageCache {
 	}
 
 	@Override
-	public ArrayList<BlockCoords> getConnections(CacheTypes type) {
+	public ArrayList<BlockCoords> getConnections(CacheTypes type, boolean includeChannels) {
 		ArrayList array = new ArrayList();
-		try {
-			array.add(tile.getCoords());
-		} catch (Exception exception) {
+		if (tile instanceof IChannelProvider) {
+			try {
+				IChannelProvider provider = (IChannelProvider) tile;
+				final ExternalCoords coords = provider.getChannel();
+				TileEntity channel = coords.blockCoords.getTileEntity();
+				return LogisticsAPI.getCableHelper().getNetwork(channel, ForgeDirection.getOrientation(channel.getBlockMetadata()).getOpposite()).getConnections(type, includeChannels);
+			} catch (Exception exception) {
+			}
+		} else {
+			switch (type) {
+			case ENTITY_NODES:
+				if (tile instanceof IEntityNode) {
+					array.add(tile.getCoords());
+				}
+				break;
+			case NODES:
+				if (tile instanceof IConnectionNode) {
+					array.add(tile.getCoords());
+				}
+				break;
+			case EMITTER:
+				if (tile instanceof IInfoEmitter) {
+					array.add(tile.getCoords());
+				}
+				break;
+			case NETWORK:
+				if (tile instanceof ILogicTile) {
+					array.add(tile.getCoords());
+				}
+				break;
+			default:
+				break;
+			}
 		}
 		return array;
 	}
 
 	@Override
 	public BlockCoords getFirstConnection(CacheTypes type) {
-		return tile.getCoords();
+		try {
+			return this.getConnections(type, true).get(0);
+		} catch (Exception exception) {
+			return null;
+		}
 	}
 
 	@Override
 	public Block getFirstBlock(CacheTypes type) {
 		try {
-			return tile.getCoords().getBlock();
+			return this.getConnections(type, true).get(0).getBlock();
 		} catch (Exception exception) {
+			return null;
 		}
-		return null;
 	}
 
 	@Override
 	public TileEntity getFirstTileEntity(CacheTypes type) {
 		try {
-			return tile.getCoords().getTileEntity();
+			return this.getConnections(type, true).get(0).getTileEntity();
 		} catch (Exception exception) {
+			return null;
 		}
-		return null;
 	}
 
 	@Override
@@ -127,11 +163,11 @@ public class LocalNetworkCache extends StorageCache {
 
 	@Override
 	public StorageItems getStoredItems() {
-		return this.getStoredItems();
+		return this.getCachedItems();
 	}
 
 	@Override
 	public StorageFluids getStoredFluids() {
-		return this.getStoredFluids();
+		return this.getCachedFluids();
 	}
 }

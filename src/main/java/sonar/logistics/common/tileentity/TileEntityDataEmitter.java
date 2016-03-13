@@ -1,20 +1,24 @@
 package sonar.logistics.common.tileentity;
 
+import io.netty.buffer.ByteBuf;
+
 import java.util.List;
 
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.network.sync.ISyncPart;
 import sonar.core.network.sync.SyncTagType;
 import sonar.core.network.sync.SyncTagType.STRING;
+import sonar.core.network.utils.IByteBufTile;
 import sonar.core.network.utils.ITextField;
 import sonar.core.utils.BlockCoords;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.connecting.IInfoEmitter;
+import sonar.logistics.api.connecting.ILogicTile;
 import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.info.types.BlockCoordsInfo;
 import sonar.logistics.registries.EmitterRegistry;
 
-public class TileEntityDataEmitter extends TileEntityNode implements IInfoEmitter, ITextField{
+public class TileEntityDataEmitter extends TileEntityNode implements ITextField, ILogicTile, IByteBufTile {
 
 	public SyncTagType.STRING clientName = (STRING) new SyncTagType.STRING(0).setDefault("Unnamed Emitter");
 
@@ -25,20 +29,20 @@ public class TileEntityDataEmitter extends TileEntityNode implements IInfoEmitte
 
 	public void addToFrequency() {
 		if (!this.worldObj.isRemote) {
-			EmitterRegistry.addEmitters(playerName, new BlockCoords(this, this.worldObj.provider.dimensionId));
+			EmitterRegistry.addEmitters(playerName, new BlockCoords(this, this.worldObj.provider.dimensionId), isPrivate.getObject());
 		}
 	}
 
 	public void removeFromFrequency() {
 		if (!this.worldObj.isRemote) {
-			EmitterRegistry.removeEmitter(playerName, new BlockCoords(this, this.worldObj.provider.dimensionId));
+			EmitterRegistry.removeEmitter(playerName, new BlockCoords(this, this.worldObj.provider.dimensionId), isPrivate.getObject());
 		}
 	}
 
 	public void onChunkUnload() {
 		super.onChunkUnload();
 		if (!this.worldObj.isRemote) {
-			this.removeFromFrequency();			
+			this.removeFromFrequency();
 		}
 	}
 
@@ -46,7 +50,6 @@ public class TileEntityDataEmitter extends TileEntityNode implements IInfoEmitte
 		super.onLoaded();
 		if (!this.worldObj.isRemote) {
 			this.addToFrequency();
-			this.addConnections();
 		}
 	}
 
@@ -55,13 +58,7 @@ public class TileEntityDataEmitter extends TileEntityNode implements IInfoEmitte
 		super.invalidate();
 		if (!this.worldObj.isRemote) {
 			this.removeFromFrequency();
-			this.removeConnections();
 		}
-	}
-
-	@Override
-	public boolean canConnect(ForgeDirection dir) {
-		return dir == ForgeDirection.getOrientation(this.getBlockMetadata()).getOpposite();
 	}
 
 	public boolean maxRender() {
@@ -80,17 +77,8 @@ public class TileEntityDataEmitter extends TileEntityNode implements IInfoEmitte
 	}
 
 	@Override
-	public void addConnections() {
-		if (!this.worldObj.isRemote) {
-			LogisticsAPI.getCableHelper().addConnection(this, ForgeDirection.getOrientation(this.getBlockMetadata()).getOpposite());
-		}
-	}
-
-	@Override
-	public void removeConnections() {
-		if (!this.worldObj.isRemote) {
-			LogisticsAPI.getCableHelper().removeConnection(this, ForgeDirection.getOrientation(this.getBlockMetadata()).getOpposite());
-		}
+	public boolean canConnect(ForgeDirection dir) {
+		return dir == ForgeDirection.getOrientation(this.getBlockMetadata()).getOpposite();
 	}
 
 	@Override
@@ -99,8 +87,18 @@ public class TileEntityDataEmitter extends TileEntityNode implements IInfoEmitte
 	}
 
 	@Override
-	public ILogicInfo currentInfo() {
-		return BlockCoordsInfo.createInfo("Data Emitter", getCoords());
+	public void writePacket(ByteBuf buf, int id) {
+		if (id == 0) {
+			this.isPrivate.invert();
+		}
 	}
 
+	@Override
+	public void readPacket(ByteBuf buf, int id) {
+		if (id == 0) {
+			this.removeFromFrequency();
+			this.isPrivate.invert();
+			this.addToFrequency();
+		}
+	}
 }

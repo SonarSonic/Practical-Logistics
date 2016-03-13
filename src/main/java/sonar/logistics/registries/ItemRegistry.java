@@ -23,7 +23,7 @@ public class ItemRegistry extends Logistics {
 		GameRegistry.registerItem(sapphire_dust, "SapphireDust");
 		stone_plate = new Item().setUnlocalizedName("StonePlate").setCreativeTab(Logistics.creativeTab).setTextureName(MODID + ":" + "stone_plate");
 		GameRegistry.registerItem(stone_plate, "StonePlate");
-		transceiver = new WirelessTransceiver().setUnlocalizedName("Transceiver").setCreativeTab(Logistics.creativeTab).setMaxStackSize(1).setTextureName(MODID + ":" + "Transceiver");
+		transceiver = new WirelessTransceiver().setUnlocalizedName("Transceiver").setCreativeTab(Logistics.creativeTab).setMaxStackSize(1).setTextureName(MODID + ":" + "transceiver");
 		GameRegistry.registerItem(transceiver, "Transceiver");
 	}
 }

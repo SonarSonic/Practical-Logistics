@@ -46,8 +46,10 @@ public abstract class ILogicInfo<T> implements INBTObject, IBufObject {
 
 	public abstract void readUpdate(NBTTagCompound tag);
 
+	/**do they match*/
 	public abstract boolean matches(T currentInfo);
-
+	
+	/**same type of data*/
 	public boolean areTypesEqual(ILogicInfo info) {
 		return info == null ? false : info.getName().equals(this.getName()) && getProviderID() == info.getProviderID();
 	}

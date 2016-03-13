@@ -23,8 +23,9 @@ public interface INetworkCache {
 
 	/** gets the full list of Cached Coordinates for a given {@link CacheType}.
 	 * @param type the {@link CacheType} you wish to retrieve.
+	 * @param includeChannels normally true, false if you are retrieving blocks from multiple connected networks, which have already been logged
 	 * @return the {@link ArrayList}<{@link BlockCoords}> requested */
-	public ArrayList<BlockCoords> getConnections(CacheTypes type);
+	public ArrayList<BlockCoords> getConnections(CacheTypes type, boolean includeChannels);
 
 	/** convenience method for getting the BlockCoords of the first connection from the given {@link CacheType}
 	 * @param type the {@link CacheType} you wish to retrieve.

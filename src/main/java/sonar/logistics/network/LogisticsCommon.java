@@ -170,7 +170,7 @@ public class LogisticsCommon implements IGuiHandler {
 				}
 			case LogisticsGui.dataEmitter:
 				if (entity instanceof TileEntityDataEmitter) {
-					return new GuiRenameEmitter.DataEmitter((TileEntityDataEmitter) entity);
+					return new GuiRenameEmitter((TileEntityDataEmitter) entity);
 				}
 			case LogisticsGui.inventoryReader:
 				if (handler != null && handler instanceof InventoryReaderHandler)

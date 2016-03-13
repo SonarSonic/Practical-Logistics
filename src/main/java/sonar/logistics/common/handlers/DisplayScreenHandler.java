@@ -29,6 +29,7 @@ import sonar.logistics.api.info.LogicInfo;
 import sonar.logistics.api.interaction.IDefaultInteraction;
 import sonar.logistics.api.render.InfoInteractionHandler;
 import sonar.logistics.api.render.ScreenType;
+import sonar.logistics.info.types.ManaInfo;
 import sonar.logistics.registries.DisplayRegistry;
 import cpw.mods.fml.common.network.ByteBufUtils;
 import cpw.mods.fml.relauncher.Side;
@@ -75,16 +76,17 @@ public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 		boolean shouldUpdate = true;
 		if (target instanceof IInfoReader) {
 			IInfoReader infoReader = (IInfoReader) target;
+			ILogicInfo currentInfo =infoReader.currentInfo();
 			if (infoReader.currentInfo() != null && infoReader.getSecondaryInfo() != null) {
-				ILogicInfo progress = LogisticsAPI.getInfoHelper().combineData(infoReader.currentInfo(), infoReader.getSecondaryInfo());
-				if (!progress.equals(info) || (info != null && info instanceof LogicInfo && progress instanceof LogicInfo && !((LogicInfo) progress).data.equals(((LogicInfo) info).data))) {
+				ILogicInfo progress = LogisticsAPI.getInfoHelper().combineData(currentInfo, infoReader.getSecondaryInfo());
+				if (!progress.equals(info) || (info != null && !currentInfo.getData().equals(info.getData()))) {
 					current = progress;
 				} else {
 					shouldUpdate = false;
 				}
-			} else if (infoReader.currentInfo() != null) {
-				if (!infoReader.currentInfo().equals(info) || (info != null && info instanceof LogicInfo && infoReader.currentInfo() instanceof LogicInfo && !((LogicInfo) infoReader.currentInfo()).data.equals(((LogicInfo) info).data))) {
-					current = infoReader.currentInfo();
+			} else if (currentInfo != null) {
+				if (!infoReader.currentInfo().equals(info) || (info != null && !currentInfo.getData().equals(info.getData()))) {
+					current = currentInfo;
 				} else {
 					shouldUpdate = false;
 				}
@@ -92,8 +94,9 @@ public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 
 		} else if (target instanceof IInfoEmitter) {
 			IInfoEmitter infoNode = (IInfoEmitter) target;
-			if (infoNode.currentInfo() != null) {
-				if (!infoNode.currentInfo().equals(info) || (info != null && info instanceof LogicInfo && infoNode.currentInfo() instanceof LogicInfo && !((LogicInfo) infoNode.currentInfo()).data.equals(((LogicInfo) info).data))) {
+			ILogicInfo currentInfo =infoNode.currentInfo();
+			if (currentInfo != null) {
+				if (!currentInfo.equals(info) || (info != null && !currentInfo.getData().equals(info.getData()))) {
 					current = infoNode.currentInfo();
 				} else {
 					shouldUpdate = false;
@@ -110,7 +113,7 @@ public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 			} else {
 				if (updateInfo != null) {
 					if (updateInfo.areTypesEqual(info)) {
-						if (updateInfo instanceof LogicInfo) {
+						if (updateInfo instanceof LogicInfo || updateInfo instanceof ManaInfo) {
 							info = updateInfo;
 							SonarCore.sendPacketAround(packetTile, 64, 0);
 						} else {

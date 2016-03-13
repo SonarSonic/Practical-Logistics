@@ -33,7 +33,7 @@ public final class CacheRegistry {
 	public static ArrayList<BlockCoords> getCacheList(CacheTypes type, int networkID) {
 		INetworkCache network = getCache(networkID);
 		if (network != null)
-			return network.getConnections(type);
+			return network.getConnections(type, true);
 		else
 			return new ArrayList();
 	}

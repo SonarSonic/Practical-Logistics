@@ -53,38 +53,6 @@ public class ChannelSelectorHandler extends TileHandler {
 				channels.add(new ExternalCoords(coords.toString(), stack, coords, entry.getValue()));
 			}
 		}
-		
-		/*
-		for (BlockCoords connect : network.getConnections(CacheTypes.NETWORK)) {
-			TileEntity target = connect.getTileEntity();
-			if (target != null) {
-				String name = StatCollector.translateToLocal(target.getBlockType().getLocalizedName());
-				ItemStack stack = SonarHelper.createStackedBlock(target.getBlockType(), target.getBlockMetadata());
-				if (target instanceof IConnectionNode) {
-					IConnectionNode node = (IConnectionNode) target;
-					Map<BlockCoords, ForgeDirection> connections = ((IConnectionNode) node).getConnections();
-					for (Map.Entry<BlockCoords, ForgeDirection> entry : connections.entrySet()) {
-						BlockCoords coords = entry.getKey();
-						int meta = coords.getWorld().getBlockMetadata(coords.getX(), coords.getY(), coords.getZ());
-						if (!coords.getWorld().isAirBlock(coords.getX(), coords.getY(), coords.getZ())) {
-							stack = SonarHelper.createStackedBlock(coords.getBlock(coords.getWorld()), meta);
-							channels.add(new ExternalCoords(coords.toString(), stack, connect));
-						}
-					}
-
-				} else {
-					channels.add(new ExternalCoords(connect.toString(), stack, connect));
-				}
-			} else {
-				Block block = connect.getBlock(connect.getWorld());
-				if (block != null) {
-					int meta = connect.getWorld().getBlockMetadata(connect.getX(), connect.getY(), connect.getZ());
-					ItemStack stack = SonarHelper.createStackedBlock(block, meta);
-					channels.add(new ExternalCoords(connect.toString(), stack, connect));
-				}
-			}
-		}
-		*/
 	}
 
 	public void sendAvailableData(TileEntity te, EntityPlayer player) {

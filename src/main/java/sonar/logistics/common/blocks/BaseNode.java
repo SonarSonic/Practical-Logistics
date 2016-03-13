@@ -53,8 +53,8 @@ public abstract class BaseNode extends SonarMachineBlock {
 					TileEntitySonar sonar = (TileEntitySonar) target;
 					if (sonar instanceof TileEntityNode) {
 						TileEntityNode node = (TileEntityNode) target;
-						if (!node.playerName.equals(player.getGameProfile().getName())) {
-							FontHelper.sendMessage(FontHelper.translate("dataBlock.denied")+ ": " + node.playerName, world, player);
+						if (node.isPrivate.getObject() && !node.playerName.equals(player.getGameProfile().getName())) {
+							FontHelper.sendMessage(FontHelper.translate("dataBlock.denied") + ": " + node.playerName, world, player);
 							return false;
 						}
 					}

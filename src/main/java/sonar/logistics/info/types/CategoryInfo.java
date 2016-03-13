@@ -92,5 +92,4 @@ public class CategoryInfo extends ILogicInfo<CategoryInfo> {
 	public boolean matches(CategoryInfo currentInfo) {
 		return currentInfo.category.equals(category);
 	}
-
 }

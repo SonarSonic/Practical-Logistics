@@ -38,7 +38,7 @@ public class DataModifierHandler extends TileHandler {
 			return;
 		}
 		INetworkCache network = LogisticsAPI.getCableHelper().getNetwork(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite());
-		ArrayList<BlockCoords> emitters = network.getConnections(CacheTypes.EMITTER);
+		ArrayList<BlockCoords> emitters = network.getConnections(CacheTypes.EMITTER, true);
 		if (emitters.isEmpty() || emitters.get(0) == null) {
 			return;
 		}

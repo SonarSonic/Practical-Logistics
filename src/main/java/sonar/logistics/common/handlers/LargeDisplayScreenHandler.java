@@ -96,7 +96,7 @@ public class LargeDisplayScreenHandler extends DisplayScreenHandler implements I
 			for (BlockCoords coords : displays) {
 				if (coords != null && coords.getTileEntity() != null) {
 					INetworkCache network = LogisticsAPI.getCableHelper().getNetwork(coords.getTileEntity(), dir.getOpposite());
-					if (!network.getConnections(CacheTypes.EMITTER).isEmpty()) {
+					if (!network.getConnections(CacheTypes.EMITTER, true).isEmpty()) {
 						return coords;
 					}
 				}

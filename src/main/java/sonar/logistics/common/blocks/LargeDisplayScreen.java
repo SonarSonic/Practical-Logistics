@@ -63,36 +63,6 @@ public class LargeDisplayScreen extends AbstractScreen {
 		setDefaultDirection(world, x, y, z);
 	}
 
-	public void setDefaultDirection(World world, int x, int y, int z) {
-		if (!world.isRemote) {
-			Block b1 = world.getBlock(x, y, z - 1);
-			Block b2 = world.getBlock(x, y, z + 1);
-			Block b3 = world.getBlock(x - 1, y, z);
-			Block b4 = world.getBlock(x + 1, y, z);
-
-			byte b0 = 3;
-
-			if ((b1.func_149730_j()) && (!b2.func_149730_j())) {
-				b0 = 3;
-			}
-
-			if ((b2.func_149730_j()) && (!b1.func_149730_j())) {
-				b0 = 2;
-			}
-
-			if ((b3.func_149730_j()) && (!b4.func_149730_j())) {
-				b0 = 5;
-			}
-
-			if ((b4.func_149730_j()) && (!b3.func_149730_j())) {
-				b0 = 4;
-			}
-
-			world.setBlockMetadataWithNotify(x, y, x, b0, 2);
-			//DisplayHelper.onDisplayAdded(world.getTileEntity(x, y, z));
-		}
-	}
-
 	@Override
 	public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase player, ItemStack itemstack) {
 		int l = MathHelper.floor_double(player.rotationYaw * 4.0F / 360.0F + 0.5D) & 0x3;
@@ -112,13 +82,6 @@ public class LargeDisplayScreen extends AbstractScreen {
 		if (l == 3) {
 			world.setBlockMetadataWithNotify(x, y, z, 4, 2);
 		}
-		//DisplayHelper.onDisplayAdded(world.getTileEntity(x, y, z));
-	}
-
-	@Override
-	public void breakBlock(World world, int x, int y, int z, Block oldblock, int oldMetadata) {
-		//DisplayHelper.onDisplayRemoved(world.getTileEntity(x, y, z));
-		super.breakBlock(world, x, y, z, oldblock, oldMetadata);
 	}
 
 }
