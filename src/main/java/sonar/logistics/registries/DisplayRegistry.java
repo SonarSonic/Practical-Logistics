@@ -6,8 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import sonar.core.api.BlockCoords;
 import sonar.core.integration.fmp.FMPHelper;
-import sonar.core.utils.BlockCoords;
 import sonar.logistics.api.connecting.ILargeDisplay;
 import sonar.logistics.helpers.DisplayHelper;
 

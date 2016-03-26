@@ -1,7 +1,7 @@
 package sonar.logistics.utils;
 
 import net.minecraft.item.ItemStack;
-import sonar.core.utils.helpers.RecipeHelper;
+import sonar.core.helpers.RecipeHelper;
 import sonar.logistics.registries.ItemRegistry;
 
 public class HammerRecipes extends RecipeHelper {

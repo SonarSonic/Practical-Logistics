@@ -11,8 +11,8 @@ import net.minecraftforge.common.util.ForgeDirection;
 
 import org.lwjgl.opengl.GL11;
 
+import sonar.core.helpers.RenderHelper;
 import sonar.core.integration.fmp.FMPHelper;
-import sonar.core.utils.helpers.RenderHelper;
 import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.api.render.LargeScreenSizing;
 import sonar.logistics.api.render.ScreenType;

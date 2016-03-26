@@ -8,13 +8,14 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.SonarCore;
+import sonar.core.api.ActionType;
+import sonar.core.api.SonarAPI;
+import sonar.core.api.StoredItemStack;
+import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.inventory.ContainerSync;
-import sonar.core.inventory.StoredItemStack;
 import sonar.core.inventory.slots.SlotList;
 import sonar.core.network.PacketStackUpdate;
-import sonar.core.utils.ActionType;
-import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.common.containers.slots.NetworkSlot;
@@ -131,7 +132,7 @@ public class ContainerInventoryReader extends ContainerSync {
 
 						StoredItemStack simulate = LogisticsAPI.getItemHelper().removeToPlayerInventory(stack.copy().setStackSize(extractSize), extractSize, network, player, ActionType.SIMULATE);
 						if (simulate != null) {
-							StoredItemStack storedStack = LogisticsAPI.getItemHelper().getStackToAdd(simulate.stored, stack, LogisticsAPI.getItemHelper().removeItems(simulate, network, ActionType.PERFORM));
+							StoredItemStack storedStack =SonarAPI.getItemHelper().getStackToAdd(simulate.stored, stack, LogisticsAPI.getItemHelper().removeItems(simulate, network, ActionType.PERFORM));
 
 							if (storedStack != null && storedStack.stored != 0) {
 								LogisticsAPI.getItemHelper().addStackToPlayer(storedStack, player, false, ActionType.PERFORM);
@@ -166,7 +167,7 @@ public class ContainerInventoryReader extends ContainerSync {
 							return null;
 						}
 						int extractSize = (int) Math.min(stack.getItemStack().getMaxStackSize(), Math.min(stack.stored, buttonID == 1 ? 1 : 64));
-						StoredItemStack storedStack = LogisticsAPI.getItemHelper().getStackToAdd(extractSize, stack, LogisticsAPI.getItemHelper().removeItems(stack.copy().setStackSize(extractSize), network, ActionType.PERFORM));
+						StoredItemStack storedStack = SonarAPI.getItemHelper().getStackToAdd(extractSize, stack, LogisticsAPI.getItemHelper().removeItems(stack.copy().setStackSize(extractSize), network, ActionType.PERFORM));
 						if (storedStack != null && storedStack.stored != 0) {
 							player.inventory.setItemStack(storedStack.getFullStack());
 							SonarCore.network.sendTo(new PacketStackUpdate(storedStack.getFullStack()), (EntityPlayerMP) player);

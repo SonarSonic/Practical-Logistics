@@ -6,12 +6,12 @@ import java.util.List;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import sonar.core.fluid.StoredFluidStack;
-import sonar.core.inventory.StoredItemStack;
-import sonar.core.utils.ActionType;
+import sonar.core.api.ActionType;
+import sonar.core.api.FluidHandler;
+import sonar.core.api.StoredFluidStack;
+import sonar.core.api.StoredItemStack;
+import sonar.core.api.InventoryHandler.StorageSize;
 import sonar.logistics.api.cache.INetworkCache;
-import sonar.logistics.api.providers.FluidHandler;
-import sonar.logistics.api.providers.InventoryHandler.StorageSize;
 
 public class FluidWrapper {
 
@@ -32,12 +32,6 @@ public class FluidWrapper {
 	 * @return list of {@link StoredFluidStack} on the network */
 	public StorageFluids getFluids(INetworkCache network) {
 		return StorageFluids.EMPTY;
-	}
-
-	/** convenient method, adds the given stack to the list, used by {@link FluidHandler}
-	 * @param list {@link StoredFluidStack} list to add to
-	 * @param stack {@link StoredFluidStack} to combine */
-	public void addFluidToList(List<StoredFluidStack> list, StoredFluidStack stack) {
 	}
 
 	/** used for adding Fluids to the network
@@ -75,11 +69,6 @@ public class FluidWrapper {
 	 * @return the new ItemStack */
 	public ItemStack drainFluidItemStack(ItemStack container, INetworkCache network, ActionType action) {
 		return container;
-	}
-
-	/** convenience method, creates a {@link StoredFluidStack} of how much should be added */
-	public StoredFluidStack getStackToAdd(long inputSize, StoredFluidStack stack, StoredItemStack returned) {
-		return null;
 	}
 
 	/** fills the players current item with a specific fluid from the network

@@ -9,7 +9,7 @@ import java.util.Map;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumChatFormatting;
-import sonar.core.utils.BlockCoords;
+import sonar.core.api.BlockCoords;
 import sonar.logistics.api.utils.IdentifiedCoords;
 import sonar.logistics.common.tileentity.TileEntityDataEmitter;
 

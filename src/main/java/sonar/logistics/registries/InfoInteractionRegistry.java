@@ -4,7 +4,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
 import net.minecraft.tileentity.TileEntity;
-import sonar.core.utils.helpers.RegistryHelper;
+import sonar.core.helpers.RegistryHelper;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.api.render.InfoInteractionHandler;

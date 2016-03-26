@@ -9,10 +9,10 @@ import java.util.Map.Entry;
 
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
+import sonar.core.api.BlockCoords;
+import sonar.core.helpers.SonarHelper;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.handlers.TileHandler;
-import sonar.core.utils.BlockCoords;
-import sonar.core.utils.helpers.SonarHelper;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.cache.EmptyNetworkCache;
 import sonar.logistics.api.cache.INetworkCache;

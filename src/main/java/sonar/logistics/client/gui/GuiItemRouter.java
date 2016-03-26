@@ -21,10 +21,10 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
 import sonar.core.SonarCore;
+import sonar.core.helpers.FontHelper;
 import sonar.core.inventory.GuiSonar;
 import sonar.core.inventory.SonarButtons;
 import sonar.core.network.PacketByteBufServer;
-import sonar.core.utils.helpers.FontHelper;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.utils.ItemFilter;
 import sonar.logistics.common.containers.ContainerItemRouter;

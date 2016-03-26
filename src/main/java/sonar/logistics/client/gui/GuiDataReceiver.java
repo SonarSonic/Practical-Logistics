@@ -9,8 +9,8 @@ import net.minecraftforge.common.util.ForgeDirection;
 
 import org.lwjgl.opengl.GL11;
 
-import sonar.core.utils.BlockCoords;
-import sonar.core.utils.helpers.FontHelper;
+import sonar.core.api.BlockCoords;
+import sonar.core.helpers.FontHelper;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.utils.ExternalCoords;
 import sonar.logistics.api.utils.IdentifiedCoords;

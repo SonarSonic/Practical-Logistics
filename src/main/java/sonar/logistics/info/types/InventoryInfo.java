@@ -16,9 +16,9 @@ import net.minecraft.tileentity.TileEntity;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
-import sonar.core.inventory.StoredItemStack;
-import sonar.core.utils.helpers.FontHelper;
-import sonar.core.utils.helpers.RenderHelper;
+import sonar.core.api.StoredItemStack;
+import sonar.core.helpers.FontHelper;
+import sonar.core.helpers.RenderHelper;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.info.ILogicInfo;

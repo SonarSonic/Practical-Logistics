@@ -6,7 +6,7 @@ import java.util.Map;
 
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
-import sonar.core.utils.BlockCoords;
+import sonar.core.api.BlockCoords;
 import sonar.logistics.api.cache.EmptyNetworkCache;
 import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.connecting.CableType;

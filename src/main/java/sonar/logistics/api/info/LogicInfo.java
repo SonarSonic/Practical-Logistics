@@ -2,7 +2,7 @@ package sonar.logistics.api.info;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.nbt.NBTTagCompound;
-import sonar.core.utils.IRegistryObject;
+import sonar.core.api.IRegistryObject;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.providers.EntityProvider;
 import sonar.logistics.api.providers.ICategoryProvider;

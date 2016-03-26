@@ -15,8 +15,9 @@ public class EventRegistry {
 	@SubscribeEvent
 	public void onServerTick(TickEvent.ServerTickEvent event) {
 		if (event.phase == Phase.START) {
-			ArrayList<INetworkCache> networks = (ArrayList<INetworkCache>) CacheRegistry.getNetworkCache().clone();
-			for (INetworkCache cache : networks) {
+			LinkedHashMap<Integer, INetworkCache> networks = (LinkedHashMap<Integer, INetworkCache>) CacheRegistry.getNetworkCache().clone();
+			for (Entry<Integer, INetworkCache> set : networks.entrySet()) {
+				INetworkCache cache = set.getValue();
 				if (cache instanceof IRefreshCache) {
 					try {
 						((IRefreshCache) cache).updateNetwork(cache.getNetworkID());

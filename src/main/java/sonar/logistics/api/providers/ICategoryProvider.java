@@ -1,6 +1,6 @@
 package sonar.logistics.api.providers;
 
-import sonar.core.utils.IRegistryObject;
+import sonar.core.api.IRegistryObject;
 
 /**implemented on Providers which can provide categorised info for the Info Reader*/
 public interface ICategoryProvider extends IRegistryObject {

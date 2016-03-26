@@ -3,7 +3,7 @@ package sonar.logistics.api.utils;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import sonar.core.utils.BlockCoords;
+import sonar.core.api.BlockCoords;
 import cpw.mods.fml.common.network.ByteBufUtils;
 
 public class IdentifiedCoords {

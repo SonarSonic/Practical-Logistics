@@ -17,10 +17,10 @@ import net.minecraft.util.ResourceLocation;
 
 import org.lwjgl.opengl.GL11;
 
+import sonar.core.helpers.RenderHelper;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.renderers.SonarTERender;
-import sonar.core.utils.helpers.RenderHelper;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.connecting.CableType;
 import sonar.logistics.api.connecting.ITransceiver;

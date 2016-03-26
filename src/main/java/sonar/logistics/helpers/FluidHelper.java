@@ -11,15 +11,16 @@ import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidContainerItem;
-import sonar.core.fluid.StoredFluidStack;
-import sonar.core.inventory.StoredItemStack;
-import sonar.core.utils.ActionType;
-import sonar.core.utils.BlockCoords;
+import sonar.core.SonarCore;
+import sonar.core.api.ActionType;
+import sonar.core.api.BlockCoords;
+import sonar.core.api.FluidHandler;
+import sonar.core.api.StoredFluidStack;
+import sonar.core.api.StoredItemStack;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.cache.IStorageCache;
-import sonar.logistics.api.providers.FluidHandler;
 import sonar.logistics.api.wrappers.FluidWrapper;
 
 public class FluidHelper extends FluidWrapper {
@@ -32,20 +33,6 @@ public class FluidHelper extends FluidWrapper {
 		return StorageFluids.EMPTY;
 
 	}
-
-	public void addFluidToList(List<StoredFluidStack> list, StoredFluidStack stack) {
-		int pos = 0;
-		for (StoredFluidStack storedTank : list) {
-			if (storedTank.equalStack(stack.fluid)) {
-				list.get(pos).add(stack);
-				return;
-			}
-			pos++;
-		}
-		list.add(stack);
-
-	}
-
 	public StoredFluidStack addFluids(StoredFluidStack add, INetworkCache network, ActionType action) {
 		if (add.stored == 0) {
 			return add;
@@ -53,7 +40,7 @@ public class FluidHelper extends FluidWrapper {
 		Map<BlockCoords, ForgeDirection> connections = network.getExternalBlocks(true);
 		for (Map.Entry<BlockCoords, ForgeDirection> entry : connections.entrySet()) {
 			TileEntity tile = entry.getKey().getTileEntity();
-			for (FluidHandler provider : Logistics.fluidProviders.getObjects()) {
+			for (FluidHandler provider : SonarCore.fluidProviders.getObjects()) {
 				if (provider.canHandleFluids(tile, entry.getValue())) {
 					add = provider.addStack(add, tile, entry.getValue(), action);
 					if (add == null) {
@@ -72,7 +59,7 @@ public class FluidHelper extends FluidWrapper {
 		Map<BlockCoords, ForgeDirection> connections = network.getExternalBlocks(true);
 		for (Map.Entry<BlockCoords, ForgeDirection> entry : connections.entrySet()) {
 			TileEntity tile = entry.getKey().getTileEntity();
-			for (FluidHandler provider : Logistics.fluidProviders.getObjects()) {
+			for (FluidHandler provider : SonarCore.fluidProviders.getObjects()) {
 				if (provider.canHandleFluids(tile, entry.getValue())) {
 					remove = provider.removeStack(remove, tile, entry.getValue(), action);
 					if (remove == null) {
@@ -185,16 +172,6 @@ public class FluidHelper extends FluidWrapper {
 			container.drain(handler, drainSize, true);
 		}
 		return handler;
-	}
-
-	public StoredFluidStack getStackToAdd(long inputSize, StoredFluidStack stack, StoredItemStack returned) {
-		StoredFluidStack simulateStack = null;
-		if (returned == null || returned.stored == 0) {
-			simulateStack = new StoredFluidStack(stack.getFullStack(), inputSize);
-		} else {
-			simulateStack = new StoredFluidStack(stack.getFullStack(), inputSize - returned.stored);
-		}
-		return simulateStack;
 	}
 
 	public void fillHeldItem(EntityPlayer player, INetworkCache cache, StoredFluidStack toFill) {

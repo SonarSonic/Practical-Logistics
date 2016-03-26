@@ -10,7 +10,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 
 import org.lwjgl.opengl.GL11;
 
-import sonar.core.utils.helpers.RenderHelper;
+import sonar.core.helpers.RenderHelper;
 import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.api.render.ScreenType;
 import sonar.logistics.client.models.ModelHolographicDisplay;

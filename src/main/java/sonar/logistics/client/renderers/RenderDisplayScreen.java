@@ -10,9 +10,9 @@ import net.minecraftforge.common.util.ForgeDirection;
 
 import org.lwjgl.opengl.GL11;
 
-import sonar.core.integration.SonarAPI;
+import sonar.core.helpers.RenderHelper;
+import sonar.core.integration.SonarLoader;
 import sonar.core.integration.fmp.FMPHelper;
-import sonar.core.utils.helpers.RenderHelper;
 import sonar.logistics.api.connecting.IInfoTile;
 import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.api.render.ScreenType;
@@ -37,7 +37,7 @@ public class RenderDisplayScreen extends TileEntitySpecialRenderer {
 
 		int j = entity.getBlockMetadata();
 
-		if (SonarAPI.forgeMultipartLoaded() && entity != null && entity.getWorldObj() != null && entity instanceof TileMultipart) {
+		if (SonarLoader.forgeMultipartLoaded() && entity != null && entity.getWorldObj() != null && entity instanceof TileMultipart) {
 			DisplayScreenPart screen = (DisplayScreenPart) ((TileMultipart) entity).jPartList().get(0);
 			j = screen.meta;
 		}

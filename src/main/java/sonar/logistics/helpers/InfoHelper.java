@@ -9,7 +9,7 @@ import java.util.Map;
 
 import net.minecraft.entity.Entity;
 import net.minecraftforge.common.util.ForgeDirection;
-import sonar.core.utils.BlockCoords;
+import sonar.core.api.BlockCoords;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.connecting.IEntityNode;

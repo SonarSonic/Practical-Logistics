@@ -4,7 +4,7 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.util.ForgeDirection;
-import sonar.core.utils.BlockCoords;
+import sonar.core.api.BlockCoords;
 import cpw.mods.fml.common.network.ByteBufUtils;
 
 public class ExternalCoords {

@@ -12,13 +12,14 @@ import net.minecraft.util.ResourceLocation;
 
 import org.lwjgl.opengl.GL11;
 
-import sonar.core.utils.BlockCoords;
-import sonar.core.utils.helpers.RenderHelper;
+import sonar.core.api.BlockCoords;
+import sonar.core.api.SonarAPI;
+import sonar.core.api.StoredEnergyStack;
+import sonar.core.helpers.RenderHelper;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.api.render.ScreenType;
 import sonar.logistics.api.utils.IdentifiedCoords;
-import sonar.logistics.api.utils.StoredEnergyStack;
 import sonar.logistics.client.renderers.RenderHandlers;
 
 public class StoredEnergyInfo extends ILogicInfo<StoredEnergyInfo> {
@@ -225,7 +226,7 @@ public class StoredEnergyInfo extends ILogicInfo<StoredEnergyInfo> {
 			stack.usage = tag.getLong("u");
 		}
 		if (tag.hasKey("energyType")) {
-			stack.energyType = LogisticsAPI.getRegistry().getEnergyType(tag.getString("energyType"));
+			stack.energyType = SonarAPI.getRegistry().getEnergyType(tag.getString("energyType"));
 		}
 		if (tag.hasKey("x")) {
 			coords.blockCoords = BlockCoords.readFromNBT(tag);

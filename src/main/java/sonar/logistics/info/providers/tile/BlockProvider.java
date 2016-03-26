@@ -7,7 +7,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.BlockFluidBase;
-import sonar.core.utils.helpers.SonarHelper;
+import sonar.core.helpers.SonarHelper;
 import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.api.info.LogicInfo;
 import sonar.logistics.api.providers.TileProvider;

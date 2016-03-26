@@ -1,7 +1,7 @@
 package sonar.logistics.common.tileentity;
 
+import sonar.core.api.BlockCoords;
 import sonar.core.common.tileentity.TileEntitySonar;
-import sonar.core.utils.BlockCoords;
 import sonar.logistics.api.connecting.IInfoEmitter;
 
 public abstract class TileEntityConnection extends TileEntitySonar implements IInfoEmitter {

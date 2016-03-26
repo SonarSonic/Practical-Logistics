@@ -2,11 +2,11 @@ package sonar.logistics.common.tileentity;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.common.util.ForgeDirection;
+import sonar.core.api.BlockCoords;
 import sonar.core.common.tileentity.TileEntityHandler;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.ITileHandler;
 import sonar.core.integration.fmp.handlers.TileHandler;
-import sonar.core.utils.BlockCoords;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.connecting.IInfoEmitter;
 import sonar.logistics.api.connecting.IInfoReader;

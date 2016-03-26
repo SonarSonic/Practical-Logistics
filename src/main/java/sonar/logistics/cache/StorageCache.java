@@ -7,16 +7,17 @@ import java.util.Map;
 
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
-import sonar.core.fluid.StoredFluidStack;
-import sonar.core.inventory.StoredItemStack;
-import sonar.core.utils.BlockCoords;
-import sonar.logistics.Logistics;
+import sonar.core.SonarCore;
+import sonar.core.api.BlockCoords;
+import sonar.core.api.FluidHandler;
+import sonar.core.api.InventoryHandler.StorageSize;
+import sonar.core.api.SonarAPI;
+import sonar.core.api.StoredFluidStack;
+import sonar.core.api.StoredItemStack;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.cache.CacheTypes;
 import sonar.logistics.api.cache.IStorageCache;
 import sonar.logistics.api.connecting.IEntityNode;
-import sonar.logistics.api.providers.FluidHandler;
-import sonar.logistics.api.providers.InventoryHandler.StorageSize;
 import sonar.logistics.api.wrappers.FluidWrapper.StorageFluids;
 import sonar.logistics.api.wrappers.ItemWrapper.StorageItems;
 
@@ -41,7 +42,7 @@ public abstract class StorageCache implements IStorageCache{
 	public StorageFluids getCachedFluids() {
 		ArrayList<StoredFluidStack> fluidList = new ArrayList();
 		StorageSize storage = new StorageSize(0, 0);
-		List<FluidHandler> providers = Logistics.fluidProviders.getObjects();
+		List<FluidHandler> providers = SonarCore.fluidProviders.getObjects();
 		LinkedHashMap<BlockCoords, ForgeDirection> blocks = getExternalBlocks(true);
 		for (FluidHandler provider : providers) {
 			for (Map.Entry<BlockCoords, ForgeDirection> entry : blocks.entrySet()) {
@@ -52,7 +53,7 @@ public abstract class StorageCache implements IStorageCache{
 					storage.addItems(size.getStoredFluids());
 					storage.addStorage(size.getMaxFluids());
 					for (StoredFluidStack fluid : info) {
-						LogisticsAPI.getFluidHelper().addFluidToList(fluidList, fluid);
+						SonarAPI.getFluidHelper().addFluidToList(fluidList, fluid);
 					}
 				}
 			}

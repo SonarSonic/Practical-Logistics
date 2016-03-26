@@ -8,8 +8,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.SonarCore;
+import sonar.core.api.BlockCoords;
 import sonar.core.integration.fmp.handlers.InventoryTileHandler;
-import sonar.core.utils.BlockCoords;
 import sonar.logistics.api.connecting.ITransceiver;
 
 public class ArrayHandler extends InventoryTileHandler {

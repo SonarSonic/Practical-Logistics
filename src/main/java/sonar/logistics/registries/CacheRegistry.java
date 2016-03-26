@@ -5,7 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 
 import net.minecraftforge.common.util.ForgeDirection;
-import sonar.core.utils.BlockCoords;
+import sonar.core.api.BlockCoords;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.cache.CacheTypes;
 import sonar.logistics.api.cache.EmptyNetworkCache;

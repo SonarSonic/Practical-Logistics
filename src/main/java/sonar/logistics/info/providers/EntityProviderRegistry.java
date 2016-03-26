@@ -1,6 +1,6 @@
 package sonar.logistics.info.providers;
 
-import sonar.core.utils.helpers.RegistryHelper;
+import sonar.core.helpers.RegistryHelper;
 import sonar.logistics.api.providers.EntityProvider;
 import sonar.logistics.info.providers.entity.NormalEntityProvider;
 import sonar.logistics.info.providers.entity.PlayerProvider;

@@ -8,12 +8,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import sonar.core.SonarCore;
-import sonar.core.integration.SonarAPI;
+import sonar.core.integration.SonarLoader;
+import sonar.core.registries.EnergyTypeRegistry;
 import sonar.logistics.api.LogisticsAPI;
-import sonar.logistics.info.providers.EnergyProviderRegistry;
 import sonar.logistics.info.providers.EntityProviderRegistry;
-import sonar.logistics.info.providers.FluidProviderRegistry;
-import sonar.logistics.info.providers.InventoryProviderRegistry;
 import sonar.logistics.info.providers.TileProviderRegistry;
 import sonar.logistics.integration.MineTweakerIntegration;
 import sonar.logistics.integration.multipart.ForgeMultipartHandler;
@@ -23,7 +21,6 @@ import sonar.logistics.registries.CableRegistry;
 import sonar.logistics.registries.CacheRegistry;
 import sonar.logistics.registries.CraftingRegistry;
 import sonar.logistics.registries.EmitterRegistry;
-import sonar.logistics.registries.EnergyTypeRegistry;
 import sonar.logistics.registries.EventRegistry;
 import sonar.logistics.registries.InfoInteractionRegistry;
 import sonar.logistics.registries.InfoTypeRegistry;
@@ -59,14 +56,10 @@ public class Logistics {
 	public static Logger logger = (Logger) LogManager.getLogger(MODID);
 
 	public static InfoTypeRegistry infoTypes = new InfoTypeRegistry();
-	public static EnergyTypeRegistry energyTypes = new EnergyTypeRegistry();
 	public static InfoInteractionRegistry infoInteraction = new InfoInteractionRegistry();
 	public static ItemFilterRegistry itemFilters = new ItemFilterRegistry();
 	public static TileProviderRegistry tileProviders = new TileProviderRegistry();
 	public static EntityProviderRegistry entityProviders = new EntityProviderRegistry();
-	public static InventoryProviderRegistry inventoryProviders = new InventoryProviderRegistry();
-	public static FluidProviderRegistry fluidProviders = new FluidProviderRegistry();
-	public static EnergyProviderRegistry energyProviders = new EnergyProviderRegistry();
 	
 	@Instance(MODID)
 	public static Logistics instance;
@@ -105,7 +98,7 @@ public class Logistics {
 		ItemRegistry.registerItems();
 		logger.info("Loaded Items");
 
-		if (SonarAPI.forgeMultipartLoaded()) {
+		if (SonarLoader.forgeMultipartLoaded()) {
 			ForgeMultipartHandler.init();
 			logger.info("'Forge Multipart' integration was loaded");
 		} else {
@@ -138,27 +131,19 @@ public class Logistics {
 		logger.info("Registered Renderers");
 
 		infoTypes.register();
-		energyTypes.register();		
 		infoInteraction.register();
 		itemFilters.register();
 		tileProviders.register();
 		entityProviders.register();
-		inventoryProviders.register();
-		fluidProviders.register();
-		energyProviders.register();
 	}
 
 	@EventHandler
 	public void postLoad(FMLPostInitializationEvent evt) {
 		logger.info("Registered " + infoTypes.getObjects().size() + " Info Types");
-		logger.info("Registered " + energyTypes.getObjects().size() + " Energy Types");
 		logger.info("Registered " + infoInteraction.getObjects().size() + " Info Interactions");
 		logger.info("Registered " + itemFilters.getObjects().size() + " Item Filters");
 		logger.info("Registered " + tileProviders.getObjects().size() + " Tile Providers");
 		logger.info("Registered " + entityProviders.getObjects().size() + " Entity Providers");
-		logger.info("Registered " + inventoryProviders.getObjects().size() + " Inventory Providers");
-		logger.info("Registered " + fluidProviders.getObjects().size() + " Fluid Providers");
-		logger.info("Registered " + energyProviders.getObjects().size() + " Energy Providers");
 
 		if (Loader.isModLoaded("MineTweaker3")) {
 			MineTweakerIntegration.integrate();

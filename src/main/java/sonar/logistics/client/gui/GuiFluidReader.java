@@ -18,10 +18,10 @@ import net.minecraftforge.fluids.FluidStack;
 import org.lwjgl.opengl.GL11;
 
 import sonar.core.SonarCore;
-import sonar.core.fluid.StoredFluidStack;
+import sonar.core.api.StoredFluidStack;
+import sonar.core.helpers.FontHelper;
 import sonar.core.inventory.SonarButtons;
 import sonar.core.network.PacketByteBufServer;
-import sonar.core.utils.helpers.FontHelper;
 import sonar.logistics.Logistics;
 import sonar.logistics.common.containers.ContainerFluidReader;
 import sonar.logistics.common.handlers.FluidReaderHandler;

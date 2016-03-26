@@ -8,9 +8,9 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidContainerItem;
+import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.core.inventory.ContainerSync;
 import sonar.core.inventory.slots.SlotList;
-import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.common.handlers.FluidReaderHandler;
 
 public class ContainerFluidReader extends ContainerSync {

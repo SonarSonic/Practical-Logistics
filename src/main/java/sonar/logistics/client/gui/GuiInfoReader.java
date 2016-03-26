@@ -16,9 +16,9 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
+import sonar.core.helpers.FontHelper;
 import sonar.core.inventory.GuiSonar;
 import sonar.core.inventory.SonarButtons;
-import sonar.core.utils.helpers.FontHelper;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.common.containers.ContainerInfoNode;

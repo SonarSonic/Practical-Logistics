@@ -14,16 +14,19 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.SonarCore;
+import sonar.core.api.ActionType;
+import sonar.core.api.BlockCoords;
+import sonar.core.api.SonarAPI;
+import sonar.core.api.StoredItemStack;
+import sonar.core.helpers.InventoryHelper;
+import sonar.core.helpers.InventoryHelper.IInventoryFilter;
+import sonar.core.helpers.NBTHelper;
+import sonar.core.helpers.SonarHelper;
+import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.core.integration.fmp.handlers.InventoryTileHandler;
 import sonar.core.network.sync.ISyncPart;
 import sonar.core.network.sync.SyncTagType;
 import sonar.core.network.utils.IByteBufTile;
-import sonar.core.utils.BlockCoords;
-import sonar.core.utils.helpers.InventoryHelper;
-import sonar.core.utils.helpers.InventoryHelper.IInventoryFilter;
-import sonar.core.utils.helpers.NBTHelper;
-import sonar.core.utils.helpers.NBTHelper.SyncType;
-import sonar.core.utils.helpers.SonarHelper;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.cache.INetworkCache;
@@ -114,11 +117,11 @@ public class ItemRouterHandler extends InventoryTileHandler implements ISidedInv
 	public void routeInventory(TileEntity te, int config, TileEntity target, ForgeDirection dir) {
 		if (target != null && dir != null && target instanceof IInventory) {
 			if (config == 1) {
-				InventoryHelper.extractItems(target, te, ForgeDirection.OPPOSITES[dir.ordinal()], dir.ordinal(), null);
+				SonarAPI.getItemHelper().transferItems(target, te, dir.getOpposite(), dir, null);
 			} else {
 				for (int i = 0; i < slots.length; i++) {
 					if (slots[i] != null && matchesFilters(slots[i], whitelist[update], blacklist[update])) {
-						slots[i] = InventoryHelper.addItems(target, slots[i], ForgeDirection.OPPOSITES[dir.ordinal()], null);
+						SonarAPI.getItemHelper().addItems(target, new StoredItemStack(slots[i]), dir.getOpposite(), ActionType.PERFORM, null);
 					}
 				}
 			}
@@ -291,7 +294,7 @@ public class ItemRouterHandler extends InventoryTileHandler implements ISidedInv
 		}
 
 		@Override
-		public boolean matches(ItemStack stack) {
+		public boolean allowed(ItemStack stack) {
 			return matchesFilters(stack, whitelist, blacklist);
 		}
 

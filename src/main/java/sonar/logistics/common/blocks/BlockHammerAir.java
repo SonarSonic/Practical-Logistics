@@ -14,7 +14,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import sonar.core.utils.helpers.SonarHelper;
+import sonar.core.helpers.SonarHelper;
 import sonar.logistics.Logistics;
 import sonar.logistics.network.LogisticsGui;
 import sonar.logistics.registries.BlockRegistry;

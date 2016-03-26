@@ -1,7 +1,7 @@
 package sonar.logistics.common.tileentity;
 
 import net.minecraftforge.common.util.ForgeDirection;
-import sonar.core.utils.helpers.SonarHelper;
+import sonar.core.helpers.SonarHelper;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.connecting.CableType;
 

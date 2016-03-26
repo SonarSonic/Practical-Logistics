@@ -1,6 +1,6 @@
 package sonar.logistics.info.providers;
 
-import sonar.core.utils.helpers.RegistryHelper;
+import sonar.core.helpers.RegistryHelper;
 import sonar.logistics.api.providers.TileProvider;
 import sonar.logistics.info.providers.tile.AE2CraftingProvider;
 import sonar.logistics.info.providers.tile.AE2EnergyProvider;

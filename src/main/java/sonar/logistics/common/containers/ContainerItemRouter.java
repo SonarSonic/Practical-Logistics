@@ -4,9 +4,9 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
+import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.core.inventory.ContainerSync;
 import sonar.core.inventory.slots.SlotList;
-import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.common.tileentity.TileEntityItemRouter;
 
 public class ContainerItemRouter extends ContainerSync {

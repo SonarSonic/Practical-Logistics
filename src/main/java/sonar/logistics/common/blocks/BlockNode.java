@@ -8,7 +8,7 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.common.block.SonarMaterials;
-import sonar.core.utils.helpers.SonarHelper;
+import sonar.core.helpers.SonarHelper;
 
 public class BlockNode extends BaseNode {
 

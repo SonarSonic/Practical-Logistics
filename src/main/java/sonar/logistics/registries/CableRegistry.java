@@ -5,8 +5,8 @@ import gnu.trove.map.hash.THashMap;
 import java.util.ArrayList;
 import java.util.Map;
 
+import sonar.core.api.BlockCoords;
 import sonar.core.integration.fmp.FMPHelper;
-import sonar.core.utils.BlockCoords;
 import sonar.logistics.api.connecting.IDataCable;
 import sonar.logistics.api.connecting.IInfoEmitter;
 

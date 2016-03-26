@@ -10,15 +10,15 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
-import sonar.core.inventory.StoredItemStack;
-import sonar.core.utils.ActionType;
-import sonar.core.utils.BlockCoords;
+import sonar.core.api.ActionType;
+import sonar.core.api.BlockCoords;
+import sonar.core.api.InventoryHandler;
+import sonar.core.api.StoredItemStack;
+import sonar.core.api.InventoryHandler.StorageSize;
 import sonar.core.utils.BlockInteraction;
 import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.connecting.IConnectionNode;
 import sonar.logistics.api.connecting.IEntityNode;
-import sonar.logistics.api.providers.InventoryHandler;
-import sonar.logistics.api.providers.InventoryHandler.StorageSize;
 import sonar.logistics.info.types.InventoryInfo;
 
 public class ItemWrapper {
@@ -57,20 +57,6 @@ public class ItemWrapper {
 	 * @return list of {@link StoredItemStack} on the network */
 	public StorageSize getEntityInventory(List<StoredItemStack> storedStacks, StorageSize storage, List<Entity> entityList) {
 		return storage;
-	}
-
-	/** convenient method, adds the given inventory {@link IInventory} to the list, used by {@link InventoryHandler}
-	 * @param list {@link StoredItemStack} list to add to
-	 * @param inv {@link IInventory} to combine
-	 * @return returns how many ite */
-	public StorageSize addInventoryToList(List<StoredItemStack> list, IInventory inv) {
-		return StorageSize.EMPTY;
-	}
-
-	/** convenient method, adds the given stack to the list, used by {@link InventoryHandler}
-	 * @param list {@link StoredItemStack} list to add to
-	 * @param stack {@link StoredItemStack} to combine */
-	public void addStackToList(List<StoredItemStack> list, StoredItemStack stack) {
 	}
 
 	/** used for adding Items to the network
@@ -135,16 +121,6 @@ public class ItemWrapper {
 		return remove;
 	}
 
-	/** drops a full StoredItemStack on the floor
-	 * @param drop {@link StoredItemStack} to drop
-	 * @param world the world to drop it in
-	 * @param x the X coordinate it will be dropped from
-	 * @param y the Y coordinate it will be dropped from
-	 * @param z the Z coordinate it will be dropped from
-	 * @param side side to drop from */
-	public void spawnStoredItemStack(StoredItemStack drop, World world, int x, int y, int z, ForgeDirection side) {
-	}
-
 	/** convenience method, adds the given stack to the player's inventory and returns what was/can be added.
 	 * @param stack
 	 * @param extractSize
@@ -162,15 +138,6 @@ public class ItemWrapper {
 	 * @param player
 	 * @return the {@link StoredItemStack} to add to the player */
 	public StoredItemStack addFromPlayerInventory(StoredItemStack stack, long extractSize, INetworkCache network, EntityPlayer player, ActionType type) {
-		return null;
-	}
-
-	/** convenience method, gets the stack to be added to the inventory from the remainder, can return null.
-	 * @param inputSize
-	 * @param stack
-	 * @param returned
-	 * @return */
-	public StoredItemStack getStackToAdd(long inputSize, StoredItemStack stack, StoredItemStack returned) {
 		return null;
 	}
 

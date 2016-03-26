@@ -7,9 +7,9 @@ import net.minecraft.util.ResourceLocation;
 import org.lwjgl.input.Keyboard;
 
 import sonar.core.SonarCore;
+import sonar.core.helpers.FontHelper;
 import sonar.core.inventory.GuiSonar;
 import sonar.core.network.PacketTextField;
-import sonar.core.utils.helpers.FontHelper;
 import sonar.logistics.common.containers.ContainerEmptySync;
 import sonar.logistics.common.handlers.DataModifierHandler;
 

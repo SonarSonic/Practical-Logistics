@@ -3,8 +3,8 @@ package sonar.logistics.client.gui;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StatCollector;
+import sonar.core.helpers.FontHelper;
 import sonar.core.inventory.GuiSonar;
-import sonar.core.utils.helpers.FontHelper;
 import sonar.logistics.common.containers.ContainerHammer;
 import sonar.logistics.common.tileentity.TileEntityHammer;
 

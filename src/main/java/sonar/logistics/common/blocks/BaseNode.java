@@ -8,8 +8,8 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import sonar.core.common.block.SonarMachineBlock;
 import sonar.core.common.tileentity.TileEntitySonar;
+import sonar.core.helpers.FontHelper;
 import sonar.core.utils.BlockInteraction;
-import sonar.core.utils.helpers.FontHelper;
 import sonar.logistics.common.tileentity.TileEntityBlockNode;
 import sonar.logistics.common.tileentity.TileEntityNode;
 

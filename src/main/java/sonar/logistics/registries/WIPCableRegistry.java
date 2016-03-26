@@ -8,8 +8,8 @@ import java.util.Map;
 
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
+import sonar.core.api.BlockCoords;
 import sonar.core.integration.fmp.FMPHelper;
-import sonar.core.utils.BlockCoords;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.connecting.IDataCable;
 

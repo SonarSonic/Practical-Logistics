@@ -9,7 +9,7 @@ import net.minecraft.util.ResourceLocation;
 
 import org.lwjgl.opengl.GL11;
 
-import sonar.core.utils.helpers.RenderHelper;
+import sonar.core.helpers.RenderHelper;
 import sonar.logistics.LogisticsConfig;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.render.ScreenType;

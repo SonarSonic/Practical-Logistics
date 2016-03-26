@@ -7,11 +7,12 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
+import sonar.core.api.ActionType;
+import sonar.core.api.BlockCoords;
+import sonar.core.api.SonarAPI;
+import sonar.core.api.StoredItemStack;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.handlers.TileHandler;
-import sonar.core.inventory.StoredItemStack;
-import sonar.core.utils.ActionType;
-import sonar.core.utils.BlockCoords;
 import sonar.core.utils.BlockInteraction;
 import sonar.core.utils.BlockInteractionType;
 import sonar.logistics.api.LogisticsAPI;
@@ -91,7 +92,7 @@ public class InventoryInteraction extends InfoInteractionHandler<InventoryInfo> 
 					if (stack != null) {
 						StoredItemStack extract = LogisticsAPI.getItemHelper().extractItem(cache, stack.setStackSize(interact.type == BlockInteractionType.LEFT ? 1 : 64));
 						if (extract != null) {
-							LogisticsAPI.getItemHelper().spawnStoredItemStack(extract, screen.getWorldObj(), x, y, z, dir);
+							SonarAPI.getItemHelper().spawnStoredItemStack(extract, screen.getWorldObj(), x, y, z, dir);
 						}
 					}
 				}
@@ -112,7 +113,7 @@ public class InventoryInteraction extends InfoInteractionHandler<InventoryInfo> 
 				if (stack != null) {
 					StoredItemStack extract = LogisticsAPI.getItemHelper().extractItem(cache, stack.setStackSize(interact.type == BlockInteractionType.LEFT ? 1 : 64));
 					if (extract != null) {
-						LogisticsAPI.getItemHelper().spawnStoredItemStack(extract, screen.getWorldObj(), x, y, z, dir);
+						SonarAPI.getItemHelper().spawnStoredItemStack(extract, screen.getWorldObj(), x, y, z, dir);
 					}
 				}
 			}

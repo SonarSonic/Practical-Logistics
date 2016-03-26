@@ -2,7 +2,7 @@ package sonar.logistics.api.connecting;
 
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.util.ForgeDirection;
-import sonar.core.utils.BlockCoords;
+import sonar.core.api.BlockCoords;
 
 /** implemented on Items which can provide Channels for a network when placed in a {@link IConnectionArray} */
 public interface ITransceiver {

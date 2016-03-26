@@ -1,6 +1,6 @@
 package sonar.logistics.registries;
 
-import sonar.core.utils.helpers.NBTRegistryHelper;
+import sonar.core.helpers.NBTRegistryHelper;
 import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.api.info.LogicInfo;
 import sonar.logistics.info.types.BlockCoordsInfo;

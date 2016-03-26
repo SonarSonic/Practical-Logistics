@@ -5,9 +5,9 @@ import java.util.List;
 
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
+import sonar.core.api.BlockCoords;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.handlers.TileHandler;
-import sonar.core.utils.BlockCoords;
 import sonar.logistics.api.connecting.ILargeDisplay;
 import sonar.logistics.api.render.LargeScreenSizing;
 import sonar.logistics.common.handlers.LargeDisplayScreenHandler;

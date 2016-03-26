@@ -2,9 +2,9 @@ package sonar.logistics.network;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.nbt.NBTTagCompound;
+import sonar.core.api.BlockCoords;
+import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.core.network.sync.SyncPart;
-import sonar.core.utils.BlockCoords;
-import sonar.core.utils.helpers.NBTHelper.SyncType;
 import sonar.logistics.api.utils.ExternalCoords;
 
 public class SyncExternalCoords extends SyncPart {

@@ -3,9 +3,10 @@ package sonar.logistics.info.interaction;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
+import sonar.core.api.SonarAPI;
+import sonar.core.api.StoredItemStack;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.handlers.TileHandler;
-import sonar.core.inventory.StoredItemStack;
 import sonar.core.utils.BlockInteraction;
 import sonar.core.utils.BlockInteractionType;
 import sonar.logistics.api.LogisticsAPI;
@@ -41,7 +42,7 @@ public class StoredStackInteraction extends InfoInteractionHandler<StoredStackIn
 			if (info.stack != null) {
 				StoredItemStack extract = LogisticsAPI.getItemHelper().extractItem(cache, info.stack.setStackSize(interact.type == BlockInteractionType.LEFT ? 1 : 64));
 				if (extract != null) {
-					LogisticsAPI.getItemHelper().spawnStoredItemStack(extract, screen.getWorldObj(), x, y, z, interact.getDir());
+					SonarAPI.getItemHelper().spawnStoredItemStack(extract, screen.getWorldObj(), x, y, z, interact.getDir());
 				}
 			}
 

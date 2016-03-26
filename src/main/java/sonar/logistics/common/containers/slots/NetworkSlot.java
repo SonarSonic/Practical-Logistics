@@ -3,8 +3,8 @@ package sonar.logistics.common.containers.slots;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import sonar.core.inventory.StoredItemStack;
-import sonar.core.utils.ActionType;
+import sonar.core.api.ActionType;
+import sonar.core.api.StoredItemStack;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.common.handlers.InventoryReaderHandler;
 

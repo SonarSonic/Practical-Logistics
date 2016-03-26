@@ -5,12 +5,12 @@ import java.util.List;
 
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
+import sonar.core.api.BlockCoords;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.network.sync.ISyncPart;
 import sonar.core.network.sync.SyncGeneric;
 import sonar.core.network.sync.SyncTagType;
-import sonar.core.utils.BlockCoords;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.cache.CacheTypes;

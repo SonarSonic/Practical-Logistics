@@ -4,9 +4,9 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.core.inventory.ContainerSync;
 import sonar.core.network.utils.ISyncTile;
-import sonar.core.utils.helpers.NBTHelper.SyncType;
 
 public class ContainerEmptySync extends ContainerSync {
 	SyncType[] types = new SyncType[] { SyncType.SYNC };

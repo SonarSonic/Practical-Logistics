@@ -3,9 +3,9 @@ package sonar.logistics.integration.nei;
 import java.awt.Rectangle;
 
 import net.minecraft.client.gui.inventory.GuiContainer;
+import sonar.core.helpers.FontHelper;
+import sonar.core.helpers.RecipeHelper;
 import sonar.core.integration.nei.AbstractProcessorHandler;
-import sonar.core.utils.helpers.FontHelper;
-import sonar.core.utils.helpers.RecipeHelper;
 import sonar.logistics.client.gui.GuiHammer;
 import sonar.logistics.utils.HammerRecipes;
 import codechicken.nei.recipe.TemplateRecipeHandler;

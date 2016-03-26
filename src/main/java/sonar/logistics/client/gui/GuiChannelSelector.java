@@ -11,8 +11,8 @@ import net.minecraft.util.StatCollector;
 
 import org.lwjgl.opengl.GL11;
 
-import sonar.core.utils.helpers.FontHelper;
-import sonar.core.utils.helpers.RenderHelper;
+import sonar.core.helpers.FontHelper;
+import sonar.core.helpers.RenderHelper;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.utils.ExternalCoords;
 import sonar.logistics.common.containers.ContainerEmptySync;

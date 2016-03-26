@@ -7,10 +7,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
+import sonar.core.integration.AE2Helper;
 import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.api.info.LogicInfo;
 import sonar.logistics.api.providers.TileProvider;
-import sonar.logistics.integration.AE2Helper;
 import appeng.api.AEApi;
 import appeng.api.implementations.IPowerChannelState;
 import appeng.api.networking.IGrid;
@@ -68,15 +68,9 @@ public class AE2GridProvider extends TileProvider {
 			try {
 				grid = proxy.getProxy().getGrid();
 				/*
-				 * IStorageGrid storage = grid.getCache(IStorageGrid.class); if
-				 * (storage != null) { IItemList<IAEItemStack> itemInventory =
-				 * storage.getItemInventory().getStorageList(); infoList.add(new
-				 * StandardInfo(id, 2, 4, itemInventory.size()));
+				 * IStorageGrid storage = grid.getCache(IStorageGrid.class); if (storage != null) { IItemList<IAEItemStack> itemInventory = storage.getItemInventory().getStorageList(); infoList.add(new StandardInfo(id, 2, 4, itemInventory.size()));
 				 * 
-				 * IItemList<IAEFluidStack> fluidInventory =
-				 * storage.getFluidInventory().getStorageList();
-				 * infoList.add(new StandardInfo(id, 2, 5,
-				 * fluidInventory.size())); }
+				 * IItemList<IAEFluidStack> fluidInventory = storage.getFluidInventory().getStorageList(); infoList.add(new StandardInfo(id, 2, 5, fluidInventory.size())); }
 				 */
 				long usedCells = 0;
 				long totalCells = 0;
@@ -127,15 +121,15 @@ public class AE2GridProvider extends TileProvider {
 						}
 					}
 				}
-				infoList.add(new AE2Helper.StorageInfo(id, 2, 6, usedCells).addSuffix("cells"));
-				infoList.add(new AE2Helper.StorageInfo(id, 2, 7, totalCells).addSuffix("cells"));
+				infoList.add(new StorageInfo(id, 2, 6, usedCells).addSuffix("cells"));
+				infoList.add(new StorageInfo(id, 2, 7, totalCells).addSuffix("cells"));
 
-				infoList.add(new AE2Helper.StorageInfo(id, 2, 8, usedBytes).addSuffix("bytes"));
-				infoList.add(new AE2Helper.StorageInfo(id, 2, 9, totalBytes).addSuffix("bytes"));
-				infoList.add(new AE2Helper.StorageInfo(id, 2, 10, usedTypes));
-				infoList.add(new AE2Helper.StorageInfo(id, 2, 11, totalTypes));
-				infoList.add(new AE2Helper.StorageInfo(id, 2, 12, usedTypesF));
-				infoList.add(new AE2Helper.StorageInfo(id, 2, 13, totalTypesF));
+				infoList.add(new StorageInfo(id, 2, 8, usedBytes).addSuffix("bytes"));
+				infoList.add(new StorageInfo(id, 2, 9, totalBytes).addSuffix("bytes"));
+				infoList.add(new StorageInfo(id, 2, 10, usedTypes));
+				infoList.add(new StorageInfo(id, 2, 11, totalTypes));
+				infoList.add(new StorageInfo(id, 2, 12, usedTypesF));
+				infoList.add(new StorageInfo(id, 2, 13, totalTypesF));
 
 			} catch (GridAccessException e) {
 				e.printStackTrace();
@@ -158,4 +152,22 @@ public class AE2GridProvider extends TileProvider {
 		return Loader.isModLoaded("appliedenergistics2");
 	}
 
+	public static class StorageInfo extends LogicInfo {
+		public StorageInfo() {
+
+		}
+
+		public StorageInfo(int providerID, int category, int subCategory, Object data) {
+			super(providerID, category, subCategory, data);
+
+		}
+
+		public StorageInfo(int providerID, String category, String subCategory, Object data) {
+			super(providerID, category, subCategory, data);
+		}
+
+		public int updateTicks() {
+			return 20;
+		}
+	}
 }

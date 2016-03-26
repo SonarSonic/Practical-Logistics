@@ -4,12 +4,13 @@ import java.util.List;
 
 import net.minecraft.entity.Entity;
 import net.minecraftforge.common.util.ForgeDirection;
-import sonar.core.utils.IRegistryObject;
+import sonar.core.api.IRegistryObject;
+import sonar.core.api.SonarProvider;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.info.ILogicInfo;
 
 /** used for providing information on Entities for the Info Reader to read, the Provider must be registered in the {@link LogisticsAPI} to be used */
-public abstract class EntityProvider extends LogicProvider implements ICategoryProvider {
+public abstract class EntityProvider extends SonarProvider implements ICategoryProvider {
 
 	public int getID() {
 		return LogisticsAPI.getRegistry().getEntityProviderID(getName());

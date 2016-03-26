@@ -3,8 +3,8 @@ package sonar.logistics.common.tileentity;
 import java.util.Map;
 
 import net.minecraftforge.common.util.ForgeDirection;
-import sonar.core.utils.BlockCoords;
-import sonar.core.utils.helpers.SonarHelper;
+import sonar.core.api.BlockCoords;
+import sonar.core.helpers.SonarHelper;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.connecting.CableType;
 import sonar.logistics.api.connecting.IConnectionNode;

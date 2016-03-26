@@ -6,9 +6,9 @@ import java.util.List;
 
 import net.minecraft.block.Block;
 import net.minecraftforge.common.util.ForgeDirection;
+import sonar.core.api.BlockCoords;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.SonarTilePart;
-import sonar.core.utils.BlockCoords;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.connecting.CableType;
 import sonar.logistics.api.connecting.IDataCable;

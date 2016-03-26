@@ -4,12 +4,13 @@ import java.util.List;
 
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
-import sonar.core.utils.IRegistryObject;
+import sonar.core.api.IRegistryObject;
+import sonar.core.api.SonarProvider;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.info.ILogicInfo;
 
 /** used for providing information on Block/TileEntity for the Info Reader to read, the Provider must be registered in the {@link LogisticsAPI} to be used */
-public abstract class TileProvider extends LogicProvider implements ICategoryProvider {
+public abstract class TileProvider extends SonarProvider implements ICategoryProvider {
 
 	public int getID() {
 		return LogisticsAPI.getRegistry().getTileProviderID(getName());

@@ -9,7 +9,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import sonar.core.utils.helpers.ItemStackHelper;
+import sonar.core.helpers.ItemStackHelper;
 import sonar.logistics.api.utils.ItemFilter;
 import cpw.mods.fml.common.network.ByteBufUtils;
 

@@ -4,9 +4,9 @@ import java.util.List;
 
 import net.minecraft.nbt.NBTTagCompound;
 import sonar.core.common.tileentity.TileEntitySonar;
+import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.core.network.sync.ISyncPart;
 import sonar.core.network.sync.SyncTagType;
-import sonar.core.utils.helpers.NBTHelper.SyncType;
 
 public class TileEntityNode extends TileEntitySonar {
 
