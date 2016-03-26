@@ -11,7 +11,9 @@ import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.common.block.SonarMachineBlock;
 import sonar.core.common.block.SonarMaterials;
 import sonar.core.utils.BlockInteraction;
+import sonar.core.utils.helpers.FontHelper;
 import sonar.logistics.api.connecting.CableType;
+import sonar.logistics.api.connecting.IDataCable;
 import sonar.logistics.common.tileentity.TileEntityDataCable;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -31,6 +33,10 @@ public class BlockDataCable extends SonarMachineBlock {
 
 	@Override
 	public boolean operateBlock(World world, int x, int y, int z, EntityPlayer player, BlockInteraction interact) {
+		if(!world.isRemote){
+			IDataCable cable = (IDataCable) world.getTileEntity(x, y, z);
+			FontHelper.sendMessage("ID: " + cable.registryID(), world, player);
+		}
 		return false;
 	}
 

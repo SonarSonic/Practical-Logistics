@@ -25,11 +25,13 @@ import cpw.mods.fml.common.network.ByteBufUtils;
 public class FluidInventoryInfo extends ILogicInfo<FluidInventoryInfo> {
 
 	public ArrayList<StoredFluidStack> stacks = new ArrayList();
-	public String rend = "ITEMINV";
+	public static String rend = "FLUIDS";
+	public int cacheID = -1;
 
-	public static FluidInventoryInfo createInfo(ArrayList<StoredFluidStack> stacks) {
+	public static FluidInventoryInfo createInfo(ArrayList<StoredFluidStack> stacks, int cacheID) {
 		FluidInventoryInfo info = new FluidInventoryInfo();
 		info.stacks = stacks;
+		info.cacheID = cacheID;
 		return info;
 	}
 
@@ -108,13 +110,13 @@ public class FluidInventoryInfo extends ILogicInfo<FluidInventoryInfo> {
 
 	@Override
 	public void renderInfo(Tessellator tess, TileEntity tile, float minX, float minY, float maxX, float maxY, float zOffset, ScreenType type) {
-	
+
 		if (stacks != null) {
 			int xSlots = Math.round(maxX - minX);
 			int ySlots = (int) (Math.round(maxY - minY));
 			if (type.isNormalSize()) {
 				if (stacks != null && !stacks.isEmpty() && stacks.get(0) != null) {
-					FluidStackInfo.createInfo(stacks.get(0)).renderInfo(tess, tile, minX, minY, maxX, maxY, zOffset, type);
+					FluidStackInfo.createInfo(stacks.get(0), cacheID).renderInfo(tess, tile, minX, minY, maxX, maxY, zOffset, type);
 				}
 
 			} else {
@@ -202,7 +204,7 @@ public class FluidInventoryInfo extends ILogicInfo<FluidInventoryInfo> {
 	public void writeUpdate(FluidInventoryInfo currentInfo, NBTTagCompound tag) {
 		List<StoredFluidStack> currentList = new ArrayList();
 		if (currentInfo.stacks != null) {
-			currentList= currentInfo.stacks;
+			currentList = currentInfo.stacks;
 		}
 		if (stacks == null) {
 			stacks = new ArrayList();
@@ -240,8 +242,8 @@ public class FluidInventoryInfo extends ILogicInfo<FluidInventoryInfo> {
 				} else {
 					compound.setByte("f", (byte) 0);
 					if (i < stacks.size()) {
-						 stacks.set(i, current);
-					} else{
+						stacks.set(i, current);
+					} else {
 						stacks.add(i, current);
 					}
 					StoredFluidStack.writeToNBT(compound, current);

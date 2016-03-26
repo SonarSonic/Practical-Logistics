@@ -38,27 +38,23 @@ public class CraftingRegistry extends Logistics {
 	}
 
 	public static void addShaped(ItemStack result, Object... input) {
-		if (LogisticsConfig.isEnabled(result)) {
-			GameRegistry.addRecipe(result, input);
-		}
+		GameRegistry.addRecipe(result, input);
+
 	}
 
 	public static void addShapedOre(ItemStack result, Object... input) {
 		ShapedOreRecipe recipe = new ShapedOreRecipe(result, input);
-		if (LogisticsConfig.isEnabled(recipe.getRecipeOutput())) {
-			GameRegistry.addRecipe(recipe);
-		}
+		GameRegistry.addRecipe(recipe);
+
 	}
 
 	public static void addShapeless(ItemStack result, Object... input) {
-		if (LogisticsConfig.isEnabled(result)) {
-			GameRegistry.addShapelessRecipe(result, input);
-		}
+		GameRegistry.addShapelessRecipe(result, input);
+
 	}
 
 	public static void addShapelessOre(ItemStack result, Object... input) {
-		if (LogisticsConfig.isEnabled(result)) {
-			GameRegistry.addRecipe(new ShapelessOreRecipe(result, input));
-		}
+		GameRegistry.addRecipe(new ShapelessOreRecipe(result, input));
+
 	}
 }

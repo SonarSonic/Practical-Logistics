@@ -8,7 +8,6 @@ import java.util.Comparator;
 import java.util.List;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -21,7 +20,6 @@ import sonar.core.network.sync.ISyncPart;
 import sonar.core.network.sync.SyncTagType;
 import sonar.core.network.sync.SyncTagType.INT;
 import sonar.core.network.utils.IByteBufTile;
-import sonar.core.utils.ActionType;
 import sonar.core.utils.BlockCoords;
 import sonar.core.utils.BlockInteraction;
 import sonar.core.utils.helpers.FontHelper;
@@ -30,7 +28,6 @@ import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.api.info.LogicInfo;
-import sonar.logistics.api.interaction.IDefaultInteraction;
 import sonar.logistics.api.providers.InventoryHandler.StorageSize;
 import sonar.logistics.api.render.ScreenType;
 import sonar.logistics.api.wrappers.ItemWrapper.StorageItems;
@@ -43,11 +40,11 @@ import com.google.common.collect.Lists;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.GameRegistry.UniqueIdentifier;
 
-public class InventoryReaderHandler extends InventoryTileHandler implements IByteBufTile, IDefaultInteraction {
+public class InventoryReaderHandler extends InventoryTileHandler implements IByteBufTile {
 
 	public BlockCoords coords;
-	public List<StoredItemStack> stacks = new ArrayList();
-	public List<StoredItemStack> lastStacks = new ArrayList();
+	public ArrayList<StoredItemStack> stacks = new ArrayList();
+	public ArrayList<StoredItemStack> lastStacks = new ArrayList();
 
 	public ItemStack current;
 	// 0=Stack, 1=Slot (only accepts one input)
@@ -57,6 +54,7 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 	public SyncTagType.INT sortingOrder = (INT) new SyncTagType.INT(4).addSyncType(SyncType.SPECIAL);
 	public SyncTagType.INT sortingType = (INT) new SyncTagType.INT(5).addSyncType(SyncType.SPECIAL);
 	public StorageSize maxStorage = StorageSize.EMPTY;
+	public int cacheID = -1;
 
 	public InventoryReaderHandler(boolean isMultipart, TileEntity tile) {
 		super(isMultipart, tile);
@@ -68,7 +66,10 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 		if (te.getWorldObj().isRemote) {
 			return;
 		}
-		StorageItems list = LogisticsAPI.getItemHelper().getItems(getNetwork(te));
+		INetworkCache cache = getNetwork(te);
+		cacheID = cache.getNetworkID();
+		StorageItems list = LogisticsAPI.getItemHelper().getItems(cache);
+		
 		if (sortingType.getObject() == 0) {
 			Collections.sort(list.items, new Comparator<StoredItemStack>() {
 				public int compare(StoredItemStack str1, StoredItemStack str2) {
@@ -121,12 +122,6 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 		return dir.equals(ForgeDirection.getOrientation(FMPHelper.getMeta(te))) || dir.equals(ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite());
 	}
 
-	public void setCoords(BlockCoords coords) {
-		if (!BlockCoords.equalCoords(this.coords, coords)) {
-			this.coords = coords;
-		}
-	}
-
 	public ILogicInfo currentInfo(TileEntity te) {
 
 		switch (setting.getObject()) {
@@ -135,28 +130,28 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 				if (stacks != null) {
 					for (StoredItemStack stack : stacks) {
 						if (stack.equalStack(slots[0])) {
-							return StoredStackInfo.createInfo(stack);
+							return StoredStackInfo.createInfo(stack, cacheID);
 						}
 					}
 				}
-				return StoredStackInfo.createInfo(new StoredItemStack(slots[0], 0));
+				return StoredStackInfo.createInfo(new StoredItemStack(slots[0], 0), cacheID);
 			}
 			break;
 		case 1:
 			StoredItemStack stack = LogisticsAPI.getItemHelper().getStack(LogisticsAPI.getCableHelper().getNetwork(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite()), targetSlot.getObject());
 			if (stack != null) {
-				return StoredStackInfo.createInfo(stack);
+				return StoredStackInfo.createInfo(stack, cacheID);
 			}
 			return new LogicInfo((byte) -1, "ITEMREND", " ", " ");
 
 		case 2:
 			if (posSlot.getObject() < stacks.size()) {
-				return StoredStackInfo.createInfo(stacks.get(posSlot.getObject()));
+				return StoredStackInfo.createInfo(stacks.get(posSlot.getObject()), cacheID);
 			}
 			break;
 		case 3:
 			if (stacks != null) {
-				return InventoryInfo.createInfo(stacks);
+				return InventoryInfo.createInfo(stacks, cacheID);
 			}
 			break;
 		case 4:
@@ -164,106 +159,6 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 		}
 		return new LogicInfo((byte) -1, "ITEMREND", " ", "NO DATA");
 	}
-
-	@Override
-	public void handleInteraction(ILogicInfo info, ScreenType type, TileEntity screen, TileEntity reader, EntityPlayer player, int x, int y, int z, BlockInteraction interact, boolean doubleClick) {
-		if (player.getHeldItem() != null) {
-			if (!doubleClick) {
-				insertItem(player, reader, player.inventory.currentItem);
-			} else {
-				insertInventory(player, reader, player.inventory.currentItem);
-			}
-		}
-	}
-
-	public StoredItemStack extractItem(TileEntity te, StoredItemStack stack, int max) {
-		if (stack == null || stack.stored == 0) {
-			return null;
-		}
-		int extractSize = (int) Math.min(stack.getItemStack().getMaxStackSize(), Math.min(stack.stored, max));
-		StoredItemStack remainder = LogisticsAPI.getItemHelper().removeItems(stack.setStackSize(extractSize), LogisticsAPI.getCableHelper().getNetwork(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite()), ActionType.PERFORM);
-		StoredItemStack storedStack = null;
-		if (remainder == null || remainder.stored == 0) {
-			storedStack = new StoredItemStack(stack.getItemStack(), extractSize);
-		} else {
-			storedStack = new StoredItemStack(stack.getItemStack(), extractSize - remainder.stored);
-		}
-
-		return storedStack;
-	}
-
-	public void insertItem(EntityPlayer player, TileEntity te, int slot) {
-		ItemStack add = player.inventory.getStackInSlot(slot);
-		if (add == null) {
-			return;
-		}
-		StoredItemStack stack = LogisticsAPI.getItemHelper().addItems(new StoredItemStack(add), LogisticsAPI.getCableHelper().getNetwork(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite()), ActionType.PERFORM);
-		if (stack == null || stack.stored == 0) {
-			add = null;
-		} else {
-			add.stackSize = (int) stack.stored;
-		}
-		if (!ItemStack.areItemStacksEqual(add, player.inventory.getStackInSlot(slot))) {
-			player.inventory.setInventorySlotContents(slot, add);
-		}
-	}
-
-	public void insertInventory(EntityPlayer player, TileEntity te, int slotID) {
-		ItemStack add = null;
-		if (slotID == -1) {
-			add = player.inventory.getItemStack();
-		} else
-			add = player.inventory.getStackInSlot(slotID);
-		if (add == null) {
-			return;
-		}
-		StoredItemStack stack = new StoredItemStack(add).setStackSize(0);
-		IInventory inv = player.inventory;
-		List<Integer> slots = new ArrayList();
-		for (int i = 0; i < inv.getSizeInventory(); i++) {
-			ItemStack item = inv.getStackInSlot(i);
-			if (stack.equalStack(item)) {
-				stack.add(item);
-				slots.add(i);
-			}
-		}
-		StoredItemStack remainder = LogisticsAPI.getItemHelper().addItems(stack.copy(), LogisticsAPI.getCableHelper().getNetwork(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite()), ActionType.PERFORM);
-
-		long insertSize = 0;
-		if (remainder == null || remainder.stored == 0) {
-			insertSize = stack.getStackSize();
-		} else {
-			insertSize = stack.getStackSize() - remainder.stored;
-		}
-		if (insertSize == 0) {
-			return;
-		}
-		LogisticsAPI.getItemHelper().removeStackFromPlayer(stack.copy().setStackSize(insertSize), player, false, ActionType.PERFORM);
-		/*
-		for (Integer slot : slots) {
-			ItemStack item = inv.getStackInSlot(slot);
-			int oldSize = item.stackSize;
-			if (stack.equalStack(item)) {
-				if (remainder == null || remainder.stored == 0) {
-					item.stackSize = 0;
-				} else {
-					item.stackSize = (int) Math.min(insertSize, item.getMaxStackSize());
-				}
-				insertSize -= oldSize - item.stackSize;
-				if (item.stackSize != 0) {
-					player.inventory.setInventorySlotContents(slot, item);
-				} else {
-					player.inventory.setInventorySlotContents(slot, null);
-				}
-				if (insertSize == 0) {
-					return;
-				}
-			}
-		}
-		*/
-
-	}
-
 
 	public void readData(NBTTagCompound nbt, SyncType type) {
 		super.readData(nbt, type);

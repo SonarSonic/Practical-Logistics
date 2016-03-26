@@ -11,8 +11,8 @@ import sonar.logistics.api.wrappers.RenderWrapper;
 
 public class InfoRenderer extends RenderWrapper {
 
-	public void renderStandardInfo(ILogicInfo info, FontRenderer rend, float minX, float minY, float maxX, float maxY, float zOffset, ScreenType type) {
-
+	public void renderStandardInfo(ILogicInfo info, float minX, float minY, float maxX, float maxY, float zOffset, ScreenType type) {
+		FontRenderer rend = Minecraft.getMinecraft().fontRenderer;
 		GL11.glTranslatef(minX + (maxX - minX) / 2, minY + (maxY - minY) / 2, 0.01f);
 		int sizing = Math.round(Math.min((maxX - minX), (maxY - minY) * 3));
 		GL11.glTranslatef(0.0f, (float) (type.isNormalSize() ? -0.1F : -0.2F + ((sizing - 1) * -0.01)), zOffset);

@@ -174,13 +174,19 @@ public class ChannelledCablePart extends SonarTilePart implements IDataCable {
 
 	@Override
 	public void addCable() {
-		// TODO Auto-generated method stub
+		LogisticsAPI.getCableHelper().addCable(this);
 
 	}
 
 	@Override
 	public void removeCable() {
-		// TODO Auto-generated method stub
+		LogisticsAPI.getCableHelper().removeCable(this);
+
+	}
+
+	@Override
+	public void refreshConnections() {
+		LogisticsAPI.getCableHelper().refreshConnections(this);
 
 	}
 

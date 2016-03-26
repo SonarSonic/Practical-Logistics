@@ -41,7 +41,11 @@ public class CablingWrapper {
 	/** should be called on the {@code invalidate()} method in your TileEntity class: for removing a {@link IDataCable} from a network
 	 * @param cable {@link IDataCable} to be removed */
 	public void removeCable(IDataCable cable) {}
-
+	
+	/**checks all the adjacent IInfoEmitters and refreshes their connections
+	 * @param cable the {@link IDataCable} */
+	public void refreshConnections(IDataCable cable) {}		
+	
 	/** returns the {@link INetworkCache} on a given side of a tile
 	 * @param tile TileEntity to check from
 	 * @param dir {@link ForgeDirection} to check in

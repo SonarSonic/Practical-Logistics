@@ -80,7 +80,7 @@ public class ThaumcraftAspectInfo extends LogicInfo<ThaumcraftAspectInfo> {
 		}
 		GL11.glTranslated(0.5, 0.00, 0.0);
 		GL11.glTranslated(0, 0, -zOffset);
-		LogisticsAPI.getInfoRenderer().renderStandardInfo(this, rend, minX, minY, maxX, maxY, zOffset, type);
+		LogisticsAPI.getInfoRenderer().renderStandardInfo(this, minX, minY, maxX, maxY, zOffset, type);
 	}
 
 	@Override

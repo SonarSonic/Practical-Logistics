@@ -1,21 +1,28 @@
 package sonar.logistics.info.interaction;
 
+import java.util.ArrayList;
+
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.inventory.StoredItemStack;
+import sonar.core.utils.ActionType;
 import sonar.core.utils.BlockCoords;
 import sonar.core.utils.BlockInteraction;
 import sonar.core.utils.BlockInteractionType;
 import sonar.logistics.api.LogisticsAPI;
+import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.render.InfoInteractionHandler;
 import sonar.logistics.api.render.LargeScreenSizing;
 import sonar.logistics.api.render.ScreenType;
 import sonar.logistics.common.handlers.InventoryReaderHandler;
 import sonar.logistics.common.handlers.LargeDisplayScreenHandler;
 import sonar.logistics.info.types.InventoryInfo;
+import sonar.logistics.registries.CacheRegistry;
 
 public class InventoryInteraction extends InfoInteractionHandler<InventoryInfo> {
 
@@ -25,25 +32,21 @@ public class InventoryInteraction extends InfoInteractionHandler<InventoryInfo> 
 	}
 
 	@Override
-	public boolean canHandle(ScreenType type, TileEntity te, TileEntity object) {
-		TileHandler handler = FMPHelper.getHandler(object);
-		return handler != null && handler instanceof InventoryReaderHandler;
-	}
-
-	@Override
-	public void handleInteraction(InventoryInfo info, ScreenType type, TileEntity screen, TileEntity reader, EntityPlayer player, int x, int y, int z, BlockInteraction interact, boolean doubleClick) {
-		InventoryReaderHandler handler = (InventoryReaderHandler) FMPHelper.getHandler(reader);
+	public void handleInteraction(InventoryInfo info, ScreenType type, TileEntity screen, EntityPlayer player, int x, int y, int z, BlockInteraction interact, boolean doubleClick) {
+		INetworkCache cache = CacheRegistry.getCache(info.cacheID);
+		if (cache == null || cache.getNetworkID() == -1) {
+			return;
+		}
 		TileHandler screenHandler = FMPHelper.getHandler(screen);
-
-		ForgeDirection dir = ForgeDirection.getOrientation(interact.side);
+		ForgeDirection dir = interact.getDir();
 		BlockCoords screenCoords = new BlockCoords(screen);
 		if (interact.type == BlockInteractionType.RIGHT || interact.type == BlockInteractionType.SHIFT_RIGHT) {
 			if (interact.type == BlockInteractionType.RIGHT) {
 				if (player.getHeldItem() != null) {
 					if (!doubleClick) {
-						handler.insertItem(player, reader, player.inventory.currentItem);
+						LogisticsAPI.getItemHelper().insertItemFromPlayer(player, cache, player.inventory.currentItem);
 					} else {
-						handler.insertInventory(player, reader, player.inventory.currentItem);
+						LogisticsAPI.getItemHelper().insertInventoryFromPlayer(player, cache, player.inventory.currentItem);
 					}
 				}
 			} else if (interact.type == BlockInteractionType.SHIFT_RIGHT) {
@@ -84,30 +87,35 @@ public class InventoryInteraction extends InfoInteractionHandler<InventoryInfo> 
 					slot = ((ySlot * hSlots) + hSlot) + (ySlot * 2) - sizing.maxH * 2;
 				}
 				if (slot >= 0 && slot < info.stacks.size()) {
-					StoredItemStack extract = handler.extractItem(reader, info.stacks.get(slot), interact.type == BlockInteractionType.LEFT ? 1 : 64);
-					if (extract != null) {
-						LogisticsAPI.getItemHelper().spawnStoredItemStack(extract, screen.getWorldObj(), x, y, z, dir);
+					StoredItemStack stack = info.stacks.get(slot);
+					if (stack != null) {
+						StoredItemStack extract = LogisticsAPI.getItemHelper().extractItem(cache, stack.setStackSize(interact.type == BlockInteractionType.LEFT ? 1 : 64));
+						if (extract != null) {
+							LogisticsAPI.getItemHelper().spawnStoredItemStack(extract, screen.getWorldObj(), x, y, z, dir);
+						}
 					}
 				}
 			}
 		} else {
 			int slot = -1;
-			if (dir == ForgeDirection.NORTH) {
-				slot = interact.hitx < 0.5 ? 1 : 0;
-			} else if (dir == ForgeDirection.SOUTH) {
-				slot = interact.hitx < 0.5 ? 0 : 1;
-			} else if (dir == ForgeDirection.EAST) {
-				slot = interact.hitz < 0.5 ? 1 : 0;
-			} else if (dir == ForgeDirection.WEST) {
-				slot = interact.hitz < 0.5 ? 0 : 1;
+			if (dir.offsetX != 0 || dir.offsetX != 0) {
+				int offset = dir.offsetX != 0 ? dir.offsetX : dir.offsetZ;
+				float hit = dir.offsetX != 0 ? interact.hitz : interact.hitx;
+				if (offset == 1) {
+					slot = hit < 0.5 ? 1 : 0;
+				} else {
+					slot = hit < 0.5 ? 0 : 1;
+				}
 			}
 			if (slot >= 0 && slot < info.stacks.size()) {
-				StoredItemStack extract = handler.extractItem(reader, info.stacks.get(slot), interact.type == BlockInteractionType.LEFT ? 1 : 64);
-				if (extract != null) {
-					LogisticsAPI.getItemHelper().spawnStoredItemStack(extract, screen.getWorldObj(), x, y, z, dir);
+				StoredItemStack stack = info.stacks.get(slot);
+				if (stack != null) {
+					StoredItemStack extract = LogisticsAPI.getItemHelper().extractItem(cache, stack.setStackSize(interact.type == BlockInteractionType.LEFT ? 1 : 64));
+					if (extract != null) {
+						LogisticsAPI.getItemHelper().spawnStoredItemStack(extract, screen.getWorldObj(), x, y, z, dir);
+					}
 				}
 			}
 		}
 	}
-
 }

@@ -31,7 +31,6 @@ import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.api.info.LogicInfo;
-import sonar.logistics.api.interaction.IDefaultInteraction;
 import sonar.logistics.api.providers.InventoryHandler.StorageSize;
 import sonar.logistics.api.render.ScreenType;
 import sonar.logistics.api.wrappers.FluidWrapper.StorageFluids;
@@ -41,11 +40,11 @@ import sonar.logistics.info.types.ProgressInfo;
 
 import com.google.common.collect.Lists;
 
-public class FluidReaderHandler extends TileHandler implements IByteBufTile, IDefaultInteraction {
+public class FluidReaderHandler extends TileHandler implements IByteBufTile {
 
 	public BlockCoords coords;
-	public List<StoredFluidStack> fluids;
-	public List<StoredFluidStack> lastFluids;
+	public ArrayList<StoredFluidStack> fluids = new ArrayList();
+	public ArrayList<StoredFluidStack> lastFluids = new ArrayList();
 
 	public FluidStack current;
 	public SyncTagType.INT setting = (INT) new SyncTagType.INT(1).addSyncType(SyncType.SPECIAL);
@@ -53,6 +52,7 @@ public class FluidReaderHandler extends TileHandler implements IByteBufTile, IDe
 	public SyncTagType.INT sortingOrder = (INT) new SyncTagType.INT(3).addSyncType(SyncType.SPECIAL);
 	public SyncTagType.INT sortingType = (INT) new SyncTagType.INT(4).addSyncType(SyncType.SPECIAL);
 	public StorageSize maxStorage = StorageSize.EMPTY;
+	public int cacheID = -1;
 
 	public FluidReaderHandler(boolean isMultipart, TileEntity tile) {
 		super(isMultipart, tile);
@@ -63,7 +63,9 @@ public class FluidReaderHandler extends TileHandler implements IByteBufTile, IDe
 		if (te.getWorldObj().isRemote) {
 			return;
 		}
-		StorageFluids list = LogisticsAPI.getFluidHelper().getFluids(LogisticsAPI.getCableHelper().getNetwork(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite()));
+		INetworkCache network = LogisticsAPI.getCableHelper().getNetwork(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite());
+		cacheID = network.getNetworkID();
+		StorageFluids list = LogisticsAPI.getFluidHelper().getFluids(network);
 		if (sortingType.getObject() == 0) {
 			Collections.sort(list.fluids, new Comparator<StoredFluidStack>() {
 				public int compare(StoredFluidStack str1, StoredFluidStack str2) {
@@ -100,59 +102,6 @@ public class FluidReaderHandler extends TileHandler implements IByteBufTile, IDe
 		maxStorage = list.sizing;
 	}
 
-	@Override
-	public void handleInteraction(ILogicInfo info, ScreenType type, TileEntity screen, TileEntity reader, EntityPlayer player, int x, int y, int z, BlockInteraction interact, boolean doubleClick) {
-		if (player.getHeldItem() != null) {
-			emptyFluid(player, reader, player.getHeldItem());
-		}
-	}
-
-	public void fillItemStack(EntityPlayer player, TileEntity te, StoredFluidStack storedStack) {
-		ItemStack heldItem = player.getHeldItem();
-		if (heldItem == null || storedStack == null) {
-			return;
-		}
-		if (heldItem.stackSize == 1) {
-			INetworkCache network = LogisticsAPI.getCableHelper().getNetwork(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite());
-			ItemStack simulate = LogisticsAPI.getFluidHelper().fillFluidItemStack(heldItem.copy(), storedStack.copy(), network, ActionType.SIMULATE);
-			if (!ItemStack.areItemStacksEqual(simulate, heldItem) || !ItemStack.areItemStackTagsEqual(simulate, heldItem)) {
-				player.inventory.setInventorySlotContents(player.inventory.currentItem, LogisticsAPI.getFluidHelper().fillFluidItemStack(heldItem, storedStack, network, ActionType.PERFORM));
-			}
-		} else {
-			ItemStack insert = heldItem.copy();
-			insert.stackSize = 1;
-
-			INetworkCache network = LogisticsAPI.getCableHelper().getNetwork(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite());
-			ItemStack simulate = LogisticsAPI.getFluidHelper().fillFluidItemStack(insert.copy(), storedStack.copy(), network, ActionType.SIMULATE);
-			if (!ItemStack.areItemStacksEqual(simulate, insert) || !ItemStack.areItemStackTagsEqual(simulate, insert)) {
-				ItemStack toAdd = LogisticsAPI.getFluidHelper().fillFluidItemStack(insert, storedStack, network, ActionType.PERFORM);
-				player.inventory.decrStackSize(player.inventory.currentItem, 1);
-				StoredItemStack add = LogisticsAPI.getItemHelper().addStackToPlayer(new StoredItemStack(toAdd), player, false, ActionType.PERFORM);
-			}
-		}
-	}
-
-	public void emptyFluid(EntityPlayer player, TileEntity te, ItemStack add) {
-		ItemStack heldItem = player.getHeldItem();
-		if (heldItem == null) {
-			return;
-		}
-		ItemStack insert = heldItem.copy();
-		insert.stackSize = 1;
-		INetworkCache network = LogisticsAPI.getCableHelper().getNetwork(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite());
-		ItemStack empty = LogisticsAPI.getFluidHelper().drainFluidItemStack(insert.copy(), network, ActionType.PERFORM);
-		if (!player.capabilities.isCreativeMode) {
-			if (insert.stackSize == heldItem.stackSize) {
-				player.inventory.setInventorySlotContents(player.inventory.currentItem, empty);
-			} else {
-				player.inventory.decrStackSize(player.inventory.currentItem, 1);
-				if (empty != null) {
-					LogisticsAPI.getItemHelper().addStackToPlayer(new StoredItemStack(empty), player, false, ActionType.PERFORM);
-				}
-			}
-		}
-	}
-
 	public boolean canConnect(TileEntity te, ForgeDirection dir) {
 		return dir.equals(ForgeDirection.getOrientation(FMPHelper.getMeta(te))) || dir.equals(ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite());
 	}
@@ -168,26 +117,21 @@ public class FluidReaderHandler extends TileHandler implements IByteBufTile, IDe
 		switch (setting.getObject()) {
 		case 0:
 			if (current != null) {
-				if (fluids != null) {
-					for (StoredFluidStack stack : fluids) {
-						if (stack.equalStack(current)) {
-							return FluidStackInfo.createInfo(stack);
-						}
+				for (StoredFluidStack stack : fluids) {
+					if (stack.equalStack(current)) {
+						return FluidStackInfo.createInfo(stack, cacheID);
 					}
 				}
-				return FluidStackInfo.createInfo(new StoredFluidStack(current, 0));
+				return FluidStackInfo.createInfo(new StoredFluidStack(current, 0), cacheID);
 			}
 			break;
 		case 1:
 			if (posSlot.getObject() < fluids.size()) {
-				return FluidStackInfo.createInfo(fluids.get(posSlot.getObject()));
+				return FluidStackInfo.createInfo(fluids.get(posSlot.getObject()), cacheID);
 			}
 			break;
 		case 2:
-			if (fluids != null) {
-				return FluidInventoryInfo.createInfo((ArrayList<StoredFluidStack>) fluids);
-			}
-			break;
+			return FluidInventoryInfo.createInfo((ArrayList<StoredFluidStack>) fluids, cacheID);
 		case 3:
 			return new ProgressInfo(maxStorage.getStoredFluids(), maxStorage.getMaxFluids(), FontHelper.formatFluidSize(maxStorage.getStoredFluids()) + " / " + FontHelper.formatFluidSize(maxStorage.getMaxFluids()));
 		}

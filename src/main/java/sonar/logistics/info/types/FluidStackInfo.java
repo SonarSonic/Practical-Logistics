@@ -19,11 +19,13 @@ import cpw.mods.fml.common.network.ByteBufUtils;
 public class FluidStackInfo extends ILogicInfo<FluidStackInfo> {
 
 	public StoredFluidStack stack;
-	public String rend = "FLUIDSTACK";
+	public static String rend = "FLUID";
+	public int cacheID = -1;
 
-	public static FluidStackInfo createInfo(StoredFluidStack stack) {
+	public static FluidStackInfo createInfo(StoredFluidStack stack, int cacheID) {
 		FluidStackInfo info = new FluidStackInfo();
 		info.stack = stack;
+		info.cacheID = cacheID;
 		return info;
 	}
 

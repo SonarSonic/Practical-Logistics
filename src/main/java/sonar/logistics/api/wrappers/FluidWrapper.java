@@ -1,8 +1,10 @@
 package sonar.logistics.api.wrappers;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import sonar.core.fluid.StoredFluidStack;
 import sonar.core.inventory.StoredItemStack;
@@ -15,11 +17,11 @@ public class FluidWrapper {
 
 	public static class StorageFluids {
 
-		public static final StorageFluids EMPTY = new StorageFluids(Collections.EMPTY_LIST, StorageSize.EMPTY);
-		public List<StoredFluidStack> fluids;
+		public static final StorageFluids EMPTY = new StorageFluids(new ArrayList(), StorageSize.EMPTY);
+		public ArrayList<StoredFluidStack> fluids;
 		public StorageSize sizing;
 
-		public StorageFluids(List<StoredFluidStack> items, StorageSize sizing) {
+		public StorageFluids(ArrayList<StoredFluidStack> items, StorageSize sizing) {
 			this.fluids = items;
 			this.sizing = sizing;
 		}
@@ -79,4 +81,15 @@ public class FluidWrapper {
 	public StoredFluidStack getStackToAdd(long inputSize, StoredFluidStack stack, StoredItemStack returned) {
 		return null;
 	}
+
+	/** fills the players current item with a specific fluid from the network
+	 * @param player the player interacting
+	 * @param cache the network to fill from
+	 * @param toFill the {@link StoredFluidStack} to fill with */
+	public void fillHeldItem(EntityPlayer player, INetworkCache cache, StoredFluidStack toFill) {}
+
+	/** drains the players current item into the network
+	 * @param player the player interacting
+	 * @param cache the network to drain into */
+	public void drainHeldItem(EntityPlayer player, INetworkCache cache) {}
 }

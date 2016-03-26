@@ -196,13 +196,14 @@ public class GuiInventoryReader extends GuiSelectionGrid<StoredItemStack> {
 
 	@Override
 	public List<StoredItemStack> getGridList() {
-		if (searchField.getText() == null || searchField.getText().isEmpty() || searchField.getText().equals(" "))
+		String search = searchField.getText();
+		if (search == null || search.isEmpty() || search.equals(" "))
 			return handler.stacks;
 		else {
 			List<StoredItemStack> searchList = new ArrayList();
 			List<StoredItemStack> currentList = (List<StoredItemStack>) ((ArrayList<StoredItemStack>) handler.stacks).clone();
 			for (StoredItemStack stack : currentList) {
-				if (stack.item.getDisplayName().toLowerCase().contains(searchField.getText().toLowerCase())) {
+				if (stack.item.getDisplayName().toLowerCase().contains(search.toLowerCase())) {
 					searchList.add(stack);
 				}
 			}

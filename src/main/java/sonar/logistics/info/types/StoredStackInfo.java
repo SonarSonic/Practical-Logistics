@@ -20,10 +20,12 @@ public class StoredStackInfo extends ILogicInfo<StoredStackInfo> {
 
 	public StoredItemStack stack;
 	public String rend = "ITEMREND";
+	public int cacheID = -1;
 
-	public static StoredStackInfo createInfo(StoredItemStack stack) {
+	public static StoredStackInfo createInfo(StoredItemStack stack, int cacheID) {
 		StoredStackInfo info = new StoredStackInfo();
 		info.stack = stack;
+		info.cacheID = cacheID;
 		return info;
 	}
 

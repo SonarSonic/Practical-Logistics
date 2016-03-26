@@ -74,8 +74,8 @@ public class ContainerInventoryReader extends ContainerSync {
 			if (id < 36) {
 				if (!tile.getWorldObj().isRemote) {
 					StoredItemStack stack = new StoredItemStack(itemstack);
-					if (lastStack!=null && ItemStack.areItemStackTagsEqual(itemstack1,lastStack) && lastStack.isItemEqual(itemstack1))
-						handler.insertInventory(player, tile, slot.getSlotIndex());
+					if (lastStack != null && ItemStack.areItemStackTagsEqual(itemstack1, lastStack) && lastStack.isItemEqual(itemstack1))
+						LogisticsAPI.getItemHelper().insertInventoryFromPlayer(player, handler.getNetwork(tile), slot.getSlotIndex());
 					else {
 						StoredItemStack perform = LogisticsAPI.getItemHelper().addItems(stack, handler.getNetwork(tile), ActionType.PERFORM);
 						lastStack = itemstack1;
@@ -120,9 +120,8 @@ public class ContainerInventoryReader extends ContainerSync {
 			if (targetSlot instanceof NetworkSlot) {
 				NetworkSlot slot = (NetworkSlot) targetSlot;
 				if (!tile.getWorldObj().isRemote) {
-					
 					INetworkCache network = LogisticsAPI.getCableHelper().getNetwork(tile, ForgeDirection.getOrientation(FMPHelper.getMeta(tile)).getOpposite());
-								if (flag == 1) {
+					if (flag == 1) {
 						StoredItemStack stack = slot.getStoredStack();
 
 						if (stack == null || stack.stored == 0) {
@@ -133,15 +132,15 @@ public class ContainerInventoryReader extends ContainerSync {
 						StoredItemStack simulate = LogisticsAPI.getItemHelper().removeToPlayerInventory(stack.copy().setStackSize(extractSize), extractSize, network, player, ActionType.SIMULATE);
 						if (simulate != null) {
 							StoredItemStack storedStack = LogisticsAPI.getItemHelper().getStackToAdd(simulate.stored, stack, LogisticsAPI.getItemHelper().removeItems(simulate, network, ActionType.PERFORM));
-							
+
 							if (storedStack != null && storedStack.stored != 0) {
 								LogisticsAPI.getItemHelper().addStackToPlayer(storedStack, player, false, ActionType.PERFORM);
 								this.detectAndSendChanges();
 								return null;
 							}
-							
+
 						}
-					} else  if (player.inventory.getItemStack() != null) {
+					} else if (player.inventory.getItemStack() != null) {
 						ItemStack add = player.inventory.getItemStack();
 						int stackSize = Math.min(buttonID == 1 ? 1 : 64, add.stackSize);
 						StoredItemStack stack = LogisticsAPI.getItemHelper().addItems(new StoredItemStack(add.copy()).setStackSize(stackSize), network, ActionType.PERFORM);

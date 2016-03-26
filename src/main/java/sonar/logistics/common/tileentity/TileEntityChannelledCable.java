@@ -4,10 +4,13 @@ import java.util.List;
 
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.common.tileentity.TileEntitySonar;
+import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.utils.BlockCoords;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.connecting.CableType;
 import sonar.logistics.api.connecting.IDataCable;
+import sonar.logistics.api.connecting.IInfoEmitter;
+import sonar.logistics.api.connecting.ILogicTile;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -76,7 +79,13 @@ public class TileEntityChannelledCable extends TileEntitySonar implements IDataC
 	}
 
 	@Override
+	public void refreshConnections() {
+		LogisticsAPI.getCableHelper().refreshConnections(this);
+	}
+
+	@Override
 	public boolean canConnect(ForgeDirection dir) {
 		return true;
 	}
+
 }

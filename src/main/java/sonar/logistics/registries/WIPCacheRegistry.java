@@ -12,14 +12,13 @@ import sonar.logistics.api.cache.EmptyNetworkCache;
 import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.cache.NetworkCache;
 
-public final class CacheRegistry {
+public class WIPCacheRegistry {
 
 	public static final EmptyNetworkCache EMPTY_CACHE = new EmptyNetworkCache();
-
-	private static LinkedHashMap<Integer, INetworkCache> cache = new LinkedHashMap<Integer, INetworkCache>();
+	private static ArrayList<INetworkCache> caches = new ArrayList<INetworkCache>();
 
 	public static void removeAll() {
-		cache.clear();
+		caches.clear();
 	}
 
 	public static Entry<BlockCoords, ForgeDirection> getFirstConnection(int networkID) {
@@ -47,7 +46,9 @@ public final class CacheRegistry {
 	}
 
 	public static INetworkCache getCache(int networkID) {
-		INetworkCache networkCache = cache.get(networkID);
+		INetworkCache networkCache = null;
+		if (caches.size() > networkID)
+			networkCache = caches.get(networkID);
 		if (networkCache == null) {
 			return EMPTY_CACHE;
 		}
@@ -56,20 +57,19 @@ public final class CacheRegistry {
 
 	public static void refreshCache(int oldID, int newID) {
 		if (oldID != newID) {
-			System.out.print(oldID);
-			cache.remove(oldID);
+			caches.remove(oldID);
 		}
-		INetworkCache networkCache = cache.get(newID);
+		INetworkCache networkCache = caches.get(newID);
 		if (networkCache != null && networkCache instanceof INetworkCache) {
 			((NetworkCache) networkCache).refreshCache(newID);
 		}
 		NetworkCache network = new NetworkCache();
 		network.refreshCache(newID);
-		cache.put(newID, network);
+		caches.set(newID, network);
 		Logistics.logger.debug("refreshed cache");
 	}
 
-	public static LinkedHashMap<Integer, INetworkCache> getNetworkCache() {
-		return cache;
+	public static ArrayList<INetworkCache> getNetworkCache() {
+		return caches;
 	}
 }

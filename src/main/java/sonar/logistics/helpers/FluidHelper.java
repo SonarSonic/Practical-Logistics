@@ -3,6 +3,7 @@ package sonar.logistics.helpers;
 import java.util.List;
 import java.util.Map;
 
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -23,17 +24,7 @@ import sonar.logistics.api.wrappers.FluidWrapper;
 
 public class FluidHelper extends FluidWrapper {
 
-	/*
-	 * public StorageFluids getFluids(List<BlockCoords> network) { List<StoredFluidStack> fluidList = new ArrayList(); StorageSize storage = new StorageSize(0, 0); List<FluidHandler> providers = Logistics.fluidProviders.getObjects();
-	 * 
-	 * for (FluidHandler provider : providers) { for (BlockCoords coord : network) { TileEntity target = coord.getTileEntity(); if (target != null && target instanceof IConnectionNode) { IConnectionNode node = (IConnectionNode) target; Map<BlockCoords, ForgeDirection> connections = node.getConnections(); for (Map.Entry<BlockCoords, ForgeDirection> entry : connections.entrySet()) { TileEntity fluidTile = entry.getKey().getTileEntity(target.getWorldObj()); if (provider.canHandleFluids(fluidTile, entry.getValue())) { List<StoredFluidStack> info = new ArrayList(); StorageSize size = provider.getFluids(info, fluidTile, entry.getValue()); storage.addItems(size.getStoredFluids()); storage.addStorage(size.getMaxFluids()); for (StoredFluidStack fluid : info) { addFluidToList(fluidList, fluid); } }
-	 * } } } } return new StorageFluids(fluidList, storage); }
-	 */
 	public StorageFluids getFluids(INetworkCache network) {
-		/*
-		 * List<StoredFluidStack> fluidList = new ArrayList(); StorageSize storage = new StorageSize(0, 0); List<FluidHandler> providers = Logistics.fluidProviders.getObjects(); LinkedHashMap<BlockCoords,ForgeDirection> blocks = network.getExternalBlocks(true); for (FluidHandler provider : providers) { for (Map.Entry<BlockCoords, ForgeDirection> entry : blocks.entrySet()) { TileEntity fluidTile = entry.getKey().getTileEntity(); if (fluidTile != null && provider.canHandleFluids(fluidTile, entry.getValue())) { List<StoredFluidStack> info = new ArrayList(); StorageSize size = provider.getFluids(info, fluidTile, entry.getValue()); storage.addItems(size.getStoredFluids()); storage.addStorage(size.getMaxFluids()); for (StoredFluidStack fluid : info) { addFluidToList(fluidList, fluid); } } } }
-		 * return new StorageFluids(fluidList, storage);
-		 */
 		if (network instanceof IStorageCache) {
 			StorageFluids stored = ((IStorageCache) network).getStoredFluids();
 			return stored;
@@ -204,5 +195,48 @@ public class FluidHelper extends FluidWrapper {
 			simulateStack = new StoredFluidStack(stack.getFullStack(), inputSize - returned.stored);
 		}
 		return simulateStack;
+	}
+
+	public void fillHeldItem(EntityPlayer player, INetworkCache cache, StoredFluidStack toFill) {
+		ItemStack heldItem = player.getHeldItem();
+		if (heldItem == null || toFill == null) {
+			return;
+		}
+		if (heldItem.stackSize == 1) {
+			ItemStack simulate = LogisticsAPI.getFluidHelper().fillFluidItemStack(heldItem.copy(), toFill.copy(), cache, ActionType.SIMULATE);
+			if (!ItemStack.areItemStacksEqual(simulate, heldItem) || !ItemStack.areItemStackTagsEqual(simulate, heldItem)) {
+				player.inventory.setInventorySlotContents(player.inventory.currentItem, LogisticsAPI.getFluidHelper().fillFluidItemStack(heldItem, toFill, cache, ActionType.PERFORM));
+			}
+		} else {
+			ItemStack insert = heldItem.copy();
+			insert.stackSize = 1;
+
+			ItemStack simulate = LogisticsAPI.getFluidHelper().fillFluidItemStack(insert.copy(), toFill.copy(), cache, ActionType.SIMULATE);
+			if (!ItemStack.areItemStacksEqual(simulate, insert) || !ItemStack.areItemStackTagsEqual(simulate, insert)) {
+				ItemStack toAdd = LogisticsAPI.getFluidHelper().fillFluidItemStack(insert, toFill, cache, ActionType.PERFORM);
+				player.inventory.decrStackSize(player.inventory.currentItem, 1);
+				StoredItemStack add = LogisticsAPI.getItemHelper().addStackToPlayer(new StoredItemStack(toAdd), player, false, ActionType.PERFORM);
+			}
+		}
+	}
+
+	public void drainHeldItem(EntityPlayer player, INetworkCache cache) {
+		ItemStack heldItem = player.getHeldItem();
+		if (heldItem == null) {
+			return;
+		}
+		ItemStack insert = heldItem.copy();
+		insert.stackSize = 1;
+		ItemStack empty = LogisticsAPI.getFluidHelper().drainFluidItemStack(insert.copy(), cache, ActionType.PERFORM);
+		if (!player.capabilities.isCreativeMode) {
+			if (insert.stackSize == heldItem.stackSize) {
+				player.inventory.setInventorySlotContents(player.inventory.currentItem, empty);
+			} else {
+				player.inventory.decrStackSize(player.inventory.currentItem, 1);
+				if (empty != null) {
+					LogisticsAPI.getItemHelper().addStackToPlayer(new StoredItemStack(empty), player, false, ActionType.PERFORM);
+				}
+			}
+		}
 	}
 }

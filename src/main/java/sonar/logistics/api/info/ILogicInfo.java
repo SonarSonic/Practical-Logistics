@@ -1,7 +1,6 @@
 package sonar.logistics.api.info;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -65,7 +64,7 @@ public abstract class ILogicInfo<T> implements INBTObject, IBufObject {
 	}
 
 	public void renderInfo(Tessellator tess, TileEntity tile, float minX, float minY, float maxX, float maxY, float zOffset, ScreenType type) {
-		LogisticsAPI.getInfoRenderer().renderStandardInfo(this, Minecraft.getMinecraft().fontRenderer, minX, minY, maxX, maxY, zOffset, type);
+		LogisticsAPI.getInfoRenderer().renderStandardInfo(this, minX, minY, maxX, maxY, zOffset, type);
 	}
 
 	public int updateTicks() {

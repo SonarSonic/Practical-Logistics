@@ -9,10 +9,12 @@ import sonar.core.inventory.StoredItemStack;
 import sonar.core.utils.BlockInteraction;
 import sonar.core.utils.BlockInteractionType;
 import sonar.logistics.api.LogisticsAPI;
+import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.render.InfoInteractionHandler;
 import sonar.logistics.api.render.ScreenType;
 import sonar.logistics.common.handlers.InventoryReaderHandler;
 import sonar.logistics.info.types.StoredStackInfo;
+import sonar.logistics.registries.CacheRegistry;
 
 public class StoredStackInteraction extends InfoInteractionHandler<StoredStackInfo> {
 
@@ -22,29 +24,27 @@ public class StoredStackInteraction extends InfoInteractionHandler<StoredStackIn
 	}
 
 	@Override
-	public boolean canHandle(ScreenType type, TileEntity te, TileEntity object) {
-		TileHandler handler = FMPHelper.getHandler(object);
-		return handler != null && handler instanceof InventoryReaderHandler;
-	}
-
-	@Override
-	public void handleInteraction(StoredStackInfo info, ScreenType type, TileEntity screen, TileEntity reader, EntityPlayer player, int x, int y, int z, BlockInteraction interact, boolean doubleClick) {
-		InventoryReaderHandler handler = (InventoryReaderHandler) FMPHelper.getHandler(reader);
-		
+	public void handleInteraction(StoredStackInfo info, ScreenType type, TileEntity screen, EntityPlayer player, int x, int y, int z, BlockInteraction interact, boolean doubleClick) {
+		INetworkCache cache = CacheRegistry.getCache(info.cacheID);
+		if (cache == null || cache.getNetworkID() == -1) {
+			return;
+		}
 		if (interact.type == BlockInteractionType.RIGHT) {
 			if (player.getHeldItem() != null && info.stack.equalStack(player.getHeldItem())) {
 				if (!doubleClick) {
-					handler.insertItem(player, reader, player.inventory.currentItem);
+					LogisticsAPI.getItemHelper().insertItemFromPlayer(player, cache, player.inventory.currentItem);
 				} else {
-					handler.insertInventory(player, reader, player.inventory.currentItem);
+					LogisticsAPI.getItemHelper().insertInventoryFromPlayer(player, cache, player.inventory.currentItem);
 				}
-
 			}
 		} else if (interact.type != BlockInteractionType.SHIFT_RIGHT) {
-			StoredItemStack extract = handler.extractItem(reader, info.stack, interact.type == BlockInteractionType.LEFT ? 1 : 64);
-			if (extract != null) {
-				LogisticsAPI.getItemHelper().spawnStoredItemStack(extract, screen.getWorldObj(), x, y, z, ForgeDirection.getOrientation(interact.side));
+			if (info.stack != null) {
+				StoredItemStack extract = LogisticsAPI.getItemHelper().extractItem(cache, info.stack.setStackSize(interact.type == BlockInteractionType.LEFT ? 1 : 64));
+				if (extract != null) {
+					LogisticsAPI.getItemHelper().spawnStoredItemStack(extract, screen.getWorldObj(), x, y, z, interact.getDir());
+				}
 			}
+
 		}
 	}
 

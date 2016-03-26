@@ -23,7 +23,7 @@ import sonar.logistics.api.wrappers.ItemWrapper.StorageItems;
 public abstract class StorageCache implements IStorageCache{
 	
 	public StorageItems getCachedItems() {
-		List<StoredItemStack> storedStacks = new ArrayList();
+		ArrayList<StoredItemStack> storedStacks = new ArrayList();
 		StorageSize storage = new StorageSize(0, 0);
 
 		Map<BlockCoords, ForgeDirection> blocks = getExternalBlocks(true);
@@ -39,7 +39,7 @@ public abstract class StorageCache implements IStorageCache{
 	}
 
 	public StorageFluids getCachedFluids() {
-		List<StoredFluidStack> fluidList = new ArrayList();
+		ArrayList<StoredFluidStack> fluidList = new ArrayList();
 		StorageSize storage = new StorageSize(0, 0);
 		List<FluidHandler> providers = Logistics.fluidProviders.getObjects();
 		LinkedHashMap<BlockCoords, ForgeDirection> blocks = getExternalBlocks(true);

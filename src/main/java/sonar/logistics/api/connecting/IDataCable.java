@@ -12,7 +12,7 @@ public interface IDataCable extends ICableRenderer, ILogicTile {
 	/** when cables join together they create networks which are stored under IDs in the registry, this returns this id */
 	public int registryID();
 
-	/** DON'T CALL THIS OUTSIDE OF THE CABLE REGISTRY - Once this is called the Registry will assume the id was successfully changed. */
+	/** DON'T CALL THIS OUTSIDE OF THE CABLE REGISTRY - Once this is called the Registry will assume the id was successfully changed*/
 	public void setRegistryID(int id);
 
 	/** is the cable limited by the number of channels, true for Channelled Cables, false for Data Cables */
@@ -22,5 +22,8 @@ public interface IDataCable extends ICableRenderer, ILogicTile {
 	public void addCable();
 
 	/** called when the cable is removed to the world */
-	public void removeCable();
+	public void removeCable();	
+
+	/** the cable should check it's connections and add them again */
+	public void refreshConnections();
 }

@@ -19,18 +19,22 @@ import org.lwjgl.opengl.GL12;
 import sonar.core.inventory.StoredItemStack;
 import sonar.core.utils.helpers.FontHelper;
 import sonar.core.utils.helpers.RenderHelper;
+import sonar.logistics.api.LogisticsAPI;
+import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.api.render.ScreenType;
 import cpw.mods.fml.common.network.ByteBufUtils;
 
 public class InventoryInfo extends ILogicInfo<InventoryInfo> {
 
-	public List<StoredItemStack> stacks = new ArrayList();
+	public ArrayList<StoredItemStack> stacks = new ArrayList();
+	public int cacheID = -1;
 	public String rend = "ITEMINV";
 
-	public static InventoryInfo createInfo(List<StoredItemStack> stacks) {
+	public static InventoryInfo createInfo(ArrayList<StoredItemStack> stacks, int cacheID) {
 		InventoryInfo info = new InventoryInfo();
 		info.stacks = stacks;
+		info.cacheID = cacheID;
 		return info;
 	}
 
@@ -196,7 +200,7 @@ public class InventoryInfo extends ILogicInfo<InventoryInfo> {
 	public void writeUpdate(InventoryInfo currentInfo, NBTTagCompound tag) {
 		if (currentInfo.stacks == null) {
 			currentInfo.stacks = new ArrayList();
-			
+
 		}
 		if (stacks == null) {
 			stacks = new ArrayList();
@@ -293,7 +297,7 @@ public class InventoryInfo extends ILogicInfo<InventoryInfo> {
 
 	@Override
 	public boolean matches(InventoryInfo currentInfo) {
-		return currentInfo.stacks.equals(stacks);
+		return currentInfo.stacks.equals(stacks) && this.cacheID==currentInfo.cacheID;
 	}
 
 }

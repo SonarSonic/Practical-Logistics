@@ -15,11 +15,15 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.SonarCore;
+import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.inventory.StoredItemStack;
 import sonar.core.network.PacketInvUpdate;
 import sonar.core.utils.ActionType;
 import sonar.core.utils.BlockCoords;
+import sonar.core.utils.BlockInteraction;
+import sonar.core.utils.BlockInteractionType;
 import sonar.logistics.Logistics;
+import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.cache.CacheTypes;
 import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.cache.IStorageCache;
@@ -27,11 +31,12 @@ import sonar.logistics.api.connecting.IEntityNode;
 import sonar.logistics.api.providers.InventoryHandler;
 import sonar.logistics.api.providers.InventoryHandler.StorageSize;
 import sonar.logistics.api.wrappers.ItemWrapper;
+import sonar.logistics.info.types.InventoryInfo;
 
 public class ItemHelper extends ItemWrapper {
 
 	public StorageItems getItems(INetworkCache network) {
-		if(network instanceof IStorageCache){
+		if (network instanceof IStorageCache) {
 			return ((IStorageCache) network).getStoredItems();
 		}
 		return StorageItems.EMPTY;
@@ -159,26 +164,13 @@ public class ItemHelper extends ItemWrapper {
 			network.getFirstConnection(CacheTypes.EMITTER);
 		}
 		return stack;
-/*
-		if (block != null) {
-			return getTileStack(network, slot);
-		} else {
-			
-		}
-		for (BlockCoords connect : connections) {
-			Object tile = connect.getTileEntity();
-			if (tile != null) {
-				if (tile instanceof IConnectionNode) {
-					return getTileStack((IConnectionNode) tile, slot);
-				}
-				if (tile instanceof IEntityNode) {
-					return getEntityStack((IEntityNode) tile, slot);
-				}
-			}
-		}
-
-		return null;
-		*/
+		/*
+		 * if (block != null) { return getTileStack(network, slot); } else {
+		 * 
+		 * } for (BlockCoords connect : connections) { Object tile = connect.getTileEntity(); if (tile != null) { if (tile instanceof IConnectionNode) { return getTileStack((IConnectionNode) tile, slot); } if (tile instanceof IEntityNode) { return getEntityStack((IEntityNode) tile, slot); } } }
+		 * 
+		 * return null;
+		 */
 	}
 
 	public StoredItemStack getEntityStack(IEntityNode node, int slot) {
@@ -376,5 +368,55 @@ public class ItemHelper extends ItemWrapper {
 			simulateStack = new StoredItemStack(stack.getItemStack(), inputSize - returned.stored);
 		}
 		return simulateStack;
+	}
+
+	public StoredItemStack extractItem(INetworkCache cache, StoredItemStack stack) {
+		if (stack != null && stack.stored != 0) {
+			StoredItemStack extract = LogisticsAPI.getItemHelper().removeItems(stack.copy(), cache, ActionType.PERFORM);
+			StoredItemStack toAdd = LogisticsAPI.getItemHelper().getStackToAdd(stack.getStackSize(), stack, extract);
+			return toAdd;
+		}
+		return null;
+	}
+
+	public void insertInventoryFromPlayer(EntityPlayer player, INetworkCache cache, int slotID) {
+		ItemStack add = null;
+		if (slotID == -1) {
+			add = player.inventory.getItemStack();
+		} else
+			add = player.inventory.getStackInSlot(slotID);
+		if (add == null) {
+			return;
+		}
+		StoredItemStack stack = new StoredItemStack(add).setStackSize(0);
+		IInventory inv = player.inventory;
+		ArrayList<Integer> slots = new ArrayList();
+		for (int i = 0; i < inv.getSizeInventory(); i++) {
+			ItemStack item = inv.getStackInSlot(i);
+			if (stack.equalStack(item)) {
+				stack.add(item);
+				slots.add(i);
+			}
+		}
+		StoredItemStack remainder = LogisticsAPI.getItemHelper().addItems(stack.copy(), cache, ActionType.PERFORM);
+		StoredItemStack toAdd = LogisticsAPI.getItemHelper().getStackToAdd(stack.getStackSize(), stack, remainder);
+		LogisticsAPI.getItemHelper().removeStackFromPlayer(toAdd, player, false, ActionType.PERFORM);
+
+	}
+
+	public void insertItemFromPlayer(EntityPlayer player, INetworkCache cache, int slot) {
+		ItemStack add = player.inventory.getStackInSlot(slot);
+		if (add == null) {
+			return;
+		}
+		StoredItemStack stack = LogisticsAPI.getItemHelper().addItems(new StoredItemStack(add), cache, ActionType.PERFORM);
+		if (stack == null || stack.stored == 0) {
+			add = null;
+		} else {
+			add.stackSize = (int) stack.stored;
+		}
+		if (!ItemStack.areItemStacksEqual(add, player.inventory.getStackInSlot(slot))) {
+			player.inventory.setInventorySlotContents(slot, add);
+		}
 	}
 }

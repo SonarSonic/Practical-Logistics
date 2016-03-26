@@ -47,14 +47,13 @@ public class TileEntityArray extends TileEntityHandlerInventory implements IConn
 		connections.putAll(handler.coordList);
 	}
 
-
 	@Override
 	public boolean isBlocked(ForgeDirection dir) {
 		return dir == ForgeDirection.UP;
 	}
 
 	public CableType canRenderConnection(ForgeDirection dir) {
-		if(dir == ForgeDirection.UP){
+		if (dir == ForgeDirection.UP) {
 			return CableType.NONE;
 		}
 		return LogisticsAPI.getCableHelper().canRenderConnection(this, dir, getCableType());
@@ -70,7 +69,7 @@ public class TileEntityArray extends TileEntityHandlerInventory implements IConn
 			addCable();
 		}
 		handler.updateCoordsList();
-		//CacheRegistry.refreshCache(registryID);
+		// CacheRegistry.refreshCache(registryID);
 	}
 
 	public void invalidate() {
@@ -115,7 +114,11 @@ public class TileEntityArray extends TileEntityHandlerInventory implements IConn
 		super.setInventorySlotContents(i, itemstack);
 		this.worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
 		handler.updateCoordsList();
-		//CacheRegistry.refreshCache(registryID);
+	}
+
+	@Override
+	public void refreshConnections() {
+		LogisticsAPI.getCableHelper().refreshConnections(this);
 	}
 
 }

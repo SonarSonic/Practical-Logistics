@@ -26,9 +26,9 @@ import sonar.logistics.api.connecting.IInfoReader;
 import sonar.logistics.api.connecting.ILargeDisplay;
 import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.api.info.LogicInfo;
-import sonar.logistics.api.interaction.IDefaultInteraction;
 import sonar.logistics.api.render.InfoInteractionHandler;
 import sonar.logistics.api.render.ScreenType;
+import sonar.logistics.info.types.InventoryInfo;
 import sonar.logistics.info.types.ManaInfo;
 import sonar.logistics.registries.DisplayRegistry;
 import cpw.mods.fml.common.network.ByteBufUtils;
@@ -70,13 +70,14 @@ public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 		}
 		Object target = FMPHelper.getTile(network.getFirstTileEntity(CacheTypes.EMITTER));
 		if (target == null) {
+			info = new LogicInfo((byte) -1, "INFO", " ", "NO DATA");
 			return;
 		}
 		ILogicInfo current = null;
 		boolean shouldUpdate = true;
 		if (target instanceof IInfoReader) {
 			IInfoReader infoReader = (IInfoReader) target;
-			ILogicInfo currentInfo =infoReader.currentInfo();
+			ILogicInfo currentInfo = infoReader.currentInfo();
 			if (infoReader.currentInfo() != null && infoReader.getSecondaryInfo() != null) {
 				ILogicInfo progress = LogisticsAPI.getInfoHelper().combineData(currentInfo, infoReader.getSecondaryInfo());
 				if (!progress.equals(info) || (info != null && !currentInfo.getData().equals(info.getData()))) {
@@ -94,7 +95,7 @@ public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 
 		} else if (target instanceof IInfoEmitter) {
 			IInfoEmitter infoNode = (IInfoEmitter) target;
-			ILogicInfo currentInfo =infoNode.currentInfo();
+			ILogicInfo currentInfo = infoNode.currentInfo();
 			if (currentInfo != null) {
 				if (!currentInfo.equals(info) || (info != null && !currentInfo.getData().equals(info.getData()))) {
 					current = infoNode.currentInfo();
@@ -102,7 +103,11 @@ public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 					shouldUpdate = false;
 				}
 			}
-		}
+		} else {
+			info = new LogicInfo((byte) -1, "INFO", " ", "NO DATA");
+			return;
+		}		
+		
 		updateInfo = current;
 		if (shouldUpdate) {
 			if (info == null) {
@@ -142,7 +147,6 @@ public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 		}
 		lastClickTime = world.getTotalWorldTime();
 		lastClickUUID = player.getPersistentID();
-		TileEntity connectTe = te;
 		ILogicInfo screenInfo = info;
 		if (te instanceof ILargeDisplay) {
 			List<BlockCoords> displays = DisplayRegistry.getScreens(((ILargeDisplay) te).registryID());
@@ -152,18 +156,15 @@ public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 				if (tilehandler != null && tilehandler instanceof LargeDisplayScreenHandler) {
 					LargeDisplayScreenHandler handlerDisplay = (LargeDisplayScreenHandler) tilehandler;
 					if (handlerDisplay.connectedTile != null) {
-						connectTe = handlerDisplay.connectedTile.getTileEntity();
 						screenInfo = handlerDisplay.info;
+					} else {
+						return;
 					}
 				}
 			}
 		}
 		INetworkCache network = LogisticsAPI.getCableHelper().getNetwork(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite());
-		if(network==null){
-			return;
-		}
-		TileEntity target = network.getFirstTileEntity(CacheTypes.NETWORK);
-		if (target == null) {
+		if (network == null) {
 			return;
 		}
 		ScreenType screenType = ScreenType.NORMAL;
@@ -173,15 +174,9 @@ public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 				screenType = ScreenType.CONNECTED;
 			}
 		}
-		InfoInteractionHandler handler = Logistics.infoInteraction.getInteractionHandler(screenInfo, screenType, te, target);
+		InfoInteractionHandler handler = Logistics.infoInteraction.getInteractionHandler(screenInfo, screenType, te);
 		if (handler != null) {
-			handler.handleInteraction(screenInfo, screenType, te, target, player, x, y, z, interact, doubleClick);
-		} else {
-			Object reader = FMPHelper.getHandler(target);
-			if (reader != null && reader instanceof IDefaultInteraction) {
-				IDefaultInteraction interaction = (IDefaultInteraction) reader;
-				interaction.handleInteraction(screenInfo, screenType, te, target, player, x, y, z, interact, doubleClick);
-			}
+			handler.handleInteraction(screenInfo, screenType, te, player, x, y, z, interact, doubleClick);
 		}
 	}
 

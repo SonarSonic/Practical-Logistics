@@ -76,7 +76,7 @@ public class CableRegistry {
 				}
 				cables.get(registryID).add(cable);
 				((IDataCable) target).setRegistryID(registryID);
-				CacheRegistry.refreshCache(registryID);
+				CacheRegistry.refreshCache(registryID, registryID);
 			}
 		}
 	}
@@ -92,7 +92,7 @@ public class CableRegistry {
 			if (connections.get(registryID) == null) {
 				connections.put(registryID, new ArrayList());
 				connections.get(registryID).add(connection);
-				CacheRegistry.refreshCache(registryID);
+				CacheRegistry.refreshCache(registryID, registryID);
 				return;
 			}
 			ArrayList<BlockCoords> removeList = new ArrayList();
@@ -102,7 +102,7 @@ public class CableRegistry {
 				}
 			}
 			connections.get(registryID).add(connection);
-			CacheRegistry.refreshCache(registryID);
+			CacheRegistry.refreshCache(registryID, registryID);
 		}
 	}
 
@@ -156,8 +156,8 @@ public class CableRegistry {
 					tile.addConnections();
 				}
 			}
-
-			CacheRegistry.refreshCache(registryID);
+			
+			//CacheRegistry.refreshCache(registryID, newID);
 		}
 	}
 
@@ -175,7 +175,7 @@ public class CableRegistry {
 		}
 		addCables(newID, oldCables);
 		addConnections(newID, oldConnections);
-		CacheRegistry.refreshCache(newID);
+		CacheRegistry.refreshCache(secondaryID, newID);
 	}
 
 	public static void removeConnection(int registryID, BlockCoords connection) {
@@ -192,7 +192,7 @@ public class CableRegistry {
 			for (BlockCoords remove : removeList) {
 				connections.get(registryID).remove(remove);
 			}
-			CacheRegistry.refreshCache(registryID);
+			CacheRegistry.refreshCache(registryID, registryID);
 		}
 	}
 

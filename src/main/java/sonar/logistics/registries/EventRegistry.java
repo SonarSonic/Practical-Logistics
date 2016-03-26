@@ -1,5 +1,6 @@
 package sonar.logistics.registries;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 
@@ -14,11 +15,11 @@ public class EventRegistry {
 	@SubscribeEvent
 	public void onServerTick(TickEvent.ServerTickEvent event) {
 		if (event.phase == Phase.START) {
-			LinkedHashMap<Integer, INetworkCache> networks = (LinkedHashMap<Integer, INetworkCache>) CacheRegistry.getNetworkCache().clone();
-			for (Entry<Integer, INetworkCache> set : networks.entrySet()) {
-				if (set.getValue() instanceof IRefreshCache) {
+			ArrayList<INetworkCache> networks = (ArrayList<INetworkCache>) CacheRegistry.getNetworkCache().clone();
+			for (INetworkCache cache : networks) {
+				if (cache instanceof IRefreshCache) {
 					try {
-						((IRefreshCache) set.getValue()).updateNetwork(set.getKey());
+						((IRefreshCache) cache).updateNetwork(cache.getNetworkID());
 					} catch (Exception exception) {
 						Logistics.logger.error("FAILED TO REFRESH NETWORK CACHE - TELL MOD AUTHOR", exception);
 					}

@@ -77,8 +77,8 @@ public abstract class GuiSelectionGrid<T> extends GuiSonar {
 				int start = (int) (getGridSize() / 12 * this.currentScroll);
 				int X = (x - guiLeft - 13) / 18;
 				int Y = (y - guiTop - 32) / 18;
-				int i = (start * 12) + X + ((Y) * 12);
-
+				int i = (start * 12) + (12*Y)+X;
+				//System.out.print(i);
 				if (i < getGridList().size()) {
 					T storedStack = getGridList().get(i);
 					if (storedStack != null) {

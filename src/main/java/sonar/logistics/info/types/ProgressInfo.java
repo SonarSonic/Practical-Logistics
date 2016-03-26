@@ -113,15 +113,6 @@ public class ProgressInfo extends ILogicInfo<ProgressInfo> {
 		Minecraft.getMinecraft().renderEngine.bindTexture(progress);
 		RenderHelper.drawTexturedModalRect(minX, minY, maxY, width, (maxY - minY));
 		LogisticsAPI.getInfoRenderer().renderCenteredString(data, minX, minY, maxX, maxY, type);
-		/*
-		 * GL11.glTranslatef(minX + (maxX - minX) / 2, minY + (maxY - minY) / 2,
-		 * 0.01f); int sizing = Math.round(Math.min((maxX - minX), (maxY - minY)
-		 * * 3)); GL11.glTranslatef(0.0f, (float) (scale >= 120 ? -0.08F : -0.2F
-		 * + ((sizing - 1) * 0.001)), 0); double itemScale = sizing >= 2 ?
-		 * InfoRenderer.getScale(sizing) : 120; GL11.glScaled(1.0f / itemScale,
-		 * 1.0f / itemScale, 1.0f / itemScale); rend.drawString(data,
-		 * -rend.getStringWidth(data) / 2, -4, -1);
-		 */
 	}
 
 	@Override

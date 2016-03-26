@@ -1,5 +1,6 @@
 package sonar.logistics.api.wrappers;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -12,21 +13,23 @@ import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.inventory.StoredItemStack;
 import sonar.core.utils.ActionType;
 import sonar.core.utils.BlockCoords;
+import sonar.core.utils.BlockInteraction;
 import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.connecting.IConnectionNode;
 import sonar.logistics.api.connecting.IEntityNode;
 import sonar.logistics.api.providers.InventoryHandler;
 import sonar.logistics.api.providers.InventoryHandler.StorageSize;
+import sonar.logistics.info.types.InventoryInfo;
 
 public class ItemWrapper {
 
 	public static class StorageItems {
 
-		public static final StorageItems EMPTY = new StorageItems(Collections.EMPTY_LIST, StorageSize.EMPTY);
-		public List<StoredItemStack> items;
+		public static final StorageItems EMPTY = new StorageItems(new ArrayList(), StorageSize.EMPTY);
+		public ArrayList<StoredItemStack> items;
 		public StorageSize sizing;
 
-		public StorageItems(List<StoredItemStack> items, StorageSize sizing) {
+		public StorageItems(ArrayList<StoredItemStack> items, StorageSize sizing) {
 			this.items = items;
 			this.sizing = sizing;
 		}
@@ -169,5 +172,27 @@ public class ItemWrapper {
 	 * @return */
 	public StoredItemStack getStackToAdd(long inputSize, StoredItemStack stack, StoredItemStack returned) {
 		return null;
+	}
+
+	/** simple method to extract a given stack from a network
+	 * @param cache the network to remove from
+	 * @param stack the stack to remove
+	 * @return the removed stack */
+	public StoredItemStack extractItem(INetworkCache cache, StoredItemStack stack) {
+		return null;
+	}
+
+	/** inserts all the items from the players inventory into the network which match the one in the given slot
+	 * @param player the player who is inserting the items
+	 * @param cache the network to add them to
+	 * @param slot the slot of the item to be added */
+	public void insertInventoryFromPlayer(EntityPlayer player, INetworkCache cache, int slotID) {
+	}
+
+	/** inserts an item into the given network from the players inventory from the given slot
+	 * @param player the player who is inserting the items
+	 * @param cache the network to add them to
+	 * @param slot the slot to remove from */
+	public void insertItemFromPlayer(EntityPlayer player, INetworkCache cache, int slot) {
 	}
 }
