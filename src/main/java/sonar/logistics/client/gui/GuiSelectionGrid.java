@@ -26,7 +26,7 @@ public abstract class GuiSelectionGrid<T> extends GuiSonar {
 	private boolean wasClicking;
 	private int scrollerLeft, scrollerStart, scrollerEnd, scrollerWidth;
 
-	public abstract void onGridClicked(T selection, int pos, int button);
+	public abstract void onGridClicked(T selection, int pos, int button, boolean empty);
 
 	public abstract void renderSelection(T selection, int x, int y);
 
@@ -77,14 +77,15 @@ public abstract class GuiSelectionGrid<T> extends GuiSonar {
 				int start = (int) (getGridSize() / 12 * this.currentScroll);
 				int X = (x - guiLeft - 13) / 18;
 				int Y = (y - guiTop - 32) / 18;
-				int i = (start * 12) + (12*Y)+X;
-				//System.out.print(i);
+				int i = (start * 12) + (12 * Y) + X;
 				if (i < getGridList().size()) {
 					T storedStack = getGridList().get(i);
 					if (storedStack != null) {
-						onGridClicked(storedStack, i, button);
+						onGridClicked(storedStack, i, button, false);
+						return;
 					}
 				}
+				onGridClicked(null, i, button, true);
 			}
 		}
 	}
@@ -135,10 +136,12 @@ public abstract class GuiSelectionGrid<T> extends GuiSonar {
 		}
 		super.drawGuiContainerForegroundLayer(x, y);
 	}
-	
-	public void preRender(){}
-	
-	public void postRender(){}
+
+	public void preRender() {
+	}
+
+	public void postRender() {
+	}
 
 	public void handleMouseInput() {
 		super.handleMouseInput();

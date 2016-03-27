@@ -50,7 +50,7 @@ public class Logistics {
 
 	public static final String MODID = "PracticalLogistics";
 	public static final String NAME = "Practical Logistics";
-	public static final String VERSION = "0.1.5";
+	public static final String VERSION = "0.1.6";
 
 	public static SimpleNetworkWrapper network;
 	public static Logger logger = (Logger) LogManager.getLogger(MODID);
@@ -109,8 +109,6 @@ public class Logistics {
 			logger.info("Registered Sapphire World Generator");
 		} else
 			logger.info("Sapphire Ore Generation is disabled in the config");
-
-		/*if (SonarAPI.wailaLoaded()) { SonarWailaModule.addFMPProvider("Info Reader"); } */
 	}
 
 	@EventHandler

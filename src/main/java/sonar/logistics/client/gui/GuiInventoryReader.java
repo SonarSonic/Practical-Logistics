@@ -3,6 +3,8 @@ package sonar.logistics.client.gui;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.lwjgl.input.Keyboard;
+
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
@@ -53,7 +55,7 @@ public class GuiInventoryReader extends GuiSelectionGrid<StoredItemStack> {
 		super.initGui();
 		this.buttonList.add(new GuiButton(-1, guiLeft + 120 - (18 * 6), guiTop + 7, 65 + 3, 20, getSettingsString()));
 		this.buttonList.add(new FilterButton(0, guiLeft + 193, guiTop + 9));
-		this.buttonList.add(new FilterButton(1, guiLeft + 193 +18, guiTop + 9));
+		this.buttonList.add(new FilterButton(1, guiLeft + 193 + 18, guiTop + 9));
 		switch (getSetting()) {
 		case SLOT:
 		case POS:
@@ -66,7 +68,7 @@ public class GuiInventoryReader extends GuiSelectionGrid<StoredItemStack> {
 			break;
 		}
 		searchField = new GuiTextField(this.fontRendererObj, 195 - (18 * 3), 9, 13 + 18 * 2, 16);
-		//searchField = new GuiTextField(this.fontRendererObj, 95 - (18 * 3), 160, 16 + 18 * 8, 10);
+		// searchField = new GuiTextField(this.fontRendererObj, 95 - (18 * 3), 160, 16 + 18 * 8, 10);
 		searchField.setMaxStringLength(20);
 		// searchField.setText("");
 	}
@@ -212,34 +214,22 @@ public class GuiInventoryReader extends GuiSelectionGrid<StoredItemStack> {
 	}
 
 	@Override
-	public void onGridClicked(StoredItemStack selection, int pos, int button) {
-		if (getSetting() == STACK) {
-			handler.current = selection.item;
-			handler.current.stackSize = 1;
-			Logistics.network.sendToServer(new PacketInventoryReader(tile.xCoord, tile.yCoord, tile.zCoord, handler.current));
+	public void onGridClicked(StoredItemStack selection, int pos, int button, boolean empty) {
+		if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)) {
+			button = 2;
 		}
-		if (getSetting() == POS) {
-			List<StoredItemStack> currentList = (List<StoredItemStack>) ((ArrayList<StoredItemStack>) handler.stacks).clone();
-			int position = 0;
-			for (StoredItemStack stack : currentList) {
-				if (stack != null) {
-					if (stack.equals(selection)) {
-						String posString = String.valueOf(position);
-						slotField.setText(posString);
-						setPosSlot(posString);
-					}
-				}
-				position++;
-			}
+		if (!empty) {
+			Logistics.network.sendToServer(new PacketInventoryReader(tile.xCoord, tile.yCoord, tile.zCoord, selection.item, button));
+		}else{
+			Logistics.network.sendToServer(new PacketInventoryReader(tile.xCoord, tile.yCoord, tile.zCoord, null, button));			
 		}
+		/*
+		 * if (getSetting() == STACK) { handler.current = selection.item; handler.current.stackSize = 1; Logistics.network.sendToServer(new PacketInventoryReader(tile.xCoord, tile.yCoord, tile.zCoord, handler.current)); } if (getSetting() == POS) { List<StoredItemStack> currentList = (List<StoredItemStack>) ((ArrayList<StoredItemStack>) handler.stacks).clone(); int position = 0; for (StoredItemStack stack : currentList) { if (stack != null) { if (stack.equals(selection)) { String posString = String.valueOf(position); slotField.setText(posString); setPosSlot(posString); } } position++; } }
+		 */
 	}
 
 	@Override
 	public void renderStrings(int x, int y) {
-		// FontHelper.textOffsetCentre(StatCollector.translateToLocal("tile.InventoryReader.name").split(" ")[0],
-		// 197, 8, 1);
-		// FontHelper.textOffsetCentre(StatCollector.translateToLocal("tile.InventoryReader.name").split(" ")[1],
-		// 197, 18, 1);
 	}
 
 	@Override
@@ -298,15 +288,16 @@ public class GuiInventoryReader extends GuiSelectionGrid<StoredItemStack> {
 		}
 
 		@Override
-		public void onClicked() {}
+		public void onClicked() {
+		}
 
 		@Override
 		public int getTextureX() {
 			switch (id) {
 			case 0:
-				return 0 + handler.sortingOrder.getObject()*16;
+				return 0 + handler.sortingOrder.getObject() * 16;
 			case 1:
-				return 32 + (handler.sortingType.getObject()*16);
+				return 32 + (handler.sortingType.getObject() * 16);
 			}
 			return 0;
 		}

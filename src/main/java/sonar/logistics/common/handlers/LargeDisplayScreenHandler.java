@@ -43,7 +43,7 @@ public class LargeDisplayScreenHandler extends DisplayScreenHandler implements I
 		if (!te.getWorldObj().isRemote) {
 			boolean lastHandler = isHandler.getObject();
 			List<BlockCoords> displays = DisplayRegistry.getScreens(registryID);
-			if (displays != null) {
+			if (displays != null && !displays.isEmpty()) {
 				if (BlockCoords.equalCoords(displays.get(0), new BlockCoords(te))) {
 					TileEntity target = te.getWorldObj().getTileEntity(te.xCoord, te.yCoord - 1, te.zCoord);
 					if (target != null && target instanceof ILargeDisplay) {

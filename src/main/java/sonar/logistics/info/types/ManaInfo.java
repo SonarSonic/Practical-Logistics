@@ -115,10 +115,8 @@ public class ManaInfo extends ProgressInfo {
 	@Override
 	public boolean matches(ProgressInfo currentInfo) {
 		if (currentInfo instanceof ManaInfo) {
-			// return currentInfo.max == max && currentInfo.stored == stored;
 			return true;
 		} else {
-			// System.out.print("mana");
 			return false;
 		}
 	}

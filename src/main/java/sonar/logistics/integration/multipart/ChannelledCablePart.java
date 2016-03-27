@@ -104,7 +104,7 @@ public class ChannelledCablePart extends SonarTilePart implements IDataCable {
 		if (this.isBlocked(dir)) {
 			return CableType.NONE;
 		}
-		return LogisticsAPI.getCableHelper().canRenderConnection(tile(), dir, CableType.CHANNELLED_CABLE);
+		return LogisticsAPI.getCableHelper().canRenderConnection(tile(), dir, getCableType());
 	}
 
 	@Override

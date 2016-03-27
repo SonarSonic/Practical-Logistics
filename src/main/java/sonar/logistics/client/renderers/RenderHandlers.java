@@ -102,7 +102,7 @@ public class RenderHandlers {
 
 		@Override
 		public void renderTileEntityAt(TileEntity entity, double x, double y, double z, float f) {
-			RenderHelper.beginRender(x + 0.5F, y + 1.5F, z + 0.5F, RenderHelper.setMetaData(entity), texture);
+			RenderHelper.beginRender(x + 0.5F, y + 1.5F, z + 0.5F, 0, texture);
 			model.renderTile(entity, (Entity) null, 0.0F, 0.0F, -0.1F, 0.0F, 0.0F, 0.0625F, CableType.DATA_CABLE);
 			RenderHelper.finishRender();
 		}
@@ -114,7 +114,7 @@ public class RenderHandlers {
 
 		@Override
 		public void renderTileEntityAt(TileEntity entity, double x, double y, double z, float f) {
-			RenderHelper.beginRender(x + 0.5F, y + 1.5F, z + 0.5F, RenderHelper.setMetaData(entity), texture);
+			RenderHelper.beginRender(x + 0.5F, y + 1.5F, z + 0.5F, 0, texture);
 			model.renderTile(entity, (Entity) null, 0.0F, 0.0F, -0.1F, 0.0F, 0.0F, 0.0625F, CableType.CHANNELLED_CABLE);
 			RenderHelper.finishRender();
 		}

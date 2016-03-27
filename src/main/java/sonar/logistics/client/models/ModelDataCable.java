@@ -121,7 +121,6 @@ public class ModelDataCable extends ModelBase {
 
 	private boolean setTexture(ICableRenderer rend, ForgeDirection dir, CableType override) {
 		CableType type = rend.canRenderConnection(dir);
-
 		switch (type) {
 		case DATA_CABLE:
 			Minecraft.getMinecraft().getTextureManager().bindTexture(override != CableType.NONE ? (override.equals(CableType.CHANNELLED_CABLE) ? multicable : cable) : cable);

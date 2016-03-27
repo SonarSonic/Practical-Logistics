@@ -56,7 +56,6 @@ public final class CacheRegistry {
 
 	public static void refreshCache(int oldID, int newID) {
 		if (oldID != newID) {
-			System.out.print(oldID);
 			cache.remove(oldID);
 		}
 		INetworkCache networkCache = cache.get(newID);

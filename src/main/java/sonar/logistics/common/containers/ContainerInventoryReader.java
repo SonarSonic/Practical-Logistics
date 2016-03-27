@@ -18,7 +18,6 @@ import sonar.core.inventory.slots.SlotList;
 import sonar.core.network.PacketStackUpdate;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.cache.INetworkCache;
-import sonar.logistics.common.containers.slots.NetworkSlot;
 import sonar.logistics.common.handlers.InventoryReaderHandler;
 
 public class ContainerInventoryReader extends ContainerSync {
@@ -47,11 +46,6 @@ public class ContainerInventoryReader extends ContainerSync {
 		for (int i = 0; i < 9; ++i) {
 			this.addSlotToContainer(new Slot(inventoryPlayer, i, 41 + i * 18, 232));
 		}
-		for (int i = 0; i < 7; ++i) {
-			for (int j = 0; j < 12; ++j) {
-				this.addSlotToContainer(new NetworkSlot(handler, tile, j + i * 12, 13 + j * 18, 32 + i * 18));
-			}
-		}
 		if (hasStack)
 			addSlotToContainer(new SlotList(handler, 0, 103, 9));
 	}
@@ -65,12 +59,7 @@ public class ContainerInventoryReader extends ContainerSync {
 		ItemStack itemstack = null;
 		Slot slot = (Slot) this.inventorySlots.get(id);
 		if (slot != null && slot.getHasStack()) {
-			ItemStack itemstack1 = null;
-			if (slot instanceof NetworkSlot) {
-				itemstack1 = ((NetworkSlot) slot).getStoredStack().getFullStack();
-			} else {
-				itemstack1 = slot.getStack();
-			}
+			ItemStack itemstack1 = slot.getStack();
 			itemstack = itemstack1.copy();
 			if (id < 36) {
 				if (!tile.getWorldObj().isRemote) {
@@ -118,6 +107,7 @@ public class ContainerInventoryReader extends ContainerSync {
 	public ItemStack slotClick(int slotID, int buttonID, int flag, EntityPlayer player) {
 		if (slotID < this.inventorySlots.size()) {
 			Slot targetSlot = slotID < 0 ? null : (Slot) this.inventorySlots.get(slotID);
+			/*
 			if (targetSlot instanceof NetworkSlot) {
 				NetworkSlot slot = (NetworkSlot) targetSlot;
 				if (!tile.getWorldObj().isRemote) {
@@ -178,7 +168,9 @@ public class ContainerInventoryReader extends ContainerSync {
 				}
 				return null;
 
-			} else if ((targetSlot instanceof SlotList)) {
+			} else 
+				*/
+				if ((targetSlot instanceof SlotList)) {
 				if (buttonID == 2) {
 					targetSlot.putStack(null);
 				} else {

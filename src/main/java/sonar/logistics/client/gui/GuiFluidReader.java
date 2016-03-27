@@ -231,11 +231,13 @@ public class GuiFluidReader extends GuiSelectionGrid<StoredFluidStack> {
 	}
 
 	@Override
-	public void onGridClicked(StoredFluidStack selection, int pos, int button) {
+	public void onGridClicked(StoredFluidStack selection, int pos, int button, boolean empty) {
+		if(empty){
+			return;
+		}
 		if (getSetting() == STACK) {
-			if (selection.fluid != null) {
-				Logistics.network.sendToServer(new PacketFluidReader(tile.xCoord, tile.yCoord, tile.zCoord, selection.fluid));
-			}
+			Logistics.network.sendToServer(new PacketFluidReader(tile.xCoord, tile.yCoord, tile.zCoord, selection.fluid));
+
 		}
 		if (getSetting() == POS) {
 			List<StoredFluidStack> currentList = (List<StoredFluidStack>) ((ArrayList<StoredFluidStack>) handler.fluids).clone();
