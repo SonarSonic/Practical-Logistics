@@ -20,6 +20,11 @@ tile.EntityNode.name=实体监测节点
 tile.LargeDisplayScreen.name=大型显示屏
 tile.FluidReader.name=流体信息读取器
 tile.ItemRouter.name=物品路由器
+tile.MultiCable.name=频道线缆
+tile.ChannelSelector.name=频道选择器
+tile.Clock.name=钟
+tile.EnergyReader.name=能量信息读取器
+tile.TransceiverArray.name=无线电收发阵列
 
 //items
 item.EnergyScreenItem.name=能源显示屏
