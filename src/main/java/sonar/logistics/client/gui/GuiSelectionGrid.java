@@ -95,14 +95,15 @@ public abstract class GuiSelectionGrid<T> extends GuiSonar {
 		net.minecraft.client.renderer.RenderHelper.enableGUIStandardItemLighting();
 		renderStrings(x, y);
 		preRender();
-		if (getGridList() != null) {
+		List<T> list = getGridList();
+		if (list != null) {
 			int start = (int) (getGridSize() / 12 * this.currentScroll);
 			int i = start * 12;
 			int finish = Math.min(i + (12 * 7), getGridSize());
 			for (int Y = 0; Y < 7; Y++) {
 				for (int X = 0; X < 12; X++) {
 					if (i < finish) {
-						T selection = getGridList().get(i);
+						T selection = list.get(i);
 						if (selection != null) {
 							renderSelection(selection, X, Y);
 						}
@@ -118,9 +119,9 @@ public abstract class GuiSelectionGrid<T> extends GuiSonar {
 			int Y = (y - guiTop - 32) / 18;
 			int i = (start * 12) + X + ((Y) * 12);
 
-			if (getGridList() != null) {
-				if (i < getGridList().size()) {
-					T selection = getGridList().get(i);
+			if (list != null) {
+				if (i < list.size()) {
+					T selection = list.get(i);
 					if (selection != null) {
 
 						GL11.glDisable(GL11.GL_DEPTH_TEST);

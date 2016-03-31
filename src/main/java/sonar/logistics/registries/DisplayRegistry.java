@@ -9,6 +9,7 @@ import java.util.Map;
 import sonar.core.api.BlockCoords;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.logistics.api.connecting.ILargeDisplay;
+import sonar.logistics.common.handlers.LargeDisplayScreenHandler;
 import sonar.logistics.helpers.DisplayHelper;
 
 public class DisplayRegistry {
@@ -53,17 +54,20 @@ public class DisplayRegistry {
 					screens.put(registryID, new ArrayList());
 					screens.get(registryID).add(cable);
 					((ILargeDisplay) target).setRegistryID(registryID);
+					setHandler(registryID);
 					return;
 
 				}
 				List<BlockCoords> removeList = new ArrayList();
 				for (BlockCoords coords : screens.get(registryID)) {
 					if (BlockCoords.equalCoords(coords, cable)) {
+						setHandler(registryID);
 						return;
 					}
 				}
 				screens.get(registryID).add(cable);
 				((ILargeDisplay) target).setRegistryID(registryID);
+				setHandler(registryID);
 			}
 		}
 	}
@@ -104,6 +108,7 @@ public class DisplayRegistry {
 					DisplayHelper.addScreen(tile);
 				}
 			}
+			setHandler(newID);
 		}
 	}
 
@@ -113,8 +118,36 @@ public class DisplayRegistry {
 			oldCables.addAll(screens.get(secondaryID));
 			screens.get(secondaryID).clear();
 		}
-
 		addScreens(newID, oldCables);
+		setHandler(newID);
+	}
 
+	public static void setHandler(int id) {
+		List<BlockCoords> coords = getScreens(id);
+		int y = 1000;
+		BlockCoords handler = null;
+		for (BlockCoords coord : coords) {
+			if (coord.getY() < y) {
+				handler = coord;
+				y = coord.getY();
+			}
+		}
+		if (handler != null && y != 1000) {
+			for (BlockCoords coord : coords) {
+				Object object = FMPHelper.getHandler(coord.getTileEntity());
+				if (object != null && object instanceof LargeDisplayScreenHandler) {
+					LargeDisplayScreenHandler screen = (LargeDisplayScreenHandler) object;
+					if (BlockCoords.equalCoords(handler, coord)) {
+						screen.isHandler.setObject(true);
+						screen.resetHandler = true;
+					} else {
+						if (screen.isHandler.getObject()) {
+							screen.isHandler.setObject(false);
+							screen.resetHandler = true;
+						}
+					}
+				}
+			}
+		}
 	}
 }

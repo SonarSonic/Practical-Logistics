@@ -205,7 +205,7 @@ public class GuiInventoryReader extends GuiSelectionGrid<StoredItemStack> {
 			List<StoredItemStack> searchList = new ArrayList();
 			List<StoredItemStack> currentList = (List<StoredItemStack>) ((ArrayList<StoredItemStack>) handler.stacks).clone();
 			for (StoredItemStack stack : currentList) {
-				if (stack.item.getDisplayName().toLowerCase().contains(search.toLowerCase())) {
+				if (stack != null && stack.item != null && stack.item.getDisplayName().toLowerCase().contains(search.toLowerCase())) {
 					searchList.add(stack);
 				}
 			}
@@ -220,8 +220,8 @@ public class GuiInventoryReader extends GuiSelectionGrid<StoredItemStack> {
 		}
 		if (!empty) {
 			Logistics.network.sendToServer(new PacketInventoryReader(tile.xCoord, tile.yCoord, tile.zCoord, selection.item, button));
-		}else{
-			Logistics.network.sendToServer(new PacketInventoryReader(tile.xCoord, tile.yCoord, tile.zCoord, null, button));			
+		} else {
+			Logistics.network.sendToServer(new PacketInventoryReader(tile.xCoord, tile.yCoord, tile.zCoord, null, button));
 		}
 		/*
 		 * if (getSetting() == STACK) { handler.current = selection.item; handler.current.stackSize = 1; Logistics.network.sendToServer(new PacketInventoryReader(tile.xCoord, tile.yCoord, tile.zCoord, handler.current)); } if (getSetting() == POS) { List<StoredItemStack> currentList = (List<StoredItemStack>) ((ArrayList<StoredItemStack>) handler.stacks).clone(); int position = 0; for (StoredItemStack stack : currentList) { if (stack != null) { if (stack.equals(selection)) { String posString = String.valueOf(position); slotField.setText(posString); setPosSlot(posString); } } position++; } }

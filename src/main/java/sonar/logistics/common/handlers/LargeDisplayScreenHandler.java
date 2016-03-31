@@ -30,7 +30,7 @@ public class LargeDisplayScreenHandler extends DisplayScreenHandler implements I
 
 	public SyncTagType.BOOLEAN isHandler = new SyncTagType.BOOLEAN(0);
 	public LargeScreenSizing sizing;
-	public boolean resetSizing = true;
+	public boolean resetSizing = true, resetHandler = true;;
 	public BlockCoords connectedTile = null;
 	public int registryID = -1;
 
@@ -41,44 +41,23 @@ public class LargeDisplayScreenHandler extends DisplayScreenHandler implements I
 	@Override
 	public void update(TileEntity te) {
 		if (!te.getWorldObj().isRemote) {
-			boolean lastHandler = isHandler.getObject();
-			List<BlockCoords> displays = DisplayRegistry.getScreens(registryID);
-			if (displays != null && !displays.isEmpty()) {
-				if (BlockCoords.equalCoords(displays.get(0), new BlockCoords(te))) {
-					TileEntity target = te.getWorldObj().getTileEntity(te.xCoord, te.yCoord - 1, te.zCoord);
-					if (target != null && target instanceof ILargeDisplay) {
-						if (((ILargeDisplay) target).registryID() == registryID) {
-							List<BlockCoords> screens = (List<BlockCoords>) ((ArrayList<BlockCoords>) DisplayRegistry.getScreens(registryID)).clone();
-							int pos = 0;
-							for (BlockCoords coords : screens) {
-								if (BlockCoords.equalCoords(coords, new BlockCoords(te.xCoord, te.yCoord - 1, te.zCoord, te.getWorldObj().provider.dimensionId))) {
-									Collections.swap(DisplayRegistry.getScreens(registryID), 0, pos);
-									return;
-								}
-								pos++;
-							}
-						}
-					}
-					isHandler.setObject(true);
-					LargeScreenSizing lastSize = sizing;
-					sizing = DisplayHelper.getScreenSizing(te);
+			if (this.isHandler.getObject()) {
+				LargeScreenSizing lastSize = sizing;
+				sizing = DisplayHelper.getScreenSizing(te);
+				if (sizing == null && lastSize != null || (lastSize == null) || !lastSize.equals(sizing)) {
+					SonarCore.sendPacketAround(te, 64, 3);
+				}
 
-					if (sizing == null && lastSize != null || (lastSize == null) || !lastSize.equals(sizing)) {
-						SonarCore.sendPacketAround(te, 64, 3);
-					}
-
-					connectedTile = getConnectedTile(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)));
-					if (connectedTile == null || connectedTile.getTileEntity(te.getWorldObj()) == null) {
-						this.updateData(te, te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)));
-					} else {
-						this.updateData(connectedTile.getTileEntity(te.getWorldObj()), te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)));
-					}
+				connectedTile = getConnectedTile(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)));
+				if (connectedTile == null || connectedTile.getTileEntity(te.getWorldObj()) == null) {
+					this.updateData(te, te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)));
 				} else {
-					isHandler.setObject(false);
+					this.updateData(connectedTile.getTileEntity(te.getWorldObj()), te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)));
 				}
 			}
-			if (lastHandler != isHandler.getObject()) {
+			if (resetHandler) {
 				SonarCore.sendPacketAround(te, 64, 4);
+				resetHandler = false;
 			}
 
 			if (updateTicks == updateTime) {
