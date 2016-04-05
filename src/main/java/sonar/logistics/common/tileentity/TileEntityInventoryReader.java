@@ -4,7 +4,6 @@ import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.api.BlockCoords;
 import sonar.core.common.tileentity.TileEntityHandlerInventory;
 import sonar.core.integration.fmp.FMPHelper;
-import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.inventory.IDropInventory;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.connecting.IInfoEmitter;
@@ -13,21 +12,21 @@ import sonar.logistics.common.handlers.InventoryReaderHandler;
 
 public class TileEntityInventoryReader extends TileEntityHandlerInventory implements IInfoEmitter, IDropInventory {
 
-	public InventoryReaderHandler handler = new InventoryReaderHandler(false, this);
+	public InventoryReaderHandler handler = new InventoryReaderHandler(true);;
 
 	@Override
-	public TileHandler getTileHandler() {
+	public InventoryReaderHandler getTileHandler() {
 		return handler;
 	}
 
 	@Override
 	public boolean canConnect(ForgeDirection dir) {
-		return handler.canConnect(this, dir);
+		return getTileHandler().canConnect(this, dir);
 	}
 
 	@Override
 	public ILogicInfo currentInfo() {
-		return handler.currentInfo(this);
+		return getTileHandler().currentInfo(this);
 	}
 
 	public boolean maxRender() {

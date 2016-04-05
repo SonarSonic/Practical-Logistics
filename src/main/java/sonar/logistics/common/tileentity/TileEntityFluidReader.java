@@ -4,7 +4,6 @@ import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.api.BlockCoords;
 import sonar.core.common.tileentity.TileEntityHandler;
 import sonar.core.integration.fmp.FMPHelper;
-import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.connecting.IInfoEmitter;
 import sonar.logistics.api.info.ILogicInfo;
@@ -12,21 +11,24 @@ import sonar.logistics.common.handlers.FluidReaderHandler;
 
 public class TileEntityFluidReader extends TileEntityHandler implements IInfoEmitter {
 
-	public FluidReaderHandler handler = new FluidReaderHandler(false, this);
+	public FluidReaderHandler handler;
 
 	@Override
-	public TileHandler getTileHandler() {
+	public FluidReaderHandler getTileHandler() {
+		if (handler == null) {
+			handler = new FluidReaderHandler(false, this);
+		}
 		return handler;
 	}
 
 	@Override
 	public boolean canConnect(ForgeDirection dir) {
-		return handler.canConnect(this, dir);
+		return getTileHandler().canConnect(this, dir);
 	}
 
 	@Override
 	public ILogicInfo currentInfo() {
-		return handler.currentInfo(this);
+		return getTileHandler().currentInfo(this);
 	}
 
 	public boolean maxRender() {
