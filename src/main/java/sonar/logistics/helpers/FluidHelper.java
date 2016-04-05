@@ -1,6 +1,5 @@
 package sonar.logistics.helpers;
 
-import java.util.List;
 import java.util.Map;
 
 import net.minecraft.entity.player.EntityPlayer;
@@ -17,7 +16,6 @@ import sonar.core.api.BlockCoords;
 import sonar.core.api.FluidHandler;
 import sonar.core.api.StoredFluidStack;
 import sonar.core.api.StoredItemStack;
-import sonar.logistics.Logistics;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.cache.IStorageCache;

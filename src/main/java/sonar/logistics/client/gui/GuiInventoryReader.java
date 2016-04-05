@@ -3,8 +3,6 @@ package sonar.logistics.client.gui;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.lwjgl.input.Keyboard;
-
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
@@ -14,6 +12,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.ResourceLocation;
+
+import org.lwjgl.input.Keyboard;
+
 import sonar.core.SonarCore;
 import sonar.core.api.StoredItemStack;
 import sonar.core.helpers.FontHelper;
@@ -34,7 +35,7 @@ public class GuiInventoryReader extends GuiSelectionGrid<StoredItemStack> {
 	public static final ResourceLocation stackBGround = new ResourceLocation("PracticalLogistics:textures/gui/inventoryReader_stack.png");
 	public static final ResourceLocation clearBGround = new ResourceLocation("PracticalLogistics:textures/gui/inventoryReader_clear.png");
 
-	public InventoryReaderHandler handler;
+	private InventoryReaderHandler handler;
 	private GuiTextField slotField;
 	private GuiTextField searchField;
 	public static final int STACK = 0, SLOT = 1, POS = 2, INV = 3, STORAGE = 4;

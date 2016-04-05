@@ -3,6 +3,7 @@ package sonar.logistics.integration.multipart;
 import net.minecraft.block.Block;
 import sonar.logistics.api.connecting.CableType;
 import sonar.logistics.client.renderers.RenderHandlers;
+import sonar.logistics.integration.multipart.ForgeMultipartHandler.MultiPart;
 import sonar.logistics.registries.BlockRegistry;
 
 public class DataCablePart extends ChannelledCablePart {
@@ -21,17 +22,17 @@ public class DataCablePart extends ChannelledCablePart {
 	}
 
 	@Override
-	public Block getBlock() {
-		return BlockRegistry.dataCable;
-	}
-
-	@Override
-	public String getType() {
-		return "Cable Part";
+	public MultiPart getPartType() {
+		return MultiPart.DATA_CABLE;
 	}
 
 	@Override
 	public CableType getCableType() {
 		return CableType.DATA_CABLE;
+	}
+
+	@Override
+	public Block getBlock() {
+		return BlockRegistry.dataCable;
 	}
 }

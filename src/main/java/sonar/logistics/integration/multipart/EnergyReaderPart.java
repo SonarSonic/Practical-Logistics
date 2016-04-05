@@ -8,29 +8,26 @@ import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.api.BlockCoords;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.handlers.TileHandler;
-import sonar.core.network.utils.ITextField;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.LogisticsAPI;
-import sonar.logistics.api.connecting.CableType;
 import sonar.logistics.api.connecting.IInfoEmitter;
 import sonar.logistics.api.info.ILogicInfo;
-import sonar.logistics.api.render.ICableRenderer;
 import sonar.logistics.client.renderers.RenderHandlers;
-import sonar.logistics.common.handlers.InfoCreatorHandler;
+import sonar.logistics.common.handlers.EnergyReaderHandler;
 import sonar.logistics.integration.multipart.ForgeMultipartHandler.MultiPart;
 import sonar.logistics.network.LogisticsGui;
 import sonar.logistics.registries.BlockRegistry;
 import codechicken.lib.vec.Cuboid6;
 
-public class InfoCreatorPart extends ConnectionPart implements IInfoEmitter, ICableRenderer, ITextField {
+public class EnergyReaderPart extends ConnectionPart implements IInfoEmitter {
 
-	public InfoCreatorHandler handler = new InfoCreatorHandler(true, tile());
+	public EnergyReaderHandler handler = new EnergyReaderHandler(true, tile());
 
-	public InfoCreatorPart() {
+	public EnergyReaderPart() {
 		super();
 	}
 
-	public InfoCreatorPart(int meta) {
+	public EnergyReaderPart(int meta) {
 		super(meta);
 	}
 
@@ -46,42 +43,36 @@ public class InfoCreatorPart extends ConnectionPart implements IInfoEmitter, ICa
 
 	@Override
 	public ILogicInfo currentInfo() {
-		return handler.currentInfo();
-	}
-
-	@Override
-	public void textTyped(String string, int id) {
-		handler.textTyped(string, id);
-
-	}
-
-	@Override
-	public CableType canRenderConnection(ForgeDirection dir) {
-		return handler.canRenderConnection(tile(), dir);
+		return handler.currentInfo(tile());
 	}
 
 	public boolean activate(EntityPlayer player, MovingObjectPosition pos, ItemStack stack) {
 		if (player != null) {
-			player.openGui(Logistics.instance, LogisticsGui.infoCreator, tile().getWorldObj(), x(), y(), z());
+			player.openGui(Logistics.instance, LogisticsGui.energyReader, tile().getWorldObj(), x(), y(), z());
 			return true;
-
 		}
 		return false;
 	}
 
 	@Override
 	public Cuboid6 getBounds() {
+		if (meta == 2 || meta == 3) {
+			return new Cuboid6(6 * 0.0625, 6 * 0.0625, 0.0F, 1.0F - 6 * 0.0625, 1.0F - 6 * 0.0625, 1.0F);
+		}
+		if (meta == 4 || meta == 5) {
+			return new Cuboid6(0.0F, 6 * 0.0625, 6 * 0.0625, 1.0F, 1.0F - 6 * 0.0625, 1.0F - 6 * 0.0625);
+		}
 		return new Cuboid6(4 * 0.0625, 4 * 0.0625, 4 * 0.0625, 1 - 4 * 0.0625, 1 - 4 * 0.0625, 1 - 4 * 0.0625);
 	}
 
 	@Override
-	public MultiPart getPartType() {
-		return MultiPart.INFO_CREATOR;
+	public Object getSpecialRenderer() {
+		return new RenderHandlers.EnergyReader();
 	}
 
 	@Override
-	public Object getSpecialRenderer() {
-		return new RenderHandlers.InfoCreator();
+	public MultiPart getPartType() {
+		return MultiPart.ENERGY_READER;
 	}
 
 	@Override
@@ -101,6 +92,6 @@ public class InfoCreatorPart extends ConnectionPart implements IInfoEmitter, ICa
 
 	@Override
 	public Block getBlock() {
-		return BlockRegistry.infoCreator;
+		return BlockRegistry.energyReader;
 	}
 }

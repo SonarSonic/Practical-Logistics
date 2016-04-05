@@ -15,6 +15,7 @@ import sonar.logistics.api.connecting.IInfoReader;
 import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.client.renderers.RenderHandlers;
 import sonar.logistics.common.handlers.InfoReaderHandler;
+import sonar.logistics.integration.multipart.ForgeMultipartHandler.MultiPart;
 import sonar.logistics.network.LogisticsGui;
 import sonar.logistics.registries.BlockRegistry;
 import codechicken.lib.vec.Cuboid6;
@@ -82,13 +83,8 @@ public class InfoReaderPart extends ConnectionPart implements IInfoEmitter, IInf
 	}
 
 	@Override
-	public Block getBlock() {
-		return BlockRegistry.infoReader;
-	}
-
-	@Override
-	public String getType() {
-		return "Info Reader";
+	public MultiPart getPartType() {
+		return MultiPart.INFO_READER;
 	}
 
 	@Override
@@ -104,5 +100,10 @@ public class InfoReaderPart extends ConnectionPart implements IInfoEmitter, IInf
 	@Override
 	public void removeConnections() {
 		LogisticsAPI.getCableHelper().removeConnection(tile(), ForgeDirection.getOrientation(FMPHelper.getMeta(tile())));
+	}
+
+	@Override
+	public Block getBlock() {
+		return BlockRegistry.infoReader;
 	}
 }

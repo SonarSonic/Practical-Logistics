@@ -7,17 +7,17 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.api.BlockCoords;
-import sonar.core.integration.fmp.SonarHandlerPart;
 import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.logistics.api.connecting.IInfoTile;
 import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.client.renderers.RenderDisplayScreen;
 import sonar.logistics.common.handlers.DisplayScreenHandler;
+import sonar.logistics.integration.multipart.ForgeMultipartHandler.MultiPart;
 import sonar.logistics.registries.BlockRegistry;
 import sonar.logistics.registries.ItemRegistry;
 import codechicken.lib.vec.Cuboid6;
 
-public class DisplayScreenPart extends SonarHandlerPart implements IInfoTile {
+public class DisplayScreenPart extends LogisticsPart.Handler implements IInfoTile {
 
 	public DisplayScreenHandler handler = new DisplayScreenHandler(true, tile());
 
@@ -80,13 +80,8 @@ public class DisplayScreenPart extends SonarHandlerPart implements IInfoTile {
 	}
 
 	@Override
-	public Block getBlock() {
-		return BlockRegistry.displayScreen;
-	}
-
-	@Override
-	public String getType() {
-		return "Screen Part";
+	public MultiPart getPartType() {
+		return MultiPart.DISPLAY_SCREEN;
 	}
 
 	@Override
@@ -99,4 +94,8 @@ public class DisplayScreenPart extends SonarHandlerPart implements IInfoTile {
 		return new BlockCoords(tile());
 	}
 
+	@Override
+	public Block getBlock() {
+		return BlockRegistry.displayScreen;
+	}
 }

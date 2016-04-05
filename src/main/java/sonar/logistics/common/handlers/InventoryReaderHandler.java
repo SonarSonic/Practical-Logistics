@@ -7,15 +7,14 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.api.BlockCoords;
-import sonar.core.api.StoredItemStack;
 import sonar.core.api.InventoryHandler.StorageSize;
+import sonar.core.api.StoredItemStack;
 import sonar.core.helpers.FontHelper;
 import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.core.integration.fmp.FMPHelper;
@@ -24,12 +23,10 @@ import sonar.core.network.sync.ISyncPart;
 import sonar.core.network.sync.SyncTagType;
 import sonar.core.network.sync.SyncTagType.INT;
 import sonar.core.network.utils.IByteBufTile;
-import sonar.core.utils.BlockInteraction;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.api.info.LogicInfo;
-import sonar.logistics.api.render.ScreenType;
 import sonar.logistics.api.wrappers.ItemWrapper.StorageItems;
 import sonar.logistics.info.types.InventoryInfo;
 import sonar.logistics.info.types.ProgressInfo;
@@ -56,8 +53,8 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 	public StorageSize maxStorage = StorageSize.EMPTY;
 	public int cacheID = -1;
 
-	public InventoryReaderHandler(boolean isMultipart, TileEntity tile) {
-		super(isMultipart, tile);
+	public InventoryReaderHandler(boolean isMultipart) {
+		super(isMultipart, null);
 		super.slots = new ItemStack[1];
 	}
 
@@ -69,9 +66,9 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 		INetworkCache cache = getNetwork(te);
 		cacheID = cache.getNetworkID();
 		StorageItems list = LogisticsAPI.getItemHelper().getItems(cache);
-		
+		ArrayList<StoredItemStack> current = (ArrayList<StoredItemStack>)list.items.clone();
 		if (sortingType.getObject() == 0) {
-			Collections.sort(list.items, new Comparator<StoredItemStack>() {
+			Collections.sort(current, new Comparator<StoredItemStack>() {
 				public int compare(StoredItemStack str1, StoredItemStack str2) {
 					if (str1.stored < str2.stored)
 						return sortingOrder.getObject() == 0 ? 1 : -1;
@@ -81,7 +78,7 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 				}
 			});
 		} else if (sortingType.getObject() == 1) {
-			Collections.sort(list.items, new Comparator<StoredItemStack>() {
+			Collections.sort(current, new Comparator<StoredItemStack>() {
 				public int compare(StoredItemStack str1, StoredItemStack str2) {
 					int res = String.CASE_INSENSITIVE_ORDER.compare(str1.getItemStack().getDisplayName(), str2.getItemStack().getDisplayName());
 					if (res == 0) {
@@ -91,7 +88,7 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 				}
 			});
 		} else if (sortingType.getObject() == 2) {
-			Collections.sort(list.items, new Comparator<StoredItemStack>() {
+			Collections.sort(current, new Comparator<StoredItemStack>() {
 				public int compare(StoredItemStack str1, StoredItemStack str2) {
 					UniqueIdentifier modid1 = GameRegistry.findUniqueIdentifierFor(str1.getItemStack().getItem());
 					UniqueIdentifier modid2 = GameRegistry.findUniqueIdentifierFor(str2.getItemStack().getItem());
@@ -110,7 +107,7 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 			});
 		}
 
-		stacks = list.items;
+		stacks = current;
 		maxStorage = list.sizing;
 	}
 
@@ -123,7 +120,7 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 	}
 
 	public ILogicInfo currentInfo(TileEntity te) {
-
+		ArrayList<StoredItemStack> stacks = (ArrayList<StoredItemStack>)this.stacks.clone();
 		switch (setting.getObject()) {
 		case 0:
 			if (slots[0] != null) {
@@ -220,7 +217,7 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 			for (int i = 0; i < list.tagCount(); i++) {
 				NBTTagCompound compound = list.getCompoundTagAt(i);
 				this.stacks.add(StoredItemStack.readFromNBT(compound));
-
+				
 			}
 		}
 	}
@@ -238,7 +235,6 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 			nbt.setTag("coords", coordTag);
 		}
 		if (type == SyncType.SPECIAL) {
-
 			if (stacks == null) {
 				stacks = new ArrayList();
 			}

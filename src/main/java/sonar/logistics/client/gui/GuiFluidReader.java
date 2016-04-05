@@ -79,7 +79,7 @@ public class GuiFluidReader extends GuiSelectionGrid<StoredFluidStack> {
 		if (button != null) {
 			if (button.id == -1) {
 
-				if (handler.setting.getObject() == 4) {
+				if (handler.setting.getObject() == 3) {
 					handler.setting.setObject(0);
 				} else {
 					handler.setting.increaseBy(1);
@@ -195,7 +195,7 @@ public class GuiFluidReader extends GuiSelectionGrid<StoredFluidStack> {
 		case 3:
 			return "Current Tank Usage";
 		default:
-			return "Inventories";
+			return "Fluids";
 		}
 	}
 
@@ -210,7 +210,7 @@ public class GuiFluidReader extends GuiSelectionGrid<StoredFluidStack> {
 		case 3:
 			return "Storage";
 		default:
-			return "Inventories";
+			return "Fluids";
 		}
 	}
 

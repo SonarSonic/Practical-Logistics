@@ -6,33 +6,26 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.SonarCore;
 import sonar.core.api.ActionType;
 import sonar.core.api.BlockCoords;
 import sonar.core.api.InventoryHandler;
+import sonar.core.api.InventoryHandler.StorageSize;
 import sonar.core.api.SonarAPI;
 import sonar.core.api.StoredItemStack;
-import sonar.core.api.InventoryHandler.StorageSize;
-import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.network.PacketInvUpdate;
-import sonar.core.utils.BlockInteraction;
-import sonar.core.utils.BlockInteractionType;
-import sonar.logistics.Logistics;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.cache.CacheTypes;
 import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.cache.IStorageCache;
 import sonar.logistics.api.connecting.IEntityNode;
 import sonar.logistics.api.wrappers.ItemWrapper;
-import sonar.logistics.info.types.InventoryInfo;
 
 public class ItemHelper extends ItemWrapper {
 

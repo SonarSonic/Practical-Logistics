@@ -7,18 +7,14 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.FluidStack;
-import sonar.core.api.ActionType;
 import sonar.core.api.BlockCoords;
-import sonar.core.api.StoredFluidStack;
-import sonar.core.api.StoredItemStack;
 import sonar.core.api.InventoryHandler.StorageSize;
+import sonar.core.api.StoredFluidStack;
 import sonar.core.helpers.FontHelper;
 import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.core.integration.fmp.FMPHelper;
@@ -27,12 +23,10 @@ import sonar.core.network.sync.ISyncPart;
 import sonar.core.network.sync.SyncTagType;
 import sonar.core.network.sync.SyncTagType.INT;
 import sonar.core.network.utils.IByteBufTile;
-import sonar.core.utils.BlockInteraction;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.api.info.LogicInfo;
-import sonar.logistics.api.render.ScreenType;
 import sonar.logistics.api.wrappers.FluidWrapper.StorageFluids;
 import sonar.logistics.info.types.FluidInventoryInfo;
 import sonar.logistics.info.types.FluidStackInfo;
@@ -66,8 +60,9 @@ public class FluidReaderHandler extends TileHandler implements IByteBufTile {
 		INetworkCache network = LogisticsAPI.getCableHelper().getNetwork(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite());
 		cacheID = network.getNetworkID();
 		StorageFluids list = LogisticsAPI.getFluidHelper().getFluids(network);
+		ArrayList<StoredFluidStack> current = (ArrayList<StoredFluidStack>)list.fluids.clone();
 		if (sortingType.getObject() == 0) {
-			Collections.sort(list.fluids, new Comparator<StoredFluidStack>() {
+			Collections.sort(current, new Comparator<StoredFluidStack>() {
 				public int compare(StoredFluidStack str1, StoredFluidStack str2) {
 					if (str1.stored < str2.stored)
 						return sortingOrder.getObject() == 0 ? 1 : -1;
@@ -77,7 +72,7 @@ public class FluidReaderHandler extends TileHandler implements IByteBufTile {
 				}
 			});
 		} else if (sortingType.getObject() == 1) {
-			Collections.sort(list.fluids, new Comparator<StoredFluidStack>() {
+			Collections.sort(current, new Comparator<StoredFluidStack>() {
 				public int compare(StoredFluidStack str1, StoredFluidStack str2) {
 					int res = String.CASE_INSENSITIVE_ORDER.compare(str1.getFullStack().getLocalizedName(), str2.getFullStack().getLocalizedName());
 					if (res == 0) {
@@ -87,7 +82,7 @@ public class FluidReaderHandler extends TileHandler implements IByteBufTile {
 				}
 			});
 		} else if (sortingType.getObject() == 2) {
-			Collections.sort(list.fluids, new Comparator<StoredFluidStack>() {
+			Collections.sort(current, new Comparator<StoredFluidStack>() {
 				public int compare(StoredFluidStack str1, StoredFluidStack str2) {
 					if (str1.getFullStack().getFluid().getTemperature() < str2.getFullStack().getFluid().getTemperature())
 						return sortingOrder.getObject() == 0 ? 1 : -1;
@@ -98,7 +93,7 @@ public class FluidReaderHandler extends TileHandler implements IByteBufTile {
 			});
 		}
 
-		fluids = list.fluids;
+		fluids = current;
 		maxStorage = list.sizing;
 	}
 

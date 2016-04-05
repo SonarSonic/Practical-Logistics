@@ -17,6 +17,7 @@ import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.api.render.ICableRenderer;
 import sonar.logistics.client.renderers.RenderHandlers;
 import sonar.logistics.common.handlers.DataModifierHandler;
+import sonar.logistics.integration.multipart.ForgeMultipartHandler.MultiPart;
 import sonar.logistics.network.LogisticsGui;
 import sonar.logistics.registries.BlockRegistry;
 import codechicken.lib.vec.Cuboid6;
@@ -74,13 +75,8 @@ public class DataModifierPart extends ConnectionPart implements IInfoEmitter, IC
 	}
 
 	@Override
-	public Block getBlock() {
-		return BlockRegistry.dataModifier;
-	}
-
-	@Override
-	public String getType() {
-		return "Data Modifier";
+	public MultiPart getPartType() {
+		return MultiPart.DATA_MODIFIER;
 	}
 
 	@Override
@@ -111,5 +107,10 @@ public class DataModifierPart extends ConnectionPart implements IInfoEmitter, IC
 				LogisticsAPI.getCableHelper().removeConnection(tile(), dir);
 			}
 		}
+	}
+
+	@Override
+	public Block getBlock() {
+		return BlockRegistry.dataModifier;
 	}
 }

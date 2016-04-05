@@ -1,10 +1,9 @@
 package sonar.logistics.integration.multipart;
 
-import sonar.core.integration.fmp.SonarHandlerPart;
 import sonar.logistics.api.connecting.IInfoEmitter;
 import codechicken.multipart.TMultiPart;
 
-public abstract class ConnectionPart extends SonarHandlerPart implements IInfoEmitter {
+public abstract class ConnectionPart extends LogisticsPart.Handler implements IInfoEmitter {
 	public ConnectionPart() {
 		super();
 	}

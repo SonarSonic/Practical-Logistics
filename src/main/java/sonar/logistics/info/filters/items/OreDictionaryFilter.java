@@ -32,8 +32,6 @@ public class OreDictionaryFilter extends ItemFilter<OreDictionaryFilter> {
 					return true;
 				}
 			}
-
-			// List<ItemStack> ores = OreDictionary.getOres(oreDict);
 		}
 
 		return false;

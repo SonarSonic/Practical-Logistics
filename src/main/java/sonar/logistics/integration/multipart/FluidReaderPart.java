@@ -14,11 +14,12 @@ import sonar.logistics.api.connecting.IInfoEmitter;
 import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.client.renderers.RenderHandlers;
 import sonar.logistics.common.handlers.FluidReaderHandler;
+import sonar.logistics.integration.multipart.ForgeMultipartHandler.MultiPart;
 import sonar.logistics.network.LogisticsGui;
 import sonar.logistics.registries.BlockRegistry;
 import codechicken.lib.vec.Cuboid6;
 
-public class FluidReaderPart extends ConnectionPart implements IInfoEmitter{
+public class FluidReaderPart extends ConnectionPart implements IInfoEmitter {
 
 	public FluidReaderHandler handler = new FluidReaderHandler(true, tile());
 
@@ -47,7 +48,7 @@ public class FluidReaderPart extends ConnectionPart implements IInfoEmitter{
 
 	public boolean activate(EntityPlayer player, MovingObjectPosition pos, ItemStack stack) {
 		if (player != null) {
-			this.sendSyncPacket(player);			
+			this.sendSyncPacket(player);
 			player.openGui(Logistics.instance, LogisticsGui.fluidReader, tile().getWorldObj(), x(), y(), z());
 			return true;
 
@@ -72,13 +73,8 @@ public class FluidReaderPart extends ConnectionPart implements IInfoEmitter{
 	}
 
 	@Override
-	public Block getBlock() {
-		return BlockRegistry.fluidReader;
-	}
-
-	@Override
-	public String getType() {
-		return "Fluid Reader";
+	public MultiPart getPartType() {
+		return MultiPart.FLUID_READER;
 	}
 
 	@Override
@@ -94,5 +90,10 @@ public class FluidReaderPart extends ConnectionPart implements IInfoEmitter{
 	@Override
 	public void removeConnections() {
 		LogisticsAPI.getCableHelper().removeConnection(tile(), ForgeDirection.getOrientation(FMPHelper.getMeta(tile())));
+	}
+
+	@Override
+	public Block getBlock() {
+		return BlockRegistry.fluidReader;
 	}
 }

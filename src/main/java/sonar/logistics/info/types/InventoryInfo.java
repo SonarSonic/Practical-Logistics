@@ -19,8 +19,6 @@ import org.lwjgl.opengl.GL12;
 import sonar.core.api.StoredItemStack;
 import sonar.core.helpers.FontHelper;
 import sonar.core.helpers.RenderHelper;
-import sonar.logistics.api.LogisticsAPI;
-import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.api.render.ScreenType;
 import cpw.mods.fml.common.network.ByteBufUtils;

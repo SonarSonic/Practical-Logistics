@@ -33,25 +33,13 @@ public class BlockInventoryReader extends BlockDirectionalConnector {
 		TileEntity target = world.getTileEntity(x, y, z);
 		if (!world.isRemote && target != null && target instanceof TileEntityInventoryReader) {
 			TileEntityInventoryReader node = (TileEntityInventoryReader) target;
-			//if (player.getHeldItem() == null)
-				player.openGui(Logistics.instance, LogisticsGui.inventoryReader, world, x, y, z);
-				/*
-			else {
-				ItemStack remove = player.getHeldItem().copy();
-				StoredItemStack stack = node.handler.insertItem(node, new StoredItemStack(remove));
-				if (stack == null || stack.stored == 0) {
-					remove = null;
-				} else {
-					remove.stackSize = (int) stack.stored;
-				}
-				if (!ItemStack.areItemStacksEqual(remove, player.getHeldItem())) {
-					player.inventory.setInventorySlotContents(player.inventory.currentItem, remove);
-				} else {
-					player.openGui(Logistics.instance, LogisticsGui.inventoryReader, world, x, y, z);
-				}
-
-			}
-			*/
+			// if (player.getHeldItem() == null)
+			player.openGui(Logistics.instance, LogisticsGui.inventoryReader, world, x, y, z);
+			/*
+			 * else { ItemStack remove = player.getHeldItem().copy(); StoredItemStack stack = node.handler.insertItem(node, new StoredItemStack(remove)); if (stack == null || stack.stored == 0) { remove = null; } else { remove.stackSize = (int) stack.stored; } if (!ItemStack.areItemStacksEqual(remove, player.getHeldItem())) { player.inventory.setInventorySlotContents(player.inventory.currentItem, remove); } else { player.openGui(Logistics.instance, LogisticsGui.inventoryReader, world, x, y, z); }
+			 * 
+			 * }
+			 */
 
 		}
 	}

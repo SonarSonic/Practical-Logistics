@@ -8,19 +8,20 @@ import net.minecraft.block.Block;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.api.BlockCoords;
 import sonar.core.integration.fmp.FMPHelper;
-import sonar.core.integration.fmp.SonarTilePart;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.connecting.CableType;
 import sonar.logistics.api.connecting.IDataCable;
 import sonar.logistics.api.connecting.IInfoEmitter;
 import sonar.logistics.api.connecting.ILogicTile;
 import sonar.logistics.client.renderers.RenderHandlers;
+import sonar.logistics.integration.multipart.ForgeMultipartHandler.MultiPart;
 import sonar.logistics.registries.BlockRegistry;
 import codechicken.lib.vec.Cuboid6;
+import codechicken.multipart.JNormalOcclusion;
 import codechicken.multipart.NormallyOccludedPart;
 import codechicken.multipart.TMultiPart;
 
-public class ChannelledCablePart extends SonarTilePart implements IDataCable {
+public class ChannelledCablePart extends LogisticsPart implements IDataCable, JNormalOcclusion {
 
 	public int registryID = -1;
 
@@ -61,7 +62,7 @@ public class ChannelledCablePart extends SonarTilePart implements IDataCable {
 
 	@Override
 	public Cuboid6 getBounds() {
-		return new Cuboid6((float) 0.0625 * 6, (float) 0.0625 * 6, (float) 0.0625 * 6, (float) (1 - (0.0625 * 6)), (float) (1 - (0.0625 * 6)), (float) (1 - (0.0625 * 6)));
+		return new Cuboid6(0.375, 0.375, 0.375, 0.625, 0.625, 0.625);
 	}
 
 	@Override
@@ -70,13 +71,8 @@ public class ChannelledCablePart extends SonarTilePart implements IDataCable {
 	}
 
 	@Override
-	public Block getBlock() {
-		return BlockRegistry.channelledCable;
-	}
-
-	@Override
-	public String getType() {
-		return "Multi Cable Part";
+	public MultiPart getPartType() {
+		return MultiPart.CHANNELLED_CABLE;
 	}
 
 	@Override
@@ -90,6 +86,7 @@ public class ChannelledCablePart extends SonarTilePart implements IDataCable {
 
 	@Override
 	public boolean isBlocked(final ForgeDirection side) {
+
 		if (side == null || side == ForgeDirection.UNKNOWN || this.tile() == null) {
 			return false;
 		}
@@ -115,41 +112,44 @@ public class ChannelledCablePart extends SonarTilePart implements IDataCable {
 	@Override
 	public void onWorldJoin() {
 		super.onWorldJoin();
-		LogisticsAPI.getCableHelper().addCable(this);
+		addCable();
 	}
 
 	@Override
 	public void onWorldSeparate() {
 		super.onWorldSeparate();
-		LogisticsAPI.getCableHelper().removeCable(this);
+		removeCable();
 	}
 
 	public void onPartChanged(TMultiPart part) {
 		super.onPartChanged(part);
-		List<ILogicTile> adjacents = new ArrayList();
-		for (int i = 0; i < 6; i++) {
-			ForgeDirection dir = ForgeDirection.getOrientation(i);
-			BlockCoords coords = new BlockCoords(tile());
-			Object object = FMPHelper.checkObject(BlockCoords.translateCoords(coords, dir).getTileEntity());
-			if (object != null && object instanceof ILogicTile) {
-				adjacents.add((ILogicTile) object);
+		if (!world().isRemote) {
+			List<ILogicTile> adjacents = new ArrayList();
+			for (int i = 0; i < 6; i++) {
+				ForgeDirection dir = ForgeDirection.getOrientation(i);
+				BlockCoords coords = new BlockCoords(tile());
+				Object object = FMPHelper.checkObject(BlockCoords.translateCoords(coords, dir).getTileEntity());
+				if (object != null && object instanceof ILogicTile) {
+					adjacents.add((ILogicTile) object);
+				}
 			}
+
+			for (ILogicTile tile : adjacents) {
+				if (tile instanceof IDataCable) {
+					IDataCable cable = (IDataCable) tile;
+					cable.removeCable();
+					cable.addCable();
+				}
+				if (tile instanceof IInfoEmitter) {
+					IInfoEmitter emitter = (IInfoEmitter) tile;
+					emitter.removeConnections();
+					emitter.addConnections();
+				}
+			}
+			this.removeCable();
+			this.addCable();
 		}
 
-		for (ILogicTile tile : adjacents) {
-			if (tile instanceof IDataCable) {
-				IDataCable cable = (IDataCable) tile;
-				cable.removeCable();
-				cable.addCable();
-			}
-			if (tile instanceof IInfoEmitter) {
-				IInfoEmitter emitter = (IInfoEmitter) tile;
-				emitter.removeConnections();
-				emitter.addConnections();
-			}
-		}
-		this.removeCable();
-		this.addCable();
 	}
 
 	@Override
@@ -174,20 +174,28 @@ public class ChannelledCablePart extends SonarTilePart implements IDataCable {
 
 	@Override
 	public void addCable() {
-		LogisticsAPI.getCableHelper().addCable(this);
+		if (!world().isRemote)
+			LogisticsAPI.getCableHelper().addCable(this);
 
 	}
 
 	@Override
 	public void removeCable() {
-		LogisticsAPI.getCableHelper().removeCable(this);
+		if (!world().isRemote)
+			LogisticsAPI.getCableHelper().removeCable(this);
 
 	}
 
 	@Override
 	public void refreshConnections() {
-		LogisticsAPI.getCableHelper().refreshConnections(this);
-
+		if (!world().isRemote)
+			LogisticsAPI.getCableHelper().refreshConnections(this);
 	}
+
+	@Override
+	public Block getBlock() {
+		return BlockRegistry.channelledCable;
+	}
+
 
 }

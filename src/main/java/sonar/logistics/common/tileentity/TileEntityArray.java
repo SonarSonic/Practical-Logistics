@@ -69,7 +69,6 @@ public class TileEntityArray extends TileEntityHandlerInventory implements IConn
 			addCable();
 		}
 		handler.updateCoordsList();
-		// CacheRegistry.refreshCache(registryID);
 	}
 
 	public void invalidate() {

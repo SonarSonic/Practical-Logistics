@@ -1,13 +1,8 @@
 package sonar.logistics.info.interaction;
 
-import java.util.ArrayList;
-
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
-import sonar.core.api.ActionType;
 import sonar.core.api.BlockCoords;
 import sonar.core.api.SonarAPI;
 import sonar.core.api.StoredItemStack;
@@ -20,7 +15,6 @@ import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.render.InfoInteractionHandler;
 import sonar.logistics.api.render.LargeScreenSizing;
 import sonar.logistics.api.render.ScreenType;
-import sonar.logistics.common.handlers.InventoryReaderHandler;
 import sonar.logistics.common.handlers.LargeDisplayScreenHandler;
 import sonar.logistics.info.types.InventoryInfo;
 import sonar.logistics.registries.CacheRegistry;
@@ -99,14 +93,14 @@ public class InventoryInteraction extends InfoInteractionHandler<InventoryInfo> 
 			}
 		} else {
 			int slot = -1;
-			if (dir.offsetX != 0 || dir.offsetX != 0) {
-				int offset = dir.offsetX != 0 ? dir.offsetX : dir.offsetZ;
-				float hit = dir.offsetX != 0 ? interact.hitz : interact.hitx;
-				if (offset == 1) {
-					slot = hit < 0.5 ? 1 : 0;
-				} else {
-					slot = hit < 0.5 ? 0 : 1;
-				}
+			if (dir == ForgeDirection.NORTH) {
+				slot = interact.hitx < 0.5 ? 1 : 0;
+			} else if (dir == ForgeDirection.SOUTH) {
+				slot = interact.hitx < 0.5 ? 0 : 1;
+			} else if (dir == ForgeDirection.EAST) {
+				slot = interact.hitz < 0.5 ? 1 : 0;
+			} else if (dir == ForgeDirection.WEST) {
+				slot = interact.hitz < 0.5 ? 0 : 1;
 			}
 			if (slot >= 0 && slot < info.stacks.size()) {
 				StoredItemStack stack = info.stacks.get(slot);

@@ -1,9 +1,5 @@
 package sonar.logistics.api.wrappers;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.api.BlockCoords;

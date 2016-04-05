@@ -1,9 +1,5 @@
 package sonar.logistics;
 
-import sonar.core.api.EnergyHandler;
-import sonar.core.api.EnergyType;
-import sonar.core.api.FluidHandler;
-import sonar.core.api.InventoryHandler;
 import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.api.providers.EntityProvider;
 import sonar.logistics.api.providers.TileProvider;

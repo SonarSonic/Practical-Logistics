@@ -2,8 +2,6 @@ package sonar.logistics.common.handlers;
 
 import io.netty.buffer.ByteBuf;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import net.minecraft.nbt.NBTTagCompound;
@@ -19,7 +17,6 @@ import sonar.core.network.utils.IByteBufTile;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.cache.CacheTypes;
 import sonar.logistics.api.cache.INetworkCache;
-import sonar.logistics.api.connecting.ILargeDisplay;
 import sonar.logistics.api.render.LargeScreenSizing;
 import sonar.logistics.helpers.DisplayHelper;
 import sonar.logistics.registries.DisplayRegistry;

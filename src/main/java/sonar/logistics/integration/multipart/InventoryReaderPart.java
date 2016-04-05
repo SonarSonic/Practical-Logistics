@@ -14,16 +14,18 @@ import sonar.logistics.api.connecting.IInfoEmitter;
 import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.client.renderers.RenderHandlers;
 import sonar.logistics.common.handlers.InventoryReaderHandler;
+import sonar.logistics.integration.multipart.ForgeMultipartHandler.MultiPart;
 import sonar.logistics.network.LogisticsGui;
 import sonar.logistics.registries.BlockRegistry;
 import codechicken.lib.vec.Cuboid6;
 
-public class InventoryReaderPart extends ConnectionPart implements IInfoEmitter{
+public class InventoryReaderPart extends ConnectionPart implements IInfoEmitter {
 
-	public InventoryReaderHandler handler = new InventoryReaderHandler(true, tile());
+	public InventoryReaderHandler handler = new InventoryReaderHandler(true);
 
 	public InventoryReaderPart() {
 		super();
+		handler = new InventoryReaderHandler(true);
 	}
 
 	public InventoryReaderPart(int meta) {
@@ -47,7 +49,7 @@ public class InventoryReaderPart extends ConnectionPart implements IInfoEmitter{
 
 	public boolean activate(EntityPlayer player, MovingObjectPosition pos, ItemStack stack) {
 		if (player != null) {
-			this.sendSyncPacket(player);			
+			this.sendSyncPacket(player);
 			player.openGui(Logistics.instance, LogisticsGui.inventoryReader, tile().getWorldObj(), x(), y(), z());
 			return true;
 
@@ -72,13 +74,8 @@ public class InventoryReaderPart extends ConnectionPart implements IInfoEmitter{
 	}
 
 	@Override
-	public Block getBlock() {
-		return BlockRegistry.inventoryReader;
-	}
-
-	@Override
-	public String getType() {
-		return "Inventory Reader";
+	public MultiPart getPartType() {
+		return MultiPart.INV_READER;
 	}
 
 	@Override
@@ -94,5 +91,10 @@ public class InventoryReaderPart extends ConnectionPart implements IInfoEmitter{
 	@Override
 	public void removeConnections() {
 		LogisticsAPI.getCableHelper().removeConnection(tile(), ForgeDirection.getOrientation(FMPHelper.getMeta(tile())));
+	}
+
+	@Override
+	public Block getBlock() {
+		return BlockRegistry.inventoryReader;
 	}
 }

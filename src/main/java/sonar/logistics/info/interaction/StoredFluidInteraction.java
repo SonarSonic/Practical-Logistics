@@ -2,15 +2,12 @@ package sonar.logistics.info.interaction;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
-import sonar.core.integration.fmp.FMPHelper;
-import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.utils.BlockInteraction;
 import sonar.core.utils.BlockInteractionType;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.render.InfoInteractionHandler;
 import sonar.logistics.api.render.ScreenType;
-import sonar.logistics.common.handlers.FluidReaderHandler;
 import sonar.logistics.info.types.FluidStackInfo;
 import sonar.logistics.registries.CacheRegistry;
 

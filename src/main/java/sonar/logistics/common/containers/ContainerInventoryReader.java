@@ -1,23 +1,16 @@
 package sonar.logistics.common.containers;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraftforge.common.util.ForgeDirection;
-import sonar.core.SonarCore;
 import sonar.core.api.ActionType;
-import sonar.core.api.SonarAPI;
 import sonar.core.api.StoredItemStack;
 import sonar.core.helpers.NBTHelper.SyncType;
-import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.inventory.ContainerSync;
 import sonar.core.inventory.slots.SlotList;
-import sonar.core.network.PacketStackUpdate;
 import sonar.logistics.api.LogisticsAPI;
-import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.common.handlers.InventoryReaderHandler;
 
 public class ContainerInventoryReader extends ContainerSync {
@@ -75,7 +68,7 @@ public class ContainerInventoryReader extends ContainerSync {
 							itemstack1.stackSize = (int) (perform.getStackSize());
 						}
 					}
-					this.detectAndSendChanges();
+					//this.detectAndSendChanges();
 				}
 			} else if (id < 27) {
 				if (!this.mergeItemStack(itemstack1, 27, 36, false)) {

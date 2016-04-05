@@ -28,7 +28,6 @@ import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.api.info.LogicInfo;
 import sonar.logistics.api.render.InfoInteractionHandler;
 import sonar.logistics.api.render.ScreenType;
-import sonar.logistics.info.types.InventoryInfo;
 import sonar.logistics.info.types.ManaInfo;
 import sonar.logistics.registries.DisplayRegistry;
 import cpw.mods.fml.common.network.ByteBufUtils;

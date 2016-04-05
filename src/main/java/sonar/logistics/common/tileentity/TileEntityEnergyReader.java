@@ -6,7 +6,6 @@ import sonar.core.api.BlockCoords;
 import sonar.core.common.tileentity.TileEntityHandler;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.ITileHandler;
-import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.connecting.IInfoEmitter;
 import sonar.logistics.api.info.ILogicInfo;
@@ -14,29 +13,34 @@ import sonar.logistics.common.handlers.EnergyReaderHandler;
 
 public class TileEntityEnergyReader extends TileEntityHandler implements IInfoEmitter, ITileHandler {
 
-	public EnergyReaderHandler handler = new EnergyReaderHandler(false, this);
+	public EnergyReaderHandler handler;
 
 	@Override
-	public TileHandler getTileHandler() {
+	public EnergyReaderHandler getTileHandler() {
+		if (handler == null) {
+			handler = new EnergyReaderHandler(false, this);
+		}
 		return handler;
 	}
 
 	@Override
 	public boolean canConnect(ForgeDirection dir) {
-		return handler.canConnect(this, dir);
+		return getTileHandler().canConnect(this, dir);
 	}
+
 	@Override
 	public ILogicInfo currentInfo() {
-		return handler.currentInfo(this);
+		return getTileHandler().currentInfo(this);
 	}
 
 	public void sendAvailableData(EntityPlayer player) {
-		//handler.sendAvailableData(this, player);
+		// handler.sendAvailableData(this, player);
 	}
 
 	public boolean maxRender() {
 		return true;
 	}
+
 	@Override
 	public BlockCoords getCoords() {
 		return new BlockCoords(this);

@@ -1,25 +1,19 @@
 package sonar.logistics.api.wrappers;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.api.ActionType;
 import sonar.core.api.BlockCoords;
-import sonar.core.api.InventoryHandler;
-import sonar.core.api.StoredItemStack;
 import sonar.core.api.InventoryHandler.StorageSize;
-import sonar.core.utils.BlockInteraction;
+import sonar.core.api.StoredItemStack;
 import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.connecting.IConnectionNode;
 import sonar.logistics.api.connecting.IEntityNode;
-import sonar.logistics.info.types.InventoryInfo;
 
 public class ItemWrapper {
 

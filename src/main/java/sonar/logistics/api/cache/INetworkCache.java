@@ -8,6 +8,7 @@ import net.minecraft.block.Block;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.api.BlockCoords;
+import sonar.logistics.api.connecting.IChannelProvider;
 
 /** implemented on Logistics Network Caches, used for retrieving info about  */
 public interface INetworkCache {

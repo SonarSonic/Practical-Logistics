@@ -2,14 +2,15 @@ package sonar.logistics.info.providers.tile;
 
 import java.util.List;
 
-import com.nauktis.solarflux.blocks.SolarPanelTileEntity;
-
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.api.info.LogicInfo;
 import sonar.logistics.api.providers.TileProvider;
+
+import com.nauktis.solarflux.blocks.SolarPanelTileEntity;
+
 import cpw.mods.fml.common.Loader;
 
 public class SolarFluxProvider extends TileProvider {

@@ -137,8 +137,11 @@ public class CableHelper extends CablingWrapper {
 			} else if (adjacent instanceof IChannelProvider) {
 				return new LocalNetworkCache((ILogicTile) adjacent);
 			} else if (adjacent instanceof ILogicTile) {
-
-				return new LocalNetworkCache((ILogicTile) adjacent);
+				ILogicTile logictile = (ILogicTile) adjacent;
+				if (logictile.canConnect(dir))
+					return new LocalNetworkCache((ILogicTile) adjacent);
+				else
+					return new EmptyNetworkCache();
 			}
 		}
 		if (registryID != -1) {
@@ -148,8 +151,9 @@ public class CableHelper extends CablingWrapper {
 				Logistics.logger.error("CableHelper: " + exception.getLocalizedMessage());
 			}
 		}
-		return new EmptyNetworkCache() ;
+		return new EmptyNetworkCache();
 	}
+
 	public Map<BlockCoords, ForgeDirection> getTileConnections(List<BlockCoords> network) {
 		if (network == null) {
 			return Collections.EMPTY_MAP;
@@ -157,7 +161,7 @@ public class CableHelper extends CablingWrapper {
 		Map<BlockCoords, ForgeDirection> connections = new LinkedHashMap();
 		for (BlockCoords connect : network) {
 			TileEntity node = connect.getTileEntity();
-			if (node != null && node instanceof IConnectionNode) {				
+			if (node != null && node instanceof IConnectionNode) {
 				((IConnectionNode) node).addConnections(connections);
 			}
 		}

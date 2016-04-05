@@ -1,6 +1,5 @@
 package sonar.logistics.api.wrappers;
 
-import sonar.core.api.EnergyType;
 import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.api.providers.EntityProvider;
 import sonar.logistics.api.providers.TileProvider;

@@ -11,11 +11,7 @@ import sonar.core.network.sync.SyncTagType;
 import sonar.core.network.sync.SyncTagType.STRING;
 import sonar.core.network.utils.IByteBufTile;
 import sonar.core.network.utils.ITextField;
-import sonar.logistics.api.LogisticsAPI;
-import sonar.logistics.api.connecting.IInfoEmitter;
 import sonar.logistics.api.connecting.ILogicTile;
-import sonar.logistics.api.info.ILogicInfo;
-import sonar.logistics.info.types.BlockCoordsInfo;
 import sonar.logistics.registries.EmitterRegistry;
 
 public class TileEntityDataEmitter extends TileEntityNode implements ITextField, ILogicTile, IByteBufTile {

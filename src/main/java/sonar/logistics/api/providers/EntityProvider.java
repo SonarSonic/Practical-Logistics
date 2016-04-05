@@ -3,8 +3,6 @@ package sonar.logistics.api.providers;
 import java.util.List;
 
 import net.minecraft.entity.Entity;
-import net.minecraftforge.common.util.ForgeDirection;
-import sonar.core.api.IRegistryObject;
 import sonar.core.api.SonarProvider;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.info.ILogicInfo;

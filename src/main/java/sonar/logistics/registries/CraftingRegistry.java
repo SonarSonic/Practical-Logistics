@@ -6,7 +6,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
 import sonar.logistics.Logistics;
-import sonar.logistics.LogisticsConfig;
 import cpw.mods.fml.common.registry.GameRegistry;
 
 public class CraftingRegistry extends Logistics {

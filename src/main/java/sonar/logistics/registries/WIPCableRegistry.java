@@ -3,10 +3,8 @@ package sonar.logistics.registries;
 import gnu.trove.map.hash.THashMap;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
-import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.api.BlockCoords;
 import sonar.core.integration.fmp.FMPHelper;

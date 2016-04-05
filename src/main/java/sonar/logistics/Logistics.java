@@ -9,7 +9,6 @@ import org.apache.logging.log4j.Logger;
 
 import sonar.core.SonarCore;
 import sonar.core.integration.SonarLoader;
-import sonar.core.registries.EnergyTypeRegistry;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.info.providers.EntityProviderRegistry;
 import sonar.logistics.info.providers.TileProviderRegistry;

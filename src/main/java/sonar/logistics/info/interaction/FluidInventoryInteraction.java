@@ -1,15 +1,10 @@
 package sonar.logistics.info.interaction;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
-import sonar.core.api.ActionType;
 import sonar.core.api.BlockCoords;
 import sonar.core.api.StoredFluidStack;
-import sonar.core.api.StoredItemStack;
-import sonar.core.integration.fmp.FMPHelper;
-import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.utils.BlockInteraction;
 import sonar.core.utils.BlockInteractionType;
 import sonar.logistics.api.LogisticsAPI;
@@ -18,7 +13,6 @@ import sonar.logistics.api.connecting.ILargeDisplay;
 import sonar.logistics.api.render.InfoInteractionHandler;
 import sonar.logistics.api.render.LargeScreenSizing;
 import sonar.logistics.api.render.ScreenType;
-import sonar.logistics.common.handlers.FluidReaderHandler;
 import sonar.logistics.info.types.FluidInventoryInfo;
 import sonar.logistics.registries.CacheRegistry;
 
