@@ -1,5 +1,7 @@
 package sonar.logistics.common.tileentity;
 
+import io.netty.buffer.ByteBuf;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,6 +16,7 @@ import sonar.core.SonarCore;
 import sonar.core.api.BlockCoords;
 import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.core.network.PacketTileSync;
+import sonar.core.network.utils.IByteBufTile;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.connecting.IChannelProvider;
 import sonar.logistics.api.connecting.IInfoEmitter;
@@ -25,13 +28,16 @@ import sonar.logistics.network.SyncIdentifiedCoords;
 import sonar.logistics.registries.BlockRegistry;
 import sonar.logistics.registries.EmitterRegistry;
 
-public class TileEntityDataReceiver extends TileEntityNode implements IChannelProvider, IInfoEmitter {
+public class TileEntityDataReceiver extends TileEntityNode implements IChannelProvider, IInfoEmitter, IByteBufTile {
 
 	public List<IdentifiedCoords> emitters;
 	public List<IdentifiedCoords> lastemitters;
 
 	public SyncIdentifiedCoords emitter = new SyncIdentifiedCoords(0);
-
+	
+	/**client selection*/
+	public IdentifiedCoords selected;
+	
 	@Override
 	public ExternalCoords getChannel() {
 		if (emitter.getCoords() != null)
@@ -250,6 +256,24 @@ public class TileEntityDataReceiver extends TileEntityNode implements IChannelPr
 	public void removeConnections() {
 		if (!this.worldObj.isRemote) {
 			LogisticsAPI.getCableHelper().removeConnection(this, ForgeDirection.getOrientation(this.getBlockMetadata()));
+		}
+	}
+
+	@Override
+	public void writePacket(ByteBuf buf, int id) {
+		switch (id) {
+		case 0:
+			IdentifiedCoords.writeCoords(buf, selected);
+			break;
+		}
+	}
+
+	@Override
+	public void readPacket(ByteBuf buf, int id) {
+		switch (id) {
+		case 0:
+			emitter.setCoords(IdentifiedCoords.readCoords(buf));
+			break;
 		}
 	}
 

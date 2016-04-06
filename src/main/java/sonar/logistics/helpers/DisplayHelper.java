@@ -24,7 +24,7 @@ public class DisplayHelper {
 			for (int i = 0; i < 6; i++) {
 				ForgeDirection dir = ForgeDirection.getOrientation(i);
 				Object adjacent = BlockCoords.translateCoords(screen.getCoords(), dir).getTileEntity();
-				if (adjacent != null && adjacent instanceof ILargeDisplay) {
+				if (dir!=ForgeDirection.getOrientation(screen.getOrientation()) && adjacent != null && adjacent instanceof ILargeDisplay) {
 					ILargeDisplay adjTile = (ILargeDisplay) adjacent;
 					if (adjTile.getOrientation() == screen.getOrientation() && adjTile.registryID() != -2) {
 						adjacents.add(adjacent);

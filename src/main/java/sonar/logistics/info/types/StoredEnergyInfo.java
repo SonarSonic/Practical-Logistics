@@ -53,7 +53,7 @@ public class StoredEnergyInfo extends ILogicInfo<StoredEnergyInfo> {
 
 	@Override
 	public String getSubCategory() {
-		return stack != null ? stack.toString() : rend;
+		return coords != null ? coords.block.getDisplayName() : rend;
 	}
 
 	@Override
@@ -63,7 +63,7 @@ public class StoredEnergyInfo extends ILogicInfo<StoredEnergyInfo> {
 
 	@Override
 	public String getData() {
-		return (stack != null ? String.valueOf(stack.stored) : String.valueOf(0));
+		return (stack != null ? String.valueOf(stack.stored) + " " + stack.energyType.getStorageSuffix() : String.valueOf(0));
 	}
 
 	@Override

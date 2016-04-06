@@ -9,8 +9,10 @@ import net.minecraftforge.common.util.ForgeDirection;
 
 import org.lwjgl.opengl.GL11;
 
+import sonar.core.SonarCore;
 import sonar.core.api.BlockCoords;
 import sonar.core.helpers.FontHelper;
+import sonar.core.network.PacketByteBufServer;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.utils.ExternalCoords;
 import sonar.logistics.api.utils.IdentifiedCoords;
@@ -64,7 +66,8 @@ public class GuiDataReceiver extends GuiSelectionList<IdentifiedCoords> {
 
 	@Override
 	public void sendPacket(IdentifiedCoords selection) {
-		Logistics.network.sendToServer(new PacketCoordsSelection(tile.xCoord, tile.yCoord, tile.zCoord, new ExternalCoords(selection, ForgeDirection.getOrientation(selection.blockCoords.getTileEntity().getBlockMetadata()))));
+		tile.selected = selection;
+		SonarCore.network.sendToServer(new PacketByteBufServer(tile, tile.xCoord, tile.yCoord, tile.zCoord, 0));
 
 	}
 
