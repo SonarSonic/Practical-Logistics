@@ -344,7 +344,8 @@ public class GuiItemRouter extends GuiSonar {
 
 	}
 
-	protected void buttonPressed(GuiButton button, int buttonID) {
+	public void buttonPressed(GuiButton button, int buttonID) {
+		System.out.print(buttonID);
 		if (button != null) {
 			if (state == MAIN) {
 				if (button.id == 3) {
@@ -409,6 +410,7 @@ public class GuiItemRouter extends GuiSonar {
 
 	protected void actionPerformed(GuiButton button) {
 		super.actionPerformed(button);
+		System.out.print("hi");
 		this.buttonPressed(button, button.id);
 	}
 

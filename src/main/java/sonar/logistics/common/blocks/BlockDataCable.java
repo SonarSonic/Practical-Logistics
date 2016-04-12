@@ -12,9 +12,13 @@ import sonar.core.common.block.SonarMachineBlock;
 import sonar.core.common.block.SonarMaterials;
 import sonar.core.helpers.FontHelper;
 import sonar.core.utils.BlockInteraction;
+import sonar.logistics.api.LogisticsAPI;
+import sonar.logistics.api.cache.CacheTypes;
+import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.connecting.CableType;
 import sonar.logistics.api.connecting.IDataCable;
 import sonar.logistics.common.tileentity.TileEntityDataCable;
+import sonar.logistics.registries.CacheRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -33,10 +37,13 @@ public class BlockDataCable extends SonarMachineBlock {
 
 	@Override
 	public boolean operateBlock(World world, int x, int y, int z, EntityPlayer player, BlockInteraction interact) {
+		
 		if(!world.isRemote){
 			IDataCable cable = (IDataCable) world.getTileEntity(x, y, z);
-			FontHelper.sendMessage("ID: " + cable.registryID(), world, player);
+			INetworkCache network = CacheRegistry.getCache(cable.registryID());
+			System.out.print(network.getConnections(CacheTypes.EMITTER, true));
 		}
+		
 		return false;
 	}
 

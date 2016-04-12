@@ -81,6 +81,7 @@ public class InventoryInteraction extends InfoInteractionHandler<InventoryInfo> 
 					int ySlot = interact.hity < 0.5 ? yPos + 1 : yPos;
 					slot = ((ySlot * hSlots) + hSlot) + (ySlot * 2) - sizing.maxH * 2;
 				}
+				System.out.print(info.stacks.size());
 				if (slot >= 0 && slot < info.stacks.size()) {
 					StoredItemStack stack = info.stacks.get(slot);
 					if (stack != null) {

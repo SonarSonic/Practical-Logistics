@@ -105,8 +105,8 @@ public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 		} else {
 			info = new LogicInfo((byte) -1, "INFO", " ", "NO DATA");
 			return;
-		}		
-		
+		}
+
 		updateInfo = current;
 		if (shouldUpdate) {
 			if (info == null) {
@@ -150,16 +150,21 @@ public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 		if (te instanceof ILargeDisplay) {
 			List<BlockCoords> displays = DisplayRegistry.getScreens(((ILargeDisplay) te).registryID());
 			if (!displays.isEmpty()) {
-				te = displays.get(0).getTileEntity();
-				TileHandler tilehandler = FMPHelper.getHandler(te);
-				if (tilehandler != null && tilehandler instanceof LargeDisplayScreenHandler) {
-					LargeDisplayScreenHandler handlerDisplay = (LargeDisplayScreenHandler) tilehandler;
-					if (handlerDisplay.connectedTile != null) {
-						screenInfo = handlerDisplay.info;
-					} else {
-						return;
+				boolean found = false;
+				for (BlockCoords display : displays) {
+					te = display.getTileEntity();
+					TileHandler tilehandler = FMPHelper.getHandler(te);
+					if (tilehandler != null && tilehandler instanceof LargeDisplayScreenHandler) {
+						LargeDisplayScreenHandler handlerDisplay = (LargeDisplayScreenHandler) tilehandler;
+						if (handlerDisplay.isHandler.getObject()) {
+							screenInfo = handlerDisplay.info;
+							found = true;
+							break;
+						}
 					}
 				}
+				if (!found)
+					return;
 			}
 		}
 		INetworkCache network = LogisticsAPI.getCableHelper().getNetwork(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite());

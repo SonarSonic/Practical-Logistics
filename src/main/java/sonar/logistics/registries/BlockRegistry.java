@@ -19,7 +19,7 @@ import sonar.logistics.common.blocks.BlockInfoCreator;
 import sonar.logistics.common.blocks.BlockInfoReader;
 import sonar.logistics.common.blocks.BlockInventoryReader;
 import sonar.logistics.common.blocks.BlockItemRouter;
-import sonar.logistics.common.blocks.BlockMultiDataCable;
+import sonar.logistics.common.blocks.BlockChannelledCable;
 import sonar.logistics.common.blocks.BlockNode;
 import sonar.logistics.common.blocks.BlockRedstoneSignaller;
 import sonar.logistics.common.blocks.BlockSapphireOre;
@@ -83,7 +83,7 @@ public class BlockRegistry extends Logistics {
 		GameRegistry.registerBlock(dataCable, SonarBlockTip.class, "DataCable");
 		GameRegistry.registerTileEntity(TileEntityDataCable.class, "DataCable");
 
-		channelledCable = new BlockMultiDataCable().setBlockName("MultiCable").setHardness(0.1F).setCreativeTab(Logistics.creativeTab).setResistance(20.0F).setBlockTextureName(MODID + ":" + "data_cable");
+		channelledCable = new BlockChannelledCable().setBlockName("MultiCable").setHardness(0.1F).setCreativeTab(Logistics.creativeTab).setResistance(20.0F).setBlockTextureName(MODID + ":" + "data_cable");
 		GameRegistry.registerBlock(channelledCable, SonarBlockTip.class, "MultiCable");
 		GameRegistry.registerTileEntity(TileEntityChannelledCable.class, "MultiCable");
 

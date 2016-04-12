@@ -201,7 +201,10 @@ public class InfoReaderHandler extends TileHandler implements IWailaInfo {
 					// clientInfo.get(slot).readUpdate(compound);
 					break;
 				case 2:
-					clientInfo.set(slot, null);
+					if (set)
+						clientInfo.set(slot, null);
+					else
+						clientInfo.add(slot, null);
 					break;
 				}
 			}

@@ -40,6 +40,20 @@ public class TileEntityFluidReader extends TileEntityHandler implements IInfoEmi
 		return new BlockCoords(this);
 	}
 
+	public void onLoaded() {
+		super.onLoaded();
+		if (!this.worldObj.isRemote) {
+			addConnections();
+		}
+	}
+
+	public void invalidate() {
+		if (!this.worldObj.isRemote) {
+			removeConnections();
+		}
+		super.invalidate();
+	}
+
 	@Override
 	public void addConnections() {
 		LogisticsAPI.getCableHelper().addConnection(this, ForgeDirection.getOrientation(FMPHelper.getMeta(this)));

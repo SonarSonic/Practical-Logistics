@@ -44,7 +44,6 @@ public class ChannelSelectorHandler extends TileHandler {
 		channels = new ArrayList();
 		for (Map.Entry<BlockCoords, ForgeDirection> entry : network.getExternalBlocks(true).entrySet()) {
 			BlockCoords coords = entry.getKey();
-			
 			Block target = coords.getBlock();
 			int meta = coords.getWorld().getBlockMetadata(coords.getX(), coords.getY(), coords.getZ());
 			ItemStack stack = SonarHelper.createStackedBlock(target, meta);
@@ -57,12 +56,10 @@ public class ChannelSelectorHandler extends TileHandler {
 
 	public void sendAvailableData(TileEntity te, EntityPlayer player) {
 		if (player != null && player instanceof EntityPlayerMP) {
-
 			NBTTagCompound syncData = new NBTTagCompound();
 			writeData(syncData, SyncType.SYNC);
 			SonarCore.network.sendTo(new PacketTileSync(te.xCoord, te.yCoord, te.zCoord, syncData, SyncType.SYNC), (EntityPlayerMP) player);
 		}
-
 	}
 
 	public ExternalCoords getChannel(TileEntity te) {
@@ -70,14 +67,10 @@ public class ChannelSelectorHandler extends TileHandler {
 		if (currentCoords == null) {
 			return null;
 		}
-		//INetworkCache network = LogisticsAPI.getCableHelper().getNetwork(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite());
+		// INetworkCache network = LogisticsAPI.getCableHelper().getNetwork(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite());
 		/*
-		for(Entry<BlockCoords,ForgeDirection> entry : network.getExternalBlocks().entrySet()){
-			if (currentCoords.blockCoords.equals(entry.getKey())) {
-				return currentCoords;
-			}
-		}
-		*/
+		 * for(Entry<BlockCoords,ForgeDirection> entry : network.getExternalBlocks().entrySet()){ if (currentCoords.blockCoords.equals(entry.getKey())) { return currentCoords; } }
+		 */
 		return currentCoords;
 	}
 
@@ -126,7 +119,6 @@ public class ChannelSelectorHandler extends TileHandler {
 			for (int i = 0; i < list.tagCount(); i++) {
 				NBTTagCompound compound = list.getCompoundTagAt(i);
 				this.channels.add(ExternalCoords.readFromNBT(compound));
-
 			}
 		}
 	}
@@ -198,7 +190,7 @@ public class ChannelSelectorHandler extends TileHandler {
 			for (int i = 0; i < this.channels.size(); i++) {
 				if (this.channels.get(i) != null) {
 					NBTTagCompound compound = new NBTTagCompound();
-					compound.setByte("Slot", (byte) i);
+					// compound.setByte("Slot", (byte) i);
 					ExternalCoords.writeToNBT(compound, this.channels.get(i));
 					list.appendTag(compound);
 				}

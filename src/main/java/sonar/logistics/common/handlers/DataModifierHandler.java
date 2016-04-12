@@ -75,7 +75,7 @@ public class DataModifierHandler extends TileHandler {
 	}
 
 	public ILogicInfo currentInfo() {
-		if (this.info == null) {
+		if (this.info.getObject() == null) {
 			return null;
 		}
 		if (this.info.getObject().getProviderID() == -1 && this.info.getObject().getCategory().equals("PERCENT")) {

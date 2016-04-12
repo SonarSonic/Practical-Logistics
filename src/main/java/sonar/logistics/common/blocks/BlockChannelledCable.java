@@ -18,9 +18,9 @@ import sonar.logistics.common.tileentity.TileEntityChannelledCable;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-public class BlockMultiDataCable extends SonarMachineBlock {
+public class BlockChannelledCable extends SonarMachineBlock {
 
-	public BlockMultiDataCable() {
+	public BlockChannelledCable() {
 		super(SonarMaterials.machine);
 		this.disableOrientation();
 		this.setBlockBounds((float) 0.0625 * 3, (float) 0.0625 * 3, (float) 0.0625 * 3, (float) (1 - (0.0625 * 3)), (float) (1 - (0.0625 * 3)), (float) (1 - (0.0625 * 3)));
@@ -33,10 +33,12 @@ public class BlockMultiDataCable extends SonarMachineBlock {
 
 	@Override
 	public boolean operateBlock(World world, int x, int y, int z, EntityPlayer player, BlockInteraction interact) {
+		/*
 		if (!world.isRemote) {
 			IDataCable cable = (IDataCable) world.getTileEntity(x, y, z);
 			FontHelper.sendMessage("ID: " + cable.registryID(), world, player);
 		}
+		*/
 		return false;
 	}
 

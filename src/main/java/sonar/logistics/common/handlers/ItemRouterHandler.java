@@ -4,7 +4,9 @@ import io.netty.buffer.ByteBuf;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map.Entry;
 
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
@@ -22,17 +24,20 @@ import sonar.core.helpers.InventoryHelper.IInventoryFilter;
 import sonar.core.helpers.NBTHelper;
 import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.core.helpers.SonarHelper;
+import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.handlers.InventoryTileHandler;
 import sonar.core.network.sync.ISyncPart;
 import sonar.core.network.sync.SyncTagType;
 import sonar.core.network.utils.IByteBufTile;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.LogisticsAPI;
+import sonar.logistics.api.cache.EmptyNetworkCache;
 import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.utils.ItemFilter;
 import sonar.logistics.common.tileentity.TileEntityBlockNode;
 import sonar.logistics.info.filters.items.ItemStackFilter;
 import sonar.logistics.info.filters.items.OreDictionaryFilter;
+import sonar.logistics.registries.CacheRegistry;
 
 import com.google.common.collect.Lists;
 
@@ -44,7 +49,7 @@ public class ItemRouterHandler extends InventoryTileHandler implements ISidedInv
 	public SyncTagType.INT side = new SyncTagType.INT(8);
 	public SyncTagType.INT filterPos = new SyncTagType.INT(9);
 
-	public List<BlockCoords>[] coords = new List[6];
+	// public List<BlockCoords>[] coords = new List[6];
 	public List<ItemFilter>[] lastWhitelist = new List[6];
 	public List<ItemFilter>[] whitelist = new List[6];
 
@@ -68,7 +73,7 @@ public class ItemRouterHandler extends InventoryTileHandler implements ISidedInv
 			whitelist[i] = new ArrayList();
 			lastBlacklist[i] = new ArrayList();
 			blacklist[i] = new ArrayList();
-			coords[i] = new ArrayList();
+			// coords[i] = new ArrayList();
 		}
 	}
 
@@ -86,26 +91,24 @@ public class ItemRouterHandler extends InventoryTileHandler implements ISidedInv
 			update++;
 		} else {
 			update = 0;
-			updateConnections(te);
 		}
 		if (update < 6) {
 			int config = this.sideConfigs[update].getObject();
 			if (config != 0) {
-				TileEntity target = null;
-				ForgeDirection dir = null;
-				if (this.coords[update] != null) {
-					for (BlockCoords coords : this.coords[update]) {
-						TileEntity tile = coords.getTileEntity();
-						if (tile != null && tile instanceof TileEntityBlockNode) {
-							TileEntityBlockNode node = (TileEntityBlockNode) tile;
-							dir = ForgeDirection.getOrientation(SonarHelper.invertMetadata(node.getBlockMetadata())).getOpposite();
-							target = node.getWorldObj().getTileEntity(node.xCoord + dir.offsetX, node.yCoord + dir.offsetY, node.zCoord + dir.offsetZ);
-
-						} else {
-							dir = ForgeDirection.getOrientation(update);
-							target = te.getWorldObj().getTileEntity(te.xCoord + dir.offsetX, te.yCoord + dir.offsetY, te.zCoord + dir.offsetZ);
+				ForgeDirection side = ForgeDirection.getOrientation(update);
+				INetworkCache cache = LogisticsAPI.getCableHelper().getNetwork(te, side);
+				if (!(cache instanceof EmptyNetworkCache)) {
+					LinkedHashMap<BlockCoords, ForgeDirection> externalBlocks = cache.getExternalBlocks(true);
+					for (Entry<BlockCoords, ForgeDirection> entry : externalBlocks.entrySet()) {
+						if (entry.getKey() != null && entry.getKey().getTileEntity() != null) {
+							TileEntity tile = entry.getKey().getTileEntity();
+							routeInventory(te, config, tile, side, entry.getValue());
 						}
-						routeInventory(te, config, target, dir);
+					}
+				} else {
+					TileEntity tile = SonarHelper.getAdjacentTileEntity(te, side);
+					if (tile != null) {
+						routeInventory(te, config, tile, side, side.getOpposite());
 					}
 				}
 			}
@@ -113,16 +116,26 @@ public class ItemRouterHandler extends InventoryTileHandler implements ISidedInv
 		}
 	}
 
-	public void routeInventory(TileEntity te, int config, TileEntity target, ForgeDirection dir) {
+	public void routeInventory(TileEntity te, int config, TileEntity target, ForgeDirection side, ForgeDirection dir) {
 		if (target != null && dir != null && target instanceof IInventory) {
 			if (config == 1) {
-				SonarAPI.getItemHelper().transferItems(target, te, dir.getOpposite(), dir, null);
+				SonarAPI.getItemHelper().transferItems(target, te, dir, side, null);
 			} else {
+				SonarAPI.getItemHelper().transferItems(te, target, side, dir, null);
+				/*
 				for (int i = 0; i < slots.length; i++) {
 					if (slots[i] != null && matchesFilters(slots[i], whitelist[update], blacklist[update])) {
-						SonarAPI.getItemHelper().addItems(target, new StoredItemStack(slots[i]), dir.getOpposite(), ActionType.PERFORM, null);
+						StoredItemStack stack = new StoredItemStack(slots[i].copy());
+						StoredItemStack returned = SonarAPI.getItemHelper().addItems(target, stack.copy(), dir, ActionType.PERFORM, null);
+						stack = SonarAPI.getItemHelper().getStackToAdd(stack.getStackSize(), stack, returned);
+						if (stack == null) {
+							slots[i] = null;
+						} else {
+							slots[i] = stack.getFullStack();
+						}
 					}
 				}
+				*/
 			}
 		}
 	}
@@ -170,18 +183,11 @@ public class ItemRouterHandler extends InventoryTileHandler implements ISidedInv
 		}
 	}
 
-	public void updateConnections(TileEntity te) {
-		for (int i = 0; i < 6; i++) {
-			int config = sideConfigs[i].getObject();
-			if (config != 0) {
-				INetworkCache connections = LogisticsAPI.getCableHelper().getNetwork(te, ForgeDirection.getOrientation(i));
-				/*
-				 * if (!connections) { this.coords[i] = connections.getConnections(CacheTypes.BLOCK); }else{ this.coords[i]=new ArrayList(); this.coords[i].add(BlockCoords.translateCoords(new BlockCoords(te), ForgeDirection.getOrientation(i))); }
-				 */
-			}
-		}
-	}
-
+	/*
+	 * public void updateConnections(TileEntity te) { for (int i = 0; i < 6; i++) { int config = sideConfigs[i].getObject(); if (config != 0) { INetworkCache connections = LogisticsAPI.getCableHelper().getNetwork(te, ForgeDirection.getOrientation(i)); /* if (!connections) { this.coords[i] = connections.getConnections(CacheTypes.BLOCK); }else{ this.coords[i]=new ArrayList(); this.coords[i].add(BlockCoords.translateCoords(new BlockCoords(te), ForgeDirection.getOrientation(i))); }
+	 * 
+	 * } } }
+	 */
 	public boolean canConnect(TileEntity te, ForgeDirection dir) {
 		return sideConfigs[dir.ordinal()].getObject() != 0;
 	}

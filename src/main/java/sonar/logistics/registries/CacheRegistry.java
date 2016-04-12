@@ -14,7 +14,7 @@ import sonar.logistics.cache.NetworkCache;
 
 public final class CacheRegistry {
 
-	public static final EmptyNetworkCache EMPTY_CACHE = new EmptyNetworkCache();
+	private static final EmptyNetworkCache EMPTY_CACHE = new EmptyNetworkCache();
 
 	private static LinkedHashMap<Integer, INetworkCache> cache = new LinkedHashMap<Integer, INetworkCache>();
 

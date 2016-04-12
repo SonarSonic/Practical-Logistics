@@ -51,7 +51,20 @@ public class TileEntityDataModifier extends TileEntityHandler implements IInfoEm
 		return new BlockCoords(this);
 	}
 
-	
+	public void onLoaded() {
+		super.onLoaded();
+		if (!this.worldObj.isRemote) {
+			addConnections();
+		}
+	}
+
+	public void invalidate() {
+		if (!this.worldObj.isRemote) {
+			removeConnections();
+		}
+		super.invalidate();
+	}
+
 	@Override
 	public void addConnections() {
 		for (int i = 0; i < 6; i++) {

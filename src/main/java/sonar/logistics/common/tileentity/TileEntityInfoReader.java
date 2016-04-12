@@ -44,9 +44,24 @@ public class TileEntityInfoReader extends TileEntityHandler implements IInfoEmit
 	public boolean maxRender() {
 		return true;
 	}
+
 	@Override
 	public BlockCoords getCoords() {
 		return new BlockCoords(this);
+	}
+
+	public void onLoaded() {
+		super.onLoaded();
+		if (!this.worldObj.isRemote) {
+			addConnections();
+		}
+	}
+
+	public void invalidate() {
+		if (!this.worldObj.isRemote) {
+			removeConnections();
+		}
+		super.invalidate();
 	}
 
 	@Override

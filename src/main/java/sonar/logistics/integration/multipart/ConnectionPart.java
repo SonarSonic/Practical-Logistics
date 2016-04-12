@@ -24,9 +24,11 @@ public abstract class ConnectionPart extends LogisticsPart.Handler implements II
 		this.removeConnections();
 	}
 
+	@Override
 	public void onPartChanged(TMultiPart part) {
 		super.onPartChanged(part);
 		this.removeConnections();
 		this.addConnections();
 	}
+	
 }

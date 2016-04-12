@@ -25,7 +25,6 @@ public class InventoryReaderPart extends ConnectionPart implements IInfoEmitter 
 
 	public InventoryReaderPart() {
 		super();
-		handler = new InventoryReaderHandler(true);
 	}
 
 	public InventoryReaderPart(int meta) {
@@ -85,7 +84,8 @@ public class InventoryReaderPart extends ConnectionPart implements IInfoEmitter 
 
 	@Override
 	public void addConnections() {
-		LogisticsAPI.getCableHelper().addConnection(tile(), ForgeDirection.getOrientation(FMPHelper.getMeta(tile())));
+		ForgeDirection dir = ForgeDirection.getOrientation(FMPHelper.getMeta(tile()));
+		LogisticsAPI.getCableHelper().addConnection(tile(), dir);
 	}
 
 	@Override

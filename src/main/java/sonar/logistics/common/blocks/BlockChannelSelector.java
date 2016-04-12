@@ -5,6 +5,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import sonar.logistics.Logistics;
 import sonar.logistics.common.tileentity.TileEntityChannelSelector;
+import sonar.logistics.common.tileentity.TileEntityInfoReader;
 import sonar.logistics.network.LogisticsGui;
 
 public class BlockChannelSelector extends BlockFramedCable {
@@ -16,7 +17,9 @@ public class BlockChannelSelector extends BlockFramedCable {
 
 	@Override
 	public void openGui(World world, int x, int y, int z, EntityPlayer player) {
-		player.openGui(Logistics.instance, LogisticsGui.channelSelector, world, x, y, z);
+		if (!world.isRemote) {
+			player.openGui(Logistics.instance, LogisticsGui.channelSelector, world, x, y, z);
+		}
 	}
 
 }

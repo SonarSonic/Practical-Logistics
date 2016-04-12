@@ -128,7 +128,8 @@ public class NetworkCache extends StorageCache implements IRefreshCache {
 			World world = coord.getWorld();
 			Block target = coord.getBlock(coord.getWorld());
 			if (target != null && !target.isAir(world, coord.getX(), coord.getY(), coord.getZ())) {
-				TileEntity tile = coord.getTileEntity();
+				//TileEntity tile = coord.getTileEntity();
+				Object tile = FMPHelper.checkObject(coord.getTileEntity());
 				if (tile != null) {
 					if (tile instanceof IChannelProvider) {
 						if (!coord.contains(channelCache)) {

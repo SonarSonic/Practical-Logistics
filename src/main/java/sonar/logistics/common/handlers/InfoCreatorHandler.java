@@ -48,7 +48,7 @@ public class InfoCreatorHandler extends TileHandler {
 	}
 
 	public boolean canConnect(TileEntity te, ForgeDirection dir) {
-		return dir == ForgeDirection.getOrientation(FMPHelper.getMeta(te));
+		return dir == ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite();
 	}
 
 	public ILogicInfo currentInfo() {
