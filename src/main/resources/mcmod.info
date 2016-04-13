@@ -2,10 +2,10 @@
 {"modid": "PracticalLogistics",
   "name": "Practical Logistics",
   "description": "All things data - Requires SonarCore",
-  "version": "2.0.0",
-  "mcversion": "1.7.10",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
 
-  "updateUrl": "",
+  "updateUrl": "http://mods.curse.com/mc-mods/minecraft/240562-practical-logistics",
   "authors": ["Ollie Lansdell"],
   "credits": "Ollie Lansdell - Ideas, Coding, Textures, Models, SkullyGamingMC - Testing, Ideas, Additional Textures and Models",
   "logoFile": "/banner.png",

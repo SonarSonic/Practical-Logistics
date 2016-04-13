@@ -148,7 +148,7 @@ public class CableHelper extends CablingWrapper {
 			try {
 				return CacheRegistry.getCache(registryID);
 			} catch (Exception exception) {
-				Logistics.logger.error("CableHelper: " + exception.getLocalizedMessage());
+				Logistics.logger.error("CableHelper: failed to get Cache", exception);
 			}
 		}
 		return new EmptyNetworkCache();

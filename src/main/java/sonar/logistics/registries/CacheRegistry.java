@@ -65,7 +65,6 @@ public final class CacheRegistry {
 		NetworkCache network = new NetworkCache();
 		network.refreshCache(newID);
 		cache.put(newID, network);
-		Logistics.logger.debug("refreshed cache");
 	}
 
 	public static LinkedHashMap<Integer, INetworkCache> getNetworkCache() {

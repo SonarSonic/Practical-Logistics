@@ -17,12 +17,12 @@ buildscript {
 
 apply plugin: 'forge'
 
-version = "2.0.0"
-group= "sonar.logistics.modid"
-archivesBaseName = "Practical-Logistics-1.7.10"
+version = "${minecraft_version}-${mod_version}"
+group= "sonar.logistics"
+archivesBaseName = "Practical-Logistics"
 
 minecraft {
-    version = "1.7.10-10.13.4.1614-1.7.10"
+    version = "${minecraft_version}-${forge_version}"
     runDir = "eclipse"
 }
 

@@ -66,7 +66,6 @@ public class WIPCacheRegistry {
 		NetworkCache network = new NetworkCache();
 		network.refreshCache(newID);
 		caches.set(newID, network);
-		Logistics.logger.debug("refreshed cache");
 	}
 
 	public static ArrayList<INetworkCache> getNetworkCache() {
