@@ -2,6 +2,7 @@ package sonar.logistics.common.handlers;
 
 import io.netty.buffer.ByteBuf;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.nbt.NBTTagCompound;
@@ -9,6 +10,8 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.SonarCore;
 import sonar.core.api.BlockCoords;
+import sonar.core.api.StoredFluidStack;
+import sonar.core.api.StoredItemStack;
 import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.network.sync.ISyncPart;
@@ -16,6 +19,7 @@ import sonar.core.network.sync.SyncTagType;
 import sonar.core.network.utils.IByteBufTile;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.cache.CacheTypes;
+import sonar.logistics.api.cache.ICacheViewer;
 import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.render.LargeScreenSizing;
 import sonar.logistics.helpers.DisplayHelper;
@@ -23,7 +27,7 @@ import sonar.logistics.registries.DisplayRegistry;
 
 import com.google.common.collect.Lists;
 
-public class LargeDisplayScreenHandler extends DisplayScreenHandler implements IByteBufTile {
+public class LargeDisplayScreenHandler extends DisplayScreenHandler implements IByteBufTile{
 
 	public SyncTagType.BOOLEAN isHandler = new SyncTagType.BOOLEAN(0);
 	public LargeScreenSizing sizing;

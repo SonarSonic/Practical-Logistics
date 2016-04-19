@@ -66,7 +66,7 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 		INetworkCache cache = getNetwork(te);
 		cacheID = cache.getNetworkID();
 		StorageItems list = LogisticsAPI.getItemHelper().getItems(cache);
-		ArrayList<StoredItemStack> current = (ArrayList<StoredItemStack>)list.items.clone();
+		ArrayList<StoredItemStack> current = (ArrayList<StoredItemStack>) list.items.clone();
 		if (sortingType.getObject() == 0) {
 			Collections.sort(current, new Comparator<StoredItemStack>() {
 				public int compare(StoredItemStack str1, StoredItemStack str2) {
@@ -77,8 +77,10 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 					return sortingOrder.getObject() == 0 ? -1 : 1;
 				}
 			});
-		} else if (sortingType.getObject() == 1) {
-			Collections.sort(current, new Comparator<StoredItemStack>() {
+		}
+		/*
+		else if (sortingType.getObject() == 1) {
+			current.sort(new Comparator<StoredItemStack>() {
 				public int compare(StoredItemStack str1, StoredItemStack str2) {
 					int res = String.CASE_INSENSITIVE_ORDER.compare(str1.getItemStack().getDisplayName(), str2.getItemStack().getDisplayName());
 					if (res == 0) {
@@ -87,7 +89,9 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 					return sortingOrder.getObject() == 0 ? res : -res;
 				}
 			});
-		} else if (sortingType.getObject() == 2) {
+		}
+		// remove TPS DEATH
+		else if (sortingType.getObject() == 2) {
 			Collections.sort(current, new Comparator<StoredItemStack>() {
 				public int compare(StoredItemStack str1, StoredItemStack str2) {
 					UniqueIdentifier modid1 = GameRegistry.findUniqueIdentifierFor(str1.getItemStack().getItem());
@@ -106,7 +110,7 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 				}
 			});
 		}
-
+	*/
 		stacks = current;
 		maxStorage = list.sizing;
 	}
@@ -120,7 +124,7 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 	}
 
 	public ILogicInfo currentInfo(TileEntity te) {
-		ArrayList<StoredItemStack> stacks = (ArrayList<StoredItemStack>)this.stacks.clone();
+		ArrayList<StoredItemStack> stacks = (ArrayList<StoredItemStack>) this.stacks.clone();
 		switch (setting.getObject()) {
 		case 0:
 			if (slots[0] != null) {
@@ -148,7 +152,7 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 			break;
 		case 3:
 			if (stacks != null) {
-				return InventoryInfo.createInfo(stacks, cacheID);
+				return InventoryInfo.createInfo(stacks, cacheID, sortingType.getObject(), sortingOrder.getObject());
 			}
 			break;
 		case 4:
@@ -172,7 +176,6 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 			}
 		}
 		if (type == SyncType.SPECIAL) {
-
 			if (nbt.hasKey("null")) {
 				this.stacks = new ArrayList();
 				return;
@@ -209,7 +212,19 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 				}
 
 			}
-
+			/*
+			if (sortingType.getObject() == 1) {
+				stacks.sort(new Comparator<StoredItemStack>() {
+					public int compare(StoredItemStack str1, StoredItemStack str2) {
+						int res = String.CASE_INSENSITIVE_ORDER.compare(str1.getItemStack().getDisplayName(), str2.getItemStack().getDisplayName());
+						if (res == 0) {
+							res = str1.getItemStack().getDisplayName().compareTo(str2.getItemStack().getDisplayName());
+						}
+						return sortingOrder.getObject() == 0 ? res : -res;
+					}
+				});
+			}
+			*/
 		}
 		if (type == SyncType.SYNC) {
 			NBTTagList list = nbt.getTagList("StoredStacks", 10);
@@ -217,7 +232,7 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 			for (int i = 0; i < list.tagCount(); i++) {
 				NBTTagCompound compound = list.getCompoundTagAt(i);
 				this.stacks.add(StoredItemStack.readFromNBT(compound));
-				
+
 			}
 		}
 	}
@@ -260,11 +275,10 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 				NBTTagCompound compound = new NBTTagCompound();
 				if (current != null) {
 					if (last != null) {
-						if (!last.item.equals(current.item)) {
+						if (last.stored!=current.stored || !ItemStack.areItemStacksEqual(last.item, current.item) || !ItemStack.areItemStackTagsEqual(last.item, current.item)) {
 							compound.setByte("f", (byte) 0);
 							this.lastStacks.set(i, current);
 							StoredItemStack.writeToNBT(compound, this.stacks.get(i));
-
 						}
 					} else {
 						compound.setByte("f", (byte) 0);
@@ -281,10 +295,10 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 				}
 
 			}
+			System.out.print(" " + list.tagCount() + " ");
 			if (list.tagCount() != 0) {
 				nbt.setTag("Stacks", list);
 			}
-
 		}
 		if (type == SyncType.SYNC) {
 			NBTTagList list = new NBTTagList();

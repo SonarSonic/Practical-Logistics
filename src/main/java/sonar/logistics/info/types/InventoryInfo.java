@@ -3,6 +3,8 @@ package sonar.logistics.info.types;
 import io.netty.buffer.ByteBuf;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import net.minecraft.client.Minecraft;
@@ -22,17 +24,22 @@ import sonar.core.helpers.RenderHelper;
 import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.api.render.ScreenType;
 import cpw.mods.fml.common.network.ByteBufUtils;
+import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.common.registry.GameRegistry.UniqueIdentifier;
 
 public class InventoryInfo extends ILogicInfo<InventoryInfo> {
 
 	public ArrayList<StoredItemStack> stacks = new ArrayList();
 	public int cacheID = -1;
+	public int sort = -1, order = -1;
 	public String rend = "ITEMINV";
 
-	public static InventoryInfo createInfo(ArrayList<StoredItemStack> stacks, int cacheID) {
+	public static InventoryInfo createInfo(ArrayList<StoredItemStack> stacks, int cacheID, int sort, int order) {
 		InventoryInfo info = new InventoryInfo();
 		info.stacks = stacks;
 		info.cacheID = cacheID;
+		info.sort = sort;
+		info.order = order;
 		return info;
 	}
 
@@ -84,16 +91,19 @@ public class InventoryInfo extends ILogicInfo<InventoryInfo> {
 	}
 
 	public void readFromNBT(NBTTagCompound tag) {
+		sort=tag.getInteger("sort");
+		order=tag.getInteger("order");
 		NBTTagList list = tag.getTagList("StoredStacks", 10);
 		this.stacks = new ArrayList();
 		for (int i = 0; i < list.tagCount(); i++) {
 			NBTTagCompound compound = list.getCompoundTagAt(i);
 			this.stacks.add(StoredItemStack.readFromNBT(compound));
-
 		}
 	}
 
 	public void writeToNBT(NBTTagCompound tag) {
+		tag.setInteger("sort", sort);
+		tag.setInteger("order", order);
 		NBTTagList list = new NBTTagList();
 		if (stacks == null) {
 			stacks = new ArrayList();
@@ -134,14 +144,14 @@ public class InventoryInfo extends ILogicInfo<InventoryInfo> {
 				for (StoredItemStack stack : currentStacks) {
 					if (stack != null) {
 						if (currentSlot < (xSlots * (ySlots))) {
+							GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 							int xLevel = (int) (currentSlot - ((Math.floor((currentSlot / xSlots))) * xSlots));
 							int yLevel = (int) (Math.floor((currentSlot / xSlots)));
 
 							FontRenderer rend = Minecraft.getMinecraft().fontRenderer;
 							if (stack.item != null) {
+								GL11.glPushMatrix();
 								stack.item.stackSize = 1;
-
-								GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 
 								GL11.glDisable(GL12.GL_RESCALE_NORMAL);
 								GL11.glEnable(GL11.GL_CULL_FACE);
@@ -170,6 +180,7 @@ public class InventoryInfo extends ILogicInfo<InventoryInfo> {
 								GL11.glScaled(40.0f, 40.0f, 40.0f);
 								GL11.glTranslatef(0.0f, 0.0f, 0.242f);
 								GL11.glTranslatef(-xLevel * spacing, -yLevel * spacing, 0);
+								GL11.glPopMatrix();
 							}
 						}
 					}
@@ -196,9 +207,16 @@ public class InventoryInfo extends ILogicInfo<InventoryInfo> {
 
 	@Override
 	public void writeUpdate(InventoryInfo currentInfo, NBTTagCompound tag) {
+		if (currentInfo.sort != sort) {
+			tag.setInteger("sort", currentInfo.sort);
+			sort = currentInfo.sort;
+		}
+		if (currentInfo.order != order) {
+			tag.setInteger("order", currentInfo.order);
+			order = currentInfo.order;
+		}
 		if (currentInfo.stacks == null) {
 			currentInfo.stacks = new ArrayList();
-
 		}
 		if (stacks == null) {
 			stacks = new ArrayList();
@@ -255,6 +273,12 @@ public class InventoryInfo extends ILogicInfo<InventoryInfo> {
 
 	@Override
 	public void readUpdate(NBTTagCompound tag) {
+		if (tag.hasKey("sort")) {
+			sort = tag.getInteger("sort");
+		}
+		if (tag.hasKey("order")) {
+			order = tag.getInteger("order");
+		}
 		if (tag.hasKey("null")) {
 			this.stacks = new ArrayList();
 			return;
@@ -290,12 +314,22 @@ public class InventoryInfo extends ILogicInfo<InventoryInfo> {
 				break;
 			}
 		}
-
+		if (sort == 1) {
+			stacks.sort(new Comparator<StoredItemStack>() {
+				public int compare(StoredItemStack str1, StoredItemStack str2) {
+					int res = String.CASE_INSENSITIVE_ORDER.compare(str1.getItemStack().getDisplayName(), str2.getItemStack().getDisplayName());
+					if (res == 0) {
+						res = str1.getItemStack().getDisplayName().compareTo(str2.getItemStack().getDisplayName());
+					}
+					return order == 0 ? res : -res;
+				}
+			});
+		}
 	}
 
 	@Override
 	public boolean matches(InventoryInfo currentInfo) {
-		return currentInfo.stacks.equals(stacks) && this.cacheID==currentInfo.cacheID;
+		return currentInfo.stacks.equals(stacks) && this.cacheID == currentInfo.cacheID;
 	}
 
 }

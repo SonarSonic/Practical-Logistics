@@ -126,7 +126,6 @@ public class ProgressInfo extends ILogicInfo<ProgressInfo> {
 			tag.setLong("m", currentInfo.max);
 			max = currentInfo.max;
 		}
-
 		if (currentInfo.stored != stored) {
 			tag.setLong("s", currentInfo.stored);
 			stored = currentInfo.stored;

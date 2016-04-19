@@ -11,23 +11,17 @@ import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.core.inventory.ContainerSync;
 import sonar.core.inventory.slots.SlotList;
 import sonar.logistics.api.LogisticsAPI;
+import sonar.logistics.api.cache.ICacheViewer;
 import sonar.logistics.common.handlers.InventoryReaderHandler;
 
-public class ContainerInventoryReader extends ContainerSync {
+public class ContainerInventoryCache extends ContainerSync {
 
 	private static final int INV_START = 1, INV_END = INV_START + 26, HOTBAR_START = INV_END + 1, HOTBAR_END = HOTBAR_START + 8;
-	public boolean stackMode = false;
 	public ItemStack lastStack = null;
-	InventoryReaderHandler handler;
+	public ICacheViewer viewer;
 
-	public ContainerInventoryReader(InventoryReaderHandler handler, TileEntity entity, InventoryPlayer inventoryPlayer) {
-		super(handler, entity);
-		addSlots(handler, inventoryPlayer, handler.setting.getObject() == 0);
-		this.handler = handler;
-	}
-
-	public void addSlots(InventoryReaderHandler handler, InventoryPlayer inventoryPlayer, boolean hasStack) {
-		stackMode = hasStack;
+	public ContainerInventoryCache(ICacheViewer viewer, TileEntity entity, InventoryPlayer inventoryPlayer) {
+		super(viewer, entity);
 		this.inventoryItemStacks.clear();
 		this.inventorySlots.clear();
 		for (int i = 0; i < 3; ++i) {
@@ -39,8 +33,6 @@ public class ContainerInventoryReader extends ContainerSync {
 		for (int i = 0; i < 9; ++i) {
 			this.addSlotToContainer(new Slot(inventoryPlayer, i, 41 + i * 18, 232));
 		}
-		if (hasStack)
-			addSlotToContainer(new SlotList(handler, 0, 103, 9));
 	}
 
 	@Override
@@ -58,9 +50,9 @@ public class ContainerInventoryReader extends ContainerSync {
 				if (!tile.getWorldObj().isRemote) {
 					StoredItemStack stack = new StoredItemStack(itemstack);
 					if (lastStack != null && ItemStack.areItemStackTagsEqual(itemstack1, lastStack) && lastStack.isItemEqual(itemstack1))
-						LogisticsAPI.getItemHelper().insertInventoryFromPlayer(player, handler.getNetwork(tile), slot.getSlotIndex());
+						LogisticsAPI.getItemHelper().insertInventoryFromPlayer(player, viewer.getNetwork(), slot.getSlotIndex());
 					else {
-						StoredItemStack perform = LogisticsAPI.getItemHelper().addItems(stack, handler.getNetwork(tile), ActionType.PERFORM);
+						StoredItemStack perform = LogisticsAPI.getItemHelper().addItems(stack, viewer.getNetwork(), ActionType.PERFORM);
 						lastStack = itemstack1;
 						if (perform == null || perform.stored == 0) {
 							itemstack1.stackSize = 0;

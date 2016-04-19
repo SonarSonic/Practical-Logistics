@@ -21,10 +21,10 @@ public abstract class GuiSelectionGrid<T> extends GuiSonar {
 	public TileEntity tile;
 	public int xCoord, yCoord, zCoord;
 
-	private float currentScroll;
-	private boolean isScrolling;
-	private boolean wasClicking;
-	private int scrollerLeft, scrollerStart, scrollerEnd, scrollerWidth;
+	public float currentScroll;
+	public boolean isScrolling;
+	public boolean wasClicking;
+	public int scrollerLeft, scrollerStart, scrollerEnd, scrollerWidth;
 
 	public abstract void onGridClicked(T selection, int pos, int button, boolean empty);
 
