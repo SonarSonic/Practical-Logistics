@@ -28,23 +28,20 @@ public class LocalNetworkCache extends StorageCache {
 
 	@Override
 	public Entry<BlockCoords, ForgeDirection> getExternalBlock(boolean includeChannels) {
-		try {
-			if (tile instanceof IConnectionNode) {
-				LinkedHashMap<BlockCoords, ForgeDirection> map = new LinkedHashMap();
-				((IConnectionNode) tile).addConnections(map);
-				for (Entry<BlockCoords, ForgeDirection> entry : map.entrySet()) {
-					if (entry.getKey().getBlock(entry.getKey().getWorld()) != null) {
-						return entry;
-					}
+		if (tile instanceof IConnectionNode) {
+			LinkedHashMap<BlockCoords, ForgeDirection> map = new LinkedHashMap();
+			((IConnectionNode) tile).addConnections(map);
+			for (Entry<BlockCoords, ForgeDirection> entry : map.entrySet()) {
+				if (entry.getKey().getBlock(entry.getKey().getWorld()) != null) {
+					return entry;
 				}
 			}
-			if (tile instanceof IChannelProvider) {
-				IChannelProvider provider = (IChannelProvider) tile;
-				final ExternalCoords coords = provider.getChannel();
-				TileEntity channel = coords.blockCoords.getTileEntity();
-				return LogisticsAPI.getCableHelper().getNetwork(channel, ForgeDirection.getOrientation(channel.getBlockMetadata()).getOpposite()).getExternalBlock(true);
-			}
-		} catch (Exception exception) {
+		}
+		if (tile instanceof IChannelProvider) {
+			IChannelProvider provider = (IChannelProvider) tile;
+			final ExternalCoords coords = provider.getChannel();
+			TileEntity channel = coords.blockCoords.getTileEntity();
+			return LogisticsAPI.getCableHelper().getNetwork(channel, ForgeDirection.getOrientation(channel.getBlockMetadata()).getOpposite()).getExternalBlock(true);
 		}
 		return null;
 	}
@@ -52,25 +49,22 @@ public class LocalNetworkCache extends StorageCache {
 	@Override
 	public LinkedHashMap<BlockCoords, ForgeDirection> getExternalBlocks(boolean includeChannels) {
 		LinkedHashMap map = new LinkedHashMap();
-		try {
-			if (tile instanceof IConnectionNode) {
-				LinkedHashMap<BlockCoords, ForgeDirection> connections = new LinkedHashMap();
-				((IConnectionNode) tile).addConnections(connections);
-				for (Entry<BlockCoords, ForgeDirection> set : connections.entrySet()) {
-					if (!map.containsKey(set.getKey())) {
-						map.put(set.getKey(), set.getValue());
-					}
+		if (tile instanceof IConnectionNode) {
+			LinkedHashMap<BlockCoords, ForgeDirection> connections = new LinkedHashMap();
+			((IConnectionNode) tile).addConnections(connections);
+			for (Entry<BlockCoords, ForgeDirection> set : connections.entrySet()) {
+				if (!map.containsKey(set.getKey())) {
+					map.put(set.getKey(), set.getValue());
 				}
 			}
-			if (tile instanceof IChannelProvider) {
-				IChannelProvider provider = (IChannelProvider) tile;
-				final ExternalCoords coords = provider.getChannel();
-				TileEntity channel = coords.blockCoords.getTileEntity();
-				return LogisticsAPI.getCableHelper().getNetwork(channel, ForgeDirection.getOrientation(channel.getBlockMetadata()).getOpposite()).getExternalBlocks(true);
-			}
-		} catch (Exception exception) {
-			return new LinkedHashMap();
 		}
+		if (tile instanceof IChannelProvider) {
+			IChannelProvider provider = (IChannelProvider) tile;
+			final ExternalCoords coords = provider.getChannel();
+			TileEntity channel = coords.blockCoords.getTileEntity();
+			return LogisticsAPI.getCableHelper().getNetwork(channel, ForgeDirection.getOrientation(channel.getBlockMetadata()).getOpposite()).getExternalBlocks(true);
+		}
+
 		return map;
 	}
 
@@ -78,13 +72,11 @@ public class LocalNetworkCache extends StorageCache {
 	public ArrayList<BlockCoords> getConnections(CacheTypes type, boolean includeChannels) {
 		ArrayList array = new ArrayList();
 		if (tile instanceof IChannelProvider) {
-			try {
-				IChannelProvider provider = (IChannelProvider) tile;
-				final ExternalCoords coords = provider.getChannel();
-				TileEntity channel = coords.blockCoords.getTileEntity();
-				return LogisticsAPI.getCableHelper().getNetwork(channel, ForgeDirection.getOrientation(channel.getBlockMetadata()).getOpposite()).getConnections(type, includeChannels);
-			} catch (Exception exception) {
-			}
+			IChannelProvider provider = (IChannelProvider) tile;
+			final ExternalCoords coords = provider.getChannel();
+			TileEntity channel = coords.blockCoords.getTileEntity();
+			return LogisticsAPI.getCableHelper().getNetwork(channel, ForgeDirection.getOrientation(channel.getBlockMetadata()).getOpposite()).getConnections(type, includeChannels);
+
 		} else {
 			switch (type) {
 			case ENTITY_NODES:
@@ -116,41 +108,38 @@ public class LocalNetworkCache extends StorageCache {
 
 	@Override
 	public BlockCoords getFirstConnection(CacheTypes type) {
-		try {
-			return this.getConnections(type, true).get(0);
-		} catch (Exception exception) {
+		ArrayList<BlockCoords> coords = this.getConnections(type, true);
+		if (coords.isEmpty()) {
 			return null;
 		}
+		return coords.get(0);
 	}
 
 	@Override
 	public Block getFirstBlock(CacheTypes type) {
-		try {
-			return this.getConnections(type, true).get(0).getBlock();
-		} catch (Exception exception) {
+		BlockCoords connection = this.getFirstConnection(type);
+		if (connection == null) {
 			return null;
 		}
+		return connection.getBlock();
 	}
 
 	@Override
 	public TileEntity getFirstTileEntity(CacheTypes type) {
-		try {
-			return this.getConnections(type, true).get(0).getTileEntity();
-		} catch (Exception exception) {
+		BlockCoords connection = this.getFirstConnection(type);
+		if (connection == null) {
 			return null;
 		}
+		return connection.getTileEntity();
 	}
 
 	@Override
 	public int getNetworkID() {
 		if (tile instanceof IChannelProvider) {
-			try {
-				IChannelProvider provider = (IChannelProvider) tile;
-				final ExternalCoords coords = provider.getChannel();
-				TileEntity channel = coords.blockCoords.getTileEntity();
-				return LogisticsAPI.getCableHelper().getNetwork(channel, ForgeDirection.getOrientation(channel.getBlockMetadata()).getOpposite()).getNetworkID();
-			} catch (Exception exception) {
-			}
+			IChannelProvider provider = (IChannelProvider) tile;
+			final ExternalCoords coords = provider.getChannel();
+			TileEntity channel = coords.blockCoords.getTileEntity();
+			return LogisticsAPI.getCableHelper().getNetwork(channel, ForgeDirection.getOrientation(channel.getBlockMetadata()).getOpposite()).getNetworkID();
 
 		}
 		return -1;
@@ -163,11 +152,11 @@ public class LocalNetworkCache extends StorageCache {
 
 	@Override
 	public StorageItems getStoredItems() {
-		return this.getCachedItems();
+		return this.getCachedItems(null);
 	}
 
 	@Override
 	public StorageFluids getStoredFluids() {
-		return this.getCachedFluids();
+		return this.getCachedFluids(null);
 	}
 }

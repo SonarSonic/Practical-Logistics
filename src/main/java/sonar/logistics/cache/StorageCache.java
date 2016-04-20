@@ -21,9 +21,9 @@ import sonar.logistics.api.connecting.IEntityNode;
 import sonar.logistics.api.wrappers.FluidWrapper.StorageFluids;
 import sonar.logistics.api.wrappers.ItemWrapper.StorageItems;
 
-public abstract class StorageCache implements IStorageCache{
-	
-	public StorageItems getCachedItems() {
+public abstract class StorageCache implements IStorageCache {
+
+	public StorageItems getCachedItems(ArrayList<StoredItemStack> last) {
 		ArrayList<StoredItemStack> storedStacks = new ArrayList();
 		StorageSize storage = new StorageSize(0, 0);
 
@@ -36,10 +36,23 @@ public abstract class StorageCache implements IStorageCache{
 				storage = LogisticsAPI.getItemHelper().getEntityInventory(storedStacks, storage, ((IEntityNode) tile).getEntities());
 			}
 		}
-		return new StorageItems(storedStacks, storage);
+
+		ArrayList<StoredItemStack> changed = ((ArrayList<StoredItemStack>) storedStacks.clone());// copy the latest list
+		ArrayList<StoredItemStack> removed = ((ArrayList<StoredItemStack>) last.clone());// copy the last list
+		if (last != null) {
+			changed.removeAll(last);// remove any in the changed that were in last, ignoring ones which arn't equal, e.g. changed/new
+		}
+		for (StoredItemStack r : (ArrayList<StoredItemStack>) removed.clone()) { // iterates the last list
+			for (StoredItemStack c : ((ArrayList<StoredItemStack>) storedStacks.clone())) {// against the latest list
+				if (r.equalStack(c.getItemStack())) {
+					removed.remove(r);// if anything in the last list equals something in the current list it is removed
+				}
+			}
+		}
+		return new StorageItems(storedStacks, storage, changed);
 	}
 
-	public StorageFluids getCachedFluids() {
+	public StorageFluids getCachedFluids(ArrayList<StoredFluidStack> fluids) {
 		ArrayList<StoredFluidStack> fluidList = new ArrayList();
 		StorageSize storage = new StorageSize(0, 0);
 		List<FluidHandler> providers = SonarCore.fluidProviders.getObjects();
@@ -58,6 +71,9 @@ public abstract class StorageCache implements IStorageCache{
 				}
 			}
 		}
-		return new StorageFluids(fluidList, storage);
+		ArrayList<StoredFluidStack> stored = ((ArrayList<StoredFluidStack>) fluidList.clone());
+		if (fluids != null)
+			stored.removeAll(fluids);
+		return new StorageFluids(fluidList, storage, stored);
 	}
 }

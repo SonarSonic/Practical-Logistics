@@ -106,7 +106,6 @@ public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 			info = new LogicInfo((byte) -1, "INFO", " ", "NO DATA");
 			return;
 		}
-
 		updateInfo = current;
 		if (shouldUpdate) {
 			if (info == null) {
@@ -133,6 +132,7 @@ public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 				}
 			}
 		}
+	
 	}
 
 	public void screenClicked(World world, EntityPlayer player, int x, int y, int z, BlockInteraction interact) {

@@ -19,13 +19,20 @@ public class ItemWrapper {
 
 	public static class StorageItems {
 
-		public static final StorageItems EMPTY = new StorageItems(new ArrayList(), StorageSize.EMPTY);
+		public static final StorageItems EMPTY = new StorageItems(new ArrayList(), StorageSize.EMPTY, null);
 		public ArrayList<StoredItemStack> items;
+		/** when this is null and last time there was a list, everything should be updated, if last time was null don't do anything */
+		public ArrayList<StoredItemStack> changed = new ArrayList();
 		public StorageSize sizing;
 
-		public StorageItems(ArrayList<StoredItemStack> items, StorageSize sizing) {
+		public StorageItems(ArrayList<StoredItemStack> items, StorageSize sizing, ArrayList<StoredItemStack> changed) {
 			this.items = items;
 			this.sizing = sizing;
+			this.changed = changed;
+		}
+
+		public StorageItems copy() {
+			return new StorageItems((ArrayList<StoredItemStack>) this.items.clone(), sizing, (ArrayList<StoredItemStack>) changed.clone());
 		}
 	}
 

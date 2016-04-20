@@ -10,6 +10,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.SonarCore;
@@ -19,6 +21,7 @@ import sonar.core.api.InventoryHandler;
 import sonar.core.api.InventoryHandler.StorageSize;
 import sonar.core.api.SonarAPI;
 import sonar.core.api.StoredItemStack;
+import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.core.network.PacketInvUpdate;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.cache.CacheTypes;
@@ -264,7 +267,6 @@ public class ItemHelper extends ItemWrapper {
 		return remove;
 	}
 
-
 	public StoredItemStack removeToPlayerInventory(StoredItemStack stack, long extractSize, INetworkCache network, EntityPlayer player, ActionType type) {
 		StoredItemStack simulate = SonarAPI.getItemHelper().getStackToAdd(extractSize, stack, removeItems(stack.copy().setStackSize(extractSize), network, type));
 		if (simulate == null) {
@@ -332,6 +334,74 @@ public class ItemHelper extends ItemWrapper {
 		}
 		if (!ItemStack.areItemStacksEqual(add, player.inventory.getStackInSlot(slot))) {
 			player.inventory.setInventorySlotContents(slot, add);
+		}
+	}
+
+	public static void writeStorageToNBT(NBTTagCompound tag, ArrayList<StoredItemStack> last, StorageItems stacks, SyncType type) {
+		if (type == SyncType.SYNC) {
+			NBTTagList list = new NBTTagList();
+			for (int i = 0; i < stacks.items.size(); i++) {
+				if (stacks.items.get(i) != null) {
+					NBTTagCompound compound = new NBTTagCompound();
+					StoredItemStack.writeToNBT(compound, stacks.items.get(i));
+					list.appendTag(compound);
+				}
+			}
+			if (!tag.hasNoTags()) {
+				tag.setTag("Current", list);
+			} else {
+				tag.setBoolean("null", true);
+			}
+		} else if (type == SyncType.SPECIAL) {
+			if ((stacks.changed == null || stacks.changed.isEmpty()) && (last == null || last.isEmpty())) {
+				return;
+			}
+			if (stacks.changed == null && last != null) {
+				tag.setBoolean("null", true);
+				return;
+			}
+			NBTTagList list = new NBTTagList();
+			for (int i = 0; i < stacks.changed.size(); i++) {
+				if (stacks.changed.get(i) != null) {
+					NBTTagCompound compound = new NBTTagCompound();
+					StoredItemStack.writeToNBT(compound, stacks.changed.get(i));
+					list.appendTag(compound);
+				}
+			}
+			if (!tag.hasNoTags())
+				tag.setTag("Sync", list);
+		}
+	}
+
+	public static void readStorageToNBT(NBTTagCompound tag, ArrayList<StoredItemStack> current, SyncType type) {
+		//TODO: finish reading and writing of synced lists*/
+		if (tag.hasKey("null")) {
+			current.clear();
+			return;
+		}
+		if (type == SyncType.SYNC) {
+			NBTTagList list = tag.getTagList("Current", 10);
+			current.clear();
+			for (int i = 0; i < list.tagCount(); i++) {
+				NBTTagCompound compound = list.getCompoundTagAt(i);
+				current.add(StoredItemStack.readFromNBT(compound));
+			}
+		} else if (type == SyncType.SPECIAL) {
+			NBTTagList list = tag.getTagList("Sync", 10);
+			for (int i = 0; i < list.tagCount(); i++) {
+				NBTTagCompound compound = list.getCompoundTagAt(i);
+				StoredItemStack stack = StoredItemStack.readFromNBT(compound);
+				for (StoredItemStack stored : (ArrayList<StoredItemStack>) current.clone()) {
+					if (stored.equalStack(stack.getItemStack())) {
+						if (compound.getBoolean("remove")) {
+							current.remove(stored);
+						} else {
+							stored.setStackSize(stack.getStackSize());
+						}
+					}
+				}
+				current.add(stack);
+			}
 		}
 	}
 }

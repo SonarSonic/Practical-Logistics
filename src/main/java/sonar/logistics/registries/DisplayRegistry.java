@@ -16,8 +16,29 @@ public class DisplayRegistry {
 
 	private static Map<Integer, List<BlockCoords>> screens = new THashMap<Integer, List<BlockCoords>>();
 
+	private static ArrayList<Integer> needUpdate = new ArrayList();
+
 	public static void removeAll() {
 		screens.clear();
+	}
+
+	public static boolean hasChanged(int registryID) {
+		Integer inte = Integer.valueOf(registryID);
+		return needUpdate.contains(inte);
+	}
+
+	public static void setChanged(int registryID) {
+		Integer inte = Integer.valueOf(registryID);
+		if (!needUpdate.contains(inte)) {
+			needUpdate.add(inte);
+		}
+	}
+
+	public static void onUpdate(int registryID) {
+		Integer inte = Integer.valueOf(registryID);
+		if (needUpdate.contains(inte)) {
+			needUpdate.remove(inte);
+		}
 	}
 
 	public static int getNextAvailableID() {
@@ -149,5 +170,6 @@ public class DisplayRegistry {
 				}
 			}
 		}
+		setChanged(id);
 	}
 }

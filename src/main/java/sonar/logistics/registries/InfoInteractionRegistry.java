@@ -31,13 +31,12 @@ public class InfoInteractionRegistry extends RegistryHelper<InfoInteractionHandl
 
 	public InfoInteractionHandler getInteractionHandler(ILogicInfo info, ScreenType type, TileEntity te) {
 		for (InfoInteractionHandler handler : getObjects()) {
-			try {
-				Type subType = ((ParameterizedType) handler.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+			Class handlerClass = handler.getClass();
+			if (handlerClass != null) {
+				Type subType = ((ParameterizedType) handlerClass.getGenericSuperclass()).getActualTypeArguments()[0];
 				if (subType != null && info != null && subType == info.getClass()) {
 					return handler;
 				}
-			} catch (Exception exception) {
-				Logistics.logger.error("FAILED TO RETRIEVE INTERACTION HANDLER", exception.getMessage());
 			}
 		}
 		return null;

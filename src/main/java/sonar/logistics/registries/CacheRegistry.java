@@ -56,7 +56,16 @@ public final class CacheRegistry {
 
 	public static void refreshCache(int oldID, int newID) {
 		if (oldID != newID) {
-			cache.remove(oldID);
+			cache.remove(Integer.valueOf(oldID));
+			
+		}
+
+		LinkedHashMap<Integer, INetworkCache> networks = (LinkedHashMap<Integer, INetworkCache>) CacheRegistry.getNetworkCache().clone();
+		if(networks.isEmpty()){
+			//return;
+		}
+		for (Entry<Integer, INetworkCache> set : networks.entrySet()) {
+			System.out.print(set.getValue().getConnections(CacheTypes.EMITTER, true));
 		}
 		INetworkCache networkCache = cache.get(newID);
 		if (networkCache != null && networkCache instanceof INetworkCache) {

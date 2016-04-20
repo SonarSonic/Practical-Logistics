@@ -10,6 +10,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.api.BlockCoords;
+import sonar.core.api.StoredItemStack;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.cache.CacheTypes;
@@ -49,16 +50,13 @@ public class NetworkCache extends StorageCache implements IRefreshCache {
 	@Override
 	public Entry<BlockCoords, ForgeDirection> getExternalBlock(boolean includeChannels) {
 		for (BlockCoords coords : nodeCache) {
-			try {
-				Object tile = FMPHelper.checkObject(coords.getTileEntity());
-				if (tile instanceof IConnectionNode) {
-					LinkedHashMap<BlockCoords, ForgeDirection> map = new LinkedHashMap();
-					((IConnectionNode) tile).addConnections(map);
-					for (Entry<BlockCoords, ForgeDirection> set : map.entrySet()) {
-						return set;
-					}
+			Object tile = FMPHelper.checkObject(coords.getTileEntity());
+			if (tile != null && tile instanceof IConnectionNode) {
+				LinkedHashMap<BlockCoords, ForgeDirection> map = new LinkedHashMap();
+				((IConnectionNode) tile).addConnections(map);
+				for (Entry<BlockCoords, ForgeDirection> set : map.entrySet()) {
+					return set;
 				}
-			} catch (Exception exception) {
 			}
 		}
 		return null;
@@ -93,7 +91,7 @@ public class NetworkCache extends StorageCache implements IRefreshCache {
 				INetworkCache network = CacheRegistry.getCache(id);
 				ArrayList<BlockCoords> blocks = ((ArrayList<BlockCoords>) network.getConnections(type, false));
 				for (BlockCoords coord : blocks) {
-					if(!coord.contains(list)){
+					if (!coord.contains(list)) {
 						list.add(coord);
 					}
 				}
@@ -128,7 +126,7 @@ public class NetworkCache extends StorageCache implements IRefreshCache {
 			World world = coord.getWorld();
 			Block target = coord.getBlock(coord.getWorld());
 			if (target != null && !target.isAir(world, coord.getX(), coord.getY(), coord.getZ())) {
-				//TileEntity tile = coord.getTileEntity();
+				// TileEntity tile = coord.getTileEntity();
 				Object tile = FMPHelper.checkObject(coord.getTileEntity());
 				if (tile != null) {
 					if (tile instanceof IChannelProvider) {
@@ -174,29 +172,29 @@ public class NetworkCache extends StorageCache implements IRefreshCache {
 
 	@Override
 	public BlockCoords getFirstConnection(CacheTypes type) {
-		try {
-			return this.getConnections(type, true).get(0);
-		} catch (Exception exception) {
+		ArrayList<BlockCoords> coords = this.getConnections(type, true);
+		if (coords.isEmpty()) {
 			return null;
 		}
+		return coords.get(0);
 	}
 
 	@Override
 	public Block getFirstBlock(CacheTypes type) {
-		try {
-			return this.getConnections(type, true).get(0).getBlock();
-		} catch (Exception exception) {
+		BlockCoords connection = this.getFirstConnection(type);
+		if (connection == null) {
 			return null;
 		}
+		return connection.getBlock();
 	}
 
 	@Override
 	public TileEntity getFirstTileEntity(CacheTypes type) {
-		try {
-			return this.getConnections(type, true).get(0).getTileEntity();
-		} catch (Exception exception) {
+		BlockCoords connection = this.getFirstConnection(type);
+		if (connection == null) {
 			return null;
 		}
+		return connection.getTileEntity();
 	}
 
 	@Override
@@ -207,20 +205,17 @@ public class NetworkCache extends StorageCache implements IRefreshCache {
 	@Override
 	public ArrayList<Integer> getConnectedNetworks(ArrayList<Integer> networks) {
 		for (BlockCoords coord : channelCache) {
-			try {
-				Object tile = FMPHelper.checkObject(coord.getTileEntity());
-				if (tile instanceof IChannelProvider) {
-
-					IChannelProvider provider = (IChannelProvider) tile;
-					final ExternalCoords coords = provider.getChannel();
-					TileEntity channel = coords.blockCoords.getTileEntity();
-					int id = LogisticsAPI.getCableHelper().getNetwork(channel, ForgeDirection.getOrientation(channel.getBlockMetadata()).getOpposite()).getNetworkID();
-					if (id != -1 && !networks.contains(id)) {
-						networks.add(id);
-					}
+			Object tile = FMPHelper.checkObject(coord.getTileEntity());
+			if (tile != null && tile instanceof IChannelProvider) {
+				IChannelProvider provider = (IChannelProvider) tile;
+				final ExternalCoords coords = provider.getChannel();
+				TileEntity channel = coords.blockCoords.getTileEntity();
+				int id = LogisticsAPI.getCableHelper().getNetwork(channel, ForgeDirection.getOrientation(channel.getBlockMetadata()).getOpposite()).getNetworkID();
+				if (id != -1 && !networks.contains(id)) {
+					networks.add(id);
 				}
-			} catch (Exception exception) {
 			}
+
 		}
 		return networks;
 	}
@@ -232,7 +227,6 @@ public class NetworkCache extends StorageCache implements IRefreshCache {
 				networks.add(id);
 			}
 			CacheRegistry.getCache(networkID).getConnectedNetworks(networks);
-
 		}
 		return networks;
 	}
@@ -244,19 +238,17 @@ public class NetworkCache extends StorageCache implements IRefreshCache {
 		}
 		LinkedHashMap map = new LinkedHashMap();
 		for (BlockCoords coords : nodeCache) {
-			try {
-				Object tile = FMPHelper.checkObject(coords.getTileEntity());
-				if (tile instanceof IConnectionNode) {
-					LinkedHashMap<BlockCoords, ForgeDirection> connections = new LinkedHashMap();
-					((IConnectionNode) tile).addConnections(connections);
-					for (Entry<BlockCoords, ForgeDirection> set : connections.entrySet()) {
-						if (!set.getKey().contains(map)) {
-							map.put(set.getKey(), set.getValue());
-						}
+			Object tile = FMPHelper.checkObject(coords.getTileEntity());
+			if (tile instanceof IConnectionNode) {
+				LinkedHashMap<BlockCoords, ForgeDirection> connections = new LinkedHashMap();
+				((IConnectionNode) tile).addConnections(connections);
+				for (Entry<BlockCoords, ForgeDirection> set : connections.entrySet()) {
+					if (!set.getKey().contains(map)) {
+						map.put(set.getKey(), set.getValue());
 					}
 				}
-			} catch (Exception exception) {
 			}
+
 		}
 		this.blockCache.clear();
 		this.blockCache.putAll(map);
@@ -273,9 +265,9 @@ public class NetworkCache extends StorageCache implements IRefreshCache {
 		}
 		this.networkedCache.clear();
 		this.networkedCache.putAll(map);
-
-		this.cachedItems = this.getCachedItems();
-		this.cachedFluids = this.getCachedFluids();
+		
+		this.cachedItems = this.getCachedItems(cachedItems.items);
+		this.cachedFluids = this.getCachedFluids(cachedFluids.fluids);
 	}
 
 	@Override

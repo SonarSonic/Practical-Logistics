@@ -4,6 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 
 import sonar.logistics.Logistics;
+import sonar.logistics.api.cache.CacheTypes;
 import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.cache.IRefreshCache;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
@@ -15,14 +16,16 @@ public class EventRegistry {
 	public void onServerTick(TickEvent.ServerTickEvent event) {
 		if (event.phase == Phase.START) {
 			LinkedHashMap<Integer, INetworkCache> networks = (LinkedHashMap<Integer, INetworkCache>) CacheRegistry.getNetworkCache().clone();
+			if (networks.isEmpty()) {
+				return;
+			}
 			for (Entry<Integer, INetworkCache> set : networks.entrySet()) {
 				INetworkCache cache = set.getValue();
 				if (cache instanceof IRefreshCache) {
-					try {
-						((IRefreshCache) cache).updateNetwork(cache.getNetworkID());
-					} catch (Exception exception) {
-						Logistics.logger.error("FAILED TO REFRESH NETWORK CACHE - TELL MOD AUTHOR", exception);
-					}
+					((IRefreshCache) cache).updateNetwork(cache.getNetworkID());
+				}
+				if(CableRegistry.getCables(cache.getNetworkID()).size()==0){
+					CacheRegistry.getNetworkCache().remove(Integer.valueOf(cache.getNetworkID()));
 				}
 			}
 		}

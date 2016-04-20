@@ -1,5 +1,7 @@
 package sonar.logistics.common.tileentity;
 
+import io.netty.buffer.ByteBuf;
+
 import java.util.List;
 
 import net.minecraft.inventory.ISidedInventory;
@@ -8,11 +10,12 @@ import sonar.core.SonarCore;
 import sonar.core.common.tileentity.TileEntityInventory;
 import sonar.core.network.sync.ISyncPart;
 import sonar.core.network.sync.SyncTagType;
+import sonar.core.network.utils.IByteBufTile;
 import sonar.logistics.utils.HammerRecipes;
 
 import com.google.common.collect.Lists;
 
-public class TileEntityHammer extends TileEntityInventory implements ISidedInventory {
+public class TileEntityHammer extends TileEntityInventory implements ISidedInventory, IByteBufTile {
 
 	public SyncTagType.INT progress = new SyncTagType.INT(0);
 	public SyncTagType.INT coolDown = new SyncTagType.INT(1);
@@ -24,27 +27,34 @@ public class TileEntityHammer extends TileEntityInventory implements ISidedInven
 
 	public void updateEntity() {
 		if (isClient()) {
+			if (this.progress.getObject() > 90) {
+				worldObj.spawnParticle("smoke", xCoord+0.5, yCoord+1, zCoord+0.5, 0, 0, 0);
+			}
 			return;
 		}
-		if (this.worldObj.isBlockIndirectlyGettingPowered(xCoord, yCoord, zCoord)) {
-			return;
-		}
+		// if (this.worldObj.isBlockIndirectlyGettingPowered(xCoord, yCoord, zCoord)) {
+		// return;
+		// }
 		if (coolDown.getObject() != 0) {
 			coolDown.increaseBy(-1);
-			SonarCore.sendFullSyncAround(this, 64);
+			SonarCore.sendPacketAround(this, 64, 1);
+			// SonarCore.sendFullSyncAround(this, 64);
 		} else if (canProcess()) {
 			if (progress.getObject() < speed) {
 				progress.increaseBy(1);
+				SonarCore.sendPacketAround(this, 64, 0);
 			} else {
 				finishProcess();
 				this.coolDown.setObject(speed * 2);
 				progress.setObject(0);
 				this.worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
 			}
-			SonarCore.sendFullSyncAround(this, 64);
+			// SonarCore.sendPacketAround(this, 64, 0);
+			// SonarCore.sendFullSyncAround(this, 64);
 		} else {
 			this.coolDown.setObject(this.progress.getObject() * 2);
 			this.progress.setObject(0);
+			SonarCore.sendPacketAround(this, 64, 0);
 		}
 	}
 
@@ -123,6 +133,31 @@ public class TileEntityHammer extends TileEntityInventory implements ISidedInven
 		super.setInventorySlotContents(i, itemstack);
 		if (i == 1) {
 			SonarCore.sendFullSyncAround(this, 64);
+		}
+	}
+
+	@Override
+	public void writePacket(ByteBuf buf, int id) {
+		switch (id) {
+		case 0:
+			progress.writeToBuf(buf);
+			break;
+		case 1:
+			coolDown.writeToBuf(buf);
+			break;
+		}
+
+	}
+
+	@Override
+	public void readPacket(ByteBuf buf, int id) {
+		switch (id) {
+		case 0:
+			progress.readFromBuf(buf);
+			break;
+		case 1:
+			coolDown.readFromBuf(buf);
+			break;
 		}
 	}
 }

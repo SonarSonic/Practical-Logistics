@@ -272,6 +272,7 @@ public class RenderHandlers {
 					cooling = true;
 				} else
 					progress = hammer.progress.getObject();
+				// double move = progress * 1.625 / hammer.speed;
 				double move = !cooling ? progress * 1.625 / hammer.speed : progress * 1.625 / 200;
 				model.render((Entity) null, 0.0F, 0.0F, -0.1F, 0.0F, 0.0F, 0.0625F, true, move);
 			} else {
@@ -281,6 +282,7 @@ public class RenderHandlers {
 			if (entity.getWorldObj() != null) {
 				GL11.glTranslated(0, 2.75, 0);
 				double height = -(!cooling ? progress * 1.625 / 100 : progress * 1.625 / 200);
+				// double height = -(progress * 1.625 / 100);
 				float width = 0.53F;
 				Tessellator tessellator = Tessellator.instance;
 				this.bindTexture(rope);
@@ -347,9 +349,12 @@ public class RenderHandlers {
 
 					} else {
 						GL11.glRotated(90, -1, 0, 0);
-						// GL11.glTranslated(0.0625 * 8, 0.0625 * 13, 0.4);
 						GL11.glTranslated(0.5, -0.7, 0.92);
-						if (!cooling && progress > 81) {
+						if (!cooling && progress > 81 || cooling && (progress / 2)-10 > 81) {
+							if (cooling) {
+								progress = (progress / 2)-10;
+							}
+							// System.out.print(" " + progress);
 							GL11.glTranslated(0, 0, -((progress - 81) * 0.085 / (hammer.speed - 81)));
 							GL11.glScaled(1, 1, 1 - ((progress - 81) * 0.85 / (hammer.speed - 81)));
 						}
@@ -653,11 +658,11 @@ public class RenderHandlers {
 					for (int i = 0; i < stacks.length; i++) {
 						ItemStack stack = stacks[i];
 						if (stack != null && stack.getItem() instanceof ITransceiver) {
-							double translateX =i<4?0:0.355;
-							int translateZ = i<4?i:i-4;							
-							GL11.glTranslated(translateX, 0.0, translateZ*0.182);
+							double translateX = i < 4 ? 0 : 0.355;
+							int translateZ = i < 4 ? i : i - 4;
+							GL11.glTranslated(translateX, 0.0, translateZ * 0.182);
 							RenderHelper.renderItem(entity.getWorldObj(), stack);
-							GL11.glTranslated(-translateX, 0.0, -translateZ*0.182);
+							GL11.glTranslated(-translateX, 0.0, -translateZ * 0.182);
 						}
 					}
 				}

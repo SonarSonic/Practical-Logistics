@@ -295,7 +295,6 @@ public class InventoryReaderHandler extends InventoryTileHandler implements IByt
 				}
 
 			}
-			System.out.print(" " + list.tagCount() + " ");
 			if (list.tagCount() != 0) {
 				nbt.setTag("Stacks", list);
 			}

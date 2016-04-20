@@ -5,21 +5,30 @@ import java.util.ArrayList;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import sonar.core.api.ActionType;
+import sonar.core.api.StoredItemStack;
 import sonar.core.api.InventoryHandler.StorageSize;
 import sonar.core.api.StoredFluidStack;
 import sonar.logistics.api.cache.INetworkCache;
+import sonar.logistics.api.wrappers.ItemWrapper.StorageItems;
 
 public class FluidWrapper {
 
 	public static class StorageFluids {
 
-		public static final StorageFluids EMPTY = new StorageFluids(new ArrayList(), StorageSize.EMPTY);
+		public static final StorageFluids EMPTY = new StorageFluids(new ArrayList(), StorageSize.EMPTY, null);
 		public ArrayList<StoredFluidStack> fluids;
+		/**when this is null and last time there was a list, everything should be updated, if last time was null don't do anything*/
+		public ArrayList<StoredFluidStack> changed = new ArrayList();
 		public StorageSize sizing;
 
-		public StorageFluids(ArrayList<StoredFluidStack> items, StorageSize sizing) {
+		public StorageFluids(ArrayList<StoredFluidStack> items, StorageSize sizing, ArrayList<StoredFluidStack> changed) {
 			this.fluids = items;
 			this.sizing = sizing;
+			this.changed = changed;
+		}
+
+		public StorageFluids copy() {
+			return new StorageFluids((ArrayList<StoredFluidStack>) this.fluids.clone(), sizing, (ArrayList<StoredFluidStack>) changed.clone());
 		}
 	}
 
@@ -71,10 +80,12 @@ public class FluidWrapper {
 	 * @param player the player interacting
 	 * @param cache the network to fill from
 	 * @param toFill the {@link StoredFluidStack} to fill with */
-	public void fillHeldItem(EntityPlayer player, INetworkCache cache, StoredFluidStack toFill) {}
+	public void fillHeldItem(EntityPlayer player, INetworkCache cache, StoredFluidStack toFill) {
+	}
 
 	/** drains the players current item into the network
 	 * @param player the player interacting
 	 * @param cache the network to drain into */
-	public void drainHeldItem(EntityPlayer player, INetworkCache cache) {}
+	public void drainHeldItem(EntityPlayer player, INetworkCache cache) {
+	}
 }

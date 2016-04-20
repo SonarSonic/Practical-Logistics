@@ -21,13 +21,14 @@ import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.cache.CacheTypes;
 import sonar.logistics.api.cache.ICacheViewer;
 import sonar.logistics.api.cache.INetworkCache;
+import sonar.logistics.api.connecting.IInfoEmitter;
 import sonar.logistics.api.render.LargeScreenSizing;
 import sonar.logistics.helpers.DisplayHelper;
 import sonar.logistics.registries.DisplayRegistry;
 
 import com.google.common.collect.Lists;
 
-public class LargeDisplayScreenHandler extends DisplayScreenHandler implements IByteBufTile{
+public class LargeDisplayScreenHandler extends DisplayScreenHandler implements IByteBufTile {
 
 	public SyncTagType.BOOLEAN isHandler = new SyncTagType.BOOLEAN(0);
 	public LargeScreenSizing sizing;
@@ -43,17 +44,34 @@ public class LargeDisplayScreenHandler extends DisplayScreenHandler implements I
 	public void update(TileEntity te) {
 		if (!te.getWorldObj().isRemote) {
 			if (this.isHandler.getObject()) {
-				LargeScreenSizing lastSize = sizing;
-				sizing = DisplayHelper.getScreenSizing(te);
-				if (sizing == null && lastSize != null || (lastSize == null) || !lastSize.equals(sizing)) {
-					SonarCore.sendPacketAround(te, 64, 3);
+				if (DisplayRegistry.hasChanged(registryID)) {
+					LargeScreenSizing lastSize = sizing;
+					sizing = DisplayHelper.getScreenSizing(te);
+					if (sizing == null && lastSize != null || (lastSize == null) || !lastSize.equals(sizing)) {
+						SonarCore.sendPacketAround(te, 64, 3);
+					}
+					DisplayRegistry.onUpdate(registryID);
+				}
+				ForgeDirection side = ForgeDirection.getOrientation(FMPHelper.getMeta(te));
+
+				boolean updateTile = true;
+				if (connectedTile != null) {
+					TileEntity tile = connectedTile.getTileEntity();
+					if (tile != null) {
+						INetworkCache network = LogisticsAPI.getCableHelper().getNetwork(tile, side.getOpposite());
+						if (network != null && !network.getConnections(CacheTypes.EMITTER, true).isEmpty()) {
+							updateTile = false;
+						}
+					}
 				}
 
-				connectedTile = getConnectedTile(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)));
+				if (updateTile) {
+					connectedTile = getConnectedTile(te, side);
+				}
 				if (connectedTile == null || connectedTile.getTileEntity(te.getWorldObj()) == null) {
-					this.updateData(te, te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)));
+					this.updateData(te, te, side);
 				} else {
-					this.updateData(connectedTile.getTileEntity(te.getWorldObj()), te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)));
+					this.updateData(connectedTile.getTileEntity(te.getWorldObj()), te, side);
 				}
 			}
 			if (resetHandler) {
