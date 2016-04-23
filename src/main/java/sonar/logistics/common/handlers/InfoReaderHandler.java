@@ -94,9 +94,7 @@ public class InfoReaderHandler extends TileHandler implements IWailaInfo {
 	}
 
 	public ILogicInfo currentInfo(TileEntity te) {
-
 		if (secondaryInfo.getObject() == null || !te.getWorldObj().isBlockIndirectlyGettingPowered(te.xCoord, te.yCoord, te.zCoord)) {
-
 			if (primaryInfo.getObject() == null || emptyPrimary) {
 				return new LogicInfo((byte) -1, "", "", "NO DATA");
 			}
@@ -244,7 +242,8 @@ public class InfoReaderHandler extends TileHandler implements IWailaInfo {
 				NBTTagCompound compound = new NBTTagCompound();
 				if (current != null) {
 					if (last != null) {
-						if (!current.areTypesEqual(last) || !current.equals(last) || (current != null && current instanceof LogicInfo && last instanceof LogicInfo && !((LogicInfo) last).data.equals(((LogicInfo) current).data))) {
+						//NEEDS FIXING!!!!!!
+						if (!current.equals(last)) {
 							compound.setByte("f", (byte) 0);
 							this.lastInfo.set(i, current);
 							Logistics.infoTypes.writeToNBT(compound, this.clientInfo.get(i));

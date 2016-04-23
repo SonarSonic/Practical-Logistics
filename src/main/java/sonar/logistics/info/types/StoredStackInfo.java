@@ -13,6 +13,7 @@ import org.lwjgl.opengl.GL12;
 import sonar.core.api.StoredItemStack;
 import sonar.core.helpers.FontHelper;
 import sonar.core.helpers.RenderHelper;
+import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.api.render.ScreenType;
 
@@ -129,18 +130,7 @@ public class StoredStackInfo extends ILogicInfo<StoredStackInfo> {
 		return (-0.08F + ((sizing - 1) * 0.17));
 
 	}
-
-	/*
-	 * @Override public boolean isEqualType(Info info) { if (info instanceof
-	 * StoredStackInfo) { StoredStackInfo stackInfo = (StoredStackInfo) info; if
-	 * (stackInfo.stack.stored != this.stack.stored) { return false; } if
-	 * (!stackInfo.stack.equalStack(stack.item)) { return false; } return true;
-	 * } return false; }
-	 * 
-	 * @Override public void emptyData() {
-	 * 
-	 * }
-	 */
+	
 	@Override
 	public StoredStackInfo instance() {
 		return new StoredStackInfo();
@@ -175,8 +165,14 @@ public class StoredStackInfo extends ILogicInfo<StoredStackInfo> {
 	}
 
 	@Override
-	public boolean matches(StoredStackInfo currentInfo) {
-		return currentInfo.stack.equals(stack);
+	public SyncType isMatchingData(StoredStackInfo currentInfo) {
+		if(cacheID!=currentInfo.cacheID){
+			return SyncType.SAVE;
+		}
+		if (!currentInfo.stack.equals(stack)) {
+			return SyncType.SYNC;
+		}
+		return null;
 	}
 
 }

@@ -195,7 +195,7 @@ public class GuiFluidReader extends GuiSelectionGrid<StoredFluidStack> {
 		case 3:
 			return "Current Tank Usage";
 		default:
-			return "Fluids";
+			return "ERROR";
 		}
 	}
 
@@ -210,17 +210,17 @@ public class GuiFluidReader extends GuiSelectionGrid<StoredFluidStack> {
 		case 3:
 			return "Storage";
 		default:
-			return "Fluids";
+			return "ERROR";
 		}
 	}
 
 	@Override
 	public List<StoredFluidStack> getGridList() {
 		if (searchField.getText() == null || searchField.getText().isEmpty() || searchField.getText().equals(" "))
-			return handler.fluids;
+			return handler.cachedFluids.fluids;
 		else {
 			List<StoredFluidStack> searchList = new ArrayList();
-			List<StoredFluidStack> currentList = (List<StoredFluidStack>) ((ArrayList<StoredFluidStack>) handler.fluids).clone();
+			List<StoredFluidStack> currentList = (List<StoredFluidStack>) ((ArrayList<StoredFluidStack>) handler.cachedFluids.fluids).clone();
 			for (StoredFluidStack stack : currentList) {
 				if (stack.fluid.getLocalizedName().toLowerCase().contains(searchField.getText().toLowerCase())) {
 					searchList.add(stack);
@@ -240,7 +240,7 @@ public class GuiFluidReader extends GuiSelectionGrid<StoredFluidStack> {
 
 		}
 		if (getSetting() == POS) {
-			List<StoredFluidStack> currentList = (List<StoredFluidStack>) ((ArrayList<StoredFluidStack>) handler.fluids).clone();
+			List<StoredFluidStack> currentList = (List<StoredFluidStack>) ((ArrayList<StoredFluidStack>) handler.cachedFluids.fluids).clone();
 			int position = 0;
 			for (StoredFluidStack stack : currentList) {
 				if (stack != null) {

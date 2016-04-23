@@ -79,10 +79,8 @@ public class DisplayHelper {
 			north = true;
 		}
 		int screens = 0;
-
 		List<BlockCoords> displays = DisplayRegistry.getScreens(remove.registryID);
 		if (displays != null) {
-
 			for (BlockCoords coords : displays) {
 				screens++;
 				if (coords.getX() > maxX) {

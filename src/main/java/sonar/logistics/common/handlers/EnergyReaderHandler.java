@@ -17,6 +17,7 @@ import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.api.info.LogicInfo;
+import sonar.logistics.helpers.InfoHelper;
 import sonar.logistics.info.types.StoredEnergyInfo;
 
 public class EnergyReaderHandler extends TileHandler {
@@ -51,14 +52,14 @@ public class EnergyReaderHandler extends TileHandler {
 	}
 
 	public ILogicInfo currentInfo(TileEntity te) {
-		if (stacks != null) {
+		if (coords != null && stacks != null) {
 			for (StoredEnergyInfo stack : stacks) {
-				if (stack != null && primaryInfo.getObject()!=null && stack.coords.equals(primaryInfo.getObject().coords)) {
+				if (stack != null && stack.coords!=null && primaryInfo.getObject() != null && stack.coords.equals(primaryInfo.getObject().coords)) {
 					return stack;
 				}
 			}
 		}
-		return new LogicInfo((byte) -1, "ITEMREND", " ", "NO DATA");
+		return InfoHelper.empty;
 	}
 
 	public void readData(NBTTagCompound nbt, SyncType type) {

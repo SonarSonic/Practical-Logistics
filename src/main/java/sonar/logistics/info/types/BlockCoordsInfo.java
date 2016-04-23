@@ -3,12 +3,12 @@ package sonar.logistics.info.types;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.nbt.NBTTagCompound;
 import sonar.core.api.BlockCoords;
+import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.logistics.api.info.ILogicInfo;
 import cpw.mods.fml.common.network.ByteBufUtils;
 
 public class BlockCoordsInfo extends ILogicInfo<BlockCoordsInfo> {
 
-	public boolean emptyData;
 	public String name;
 	public BlockCoords coords;
 
@@ -107,8 +107,10 @@ public class BlockCoordsInfo extends ILogicInfo<BlockCoordsInfo> {
 	}
 
 	@Override
-	public boolean matches(BlockCoordsInfo currentInfo) {
-		return currentInfo.name.equals(name) && currentInfo.coords.equals(coords);
+	public SyncType isMatchingData(BlockCoordsInfo currentInfo) {
+		if(!currentInfo.name.equals(name) || !currentInfo.coords.equals(coords)){
+			return SyncType.SYNC;
+		}
+		return null;
 	}
-
 }

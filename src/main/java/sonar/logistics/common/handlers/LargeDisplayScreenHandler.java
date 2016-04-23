@@ -12,8 +12,10 @@ import sonar.core.SonarCore;
 import sonar.core.api.BlockCoords;
 import sonar.core.api.StoredFluidStack;
 import sonar.core.api.StoredItemStack;
+import sonar.core.helpers.SonarHelper;
 import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.core.integration.fmp.FMPHelper;
+import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.network.sync.ISyncPart;
 import sonar.core.network.sync.SyncTagType;
 import sonar.core.network.utils.IByteBufTile;
@@ -78,14 +80,52 @@ public class LargeDisplayScreenHandler extends DisplayScreenHandler implements I
 				SonarCore.sendPacketAround(te, 64, 4);
 				resetHandler = false;
 			}
-
+			/*
 			if (updateTicks == updateTime) {
 				updateTicks = 0;
 				SonarCore.sendPacketAround(te, 64, 0);
 			} else
 				updateTicks++;
+		*/
 		}
 
+	}
+
+	public LargeDisplayScreenHandler getHandler(TileEntity te) {
+		List<ForgeDirection> dirs = new ArrayList();
+		ForgeDirection meta = ForgeDirection.getOrientation(FMPHelper.getMeta(te));
+		for (ForgeDirection dir : ForgeDirection.values()) {
+			if (dir != meta && dir != meta.getOpposite()) {
+				dirs.add(dir);
+			}
+		}
+		ArrayList<BlockCoords> handlers = new ArrayList();
+		return addCoords(te, handlers, dirs);
+
+	}
+
+	public LargeDisplayScreenHandler addCoords(TileEntity te, ArrayList<BlockCoords> handlers, List<ForgeDirection> dirs) {
+		for (ForgeDirection side : dirs) {
+			TileEntity tile = SonarHelper.getAdjacentTileEntity(te, side);
+			if (tile == null) {
+				continue;
+			}
+			TileHandler handler = FMPHelper.getHandler(tile);
+			if (handler != null && handler instanceof LargeDisplayScreenHandler) {
+				if (tile.getBlockMetadata() == te.getBlockMetadata()) {
+					LargeDisplayScreenHandler screen = (LargeDisplayScreenHandler) handler;
+					if (screen.isHandler.getObject()) {
+						return screen;
+					}
+					BlockCoords coords = new BlockCoords(tile);
+					if (!handlers.contains(coords)) {
+						handlers.add(coords);
+						return addCoords(tile, handlers, dirs);
+					}
+				}
+			}
+		}
+		return null;
 	}
 
 	public BlockCoords getConnectedTile(TileEntity te, ForgeDirection dir) {

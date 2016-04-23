@@ -42,7 +42,7 @@ public class InfoTypeRegistry extends NBTRegistryHelper.Buf<ILogicInfo> {
 	public String registeryType() {
 		return "Info Type";
 	}
-
+	
 	@Override
 	public boolean areTypesEqual(ILogicInfo target, ILogicInfo current) {
 		if (target == null && current == null) {
@@ -51,6 +51,6 @@ public class InfoTypeRegistry extends NBTRegistryHelper.Buf<ILogicInfo> {
 		if (target == null || current == null) {
 			return false;
 		}
-		return target.areTypesEqual(current) && target.equals(current);
+		return target.checkInfoTypes(current) && target.equals(current);
 	}
 }

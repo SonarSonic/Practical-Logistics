@@ -351,6 +351,7 @@ public class ItemRouterHandler extends InventoryTileHandler implements ISidedInv
 			break;
 		case 8:
 			boolean clicked = false;
+
 			if (listType.getObject() == 0 && clientClick != -1) {
 				if (clientClick < whitelist[side.getObject()].size()) {
 					if (whitelist[side.getObject()].get(clientClick) != null) {
@@ -369,6 +370,7 @@ public class ItemRouterHandler extends InventoryTileHandler implements ISidedInv
 			if (!clicked) {
 				buf.writeInt(-1);
 			}
+			filterPos.setObject(clientClick);
 			break;
 		case 9:
 			writePacket(buf, 8);
@@ -443,7 +445,7 @@ public class ItemRouterHandler extends InventoryTileHandler implements ISidedInv
 					}
 				} else {
 					if (filterPos.getObject() + 1 < blacklist[side.getObject()].size()) {
-						Collections.swap(whitelist[side.getObject()], filterPos.getObject(), filterPos.getObject() + 1);
+						Collections.swap(blacklist[side.getObject()], filterPos.getObject(), filterPos.getObject() + 1);
 						filterPos.setObject(filterPos.getObject() + 1);
 					}
 				}
@@ -452,11 +454,14 @@ public class ItemRouterHandler extends InventoryTileHandler implements ISidedInv
 		case 7:
 			if (filterPos.getObject() != -1) {
 				if (listType.getObject() == 0) {
-					if (filterPos.getObject() < whitelist[side.getObject()].size())
-						whitelist[side.getObject()].remove(filterPos.getObject());
+					if (filterPos.getObject() < whitelist[side.getObject()].size()){
+						//System.out.print("remove");
+						whitelist[side.getObject()].remove(whitelist[side.getObject()].get(filterPos.getObject()));
+						//whitelist[side.getObject()].remove(filterPos.getObject());
+					}
 				} else {
 					if (filterPos.getObject() < blacklist[side.getObject()].size())
-						blacklist[side.getObject()].remove(filterPos.getObject());
+						blacklist[side.getObject()].remove(blacklist[side.getObject()].get(filterPos.getObject()));
 				}
 				filterPos.setObject(-1);
 			}

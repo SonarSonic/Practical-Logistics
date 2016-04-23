@@ -24,6 +24,8 @@ import sonar.logistics.info.types.ProgressInfo;
 
 public class InfoHelper extends InfoWrapper {
 
+	public static final LogicInfo empty = new LogicInfo((byte) -1, "INFO", " ", "NO DATA");
+	
 	public List<ILogicInfo> getTileInfo(INetworkCache connections) {
 		List<TileProvider> providers = Logistics.tileProviders.getObjects();
 		List<ILogicInfo> providerInfo = new ArrayList();
@@ -97,7 +99,7 @@ public class InfoHelper extends InfoWrapper {
 				List<ILogicInfo> info = new ArrayList();
 				provider.getTileInfo(info, coords.getWorld(), coords.getX(), coords.getY(), coords.getZ(), entry.getValue());
 				for (ILogicInfo currentInfo : info) {
-					if (currentInfo.equals(tileInfo)) {
+					if (currentInfo.isMatchingInfo(tileInfo)) {
 						return currentInfo;
 					}
 				}
@@ -120,7 +122,7 @@ public class InfoHelper extends InfoWrapper {
 					List<ILogicInfo> info = new ArrayList();
 					provider.getHelperInfo(info, entity);
 					for (ILogicInfo currentInfo : info) {
-						if (currentInfo.equals(entityInfo)) {
+						if (currentInfo.isMatchingInfo(entityInfo)) {
 							return currentInfo;
 						}
 					}

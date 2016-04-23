@@ -1,10 +1,13 @@
 package sonar.logistics.helpers;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.common.registry.GameRegistry.UniqueIdentifier;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -337,7 +340,7 @@ public class ItemHelper extends ItemWrapper {
 		}
 	}
 
-	public static void writeStorageToNBT(NBTTagCompound tag, ArrayList<StoredItemStack> last, StorageItems stacks, SyncType type) {
+	public static boolean writeStorageToNBT(NBTTagCompound tag, boolean lastWasNull, StorageItems stacks, SyncType type) {
 		if (type == SyncType.SYNC) {
 			NBTTagList list = new NBTTagList();
 			for (int i = 0; i < stacks.items.size(); i++) {
@@ -347,61 +350,123 @@ public class ItemHelper extends ItemWrapper {
 					list.appendTag(compound);
 				}
 			}
-			if (!tag.hasNoTags()) {
-				tag.setTag("Current", list);
+			if (list.tagCount() != 0) {
+				tag.setTag("c", list);
+				return false;
 			} else {
-				tag.setBoolean("null", true);
+				tag.setBoolean("n", true);
+				return true;
 			}
 		} else if (type == SyncType.SPECIAL) {
-			if ((stacks.changed == null || stacks.changed.isEmpty()) && (last == null || last.isEmpty())) {
-				return;
-			}
-			if (stacks.changed == null && last != null) {
-				tag.setBoolean("null", true);
-				return;
+			if ((stacks.items == null || stacks.items.isEmpty())) {
+				if (!lastWasNull)
+					tag.setBoolean("n", true);
+				return true;
 			}
 			NBTTagList list = new NBTTagList();
-			for (int i = 0; i < stacks.changed.size(); i++) {
-				if (stacks.changed.get(i) != null) {
-					NBTTagCompound compound = new NBTTagCompound();
-					StoredItemStack.writeToNBT(compound, stacks.changed.get(i));
-					list.appendTag(compound);
+			for (int l = 0; l < 2; l++) {
+				ArrayList<StoredItemStack> stackList = null;
+				switch (l) {
+				case 0:
+					stackList = stacks.changed;
+					break;
+				case 1:
+					stackList = stacks.removed;
+					break;
+				}
+				for (int i = 0; i < stackList.size(); i++) {
+					if (stackList.get(i) != null) {
+						NBTTagCompound compound = new NBTTagCompound();
+						if (l == 1) {
+							compound.setBoolean("r", true);
+						}
+						StoredItemStack.writeToNBT(compound, stackList.get(i));
+						list.appendTag(compound);
+					}
 				}
 			}
-			if (!tag.hasNoTags())
-				tag.setTag("Sync", list);
+			if (list.tagCount() != 0) {
+				tag.setTag("s", list);
+			}
 		}
+		return false;
 	}
 
 	public static void readStorageToNBT(NBTTagCompound tag, ArrayList<StoredItemStack> current, SyncType type) {
-		//TODO: finish reading and writing of synced lists*/
-		if (tag.hasKey("null")) {
+		if (tag.hasKey("n")) {
 			current.clear();
 			return;
 		}
 		if (type == SyncType.SYNC) {
-			NBTTagList list = tag.getTagList("Current", 10);
+			if(!tag.hasKey("c")){
+				return;
+			}
+			NBTTagList list = tag.getTagList("c", 10);
 			current.clear();
 			for (int i = 0; i < list.tagCount(); i++) {
 				NBTTagCompound compound = list.getCompoundTagAt(i);
 				current.add(StoredItemStack.readFromNBT(compound));
 			}
 		} else if (type == SyncType.SPECIAL) {
-			NBTTagList list = tag.getTagList("Sync", 10);
-			for (int i = 0; i < list.tagCount(); i++) {
+			if(!tag.hasKey("s")){
+				return;
+			}
+			NBTTagList list = tag.getTagList("s", 10);
+			tags: for (int i = 0; i < list.tagCount(); i++) {
 				NBTTagCompound compound = list.getCompoundTagAt(i);
 				StoredItemStack stack = StoredItemStack.readFromNBT(compound);
 				for (StoredItemStack stored : (ArrayList<StoredItemStack>) current.clone()) {
 					if (stored.equalStack(stack.getItemStack())) {
-						if (compound.getBoolean("remove")) {
+						if (compound.getBoolean("r")) {
 							current.remove(stored);
 						} else {
 							stored.setStackSize(stack.getStackSize());
 						}
+						continue tags;
 					}
 				}
 				current.add(stack);
 			}
+		}
+	}
+
+	public static void sortItemList(ArrayList<StoredItemStack> current, final SortingDirection dir, SortingType type) {
+		current.sort(new Comparator<StoredItemStack>() {
+			public int compare(StoredItemStack str1, StoredItemStack str2) {
+				int res = String.CASE_INSENSITIVE_ORDER.compare(str1.getItemStack().getDisplayName(), str2.getItemStack().getDisplayName());
+				if (res == 0) {
+					res = str1.getItemStack().getDisplayName().compareTo(str2.getItemStack().getDisplayName());
+				}
+				return dir == SortingDirection.DOWN ? res : -res;
+			}
+		});
+
+		switch (type) {
+		case STORED:
+			current.sort(new Comparator<StoredItemStack>() {
+				public int compare(StoredItemStack str1, StoredItemStack str2) {
+					if (str1.stored < str2.stored)
+						return dir == SortingDirection.DOWN ? 1 : -1;
+					if (str1.stored == str2.stored)
+						return 0;
+					return dir == SortingDirection.DOWN ? -1 : 1;
+				}
+			});
+			break;
+		case MODID:
+			current.sort(new Comparator<StoredItemStack>() {
+				public int compare(StoredItemStack str1, StoredItemStack str2) {
+					UniqueIdentifier ui1 = GameRegistry.findUniqueIdentifierFor(str1.getItemStack().getItem());
+					UniqueIdentifier ui2 = GameRegistry.findUniqueIdentifierFor(str2.getItemStack().getItem());
+					int res = String.CASE_INSENSITIVE_ORDER.compare(ui1.modId, ui2.modId);
+					if (res == 0) {
+						res = ui1.modId.compareTo(ui2.modId);
+					}
+					return dir == SortingDirection.DOWN ? res : -res;
+				}
+			});
+		default:
+			break;
 		}
 	}
 }

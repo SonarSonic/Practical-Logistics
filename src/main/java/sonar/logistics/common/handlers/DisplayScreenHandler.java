@@ -28,6 +28,7 @@ import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.api.info.LogicInfo;
 import sonar.logistics.api.render.InfoInteractionHandler;
 import sonar.logistics.api.render.ScreenType;
+import sonar.logistics.helpers.InfoHelper;
 import sonar.logistics.info.types.ManaInfo;
 import sonar.logistics.registries.DisplayRegistry;
 import cpw.mods.fml.common.network.ByteBufUtils;
@@ -41,8 +42,8 @@ public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 
 	public int updateTicks, updateTime = 20;
 
-	private long lastClickTime;
-	private UUID lastClickUUID;
+	public long lastClickTime;
+	public UUID lastClickUUID;
 
 	public DisplayScreenHandler(boolean isMultipart, TileEntity tile) {
 		super(isMultipart, tile);
@@ -54,12 +55,13 @@ public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 			return;
 		}
 		this.updateData(te, te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)));
-
+		
 		if (updateTicks == updateTime) {
 			updateTicks = 0;
-			SonarCore.sendPacketAround(te, 64, 0);
+			//SonarCore.sendPacketAround(te, 64, 0);
 		} else
 			updateTicks++;
+			
 	}
 
 	public void updateData(TileEntity te, TileEntity packetTile, ForgeDirection dir) {
@@ -69,70 +71,49 @@ public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 		}
 		Object target = FMPHelper.getTile(network.getFirstTileEntity(CacheTypes.EMITTER));
 		if (target == null) {
-			info = new LogicInfo((byte) -1, "INFO", " ", "NO DATA");
+			syncNewInfo(packetTile, null);
 			return;
 		}
 		ILogicInfo current = null;
-		boolean shouldUpdate = true;
 		if (target instanceof IInfoReader) {
 			IInfoReader infoReader = (IInfoReader) target;
 			ILogicInfo currentInfo = infoReader.currentInfo();
 			if (infoReader.currentInfo() != null && infoReader.getSecondaryInfo() != null) {
-				ILogicInfo progress = LogisticsAPI.getInfoHelper().combineData(currentInfo, infoReader.getSecondaryInfo());
-				if (!progress.equals(info) || (info != null && !currentInfo.getData().equals(info.getData()))) {
-					current = progress;
-				} else {
-					shouldUpdate = false;
-				}
+				current = LogisticsAPI.getInfoHelper().combineData(currentInfo, infoReader.getSecondaryInfo());
 			} else if (currentInfo != null) {
-				if (!infoReader.currentInfo().equals(info) || (info != null && !currentInfo.getData().equals(info.getData()))) {
-					current = currentInfo;
-				} else {
-					shouldUpdate = false;
-				}
+				current = currentInfo;
 			}
-
 		} else if (target instanceof IInfoEmitter) {
 			IInfoEmitter infoNode = (IInfoEmitter) target;
-			ILogicInfo currentInfo = infoNode.currentInfo();
-			if (currentInfo != null) {
-				if (!currentInfo.equals(info) || (info != null && !currentInfo.getData().equals(info.getData()))) {
-					current = infoNode.currentInfo();
-				} else {
-					shouldUpdate = false;
-				}
-			}
-		} else {
-			info = new LogicInfo((byte) -1, "INFO", " ", "NO DATA");
+			current = infoNode.currentInfo();
+
+		} else { 
+			syncNewInfo(packetTile, null);
 			return;
 		}
-		updateInfo = current;
-		if (shouldUpdate) {
-			if (info == null) {
-				if (updateInfo != null) {
-					info = updateInfo;
-					SonarCore.sendPacketAround(packetTile, 64, 0);
-				}
-			} else {
-				if (updateInfo != null) {
-					if (updateInfo.areTypesEqual(info)) {
-						if (updateInfo instanceof LogicInfo || updateInfo instanceof ManaInfo) {
-							info = updateInfo;
-							SonarCore.sendPacketAround(packetTile, 64, 0);
-						} else {
-							SonarCore.sendPacketAround(packetTile, 64, 2);
-						}
-					} else {
-						info = updateInfo;
-						SonarCore.sendPacketAround(packetTile, 64, 0);
-					}
-				} else {
-					info = null;
-					SonarCore.sendPacketAround(packetTile, 64, 0);
+		syncNewInfo(packetTile, current);
+	}
+	
+	public void syncNewInfo(TileEntity te, ILogicInfo current){
+		DisplayScreenHandler handler = (DisplayScreenHandler) FMPHelper.getHandler(te);
+		if(current==null){
+			current = InfoHelper.empty;
+		}
+		handler.updateInfo = current;		
+		if (handler.info == null) {
+			handler.info = handler.updateInfo;
+			SonarCore.sendPacketAround(te, 64, 0);
+		} else if (handler.info != null) {
+			SyncType type =handler.info.getNextSyncType(handler.updateInfo);
+			if (type != null) {
+				if (type == SyncType.SAVE) {
+					handler.info = handler.updateInfo;
+					SonarCore.sendPacketAround(te, 64, 0);
+				} else if (type == SyncType.SYNC) {
+					SonarCore.sendPacketAround(te, 64, 2);
 				}
 			}
 		}
-	
 	}
 
 	public void screenClicked(World world, EntityPlayer player, int x, int y, int z, BlockInteraction interact) {
@@ -140,6 +121,7 @@ public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 		if (interact.side != FMPHelper.getMeta(te)) {
 			return;
 		}
+		/*
 		boolean doubleClick = false;
 		if (world.getTotalWorldTime() - lastClickTime < 10 && player.getPersistentID().equals(lastClickUUID)) {
 			doubleClick = true;
@@ -171,6 +153,7 @@ public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 		if (network == null) {
 			return;
 		}
+		*/
 		ScreenType screenType = ScreenType.NORMAL;
 		if (te instanceof ILargeDisplay) {
 			screenType = ScreenType.LARGE;
@@ -178,9 +161,23 @@ public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 				screenType = ScreenType.CONNECTED;
 			}
 		}
-		InfoInteractionHandler handler = Logistics.infoInteraction.getInteractionHandler(screenInfo, screenType, te);
+		ILogicInfo screenInfo = info;
+		TileEntity tile = te;
+		if(screenType==ScreenType.CONNECTED || screenType==ScreenType.LARGE){
+			LargeDisplayScreenHandler handler = (LargeDisplayScreenHandler) this;
+			if(!handler.isHandler.getObject()){
+				LargeDisplayScreenHandler screenHandler = handler.getHandler(te);
+				if(screenHandler==null){
+					return;
+				}else{			
+					tile = screenHandler.tile;
+					screenInfo=screenHandler.info;					
+				}
+			}
+		}
+		InfoInteractionHandler handler = Logistics.infoInteraction.getInteractionHandler(screenInfo, screenType, tile);
 		if (handler != null) {
-			handler.handleInteraction(screenInfo, screenType, te, player, x, y, z, interact, doubleClick);
+			handler.handleInteraction(screenInfo, screenType, tile, player, x, y, z, interact);
 		}
 	}
 
@@ -210,13 +207,14 @@ public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 				buf.writeBoolean(false);
 			}
 		}
-		if (id == 1) {
-			ByteBufUtils.writeUTF8String(buf, info.getData());
-		}
+		//if (id == 1) {
+		//	ByteBufUtils.writeUTF8String(buf, info.getData());
+		//}
 		if (id == 2) {
 			NBTTagCompound tag = new NBTTagCompound();
-			if (updateInfo != null && updateInfo.areTypesEqual(info)) {
+			if (updateInfo != null) {
 				info.writeUpdate(updateInfo, tag);
+				info = updateInfo;
 			}
 			if (!tag.hasNoTags()) {
 				buf.writeBoolean(true);
@@ -224,7 +222,6 @@ public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 			} else {
 				buf.writeBoolean(false);
 			}
-
 		}
 	}
 
@@ -237,10 +234,10 @@ public class DisplayScreenHandler extends TileHandler implements IByteBufTile {
 				info = null;
 			}
 		}
-		if (id == 1) {
-			LogicInfo standardInfo = (LogicInfo) info;
-			standardInfo.setData(ByteBufUtils.readUTF8String(buf));
-		}
+		//if (id == 1) {
+		//	LogicInfo standardInfo = (LogicInfo) info;
+		//	standardInfo.setData(ByteBufUtils.readUTF8String(buf));
+		//}
 		if (id == 2) {
 			if (buf.readBoolean()) {
 				NBTTagCompound tag = ByteBufUtils.readTag(buf);

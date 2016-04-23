@@ -15,20 +15,22 @@ public class FluidWrapper {
 
 	public static class StorageFluids {
 
-		public static final StorageFluids EMPTY = new StorageFluids(new ArrayList(), StorageSize.EMPTY, null);
+		public static final StorageFluids EMPTY = new StorageFluids(new ArrayList(), StorageSize.EMPTY, new ArrayList(), new ArrayList());
 		public ArrayList<StoredFluidStack> fluids;
 		/**when this is null and last time there was a list, everything should be updated, if last time was null don't do anything*/
 		public ArrayList<StoredFluidStack> changed = new ArrayList();
+		public ArrayList<StoredFluidStack> removed = new ArrayList();
 		public StorageSize sizing;
 
-		public StorageFluids(ArrayList<StoredFluidStack> items, StorageSize sizing, ArrayList<StoredFluidStack> changed) {
+		public StorageFluids(ArrayList<StoredFluidStack> items, StorageSize sizing, ArrayList<StoredFluidStack> changed, ArrayList<StoredFluidStack> removed) {
 			this.fluids = items;
 			this.sizing = sizing;
 			this.changed = changed;
+			this.removed = removed;
 		}
 
 		public StorageFluids copy() {
-			return new StorageFluids((ArrayList<StoredFluidStack>) this.fluids.clone(), sizing, (ArrayList<StoredFluidStack>) changed.clone());
+			return new StorageFluids((ArrayList<StoredFluidStack>) this.fluids.clone(), sizing, (ArrayList<StoredFluidStack>) changed.clone(), (ArrayList<StoredFluidStack>) removed.clone());
 		}
 	}
 

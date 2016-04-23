@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.EffectRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -11,14 +12,18 @@ import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.IIcon;
+import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
+import sonar.core.SonarCore;
 import sonar.core.common.block.SonarMachineBlock;
 import sonar.core.common.block.SonarMaterials;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.handlers.TileHandler;
+import sonar.core.network.PacketBlockInteraction;
 import sonar.core.utils.BlockInteraction;
+import sonar.core.utils.BlockInteractionType;
 import sonar.logistics.common.handlers.DisplayScreenHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -39,6 +44,18 @@ public abstract class AbstractScreen extends SonarMachineBlock {
 	public abstract float width();
 
 	public abstract TileEntity createNewTileEntity(World world, int i);
+	
+	@Override
+	public void onBlockClicked(World world, int x, int y, int z, EntityPlayer player) {
+		if (world.isRemote && allowLeftClick()) {
+			MovingObjectPosition pos = Minecraft.getMinecraft().objectMouseOver;
+			float hitX = (float) (pos.hitVec.xCoord - pos.blockX);
+			float hitY = (float) (pos.hitVec.yCoord - pos.blockY);
+			float hitZ = (float) (pos.hitVec.zCoord - pos.blockZ);
+			operateBlock(world, x,y,z,player,new BlockInteraction(pos.sideHit, hitX, hitY, hitZ, player.isSneaking() ? BlockInteractionType.SHIFT_LEFT : BlockInteractionType.LEFT));
+			//SonarCore.network.sendToServer(new PacketBlockInteraction(x, y, z, new BlockInteraction(pos.sideHit, hitX, hitY, hitZ, player.isSneaking() ? BlockInteractionType.SHIFT_LEFT : BlockInteractionType.LEFT)));
+		}
+	}
 
 	@Override
 	public final boolean operateBlock(World world, int x, int y, int z, EntityPlayer player, BlockInteraction interact) {
@@ -46,8 +63,7 @@ public abstract class AbstractScreen extends SonarMachineBlock {
 			TileHandler target = FMPHelper.getHandler(world.getTileEntity(x, y, z));
 			if (target != null && target instanceof DisplayScreenHandler) {
 				DisplayScreenHandler handler = (DisplayScreenHandler) target;
-
-				if (!world.isRemote) {
+				if (world.isRemote) {
 					handler.screenClicked(world, player, x, y, z, interact);
 				} else {
 					world.playSound(x, y, z, "dig.stone", 1.0F, 1.0F, true);
@@ -70,7 +86,6 @@ public abstract class AbstractScreen extends SonarMachineBlock {
 
 	@SideOnly(Side.CLIENT)
 	public IIcon getIcon(int side, int meta) {
-
 		return this.blockIcon;
 	}
 

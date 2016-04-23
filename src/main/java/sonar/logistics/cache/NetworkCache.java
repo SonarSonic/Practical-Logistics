@@ -207,15 +207,13 @@ public class NetworkCache extends StorageCache implements IRefreshCache {
 		for (BlockCoords coord : channelCache) {
 			Object tile = FMPHelper.checkObject(coord.getTileEntity());
 			if (tile != null && tile instanceof IChannelProvider) {
-				IChannelProvider provider = (IChannelProvider) tile;
-				final ExternalCoords coords = provider.getChannel();
-				TileEntity channel = coords.blockCoords.getTileEntity();
-				int id = LogisticsAPI.getCableHelper().getNetwork(channel, ForgeDirection.getOrientation(channel.getBlockMetadata()).getOpposite()).getNetworkID();
+				IChannelProvider provider = (IChannelProvider) tile;				
+				INetworkCache network = provider.getNetwork();
+				int id = network.getNetworkID();
 				if (id != -1 && !networks.contains(id)) {
 					networks.add(id);
 				}
 			}
-
 		}
 		return networks;
 	}
@@ -253,6 +251,7 @@ public class NetworkCache extends StorageCache implements IRefreshCache {
 		this.blockCache.clear();
 		this.blockCache.putAll(map);
 		ArrayList<Integer> networks = getFinalNetworkList();
+		
 		for (Integer id : networks) {
 			INetworkCache network = CacheRegistry.getCache(id);
 			LinkedHashMap<BlockCoords, ForgeDirection> blocks = ((LinkedHashMap<BlockCoords, ForgeDirection>) network.getExternalBlocks(false).clone());
@@ -261,11 +260,10 @@ public class NetworkCache extends StorageCache implements IRefreshCache {
 					map.put(set.getKey(), set.getValue());
 				}
 			}
-
 		}
 		this.networkedCache.clear();
 		this.networkedCache.putAll(map);
-		
+
 		this.cachedItems = this.getCachedItems(cachedItems.items);
 		this.cachedFluids = this.getCachedFluids(cachedFluids.fluids);
 	}

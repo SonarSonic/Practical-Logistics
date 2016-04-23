@@ -12,6 +12,7 @@ import net.minecraft.util.IIcon;
 import org.lwjgl.opengl.GL11;
 
 import sonar.core.api.StoredFluidStack;
+import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.api.render.ScreenType;
 import cpw.mods.fml.common.network.ByteBufUtils;
@@ -152,8 +153,13 @@ public class FluidStackInfo extends ILogicInfo<FluidStackInfo> {
 	}
 
 	@Override
-	public boolean matches(FluidStackInfo currentInfo) {
-		return currentInfo.stack.equals(stack);
+	public SyncType isMatchingData(FluidStackInfo currentInfo) {
+		if (cacheID != currentInfo.cacheID) {
+			return SyncType.SAVE;
+		}
+		if (!currentInfo.stack.equals(stack)) {
+			return SyncType.SYNC;
+		}
+		return null;
 	}
-
 }

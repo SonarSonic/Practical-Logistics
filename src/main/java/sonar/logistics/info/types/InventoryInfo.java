@@ -21,22 +21,28 @@ import org.lwjgl.opengl.GL12;
 import sonar.core.api.StoredItemStack;
 import sonar.core.helpers.FontHelper;
 import sonar.core.helpers.RenderHelper;
+import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.api.render.ScreenType;
+import sonar.logistics.api.wrappers.ItemWrapper.SortingDirection;
+import sonar.logistics.api.wrappers.ItemWrapper.SortingType;
+import sonar.logistics.api.wrappers.ItemWrapper.StorageItems;
+import sonar.logistics.helpers.ItemHelper;
 import cpw.mods.fml.common.network.ByteBufUtils;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.GameRegistry.UniqueIdentifier;
 
 public class InventoryInfo extends ILogicInfo<InventoryInfo> {
 
-	public ArrayList<StoredItemStack> stacks = new ArrayList();
+	public StorageItems stacks = StorageItems.EMPTY.copy();
+	public boolean lastSync =false;
 	public int cacheID = -1;
 	public int sort = -1, order = -1;
 	public String rend = "ITEMINV";
 
-	public static InventoryInfo createInfo(ArrayList<StoredItemStack> stacks, int cacheID, int sort, int order) {
+	public static InventoryInfo createInfo(StorageItems stacks, int cacheID, int sort, int order) {
 		InventoryInfo info = new InventoryInfo();
-		info.stacks = stacks;
+		info.stacks = stacks.copy();
 		info.cacheID = cacheID;
 		info.sort = sort;
 		info.order = order;
@@ -80,43 +86,32 @@ public class InventoryInfo extends ILogicInfo<InventoryInfo> {
 
 	@Override
 	public void readFromBuf(ByteBuf buf) {
+		sort = buf.readInt();
+		order = buf.readInt();
 		this.readFromNBT(ByteBufUtils.readTag(buf));
 	}
 
 	@Override
 	public void writeToBuf(ByteBuf buf) {
+		buf.writeInt(sort);
+		buf.writeInt(order);
 		NBTTagCompound tag = new NBTTagCompound();
 		writeToNBT(tag);
 		ByteBufUtils.writeTag(buf, tag);
 	}
 
 	public void readFromNBT(NBTTagCompound tag) {
-		sort=tag.getInteger("sort");
-		order=tag.getInteger("order");
-		NBTTagList list = tag.getTagList("StoredStacks", 10);
-		this.stacks = new ArrayList();
-		for (int i = 0; i < list.tagCount(); i++) {
-			NBTTagCompound compound = list.getCompoundTagAt(i);
-			this.stacks.add(StoredItemStack.readFromNBT(compound));
-		}
+		sort = tag.getInteger("sort");
+		order = tag.getInteger("order");
+		ItemHelper.readStorageToNBT(tag, stacks.items, SyncType.SYNC);
+		ItemHelper.sortItemList(stacks.items, SortingDirection.values()[order], SortingType.values()[sort]);
 	}
 
 	public void writeToNBT(NBTTagCompound tag) {
 		tag.setInteger("sort", sort);
 		tag.setInteger("order", order);
-		NBTTagList list = new NBTTagList();
-		if (stacks == null) {
-			stacks = new ArrayList();
-		}
-		for (int i = 0; i < this.stacks.size(); i++) {
-			if (this.stacks.get(i) != null) {
-				NBTTagCompound compound = new NBTTagCompound();
-				StoredItemStack.writeToNBT(compound, this.stacks.get(i));
-				list.appendTag(compound);
-			}
-		}
-
-		tag.setTag("StoredStacks", list);
+		lastSync=false;
+		ItemHelper.writeStorageToNBT(tag, lastSync, stacks, SyncType.SYNC);
 	}
 
 	@Override
@@ -132,7 +127,7 @@ public class InventoryInfo extends ILogicInfo<InventoryInfo> {
 			int currentSlot = 0;
 
 			if (stacks != null) {
-				List<StoredItemStack> currentStacks = (List<StoredItemStack>) (((ArrayList<StoredItemStack>) (stacks)).clone());
+				List<StoredItemStack> currentStacks = (List<StoredItemStack>) (((ArrayList<StoredItemStack>) (stacks.items)).clone());
 
 				GL11.glTranslatef(minX + 0.18f, minY + 0.18f, 0.01f);
 
@@ -215,60 +210,9 @@ public class InventoryInfo extends ILogicInfo<InventoryInfo> {
 			tag.setInteger("order", currentInfo.order);
 			order = currentInfo.order;
 		}
-		if (currentInfo.stacks == null) {
-			currentInfo.stacks = new ArrayList();
-		}
-		if (stacks == null) {
-			stacks = new ArrayList();
-		}
-		if (currentInfo.stacks.size() <= 0 && (!(this.stacks.size() <= 0))) {
-			tag.setBoolean("null", true);
-			this.stacks = new ArrayList();
-			return;
-		}
-		NBTTagList list = new NBTTagList();
-		int size = Math.max(currentInfo.stacks.size(), this.stacks.size());
-		for (int i = 0; i < size; ++i) {
-			StoredItemStack current = null;
-			StoredItemStack last = null;
-			if (i < currentInfo.stacks.size()) {
-				current = currentInfo.stacks.get(i);
-			}
-			if (i < this.stacks.size()) {
-				last = this.stacks.get(i);
-			}
-			NBTTagCompound compound = new NBTTagCompound();
-			if (current != null) {
-				if (last != null) {
-					if (!ItemStack.areItemStacksEqual(last.item, current.item)) {
-						compound.setByte("f", (byte) 0);
-						this.stacks.set(i, current);
-						StoredItemStack.writeToNBT(compound, currentInfo.stacks.get(i));
 
-					} else if (last.stored != current.stored) {
-						compound.setByte("f", (byte) 1);
-						this.stacks.set(i, current);
-						StoredItemStack.writeToNBT(compound, currentInfo.stacks.get(i));
-						compound.setLong("Stored", current.stored);
-					}
-				} else {
-					compound.setByte("f", (byte) 0);
-					this.stacks.add(i, current);
-					StoredItemStack.writeToNBT(compound, currentInfo.stacks.get(i));
-				}
-			} else if (last != null) {
-				this.stacks.set(i, null);
-				compound.setByte("f", (byte) 2);
-			}
-			if (!compound.hasNoTags()) {
-				compound.setInteger("Slot", i);
-				list.appendTag(compound);
-			}
+		lastSync = ItemHelper.writeStorageToNBT(tag, lastSync, currentInfo.stacks, SyncType.SPECIAL);
 
-		}
-		if (list.tagCount() != 0) {
-			tag.setTag("Stacks", list);
-		}
 	}
 
 	@Override
@@ -279,57 +223,19 @@ public class InventoryInfo extends ILogicInfo<InventoryInfo> {
 		if (tag.hasKey("order")) {
 			order = tag.getInteger("order");
 		}
-		if (tag.hasKey("null")) {
-			this.stacks = new ArrayList();
-			return;
-		}
-		NBTTagList list = tag.getTagList("Stacks", 10);
-		if (this.stacks == null) {
-			this.stacks = new ArrayList();
-		}
-		for (int i = 0; i < list.tagCount(); i++) {
-			NBTTagCompound compound = list.getCompoundTagAt(i);
-			int slot = compound.getInteger("Slot");
-			boolean set = slot < stacks.size();
-			switch (compound.getByte("f")) {
-			case 0:
-				if (set)
-					stacks.set(slot, StoredItemStack.readFromNBT(compound));
-				else
-					stacks.add(slot, StoredItemStack.readFromNBT(compound));
-				break;
-			case 1:
-				long stored = compound.getLong("Stored");
-				if (stored != 0) {
-					stacks.set(slot, new StoredItemStack(stacks.get(slot).item, stored));
-				} else {
-					stacks.set(slot, null);
-				}
-				break;
-			case 2:
-				if (set)
-					stacks.set(slot, null);
-				else
-					stacks.add(slot, null);
-				break;
-			}
-		}
-		if (sort == 1) {
-			stacks.sort(new Comparator<StoredItemStack>() {
-				public int compare(StoredItemStack str1, StoredItemStack str2) {
-					int res = String.CASE_INSENSITIVE_ORDER.compare(str1.getItemStack().getDisplayName(), str2.getItemStack().getDisplayName());
-					if (res == 0) {
-						res = str1.getItemStack().getDisplayName().compareTo(str2.getItemStack().getDisplayName());
-					}
-					return order == 0 ? res : -res;
-				}
-			});
-		}
+		ItemHelper.readStorageToNBT(tag, stacks.items, SyncType.SPECIAL);
+		ItemHelper.sortItemList(stacks.items, SortingDirection.values()[order], SortingType.values()[sort]);
 	}
-
+	
 	@Override
-	public boolean matches(InventoryInfo currentInfo) {
-		return currentInfo.stacks.equals(stacks) && this.cacheID == currentInfo.cacheID;
+	public SyncType isMatchingData(InventoryInfo currentInfo) {
+		if(cacheID!=currentInfo.cacheID){
+			return SyncType.SAVE;
+		}
+		if(sort!=currentInfo.sort || order!=currentInfo.order || !currentInfo.stacks.items.equals(stacks.items)){
+			return SyncType.SYNC;
+		}
+		return null;
 	}
 
 }

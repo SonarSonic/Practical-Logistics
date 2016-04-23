@@ -26,35 +26,35 @@ public class TileEntityHammer extends TileEntityInventory implements ISidedInven
 	}
 
 	public void updateEntity() {
-		if (isClient()) {
-			if (this.progress.getObject() > 90) {
-				worldObj.spawnParticle("smoke", xCoord+0.5, yCoord+1, zCoord+0.5, 0, 0, 0);
-			}
+		if (this.worldObj.isBlockIndirectlyGettingPowered(xCoord, yCoord, zCoord)) {
 			return;
 		}
-		// if (this.worldObj.isBlockIndirectlyGettingPowered(xCoord, yCoord, zCoord)) {
-		// return;
-		// }
 		if (coolDown.getObject() != 0) {
 			coolDown.increaseBy(-1);
-			SonarCore.sendPacketAround(this, 64, 1);
+			//if (!this.worldObj.isRemote && coolDown.getObject() == 1)
+				//SonarCore.sendPacketAround(this, 64, 1);
 			// SonarCore.sendFullSyncAround(this, 64);
 		} else if (canProcess()) {
 			if (progress.getObject() < speed) {
 				progress.increaseBy(1);
-				SonarCore.sendPacketAround(this, 64, 0);
+				//if (!this.worldObj.isRemote && progress.getObject() == 1)
+					//SonarCore.sendPacketAround(this, 64, 0);
 			} else {
-				finishProcess();
-				this.coolDown.setObject(speed * 2);
+				coolDown.setObject(speed * 2);
 				progress.setObject(0);
-				this.worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+				if (!this.worldObj.isRemote) {
+					finishProcess();
+					this.worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+				}
 			}
 			// SonarCore.sendPacketAround(this, 64, 0);
 			// SonarCore.sendFullSyncAround(this, 64);
 		} else {
-			this.coolDown.setObject(this.progress.getObject() * 2);
-			this.progress.setObject(0);
-			SonarCore.sendPacketAround(this, 64, 0);
+			if (progress.getObject() != 0) {
+				this.progress.setObject(0);
+				//SonarCore.sendPacketAround(this, 64, 0);
+			}
+
 		}
 	}
 
@@ -132,7 +132,8 @@ public class TileEntityHammer extends TileEntityInventory implements ISidedInven
 	public void setInventorySlotContents(int i, ItemStack itemstack) {
 		super.setInventorySlotContents(i, itemstack);
 		if (i == 1) {
-			SonarCore.sendFullSyncAround(this, 64);
+			this.worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+			//SonarCore.sendFullSyncAround(this, 64);
 		}
 	}
 

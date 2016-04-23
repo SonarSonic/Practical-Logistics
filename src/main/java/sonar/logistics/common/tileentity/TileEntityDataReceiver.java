@@ -18,6 +18,8 @@ import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.core.network.PacketTileSync;
 import sonar.core.network.utils.IByteBufTile;
 import sonar.logistics.api.LogisticsAPI;
+import sonar.logistics.api.cache.EmptyNetworkCache;
+import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.connecting.IChannelProvider;
 import sonar.logistics.api.connecting.IInfoEmitter;
 import sonar.logistics.api.info.ILogicInfo;
@@ -43,6 +45,17 @@ public class TileEntityDataReceiver extends TileEntityNode implements IChannelPr
 		if (emitter.getCoords() != null)
 			return new ExternalCoords(emitter.getCoords(), ForgeDirection.getOrientation(this.getBlockMetadata()));
 		return null;
+	}
+	@Override
+	public INetworkCache getNetwork() {
+		final ExternalCoords coords = getChannel();
+		if (coords != null && coords.blockCoords != null) {
+			TileEntity channel = coords.blockCoords.getTileEntity();
+			if (channel != null) {
+				return LogisticsAPI.getCableHelper().getNetwork(channel, ForgeDirection.getOrientation(channel.getBlockMetadata()).getOpposite());
+			}
+		}
+		return new EmptyNetworkCache();
 	}
 
 	@Override
@@ -276,5 +289,4 @@ public class TileEntityDataReceiver extends TileEntityNode implements IChannelPr
 			break;
 		}
 	}
-
 }

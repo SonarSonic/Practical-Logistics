@@ -345,7 +345,6 @@ public class GuiItemRouter extends GuiSonar {
 	}
 
 	public void buttonPressed(GuiButton button, int buttonID) {
-		System.out.print(buttonID);
 		if (button != null) {
 			if (state == MAIN) {
 				if (button.id == 3) {
@@ -410,7 +409,6 @@ public class GuiItemRouter extends GuiSonar {
 
 	protected void actionPerformed(GuiButton button) {
 		super.actionPerformed(button);
-		System.out.print("hi");
 		this.buttonPressed(button, button.id);
 	}
 
@@ -447,10 +445,12 @@ public class GuiItemRouter extends GuiSonar {
 				int size = filters.size();
 				int start = (int) (size * this.currentScroll);
 				int finish = Math.min(start + 5, size);
-
-				int pos = handler.filterPos.getObject() - start;
-				if (pos > -1 && handler.filterPos.getObject() < finish) {
-					drawTexturedModalRect(this.guiLeft + 9, this.guiTop + 33 + (18 * pos), 0, 233, 154 + 72, 18);
+				if (handler.filterPos.getObject() != -1) {
+					int pos = handler.filterPos.getObject() - start;
+					if (pos > -1 && handler.filterPos.getObject() < finish) {
+						if (pos < filters.size() && filters.get(pos)!=null)
+							drawTexturedModalRect(this.guiLeft + 9, this.guiTop + 33 + (18 * pos), 0, 233, 154 + 72, 18);
+					}
 				}
 			}
 			this.drawTexturedModalRect(scrollerLeft, scrollerStart + (int) ((float) (scrollerEnd - scrollerStart - 17) * this.currentScroll), 176, 0, 8, 15);

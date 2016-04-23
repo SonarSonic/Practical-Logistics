@@ -10,6 +10,7 @@ import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 
 import sonar.core.helpers.RenderHelper;
+import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.logistics.LogisticsConfig;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.render.ScreenType;
@@ -113,11 +114,13 @@ public class ManaInfo extends ProgressInfo {
 	}
 
 	@Override
-	public boolean matches(ProgressInfo currentInfo) {
-		if (currentInfo instanceof ManaInfo) {
-			return true;
-		} else {
-			return false;
+	public SyncType isMatchingData(ProgressInfo currentInfo) {
+		if (!(currentInfo instanceof ManaInfo)) {
+			return SyncType.SAVE;
 		}
+		if (providerID != ((ManaInfo) currentInfo).providerID) {
+			return SyncType.SYNC;
+		}
+		return super.isMatchingData(currentInfo);
 	}
 }

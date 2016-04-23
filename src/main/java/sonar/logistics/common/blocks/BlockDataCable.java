@@ -41,7 +41,6 @@ public class BlockDataCable extends SonarMachineBlock {
 		if(!world.isRemote){
 			IDataCable cable = (IDataCable) world.getTileEntity(x, y, z);
 			INetworkCache network = CacheRegistry.getCache(cable.registryID());
-			System.out.print(network.getConnections(CacheTypes.EMITTER, true));
 		}
 		
 		return false;

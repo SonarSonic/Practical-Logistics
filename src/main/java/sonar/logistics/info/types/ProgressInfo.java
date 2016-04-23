@@ -9,6 +9,7 @@ import net.minecraft.util.ResourceLocation;
 
 import org.lwjgl.opengl.GL11;
 
+import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.core.helpers.RenderHelper;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.info.ILogicInfo;
@@ -150,8 +151,11 @@ public class ProgressInfo extends ILogicInfo<ProgressInfo> {
 	}
 
 	@Override
-	public boolean matches(ProgressInfo currentInfo) {
-		return currentInfo.max == max && currentInfo.stored == stored && currentInfo.data.equals(data);
+	public SyncType isMatchingData(ProgressInfo currentInfo) {
+		if(currentInfo.max != max || currentInfo.stored != stored || !currentInfo.data.equals(data)){
+			return SyncType.SYNC;
+		}
+		return null;
 	}
 
 }

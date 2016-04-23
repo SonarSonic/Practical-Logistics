@@ -22,8 +22,11 @@ import sonar.core.helpers.RenderHelper;
 import sonar.core.inventory.SonarButtons;
 import sonar.core.network.PacketByteBufServer;
 import sonar.logistics.Logistics;
+import sonar.logistics.api.wrappers.ItemWrapper.SortingDirection;
+import sonar.logistics.api.wrappers.ItemWrapper.SortingType;
 import sonar.logistics.common.containers.ContainerInventoryReader;
 import sonar.logistics.common.handlers.InventoryReaderHandler;
+import sonar.logistics.helpers.ItemHelper;
 import sonar.logistics.network.LogisticsGui;
 import sonar.logistics.network.packets.PacketGuiChange;
 import sonar.logistics.network.packets.PacketInventoryReader;
@@ -77,7 +80,6 @@ public class GuiInventoryReader extends GuiSelectionGrid<StoredItemStack> {
 	protected void actionPerformed(GuiButton button) {
 		if (button != null) {
 			if (button.id == -1) {
-
 				if (handler.setting.getObject() == 4) {
 					handler.setting.setObject(0);
 				} else {
@@ -102,6 +104,9 @@ public class GuiInventoryReader extends GuiSelectionGrid<StoredItemStack> {
 					handler.sortingType.increaseBy(1);
 				}
 				SonarCore.network.sendToServer(new PacketByteBufServer(handler, entity.xCoord, entity.yCoord, entity.zCoord, 4));
+			}
+			if(button.id==0||button.id==1){
+				ItemHelper.sortItemList(handler.cachedItems.items, SortingDirection.values()[handler.sortingOrder.getObject()], SortingType.values()[handler.sortingType.getObject()]);
 			}
 		}
 	}
@@ -201,10 +206,10 @@ public class GuiInventoryReader extends GuiSelectionGrid<StoredItemStack> {
 	public List<StoredItemStack> getGridList() {
 		String search = searchField.getText();
 		if (search == null || search.isEmpty() || search.equals(" "))
-			return handler.stacks;
+			return handler.cachedItems.items;
 		else {
 			List<StoredItemStack> searchList = new ArrayList();
-			List<StoredItemStack> currentList = (List<StoredItemStack>) ((ArrayList<StoredItemStack>) handler.stacks).clone();
+			List<StoredItemStack> currentList = (List<StoredItemStack>) ((ArrayList<StoredItemStack>) handler.cachedItems.items).clone();
 			for (StoredItemStack stack : currentList) {
 				if (stack != null && stack.item != null && stack.item.getDisplayName().toLowerCase().contains(search.toLowerCase())) {
 					searchList.add(stack);

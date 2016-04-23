@@ -2,6 +2,7 @@ package sonar.logistics.info.types;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.nbt.NBTTagCompound;
+import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.logistics.api.info.ILogicInfo;
 import cpw.mods.fml.common.network.ByteBufUtils;
 
@@ -89,7 +90,10 @@ public class CategoryInfo extends ILogicInfo<CategoryInfo> {
 	}
 
 	@Override
-	public boolean matches(CategoryInfo currentInfo) {
-		return currentInfo.category.equals(category);
+	public SyncType isMatchingData(CategoryInfo currentInfo) {
+		if(!currentInfo.category.equals(category)){
+			return SyncType.SYNC;
+		}
+		return null;
 	}
 }

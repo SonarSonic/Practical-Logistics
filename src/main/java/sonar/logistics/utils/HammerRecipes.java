@@ -22,7 +22,6 @@ public class HammerRecipes extends RecipeHelper {
 		this.addRecipe("gemSapphire", new ItemStack(ItemRegistry.sapphire_dust));
 		this.addRecipe("stone", new ItemStack(ItemRegistry.stone_plate, 4));
 		this.addRecipe("oreSapphire", new ItemStack(ItemRegistry.sapphire_dust, 2));
-		this.addRecipe("oreIron", new ItemStack(Blocks.iron_block));
 	}
 
 	@Override

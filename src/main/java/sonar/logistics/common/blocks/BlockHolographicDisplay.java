@@ -2,16 +2,23 @@ package sonar.logistics.common.blocks;
 
 import java.util.List;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.particle.EffectRenderer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.common.block.SonarMaterials;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.utils.BlockInteraction;
+import sonar.core.utils.BlockInteractionType;
 import sonar.logistics.common.handlers.DisplayScreenHandler;
 import sonar.logistics.common.tileentity.TileEntityHolographicDisplay;
 
@@ -29,12 +36,32 @@ public class BlockHolographicDisplay extends BaseNode {
 	}
 
 	@Override
+	public void onBlockClicked(World world, int x, int y, int z, EntityPlayer player) {
+		if (world.isRemote && allowLeftClick()) {
+			MovingObjectPosition pos = Minecraft.getMinecraft().objectMouseOver;
+			float hitX = (float) (pos.hitVec.xCoord - pos.blockX);
+			float hitY = (float) (pos.hitVec.yCoord - pos.blockY);
+			float hitZ = (float) (pos.hitVec.zCoord - pos.blockZ);
+			operateBlock(world, x, y, z, player, new BlockInteraction(pos.sideHit, hitX, hitY, hitZ, player.isSneaking() ? BlockInteractionType.SHIFT_LEFT : BlockInteractionType.LEFT));
+		}
+	}
+
+	@Override
+	public boolean allowLeftClick() {
+		return true;
+	}
+
+	public boolean isClickableSide(World world, int x, int y, int z, int side) {
+		return side == world.getBlockMetadata(x, y, z);
+	}
+
+	@Override
 	public boolean operateBlock(World world, int x, int y, int z, EntityPlayer player, BlockInteraction interact) {
 		if (player != null) {
 			TileHandler target = FMPHelper.getHandler(world.getTileEntity(x, y, z));
 			if (target != null && target instanceof DisplayScreenHandler) {
 				DisplayScreenHandler handler = (DisplayScreenHandler) target;
-				if (!world.isRemote)
+				if (world.isRemote)
 					handler.screenClicked(world, player, x, y, z, interact);
 				return true;
 			}
@@ -118,5 +145,12 @@ public class BlockHolographicDisplay extends BaseNode {
 		this.setBlockBoundsBasedOnState(world, x, y, z);
 		list.add(getCollisionBoundingBoxFromPool(world, x, y, z));
 		return list;
+	}
+
+	@SideOnly(Side.CLIENT)
+	public boolean addDestroyEffects(World world, int x, int y, int z, int meta, EffectRenderer effectRenderer) {
+		effectRenderer.addBlockHitEffects(x, y, z, meta);
+		effectRenderer.addBlockHitEffects(x, y, z, ForgeDirection.OPPOSITES[meta]);
+		return true;
 	}
 }

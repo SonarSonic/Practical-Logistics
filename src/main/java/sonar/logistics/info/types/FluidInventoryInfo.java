@@ -18,23 +18,34 @@ import org.lwjgl.opengl.GL11;
 
 import sonar.core.api.StoredFluidStack;
 import sonar.core.helpers.FontHelper;
+import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.api.render.ScreenType;
+import sonar.logistics.api.wrappers.FluidWrapper.StorageFluids;
+import sonar.logistics.api.wrappers.ItemWrapper.SortingDirection;
+import sonar.logistics.api.wrappers.ItemWrapper.SortingType;
+import sonar.logistics.api.wrappers.ItemWrapper.StorageItems;
+import sonar.logistics.helpers.FluidHelper;
+import sonar.logistics.helpers.ItemHelper;
 import cpw.mods.fml.common.network.ByteBufUtils;
 
 public class FluidInventoryInfo extends ILogicInfo<FluidInventoryInfo> {
 
-	public ArrayList<StoredFluidStack> stacks = new ArrayList();
-	public static String rend = "FLUIDS";
+	public StorageFluids stacks = StorageFluids.EMPTY.copy();
+	public boolean lastSync =false;
 	public int cacheID = -1;
+	public int sort = -1, order = -1;
+	public static String rend = "FLUIDS";
 
-	public static FluidInventoryInfo createInfo(ArrayList<StoredFluidStack> stacks, int cacheID) {
+	public static FluidInventoryInfo createInfo(StorageFluids stacks, int cacheID, int sort, int order) {
 		FluidInventoryInfo info = new FluidInventoryInfo();
-		info.stacks = stacks;
+		info.stacks = stacks.copy();
 		info.cacheID = cacheID;
+		info.sort = sort;
+		info.order = order;
 		return info;
 	}
-
+	
 	@Override
 	public String getName() {
 		return "FluidInventoryInfo";
@@ -72,51 +83,43 @@ public class FluidInventoryInfo extends ILogicInfo<FluidInventoryInfo> {
 
 	@Override
 	public void readFromBuf(ByteBuf buf) {
+		sort = buf.readInt();
+		order = buf.readInt();
 		this.readFromNBT(ByteBufUtils.readTag(buf));
 	}
 
 	@Override
 	public void writeToBuf(ByteBuf buf) {
+		buf.writeInt(sort);
+		buf.writeInt(order);
 		NBTTagCompound tag = new NBTTagCompound();
 		writeToNBT(tag);
 		ByteBufUtils.writeTag(buf, tag);
 	}
 
 	public void readFromNBT(NBTTagCompound tag) {
-		NBTTagList list = tag.getTagList("StoredStacks", 10);
-		this.stacks = new ArrayList();
-		for (int i = 0; i < list.tagCount(); i++) {
-			NBTTagCompound compound = list.getCompoundTagAt(i);
-			this.stacks.add(StoredFluidStack.readFromNBT(compound));
-
-		}
+		sort = tag.getInteger("sort");
+		order = tag.getInteger("order");
+		FluidHelper.readStorageToNBT(tag, stacks.fluids, SyncType.SYNC);
+		FluidHelper.sortFluidList(stacks.fluids, SortingDirection.values()[order], SortingType.values()[sort]);
 	}
 
 	public void writeToNBT(NBTTagCompound tag) {
-		NBTTagList list = new NBTTagList();
-		if (stacks == null) {
-			stacks = new ArrayList();
-		}
-		for (int i = 0; i < this.stacks.size(); i++) {
-			if (this.stacks.get(i) != null) {
-				NBTTagCompound compound = new NBTTagCompound();
-				StoredFluidStack.writeToNBT(compound, this.stacks.get(i));
-				list.appendTag(compound);
-			}
-		}
-
-		tag.setTag("StoredStacks", list);
+		tag.setInteger("sort", sort);
+		tag.setInteger("order", order);
+		lastSync=false;
+		FluidHelper.writeStorageToNBT(tag, lastSync, stacks, SyncType.SYNC);
 	}
 
 	@Override
 	public void renderInfo(Tessellator tess, TileEntity tile, float minX, float minY, float maxX, float maxY, float zOffset, ScreenType type) {
 
-		if (stacks != null) {
+		if (stacks.fluids != null) {
 			int xSlots = Math.round(maxX - minX);
 			int ySlots = (int) (Math.round(maxY - minY));
 			if (type.isNormalSize()) {
-				if (stacks != null && !stacks.isEmpty() && stacks.get(0) != null) {
-					FluidStackInfo.createInfo(stacks.get(0), cacheID).renderInfo(tess, tile, minX, minY, maxX, maxY, zOffset, type);
+				if (stacks.fluids != null && !stacks.fluids.isEmpty() && stacks.fluids.get(0) != null) {
+					FluidStackInfo.createInfo(stacks.fluids.get(0), cacheID).renderInfo(tess, tile, minX, minY, maxX, maxY, zOffset, type);
 				}
 
 			} else {
@@ -127,7 +130,7 @@ public class FluidInventoryInfo extends ILogicInfo<FluidInventoryInfo> {
 				int currentSlot = 0;
 
 				if (stacks != null) {
-					List<StoredFluidStack> currentStacks = (List<StoredFluidStack>) (((ArrayList<StoredFluidStack>) (stacks)).clone());
+					List<StoredFluidStack> currentStacks = (List<StoredFluidStack>) (((ArrayList<StoredFluidStack>) (stacks.fluids)).clone());
 
 					GL11.glTranslatef(minX, minY, 0.01f);
 
@@ -202,110 +205,40 @@ public class FluidInventoryInfo extends ILogicInfo<FluidInventoryInfo> {
 
 	@Override
 	public void writeUpdate(FluidInventoryInfo currentInfo, NBTTagCompound tag) {
-		List<StoredFluidStack> currentList = new ArrayList();
-		if (currentInfo.stacks != null) {
-			currentList = currentInfo.stacks;
+		if (currentInfo.sort != sort) {
+			tag.setInteger("sort", currentInfo.sort);
+			sort = currentInfo.sort;
 		}
-		if (stacks == null) {
-			stacks = new ArrayList();
+		if (currentInfo.order != order) {
+			tag.setInteger("order", currentInfo.order);
+			order = currentInfo.order;
 		}
-		if (currentList.size() <= 0 && (!(this.stacks.size() <= 0))) {
-			tag.setBoolean("null", true);
-			this.stacks = new ArrayList();
-			return;
-		}
-		NBTTagList list = new NBTTagList();
-		int size = Math.max(currentList.size(), this.stacks.size());
-		for (int i = 0; i < size; ++i) {
-			StoredFluidStack current = null;
-			StoredFluidStack last = null;
-			if (i < currentList.size()) {
-				current = currentList.get(i);
-			}
-			if (i < this.stacks.size()) {
-				last = this.stacks.get(i);
-			}
-			NBTTagCompound compound = new NBTTagCompound();
-			if (current != null) {
-				if (last != null) {
-					if (!last.equalStack(current.fluid) || current.stored != last.stored) {
-						compound.setByte("f", (byte) 0);
-						this.stacks.set(i, current);
-						StoredFluidStack.writeToNBT(compound, currentList.get(i));
 
-					} else if (last.stored != current.stored) {
-						compound.setByte("f", (byte) 1);
-						this.stacks.set(i, current);
-						StoredFluidStack.writeToNBT(compound, currentList.get(i));
-						compound.setLong("Stored", current.stored);
-					}
-				} else {
-					compound.setByte("f", (byte) 0);
-					if (i < stacks.size()) {
-						stacks.set(i, current);
-					} else {
-						stacks.add(i, current);
-					}
-					StoredFluidStack.writeToNBT(compound, current);
-				}
-			} else if (last != null) {
-				this.stacks.set(i, null);
-				compound.setByte("f", (byte) 2);
-			}
-			if (!compound.hasNoTags()) {
-				compound.setInteger("Slot", i);
-				list.appendTag(compound);
-			}
+		lastSync = FluidHelper.writeStorageToNBT(tag, lastSync, currentInfo.stacks, SyncType.SPECIAL);
 
-		}
-		if (list.tagCount() != 0) {
-			tag.setTag("Stacks", list);
-		}
 	}
 
 	@Override
 	public void readUpdate(NBTTagCompound tag) {
-		if (tag.hasKey("null")) {
-			this.stacks = new ArrayList();
-			return;
+		if (tag.hasKey("sort")) {
+			sort = tag.getInteger("sort");
 		}
-		NBTTagList list = tag.getTagList("Stacks", 10);
-		if (this.stacks == null) {
-			this.stacks = new ArrayList();
+		if (tag.hasKey("order")) {
+			order = tag.getInteger("order");
 		}
-		for (int i = 0; i < list.tagCount(); i++) {
-			NBTTagCompound compound = list.getCompoundTagAt(i);
-			int slot = compound.getInteger("Slot");
-			boolean set = slot < stacks.size();
-			switch (compound.getByte("f")) {
-			case 0:
-				if (set)
-					stacks.set(slot, StoredFluidStack.readFromNBT(compound));
-				else
-					stacks.add(slot, StoredFluidStack.readFromNBT(compound));
-				break;
-			case 1:
-				long stored = compound.getLong("Stored");
-				if (stored != 0) {
-					stacks.set(slot, new StoredFluidStack(stacks.get(slot).fluid, stored));
-				} else {
-					stacks.set(slot, null);
-				}
-				break;
-			case 2:
-				if (set)
-					stacks.set(slot, null);
-				else
-					stacks.add(slot, null);
-				break;
-			}
-		}
-
+		FluidHelper.readStorageToNBT(tag, stacks.fluids, SyncType.SPECIAL);
+		FluidHelper.sortFluidList(stacks.fluids, SortingDirection.values()[order], SortingType.values()[sort]);
 	}
 
 	@Override
-	public boolean matches(FluidInventoryInfo currentInfo) {
-		return currentInfo.stacks.equals(stacks);
+	public SyncType isMatchingData(FluidInventoryInfo currentInfo) {
+		if(cacheID!=currentInfo.cacheID){
+			return SyncType.SAVE;
+		}
+		if(sort!=currentInfo.sort || order!=currentInfo.order || !currentInfo.stacks.fluids.equals(stacks.fluids)){
+			return SyncType.SYNC;
+		}
+		return null;
 	}
 
 }

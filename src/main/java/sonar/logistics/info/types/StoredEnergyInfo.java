@@ -15,6 +15,7 @@ import org.lwjgl.opengl.GL11;
 import sonar.core.api.BlockCoords;
 import sonar.core.api.SonarAPI;
 import sonar.core.api.StoredEnergyStack;
+import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.core.helpers.RenderHelper;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.info.ILogicInfo;
@@ -63,7 +64,7 @@ public class StoredEnergyInfo extends ILogicInfo<StoredEnergyInfo> {
 
 	@Override
 	public String getData() {
-		return (stack != null ? String.valueOf(stack.stored): String.valueOf(0));
+		return (stack != null ? String.valueOf(stack.stored) : String.valueOf(0));
 	}
 
 	@Override
@@ -99,31 +100,33 @@ public class StoredEnergyInfo extends ILogicInfo<StoredEnergyInfo> {
 		float width = stack.stored * (maxX - minX) / stack.capacity;
 		Minecraft.getMinecraft().renderEngine.bindTexture(progress);
 		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-		RenderHelper.drawTexturedModalRect(minX, minY, maxY, width, (maxY - minY));	
-		GL11.glTranslated(0, 0, -zOffset - 0.002);	
+		RenderHelper.drawTexturedModalRect(minX, minY, maxY, width, (maxY - minY));
+		GL11.glTranslated(0, 0, -zOffset - 0.002);
 		FontRenderer rend = Minecraft.getMinecraft().fontRenderer;
 		GL11.glTranslatef(minX + (maxX - minX) / 2, minY + (maxY - minY) / 2, 0.01f);
 		int sizing = (int) Math.round(Math.min((maxX - minX), (maxY - minY) * 1.5));
 		GL11.glTranslatef(0.0f, (float) (type.isNormalSize() ? -0.1F : -0.31F + ((sizing - 1) * -0.04)), zOffset);
 		double itemScale = sizing >= 2 ? LogisticsAPI.getInfoRenderer().getScale(sizing) : 120;
 		GL11.glScaled(1.0f / itemScale, 1.0f / itemScale, 1.0f / itemScale);
-		String coordString = coords.block.getDisplayName();
-		rend.drawString(EnumChatFormatting.UNDERLINE + coordString, -rend.getStringWidth(coordString) / 2, -20, -1);
-		String stored = "Stored: " + String.valueOf(stack.stored) + " " + stack.energyType.getStorageSuffix();
-		String capacity = "Capacity: " + String.valueOf(stack.capacity) + " " + stack.energyType.getStorageSuffix();		
-		rend.drawString(stored, -rend.getStringWidth(stored) / 2, -8, -1);
-		rend.drawString(capacity, -rend.getStringWidth(capacity) / 2, 4, -1);
-		if (stack.hasInput) {
-			String input = "Max Input: " + String.valueOf(stack.input) + " " + stack.energyType.getStorageSuffix();
-			rend.drawString(input, -rend.getStringWidth(input) / 2, 16, -1);
-		}
-		if (stack.hasOutput) {
-			String output = "Max Output: " + String.valueOf(stack.output) + " " + stack.energyType.getStorageSuffix();
-			rend.drawString(output, -rend.getStringWidth(output) / 2, 28, -1);
-		}
-		if (stack.hasUsage) {
-			String usage = "Usage: " + String.valueOf(stack.usage) + " " + stack.energyType.getUsageSuffix();
-			rend.drawString(usage, -rend.getStringWidth(usage) / 2, 28, -1);
+		if (coords != null && coords.block != null) {
+			String coordString = coords.block.getDisplayName();
+			rend.drawString(EnumChatFormatting.UNDERLINE + coordString, -rend.getStringWidth(coordString) / 2, -20, -1);
+			String stored = "Stored: " + String.valueOf(stack.stored) + " " + stack.energyType.getStorageSuffix();
+			String capacity = "Capacity: " + String.valueOf(stack.capacity) + " " + stack.energyType.getStorageSuffix();
+			rend.drawString(stored, -rend.getStringWidth(stored) / 2, -8, -1);
+			rend.drawString(capacity, -rend.getStringWidth(capacity) / 2, 4, -1);
+			if (stack.hasInput) {
+				String input = "Max Input: " + String.valueOf(stack.input) + " " + stack.energyType.getStorageSuffix();
+				rend.drawString(input, -rend.getStringWidth(input) / 2, 16, -1);
+			}
+			if (stack.hasOutput) {
+				String output = "Max Output: " + String.valueOf(stack.output) + " " + stack.energyType.getStorageSuffix();
+				rend.drawString(output, -rend.getStringWidth(output) / 2, 28, -1);
+			}
+			if (stack.hasUsage) {
+				String usage = "Usage: " + String.valueOf(stack.usage) + " " + stack.energyType.getUsageSuffix();
+				rend.drawString(usage, -rend.getStringWidth(usage) / 2, 28, -1);
+			}
 		}
 	}
 
@@ -240,8 +243,10 @@ public class StoredEnergyInfo extends ILogicInfo<StoredEnergyInfo> {
 	}
 
 	@Override
-	public boolean matches(StoredEnergyInfo currentInfo) {
-		return currentInfo.stack.equals(stack) && currentInfo.coords.equals(coords);
+	public SyncType isMatchingData(StoredEnergyInfo currentInfo) {
+		if (!currentInfo.stack.equals(stack) || !currentInfo.coords.equals(coords)) {
+			return SyncType.SYNC;
+		}
+		return null;
 	}
-
 }

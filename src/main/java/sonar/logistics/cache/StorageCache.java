@@ -37,19 +37,19 @@ public abstract class StorageCache implements IStorageCache {
 			}
 		}
 
-		ArrayList<StoredItemStack> changed = ((ArrayList<StoredItemStack>) storedStacks.clone());// copy the latest list
-		ArrayList<StoredItemStack> removed = ((ArrayList<StoredItemStack>) last.clone());// copy the last list
+		ArrayList<StoredItemStack> changed = ((ArrayList<StoredItemStack>) storedStacks.clone());
+		ArrayList<StoredItemStack> removed = ((ArrayList<StoredItemStack>) last.clone());
 		if (last != null) {
-			changed.removeAll(last);// remove any in the changed that were in last, ignoring ones which arn't equal, e.g. changed/new
+			changed.removeAll(last);
 		}
-		for (StoredItemStack r : (ArrayList<StoredItemStack>) removed.clone()) { // iterates the last list
-			for (StoredItemStack c : ((ArrayList<StoredItemStack>) storedStacks.clone())) {// against the latest list
+		for (StoredItemStack r : (ArrayList<StoredItemStack>) removed.clone()) {
+			for (StoredItemStack c : ((ArrayList<StoredItemStack>) storedStacks.clone())) {
 				if (r.equalStack(c.getItemStack())) {
-					removed.remove(r);// if anything in the last list equals something in the current list it is removed
+					removed.remove(r);
 				}
 			}
 		}
-		return new StorageItems(storedStacks, storage, changed);
+		return new StorageItems(storedStacks, storage, changed, removed);
 	}
 
 	public StorageFluids getCachedFluids(ArrayList<StoredFluidStack> fluids) {
@@ -71,9 +71,19 @@ public abstract class StorageCache implements IStorageCache {
 				}
 			}
 		}
-		ArrayList<StoredFluidStack> stored = ((ArrayList<StoredFluidStack>) fluidList.clone());
-		if (fluids != null)
-			stored.removeAll(fluids);
-		return new StorageFluids(fluidList, storage, stored);
+
+		ArrayList<StoredFluidStack> changed = ((ArrayList<StoredFluidStack>) fluidList.clone());
+		ArrayList<StoredFluidStack> removed = ((ArrayList<StoredFluidStack>) fluids.clone());
+		if (fluids != null) {
+			changed.removeAll(fluids);
+		}
+		for (StoredFluidStack r : (ArrayList<StoredFluidStack>) removed.clone()) {
+			for (StoredFluidStack c : ((ArrayList<StoredFluidStack>) fluidList.clone())) {
+				if (r.equalStack(c.getFullStack())) {
+					removed.remove(r);
+				}
+			}
+		}
+		return new StorageFluids(fluidList, storage, changed, removed);
 	}
 }

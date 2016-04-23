@@ -10,6 +10,8 @@ import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.api.BlockCoords;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.cache.CacheTypes;
+import sonar.logistics.api.cache.INetworkCache;
+import sonar.logistics.api.cache.IStorageCache;
 import sonar.logistics.api.connecting.IChannelProvider;
 import sonar.logistics.api.connecting.IConnectionNode;
 import sonar.logistics.api.connecting.IEntityNode;
@@ -22,6 +24,9 @@ import sonar.logistics.api.wrappers.ItemWrapper.StorageItems;
 public class LocalNetworkCache extends StorageCache {
 	public final ILogicTile tile;
 
+	private StorageItems cachedItems = StorageItems.EMPTY;
+	private StorageFluids cachedFluids = StorageFluids.EMPTY;
+	
 	public LocalNetworkCache(ILogicTile tile) {
 		this.tile = tile;
 	}
@@ -39,9 +44,7 @@ public class LocalNetworkCache extends StorageCache {
 		}
 		if (tile instanceof IChannelProvider) {
 			IChannelProvider provider = (IChannelProvider) tile;
-			final ExternalCoords coords = provider.getChannel();
-			TileEntity channel = coords.blockCoords.getTileEntity();
-			return LogisticsAPI.getCableHelper().getNetwork(channel, ForgeDirection.getOrientation(channel.getBlockMetadata()).getOpposite()).getExternalBlock(true);
+			return provider.getNetwork().getExternalBlock(includeChannels);
 		}
 		return null;
 	}
@@ -60,11 +63,8 @@ public class LocalNetworkCache extends StorageCache {
 		}
 		if (tile instanceof IChannelProvider) {
 			IChannelProvider provider = (IChannelProvider) tile;
-			final ExternalCoords coords = provider.getChannel();
-			TileEntity channel = coords.blockCoords.getTileEntity();
-			return LogisticsAPI.getCableHelper().getNetwork(channel, ForgeDirection.getOrientation(channel.getBlockMetadata()).getOpposite()).getExternalBlocks(true);
+			return provider.getNetwork().getExternalBlocks(includeChannels);
 		}
-
 		return map;
 	}
 
@@ -73,10 +73,7 @@ public class LocalNetworkCache extends StorageCache {
 		ArrayList array = new ArrayList();
 		if (tile instanceof IChannelProvider) {
 			IChannelProvider provider = (IChannelProvider) tile;
-			final ExternalCoords coords = provider.getChannel();
-			TileEntity channel = coords.blockCoords.getTileEntity();
-			return LogisticsAPI.getCableHelper().getNetwork(channel, ForgeDirection.getOrientation(channel.getBlockMetadata()).getOpposite()).getConnections(type, includeChannels);
-
+			return provider.getNetwork().getConnections(type, includeChannels);
 		} else {
 			switch (type) {
 			case ENTITY_NODES:
@@ -137,10 +134,7 @@ public class LocalNetworkCache extends StorageCache {
 	public int getNetworkID() {
 		if (tile instanceof IChannelProvider) {
 			IChannelProvider provider = (IChannelProvider) tile;
-			final ExternalCoords coords = provider.getChannel();
-			TileEntity channel = coords.blockCoords.getTileEntity();
-			return LogisticsAPI.getCableHelper().getNetwork(channel, ForgeDirection.getOrientation(channel.getBlockMetadata()).getOpposite()).getNetworkID();
-
+			return provider.getNetwork().getNetworkID();
 		}
 		return -1;
 	}
@@ -149,14 +143,28 @@ public class LocalNetworkCache extends StorageCache {
 	public ArrayList<Integer> getConnectedNetworks(ArrayList<Integer> networks) {
 		return networks;
 	}
-
+	//LOCAL NETWORKS UPDATE ITEMS/FLUIDS EVERY SINGLE TICK!!!!!!! THIS NEEDS SOME ATTENTION, SOME CONFIGURATIONS MAY LAG LIKE CRAZY 
 	@Override
 	public StorageItems getStoredItems() {
-		return this.getCachedItems(null);
+		if (tile instanceof IChannelProvider) {
+			IChannelProvider provider = (IChannelProvider) tile;
+			INetworkCache cache= provider.getNetwork();
+			if(cache!=null && cache instanceof IStorageCache){
+				return ((IStorageCache) cache).getStoredItems();
+			}
+		}
+		return this.getCachedItems(cachedItems.items);
 	}
 
 	@Override
 	public StorageFluids getStoredFluids() {
-		return this.getCachedFluids(null);
+		if (tile instanceof IChannelProvider) {
+			IChannelProvider provider = (IChannelProvider) tile;
+			INetworkCache cache= provider.getNetwork();
+			if(cache!=null && cache instanceof IStorageCache){
+				return ((IStorageCache) cache).getStoredFluids();
+			}
+		}
+		return this.getCachedFluids(cachedFluids.fluids);
 	}
 }

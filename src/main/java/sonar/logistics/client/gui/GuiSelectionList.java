@@ -120,7 +120,8 @@ public abstract class GuiSelectionList<T> extends GuiSonar {
 			if (i < 0) {
 				i = -1;
 			}
-
+			//double round = 1.0F/(j);
+			//this.currentScroll = (float) (round*(Math.round((float)((double) this.currentScroll - (double) i / (double) j)/round)));
 			this.currentScroll = (float) ((double) this.currentScroll - (double) i / (double) j);
 			if (this.currentScroll < 0.0F) {
 				this.currentScroll = 0.0F;

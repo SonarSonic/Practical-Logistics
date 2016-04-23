@@ -1,6 +1,9 @@
 package sonar.logistics.common.tileentity;
 
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
+import sonar.core.SonarCore;
 import sonar.core.api.BlockCoords;
 import sonar.core.common.tileentity.TileEntityHandler;
 import sonar.core.integration.fmp.handlers.TileHandler;
@@ -26,7 +29,13 @@ public class TileEntityDisplayScreen extends TileEntityHandler implements IInfoT
 	public ILogicInfo currentInfo() {
 		return handler.currentInfo();
 	}
-
+	
+	@Override
+	public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity packet) {
+		super.onDataPacket(net, packet);
+		//SonarCore.sendPacketAround(this, 64, 0);
+	}
+	
 	public boolean maxRender() {
 		return true;
 	}

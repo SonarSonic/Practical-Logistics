@@ -2,18 +2,18 @@ package sonar.logistics.info.types;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.nbt.NBTTagCompound;
+import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.logistics.api.info.LogicInfo;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.ModContainer;
 import cpw.mods.fml.common.network.ByteBufUtils;
 import cpw.mods.fml.common.registry.GameRegistry.UniqueIdentifier;
 
-public class ModidInfo extends LogicInfo {
+public class ModidInfo extends LogicInfo<ModidInfo> {
 
 	public UniqueIdentifier block = null;
 
-	public ModidInfo() {
-	}
+	public ModidInfo() {}
 
 	public ModidInfo(int providerID, int category, int subCategory, Object data, UniqueIdentifier block) {
 		super(providerID, category, subCategory, data);
@@ -98,10 +98,14 @@ public class ModidInfo extends LogicInfo {
 			block = new UniqueIdentifier(blockTag.getString("modId") + ":" + blockTag.getString("name"));
 		}
 	}
-
+	
 	@Override
-	public boolean matches(LogicInfo currentInfo) {
-		return currentInfo.getProviderID() == this.providerID && currentInfo.dataType == dataType && currentInfo.category.equals(category) && currentInfo.subCategory.equals(subCategory) && currentInfo.suffix.equals(suffix) && currentInfo.catID == catID && currentInfo.subCatID == subCatID;
+	public SyncType isMatchingData(ModidInfo currentInfo) {
+		SyncType matching = super.isMatchingData(currentInfo);
+		if (matching == null) {
+			return block.equals(((ModidInfo) currentInfo).block) ? SyncType.SYNC : null;
+		}
+		return matching;
 	}
 
 	@Override

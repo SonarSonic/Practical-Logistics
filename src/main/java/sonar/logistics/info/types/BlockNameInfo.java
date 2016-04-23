@@ -3,10 +3,11 @@ package sonar.logistics.info.types;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.logistics.api.info.LogicInfo;
 import cpw.mods.fml.common.network.ByteBufUtils;
 
-public class BlockNameInfo extends LogicInfo {
+public class BlockNameInfo extends LogicInfo<BlockNameInfo> {
 
 	public ItemStack block = null;
 
@@ -87,12 +88,13 @@ public class BlockNameInfo extends LogicInfo {
 	}
 
 	@Override
-	public boolean matches(LogicInfo currentInfo) {
-		return currentInfo.getProviderID() == this.providerID && currentInfo.dataType == dataType && currentInfo.category.equals(category) && currentInfo.subCategory.equals(subCategory) && currentInfo.suffix.equals(suffix) && currentInfo.catID == catID && currentInfo.subCatID == subCatID;
-	}
-
-	@Override
-	public BlockNameInfo instance() {
-		return new BlockNameInfo();
+	public SyncType isMatchingData(BlockNameInfo currentInfo) {
+		if(currentInfo.getProviderID() != this.providerID){
+			return SyncType.SAVE;
+		}
+		if(currentInfo.dataType == dataType || currentInfo.category.equals(category) || currentInfo.subCategory.equals(subCategory) || currentInfo.suffix.equals(suffix) || currentInfo.catID == catID || currentInfo.subCatID == subCatID){
+			return SyncType.SYNC;
+		}
+		return null;
 	}
 }

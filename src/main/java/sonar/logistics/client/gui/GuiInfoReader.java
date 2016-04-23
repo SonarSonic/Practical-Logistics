@@ -80,7 +80,7 @@ public class GuiInfoReader extends GuiSonar {
 			if (getInfo().get(i) != null) {
 				ILogicInfo info = getInfo().get(i);
 				if (info != null) {
-					if (info.equals(getPrimaryInfo())) {
+					if (info.isMatchingInfo(getPrimaryInfo())) {
 						return i - start;
 					}
 				}
@@ -102,7 +102,7 @@ public class GuiInfoReader extends GuiSonar {
 			if (getInfo().get(i) != null) {
 				ILogicInfo info = getInfo().get(i);
 				if (info != null) {
-					if (info.equals(getSecondInfo())) {
+					if (info.isMatchingInfo(getSecondInfo())) {
 						return i - start;
 					}
 				}
@@ -141,7 +141,7 @@ public class GuiInfoReader extends GuiSonar {
 			for (int i = start; i < finish; i++) {
 				ILogicInfo info = getInfo().get(i);
 				if (info != null) {
-					boolean isSelected = info.equals(getPrimaryInfo());
+					boolean isSelected = info.isMatchingInfo(getPrimaryInfo());
 					if (!(info instanceof CategoryInfo)) {
 						int colour = isSelected ? Color.green.getRGB() : Color.lightGray.getRGB();
 						FontHelper.text(info.getSubCategory().substring(0, Math.min(15, info.getSubCategory().length())), 10, 31 + (12 * i) - (12 * start), colour);
@@ -256,7 +256,7 @@ public class GuiInfoReader extends GuiSonar {
 							return;
 						}
 						if (buttonID == 0) {
-							if (getPrimaryInfo() != null && info.equals(getPrimaryInfo())) {
+							if (getPrimaryInfo() != null && info.isMatchingInfo(getPrimaryInfo())) {
 								Logistics.network.sendToServer(new PacketInfoBlock(xCoord, yCoord, zCoord, true));
 								//if (handler.isMultipart.getObject()) {
 									handler.primaryInfo.setObject(null);
@@ -270,7 +270,7 @@ public class GuiInfoReader extends GuiSonar {
 
 						} else if (buttonID == 1) {
 							if (!info.equals(getPrimaryInfo())) {
-								if (getSecondInfo() != null && info.equals(getSecondInfo())) {
+								if (getSecondInfo() != null && info.isMatchingInfo(getSecondInfo())) {
 									Logistics.network.sendToServer(new PacketInfoBlock(xCoord, yCoord, zCoord, false));
 									//if (handler.isMultipart.getObject()) {
 										handler.secondaryInfo.setObject(null);

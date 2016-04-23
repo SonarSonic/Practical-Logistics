@@ -60,6 +60,9 @@ import sonar.logistics.network.packets.PacketInfoBlock;
 import sonar.logistics.network.packets.PacketInventoryReader;
 import sonar.logistics.network.packets.PacketProviders;
 import sonar.logistics.network.packets.PacketRouterGui;
+import sonar.logistics.network.packets.PacketScreenInteraction;
+import sonar.logistics.network.packets.PacketScreenInteraction.FluidHandler;
+import sonar.logistics.network.packets.PacketScreenInteraction.ItemHandler;
 import cpw.mods.fml.common.network.IGuiHandler;
 import cpw.mods.fml.relauncher.Side;
 
@@ -76,6 +79,8 @@ public class LogisticsCommon implements IGuiHandler {
 		Logistics.network.registerMessage(PacketFluidReader.Handler.class, PacketFluidReader.class, 5, Side.SERVER);
 		Logistics.network.registerMessage(PacketRouterGui.Handler.class, PacketRouterGui.class, 6, Side.SERVER);
 		Logistics.network.registerMessage(PacketGuiChange.Handler.class, PacketGuiChange.class, 7, Side.SERVER);
+		Logistics.network.registerMessage(ItemHandler.class, PacketScreenInteraction.PacketItemStack.class, 8, Side.SERVER);
+		Logistics.network.registerMessage(FluidHandler.class, PacketScreenInteraction.PacketFluidStack.class, 9, Side.SERVER);
 	}
 
 	@Override

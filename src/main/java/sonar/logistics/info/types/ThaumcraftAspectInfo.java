@@ -9,6 +9,7 @@ import net.minecraft.tileentity.TileEntity;
 
 import org.lwjgl.opengl.GL11;
 
+import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.info.LogicInfo;
 import sonar.logistics.api.render.ScreenType;
@@ -87,9 +88,15 @@ public class ThaumcraftAspectInfo extends LogicInfo<ThaumcraftAspectInfo> {
 	public ThaumcraftAspectInfo instance() {
 		return new ThaumcraftAspectInfo();
 	}
-
 	@Override
-	public boolean matches(ThaumcraftAspectInfo currentInfo) {
-		return tex.equals(currentInfo.tex) && currentInfo.getProviderID() == this.providerID && currentInfo.dataType == dataType && currentInfo.category.equals(category) && currentInfo.subCategory.equals(subCategory) && currentInfo.suffix.equals(suffix) && currentInfo.catID == catID && currentInfo.subCatID == subCatID;
+	public SyncType isMatchingData(ThaumcraftAspectInfo currentInfo) {
+		if (!(currentInfo instanceof ThaumcraftAspectInfo)) {
+			return SyncType.SAVE;
+		}
+		SyncType matching = super.isMatchingData(currentInfo);
+		if (matching == null) {
+			return tex.equals(((ThaumcraftAspectInfo) currentInfo).tex) ? SyncType.SYNC : null;
+		}
+		return matching;
 	}
 }

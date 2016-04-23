@@ -354,7 +354,6 @@ public class RenderHandlers {
 							if (cooling) {
 								progress = (progress / 2)-10;
 							}
-							// System.out.print(" " + progress);
 							GL11.glTranslated(0, 0, -((progress - 81) * 0.085 / (hammer.speed - 81)));
 							GL11.glScaled(1, 1, 1 - ((progress - 81) * 0.85 / (hammer.speed - 81)));
 						}

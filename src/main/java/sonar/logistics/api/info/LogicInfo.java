@@ -2,6 +2,7 @@ package sonar.logistics.api.info;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.nbt.NBTTagCompound;
+import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.providers.ICategoryProvider;
 import cpw.mods.fml.common.network.ByteBufUtils;
@@ -278,7 +279,13 @@ public class LogicInfo<T extends LogicInfo> extends ILogicInfo<T> {
 	}
 
 	@Override
-	public boolean matches(LogicInfo currentInfo) {
-		return currentInfo.getProviderID() == this.providerID && currentInfo.dataType == dataType && currentInfo.category.equals(category) && currentInfo.subCategory.equals(subCategory) && currentInfo.suffix.equals(suffix) && currentInfo.catID == catID && currentInfo.subCatID == subCatID;
+	public SyncType isMatchingData(T currentInfo) {	
+		if(currentInfo.getProviderID() != this.providerID || currentInfo.dataType != dataType || !currentInfo.category.equals(category) || !currentInfo.subCategory.equals(subCategory) || currentInfo.catID != catID || currentInfo.subCatID != subCatID){
+			return SyncType.SAVE;
+		}
+		if(!currentInfo.data.equals(data) || !currentInfo.suffix.equals(suffix)){
+			return SyncType.SYNC;
+		}
+		return null;
 	}
 }
