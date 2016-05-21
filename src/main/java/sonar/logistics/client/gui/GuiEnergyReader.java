@@ -14,6 +14,7 @@ import org.lwjgl.opengl.GL11;
 
 import sonar.core.helpers.FontHelper;
 import sonar.core.helpers.RenderHelper;
+import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.logistics.Logistics;
 import sonar.logistics.client.renderers.RenderHandlers;
 import sonar.logistics.common.containers.ContainerEmptySync;
@@ -46,7 +47,8 @@ public class GuiEnergyReader extends GuiSelectionList<StoredEnergyInfo> {
 
 	@Override
 	public boolean isEqualSelection(StoredEnergyInfo selection, StoredEnergyInfo current) {
-		return selection.equals(current);
+		
+		return selection.isMatchingInfo(current) && selection.isMatchingData(current)!=SyncType.SAVE;
 	}
 
 	@Override

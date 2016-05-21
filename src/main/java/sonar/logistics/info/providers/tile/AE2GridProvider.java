@@ -1,5 +1,6 @@
 package sonar.logistics.info.providers.tile;
 
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -18,6 +19,7 @@ import appeng.api.networking.IGridConnection;
 import appeng.api.networking.IGridHost;
 import appeng.api.networking.IGridNode;
 import appeng.api.networking.IMachineSet;
+import appeng.api.networking.storage.IStorageGrid;
 import appeng.api.storage.ICellInventory;
 import appeng.api.storage.ICellInventoryHandler;
 import appeng.api.storage.IMEInventoryHandler;
@@ -63,14 +65,8 @@ public class AE2GridProvider extends TileProvider {
 		}
 		if (target instanceof IGridProxyable) {
 			IGridProxyable proxy = (IGridProxyable) target;
-			IGrid grid;
-			try {
-				grid = proxy.getProxy().getGrid();
-				/*
-				 * IStorageGrid storage = grid.getCache(IStorageGrid.class); if (storage != null) { IItemList<IAEItemStack> itemInventory = storage.getItemInventory().getStorageList(); infoList.add(new StandardInfo(id, 2, 4, itemInventory.size()));
-				 * 
-				 * IItemList<IAEFluidStack> fluidInventory = storage.getFluidInventory().getStorageList(); infoList.add(new StandardInfo(id, 2, 5, fluidInventory.size())); }
-				 */
+			final IGrid grid = proxy.getProxy().getNode().getGrid();
+			if (grid != null) {
 				long usedCells = 0;
 				long totalCells = 0;
 
@@ -82,7 +78,6 @@ public class AE2GridProvider extends TileProvider {
 				long totalTypesF = 0;
 
 				IMachineSet set = grid.getMachines(TileDrive.class);
-				// IMachineSet chest = grid.getMachines(TileChest.class);
 				Iterator<IGridNode> drives = set.iterator();
 				while (drives.hasNext()) {
 					IGridHost node = drives.next().getMachine();
@@ -91,29 +86,20 @@ public class AE2GridProvider extends TileProvider {
 						totalCells += drive.getCellCount();
 						for (int i = 0; i < drive.getInternalInventory().getSizeInventory(); i++) {
 							ItemStack is = drive.getInternalInventory().getStackInSlot(i);
-							if (is != null) {
-								IMEInventoryHandler itemInventory = AEApi.instance().registries().cell().getCellInventory(is, null, StorageChannel.ITEMS);
-								if (itemInventory instanceof ICellInventoryHandler) {
-									ICellInventoryHandler handler = (ICellInventoryHandler) itemInventory;
-									ICellInventory cellInventory = handler.getCellInv();
+							if (is == null) {
+								continue;
+							}
+							IMEInventoryHandler itemInventory = AEApi.instance().registries().cell().getCellInventory(is, null, StorageChannel.ITEMS);
+							IMEInventoryHandler fluidInventory = AEApi.instance().registries().cell().getCellInventory(is, null, StorageChannel.FLUIDS);
+							for (IMEInventoryHandler handler : Arrays.asList(itemInventory, fluidInventory)) {
+								if (handler instanceof ICellInventoryHandler) {
+									ICellInventoryHandler cell = (ICellInventoryHandler) handler;
+									ICellInventory cellInventory = cell.getCellInv();
 									if (cellInventory != null) {
-
 										totalBytes += cellInventory.getTotalBytes();
 										usedBytes += cellInventory.getUsedBytes();
 										totalTypes += cellInventory.getTotalItemTypes();
 										usedTypes += cellInventory.getStoredItemTypes();
-									}
-								}
-								IMEInventoryHandler fluidInventory = AEApi.instance().registries().cell().getCellInventory(is, null, StorageChannel.FLUIDS);
-								if (fluidInventory instanceof ICellInventoryHandler) {
-									ICellInventoryHandler handler = (ICellInventoryHandler) fluidInventory;
-									ICellInventory cellInventory = handler.getCellInv();
-									if (cellInventory != null) {
-
-										totalBytes += cellInventory.getTotalBytes();
-										usedBytes += cellInventory.getUsedBytes();
-										totalTypesF += cellInventory.getTotalItemTypes();
-										usedTypesF += cellInventory.getStoredItemTypes();
 									}
 								}
 							}
@@ -129,11 +115,7 @@ public class AE2GridProvider extends TileProvider {
 				infoList.add(new StorageInfo(id, 2, 11, totalTypes));
 				infoList.add(new StorageInfo(id, 2, 12, usedTypesF));
 				infoList.add(new StorageInfo(id, 2, 13, totalTypesF));
-
-			} catch (GridAccessException e) {
-				e.printStackTrace();
 			}
-
 		}
 	}
 

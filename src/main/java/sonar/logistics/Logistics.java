@@ -49,7 +49,7 @@ public class Logistics {
 
 	public static final String MODID = "PracticalLogistics";
 	public static final String NAME = "Practical Logistics";
-	public static final String VERSION = "0.2.1";
+	public static final String VERSION = "0.2.3";
 
 	public static SimpleNetworkWrapper network;
 	public static Logger logger = (Logger) LogManager.getLogger(MODID);

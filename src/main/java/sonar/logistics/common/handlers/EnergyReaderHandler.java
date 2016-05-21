@@ -22,7 +22,6 @@ import sonar.logistics.info.types.StoredEnergyInfo;
 
 public class EnergyReaderHandler extends TileHandler {
 
-	public BlockCoords coords;
 	public List<StoredEnergyInfo> stacks;
 	public List<StoredEnergyInfo> lastStacks;
 
@@ -44,17 +43,17 @@ public class EnergyReaderHandler extends TileHandler {
 	public boolean canConnect(TileEntity te, ForgeDirection dir) {
 		return dir.equals(ForgeDirection.getOrientation(FMPHelper.getMeta(te))) || dir.equals(ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite());
 	}
-
+/*
 	public void setCoords(BlockCoords coords) {
 		if (!BlockCoords.equalCoords(this.coords, coords)) {
 			this.coords = coords;
 		}
 	}
-
+	*/
 	public ILogicInfo currentInfo(TileEntity te) {
-		if (coords != null && stacks != null) {
+		if (primaryInfo.getObject()!=null && primaryInfo.getObject().coords != null && stacks != null) {
 			for (StoredEnergyInfo stack : stacks) {
-				if (stack != null && stack.coords!=null && primaryInfo.getObject() != null && stack.coords.equals(primaryInfo.getObject().coords)) {
+				if (stack != null && stack.coords!=null&& stack.coords.equals(primaryInfo.getObject().coords)) {
 					return stack;
 				}
 			}
@@ -67,18 +66,7 @@ public class EnergyReaderHandler extends TileHandler {
 
 		if (type == SyncType.SAVE || type == SyncType.SYNC)
 			this.primaryInfo.readFromNBT(nbt, type);
-
-		if (type == SyncType.SAVE) {
-			if (nbt.hasKey("coords")) {
-				if (nbt.getCompoundTag("coords").getBoolean("hasCoords")) {
-					coords = BlockCoords.readFromNBT(nbt.getCompoundTag("coords"));
-				} else {
-					coords = null;
-				}
-			}
-		}
 		if (type == SyncType.SPECIAL) {
-
 			if (nbt.hasKey("null")) {
 				this.stacks = new ArrayList();
 				return;
@@ -127,17 +115,6 @@ public class EnergyReaderHandler extends TileHandler {
 		super.writeData(nbt, type);
 		if (type == SyncType.SAVE || type == SyncType.SYNC)
 			this.primaryInfo.writeToNBT(nbt, type);
-
-		if (type == SyncType.SAVE) {
-			NBTTagCompound coordTag = new NBTTagCompound();
-			if (coords != null) {
-				BlockCoords.writeToNBT(coordTag, coords);
-				coordTag.setBoolean("hasCoords", true);
-			} else {
-				coordTag.setBoolean("hasCoords", false);
-			}
-			nbt.setTag("coords", coordTag);
-		}
 		if (type == SyncType.SPECIAL) {
 
 			if (stacks == null) {

@@ -2,8 +2,8 @@ package sonar.logistics.info.providers.tile;
 
 import java.util.List;
 
+import mekanism.api.IEvaporationSolar;
 import mekanism.api.IHeatTransfer;
-import mekanism.api.ISalinationSolar;
 import mekanism.api.energy.IStrictEnergyAcceptor;
 import mekanism.api.energy.IStrictEnergyStorage;
 import mekanism.api.lasers.ILaserReceptor;
@@ -29,7 +29,7 @@ public class MekanismGeneralProvider extends TileProvider {
 	@Override
 	public boolean canProvideInfo(World world, int x, int y, int z, ForgeDirection dir) {
 		TileEntity target = world.getTileEntity(x, y, z);
-		return target != null && (target instanceof IHeatTransfer || target instanceof ISalinationSolar || target instanceof ILaserReceptor || target instanceof IStrictEnergyStorage);
+		return target != null && (target instanceof IHeatTransfer || target instanceof IEvaporationSolar || target instanceof ILaserReceptor || target instanceof IStrictEnergyStorage);
 	}
 
 	@Override
@@ -40,8 +40,8 @@ public class MekanismGeneralProvider extends TileProvider {
 			IHeatTransfer block = (IHeatTransfer) target;
 			infoList.add(new LogicInfo(id, 0, 0, (int) block.getTemp()).addSuffix("degrees"));
 		}
-		if (target instanceof ISalinationSolar) {
-			ISalinationSolar block = (ISalinationSolar) target;
+		if (target instanceof IEvaporationSolar) {
+			IEvaporationSolar block = (IEvaporationSolar) target;
 			infoList.add(new LogicInfo(id, 0, 1, block.seesSun()));
 		}
 		if (target instanceof ILaserReceptor) {

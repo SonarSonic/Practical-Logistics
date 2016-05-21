@@ -23,6 +23,7 @@ public class ManaInfo extends ProgressInfo {
 	public int providerID = -1;
 
 	public ManaInfo() {
+		this.data = " ";
 	}
 
 	public ManaInfo(int providerID, long stored, long max) {

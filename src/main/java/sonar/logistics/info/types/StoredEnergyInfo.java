@@ -244,7 +244,10 @@ public class StoredEnergyInfo extends ILogicInfo<StoredEnergyInfo> {
 
 	@Override
 	public SyncType isMatchingData(StoredEnergyInfo currentInfo) {
-		if (!currentInfo.stack.equals(stack) || !currentInfo.coords.equals(coords)) {
+		if(!currentInfo.coords.equals(coords)){
+			return SyncType.SAVE;
+		}
+		if (!currentInfo.stack.equals(stack)) {
 			return SyncType.SYNC;
 		}
 		return null;
