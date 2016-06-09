@@ -150,6 +150,9 @@ public class GuiFluidReader extends GuiSelectionGrid<StoredFluidStack> {
 			slotField.mouseClicked(i - guiLeft, j - guiTop, k);
 			break;
 		}
+		if(k==1){
+			searchField.setText("");
+		}
 		searchField.mouseClicked(i - guiLeft, j - guiTop, k);
 	}
 

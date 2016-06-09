@@ -49,8 +49,8 @@ public class InfoRenderer extends RenderWrapper {
 		default:
 			return 120F;
 		}
-	}	
-	
+	}
+
 	public double getScale(int sizing) {
 		switch (sizing) {
 		case 0 & 1:

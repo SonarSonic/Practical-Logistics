@@ -6,5 +6,5 @@ import sonar.logistics.api.info.ILogicInfo;
 public interface IInfoReader extends IInfoEmitter {
 
 	/** the secondary info for use with Screens when creating progress bars */
-	public ILogicInfo getSecondaryInfo();
+	public ILogicInfo[] getSelectedInfo();
 }

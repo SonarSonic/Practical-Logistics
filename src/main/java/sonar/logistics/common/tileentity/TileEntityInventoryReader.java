@@ -1,5 +1,7 @@
 package sonar.logistics.common.tileentity;
 
+import net.minecraft.inventory.ISidedInventory;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.util.ForgeDirection;
 import sonar.core.api.BlockCoords;
 import sonar.core.common.tileentity.TileEntityHandlerInventory;
@@ -10,7 +12,7 @@ import sonar.logistics.api.connecting.IInfoEmitter;
 import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.common.handlers.InventoryReaderHandler;
 
-public class TileEntityInventoryReader extends TileEntityHandlerInventory implements IInfoEmitter, IDropInventory {
+public class TileEntityInventoryReader extends TileEntityHandlerInventory implements IInfoEmitter, IDropInventory, ISidedInventory {
 
 	public InventoryReaderHandler handler = new InventoryReaderHandler(true);;
 
@@ -70,6 +72,21 @@ public class TileEntityInventoryReader extends TileEntityHandlerInventory implem
 	@Override
 	public void removeConnections() {
 		LogisticsAPI.getCableHelper().removeConnection(this, ForgeDirection.getOrientation(FMPHelper.getMeta(this)));
+	}
+
+	@Override
+	public int[] getAccessibleSlotsFromSide(int p_94128_1_) {
+		return new int[0];
+	}
+
+	@Override
+	public boolean canInsertItem(int p_102007_1_, ItemStack p_102007_2_, int p_102007_3_) {
+		return false;
+	}
+
+	@Override
+	public boolean canExtractItem(int p_102008_1_, ItemStack p_102008_2_, int p_102008_3_) {
+		return false;
 	}
 
 }

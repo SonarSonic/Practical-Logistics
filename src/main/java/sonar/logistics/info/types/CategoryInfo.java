@@ -48,7 +48,7 @@ public class CategoryInfo extends ILogicInfo<CategoryInfo> {
 
 	@Override
 	public int getDataType() {
-		return 1;
+		return -2;
 	}
 
 	@Override

@@ -1,27 +1,31 @@
 package sonar.logistics.api.wrappers;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import sonar.core.api.StoredFluidStack;
+import sonar.core.api.InventoryHandler.StorageSize;
 import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.connecting.IConnectionNode;
 import sonar.logistics.api.connecting.IEntityNode;
 import sonar.logistics.api.info.ILogicInfo;
+import sonar.logistics.api.wrappers.FluidWrapper.StorageFluids;
 
 public class InfoWrapper {
-
+		
 	/** gets a list of all Info available at a given {@link IConnectionNode}, used by getInfoList(), here if the need should arise
 	 * @param network the {@link INetworkCache} to get info from
 	 * @return list of {@link ILogicInfo} */
-	public List<ILogicInfo> getTileInfo(INetworkCache network) {
-		return Collections.EMPTY_LIST;
+	public ArrayList<ILogicInfo> getTileInfo(INetworkCache network) {
+		return new ArrayList();
 	}
 
 	/** gets a list of all Info available at a given {@link IEntityNode}, useg by getInfoList(), here if the need should arise
 	 * @param network the {@link INetworkCache} to get info from
 	 * @return list of {@link ILogicInfo} */
-	public List<ILogicInfo> getEntityInfo(IEntityNode tileNode) {
-		return Collections.EMPTY_LIST;
+	public ArrayList<ILogicInfo> getEntityInfo(IEntityNode tileNode) {
+		return new ArrayList();
 	}
 
 	/** for updating {@link ILogicInfo}, used by the Info Reader

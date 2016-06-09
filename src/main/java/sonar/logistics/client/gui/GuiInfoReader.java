@@ -21,8 +21,9 @@ import sonar.core.inventory.GuiSonar;
 import sonar.core.inventory.SonarButtons;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.info.ILogicInfo;
-import sonar.logistics.common.containers.ContainerInfoNode;
+import sonar.logistics.common.containers.ContainerInfoReader;
 import sonar.logistics.common.handlers.InfoReaderHandler;
+import sonar.logistics.helpers.InfoHelper;
 import sonar.logistics.info.types.CategoryInfo;
 import sonar.logistics.network.packets.PacketInfoBlock;
 import cpw.mods.fml.relauncher.Side;
@@ -34,7 +35,7 @@ public class GuiInfoReader extends GuiSonar {
 	public InfoReaderHandler handler;
 
 	public GuiInfoReader(InfoReaderHandler handler, TileEntity tile) {
-		super(new ContainerInfoNode(handler, tile), tile);
+		super(new ContainerInfoReader(handler, tile), tile);
 		this.xCoord = tile.xCoord;
 		this.yCoord = tile.yCoord;
 		this.zCoord = tile.zCoord;
@@ -337,7 +338,7 @@ public class GuiInfoReader extends GuiSonar {
 	}
 
 	public List<ILogicInfo> getInfo() {
-		return handler.clientInfo;
+		return InfoHelper.sortInfoList(handler.cachedInfo);
 	}
 
 	public ILogicInfo getPrimaryInfo(){

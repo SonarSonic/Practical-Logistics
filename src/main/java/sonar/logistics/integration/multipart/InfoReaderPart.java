@@ -43,8 +43,8 @@ public class InfoReaderPart extends ConnectionPart implements IInfoEmitter, IInf
 	}
 
 	@Override
-	public ILogicInfo getSecondaryInfo() {
-		return handler.getSecondaryInfo(tile());
+	public ILogicInfo[] getSelectedInfo() {
+		return new ILogicInfo[] { handler.currentInfo(tile()), handler.getSecondaryInfo(tile()) };
 	}
 
 	@Override

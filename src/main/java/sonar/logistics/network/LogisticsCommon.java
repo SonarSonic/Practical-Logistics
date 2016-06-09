@@ -31,7 +31,7 @@ import sonar.logistics.common.containers.ContainerDataReceiver;
 import sonar.logistics.common.containers.ContainerEmptySync;
 import sonar.logistics.common.containers.ContainerFluidReader;
 import sonar.logistics.common.containers.ContainerHammer;
-import sonar.logistics.common.containers.ContainerInfoNode;
+import sonar.logistics.common.containers.ContainerInfoReader;
 import sonar.logistics.common.containers.ContainerInventoryReader;
 import sonar.logistics.common.containers.ContainerItemRouter;
 import sonar.logistics.common.handlers.ArrayHandler;
@@ -92,7 +92,7 @@ public class LogisticsCommon implements IGuiHandler {
 			switch (ID) {
 			case LogisticsGui.infoNode:
 				if (handler != null && handler instanceof InfoReaderHandler)
-					return new ContainerInfoNode((InfoReaderHandler) handler, tile);
+					return new ContainerInfoReader((InfoReaderHandler) handler, tile);
 
 			case LogisticsGui.dataReceiver:
 				if (entity instanceof TileEntityDataReceiver)

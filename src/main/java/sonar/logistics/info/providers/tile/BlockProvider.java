@@ -40,7 +40,7 @@ public class BlockProvider extends TileProvider {
 		int meta = world.getBlockMetadata(x, y, z);
 		ItemStack block = SonarHelper.createStackedBlock(target, meta);
 		if (block != null)
-			infoList.add(new BlockNameInfo(id, 0, 19, meta, block));
+			infoList.add(new BlockNameInfo(id, 0, 19, "ERROR", block));
 		UniqueIdentifier unique = GameRegistry.findUniqueIdentifierFor(target);
 		if (unique != null)
 			infoList.add(new ModidInfo(id, 0, 20, meta, unique));

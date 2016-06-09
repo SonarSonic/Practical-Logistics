@@ -103,7 +103,8 @@ public class ModidInfo extends LogicInfo<ModidInfo> {
 	public SyncType isMatchingData(ModidInfo currentInfo) {
 		SyncType matching = super.isMatchingData(currentInfo);
 		if (matching == null) {
-			return block.equals(((ModidInfo) currentInfo).block) ? SyncType.SYNC : null;
+			
+			return !block.modId.equals(currentInfo.block.modId) || !block.name.equals(currentInfo.block.name) ? SyncType.SYNC : null;
 		}
 		return matching;
 	}

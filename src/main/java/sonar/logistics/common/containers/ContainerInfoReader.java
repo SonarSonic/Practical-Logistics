@@ -5,13 +5,14 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.core.inventory.ContainerSync;
 import sonar.logistics.common.handlers.InfoReaderHandler;
 import sonar.logistics.common.tileentity.TileEntityInfoReader;
 
-public class ContainerInfoNode extends ContainerSync {
+public class ContainerInfoReader extends ContainerSync {
 
-	public ContainerInfoNode(InfoReaderHandler handler, TileEntity tile) {
+	public ContainerInfoReader(InfoReaderHandler handler, TileEntity tile) {
 		super(handler, tile);
 	}
 
@@ -54,4 +55,7 @@ public class ContainerInfoNode extends ContainerSync {
 		return super.slotClick(slot, button, flag, player);
 	}
 
+	public SyncType[] getSyncTypes() {
+		return new SyncType[] { SyncType.SPECIAL };
+	}
 }

@@ -66,7 +66,7 @@ public class PacketProviders extends PacketCoords {
 				if (handler != null && handler instanceof InfoReaderHandler) {
 					InfoReaderHandler reader = (InfoReaderHandler) handler;
 					if (message.info != null) {
-						List<ILogicInfo> newInfo = new ArrayList();
+						ArrayList<ILogicInfo> newInfo = new ArrayList();
 						ILogicInfo lastInfo = null;
 						for (ILogicInfo blockInfo : message.info) {
 							if (lastInfo == null || !lastInfo.getCategory().equals(blockInfo.getCategory())) {
@@ -75,9 +75,9 @@ public class PacketProviders extends PacketCoords {
 							newInfo.add(blockInfo);
 							lastInfo = blockInfo;
 						}
-						reader.clientInfo = newInfo;
+						reader.cachedInfo = newInfo;
 					} else {
-						reader.clientInfo = null;
+						reader.cachedInfo = null;
 					}
 				}
 

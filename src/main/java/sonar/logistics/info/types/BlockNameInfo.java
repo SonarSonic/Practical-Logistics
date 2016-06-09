@@ -33,7 +33,7 @@ public class BlockNameInfo extends LogicInfo<BlockNameInfo> {
 
 	@Override
 	public String getData() {
-		return this.getName();
+		return block.getDisplayName();
 	}
 
 	@Override
@@ -92,9 +92,9 @@ public class BlockNameInfo extends LogicInfo<BlockNameInfo> {
 		if(currentInfo.getProviderID() != this.providerID){
 			return SyncType.SAVE;
 		}
-		if(currentInfo.dataType == dataType || currentInfo.category.equals(category) || currentInfo.subCategory.equals(subCategory) || currentInfo.suffix.equals(suffix) || currentInfo.catID == catID || currentInfo.subCatID == subCatID){
+		if(currentInfo.dataType != dataType || !currentInfo.category.equals(category) || !currentInfo.subCategory.equals(subCategory) || !currentInfo.suffix.equals(suffix) || currentInfo.catID != catID || currentInfo.subCatID != subCatID){
 			return SyncType.SYNC;
 		}
-		return null;
+		return super.isMatchingData(currentInfo);
 	}
 }

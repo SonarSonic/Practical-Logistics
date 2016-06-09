@@ -7,11 +7,12 @@ import sonar.core.SonarCore;
 import sonar.core.api.BlockCoords;
 import sonar.core.common.tileentity.TileEntityHandler;
 import sonar.core.integration.fmp.handlers.TileHandler;
+import sonar.logistics.api.connecting.IInfoScreen;
 import sonar.logistics.api.connecting.IInfoTile;
 import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.common.handlers.DisplayScreenHandler;
 
-public class TileEntityDisplayScreen extends TileEntityHandler implements IInfoTile {
+public class TileEntityDisplayScreen extends TileEntityHandler implements IInfoScreen {
 
 	public DisplayScreenHandler handler = new DisplayScreenHandler(false, this);
 
@@ -26,16 +27,22 @@ public class TileEntityDisplayScreen extends TileEntityHandler implements IInfoT
 	}
 
 	@Override
-	public ILogicInfo currentInfo() {
-		return handler.currentInfo();
+	public ILogicInfo[] getDisplayInfo() {
+		return handler.getDisplayInfo();
 	}
-	
+
+	@Override
+	public ScreenLayout getScreenLayout() {
+		return handler.getScreenLayout();
+	}
+
 	@Override
 	public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity packet) {
 		super.onDataPacket(net, packet);
-		//SonarCore.sendPacketAround(this, 64, 0);
+		for (int i = 0; i < this.handler.dInfo.length; i++)
+			SonarCore.sendPacketAround(this, 64, i+10);
 	}
-	
+
 	public boolean maxRender() {
 		return true;
 	}

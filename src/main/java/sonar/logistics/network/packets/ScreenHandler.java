@@ -44,7 +44,8 @@ public abstract class ScreenHandler<T extends PacketCoords> implements IMessageH
 					}
 					screen.lastClickTime = world.getTotalWorldTime();
 					screen.lastClickUUID = player.getPersistentID();
-					ILogicInfo screenInfo = screen.info;
+					//need to get clicked info instead and dimensions to this...need to have screen layout :)
+					ILogicInfo screenInfo = screen.dInfo[0];
 					if (te instanceof ILargeDisplay) {
 						List<BlockCoords> displays = DisplayRegistry.getScreens(((ILargeDisplay) te).registryID());
 						if (!displays.isEmpty()) {
@@ -55,7 +56,7 @@ public abstract class ScreenHandler<T extends PacketCoords> implements IMessageH
 								if (tilehandler != null && tilehandler instanceof LargeDisplayScreenHandler) {
 									LargeDisplayScreenHandler handlerDisplay = (LargeDisplayScreenHandler) tilehandler;
 									if (handlerDisplay.isHandler.getObject()) {
-										screenInfo = handlerDisplay.info;
+										screenInfo = handlerDisplay.dInfo[0];
 										found = true;
 										break;
 									}

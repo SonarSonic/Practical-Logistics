@@ -28,8 +28,8 @@ public class TileEntityInfoReader extends TileEntityHandler implements IInfoEmit
 	}
 
 	@Override
-	public ILogicInfo getSecondaryInfo() {
-		return handler.getSecondaryInfo(this);
+	public ILogicInfo[] getSelectedInfo() {
+		return new ILogicInfo[] { handler.currentInfo(this), handler.getSecondaryInfo(this) };
 	}
 
 	@Override

@@ -13,7 +13,8 @@ import org.lwjgl.opengl.GL11;
 import sonar.core.helpers.RenderHelper;
 import sonar.core.integration.SonarLoader;
 import sonar.core.integration.fmp.FMPHelper;
-import sonar.logistics.api.connecting.IInfoTile;
+import sonar.logistics.api.connecting.IInfoScreen;
+import sonar.logistics.api.connecting.IInfoScreen.ScreenLayout;
 import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.api.render.ScreenType;
 import sonar.logistics.integration.multipart.DisplayScreenPart;
@@ -69,7 +70,7 @@ public class RenderDisplayScreen extends TileEntitySpecialRenderer {
 		RenderHelper.finishRender();
 
 		final Tessellator tess = Tessellator.instance;
-		
+
 		if (entity.getWorldObj() != null) {
 			GL11.glPushMatrix();
 			GL11.glTranslated(x + 0.5, y + 0.5, z + 0.5);
@@ -89,8 +90,8 @@ public class RenderDisplayScreen extends TileEntitySpecialRenderer {
 		int x = tile.xCoord, y = tile.yCoord, z = tile.zCoord;
 
 		Object screen = FMPHelper.checkObject(tile);
-		if (screen instanceof IInfoTile) {
-			ILogicInfo info = ((IInfoTile) screen).currentInfo();
+		if (screen instanceof IInfoScreen) {
+			ILogicInfo[] info = ((IInfoScreen) screen).getDisplayInfo();
 			if (info == null) {
 				return;
 			}
@@ -127,18 +128,20 @@ public class RenderDisplayScreen extends TileEntitySpecialRenderer {
 				break;
 			}
 			GL11.glDisable(GL11.GL_LIGHTING);
-			renderInfo(tess, tile, d, info);
+			renderInfo(tess, tile, d, info, ((IInfoScreen) screen).getScreenLayout());
 			GL11.glEnable(GL11.GL_LIGHTING);
 
 		}
 
 	}
 
-	public void renderInfo(Tessellator tess, TileEntity tile, ForgeDirection side, ILogicInfo info) {
+	public void renderInfo(Tessellator tess, TileEntity tile, ForgeDirection side, ILogicInfo[] info, ScreenLayout layout) {
 		float pixel = 1.0F / 16F;
-		//GL11.glTranslatef(0.0F, -0.03F, 0F);
-		info.renderInfo(tess, tile, -0.5F + pixel-0.001f, -pixel*3-0.001f, (1.0f - (pixel) * 9)+0.001f, (pixel * 5)+0.061f, -0.207F, ScreenType.NORMAL);
+		float minX = -0.5F + pixel - 0.001f;
+		float minY = -pixel * 3 - 0.001f;
+		float maxX = (1.0f - (pixel) * 9) + 0.001f;
+		float maxY = (pixel * 5) + 0.061f;
+		info[0].renderInfo(tess, tile, minX, minY, maxX, maxY, -0.207F, ScreenType.NORMAL);
 
 	}
-
 }

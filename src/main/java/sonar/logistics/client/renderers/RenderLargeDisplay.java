@@ -13,6 +13,7 @@ import org.lwjgl.opengl.GL11;
 
 import sonar.core.helpers.RenderHelper;
 import sonar.core.integration.fmp.FMPHelper;
+import sonar.logistics.api.connecting.IInfoScreen.ScreenLayout;
 import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.api.render.LargeScreenSizing;
 import sonar.logistics.api.render.ScreenType;
@@ -184,7 +185,7 @@ public class RenderLargeDisplay extends RenderDisplayScreen {
 
 	}
 
-	public void renderInfo(Tessellator tess, TileEntity tile, ForgeDirection side, ILogicInfo info) {
+	public void renderInfo(Tessellator tess, TileEntity tile, ForgeDirection side, ILogicInfo[] info, ScreenLayout layout) {
 		LargeScreenSizing sizing = null;
 		Object target = FMPHelper.getHandler(FMPHelper.checkObject(tile));
 		if (target instanceof LargeDisplayScreenHandler) {
@@ -198,11 +199,11 @@ public class RenderLargeDisplay extends RenderDisplayScreen {
 		}
 		if (sizing == null || sizing.maxH == 0 && sizing.minH == 0 && sizing.maxY == 0 && sizing.minY == 0) {
 			float pixel = 1.0F / 16F;
-			info.renderInfo(tess, tile, -0.5F + pixel, -0.4400F, (1.0f - (pixel) * 9), (pixel * 14), -0.204F, ScreenType.LARGE);
+			info[0].renderInfo(tess, tile, -0.5F + pixel, -0.4400F, (1.0f - (pixel) * 9), (pixel * 14), -0.204F, ScreenType.LARGE);
 
 		} else {
 			float pixel = 1.0F / 16F;
-			info.renderInfo(tess, tile, -0.5F + pixel + (north ? -sizing.maxH : sizing.minH), -0.4400F - sizing.maxY, (1.0f - (pixel) * 9) + (north ? -sizing.minH : sizing.maxH), (pixel * 14) + sizing.minY, -0.204F, ScreenType.CONNECTED);
+			info[0].renderInfo(tess, tile, -0.5F + pixel + (north ? -sizing.maxH : sizing.minH), -0.4400F - sizing.maxY, (1.0f - (pixel) * 9) + (north ? -sizing.minH : sizing.maxH), (pixel * 14) + sizing.minY, -0.204F, ScreenType.CONNECTED);
 
 		}
 	}

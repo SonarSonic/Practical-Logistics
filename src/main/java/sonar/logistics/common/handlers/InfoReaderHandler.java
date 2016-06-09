@@ -6,15 +6,12 @@ import java.util.List;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
-import sonar.core.SonarCore;
 import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.core.integration.IWailaInfo;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.handlers.TileHandler;
-import sonar.core.network.PacketTileSync;
 import sonar.core.network.sync.ISyncPart;
 import sonar.core.network.sync.SyncGeneric;
 import sonar.logistics.Logistics;
@@ -24,7 +21,7 @@ import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.connecting.IEntityNode;
 import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.api.info.LogicInfo;
-import sonar.logistics.info.types.CategoryInfo;
+import sonar.logistics.helpers.InfoHelper;
 
 import com.google.common.collect.Lists;
 
@@ -34,8 +31,10 @@ public class InfoReaderHandler extends TileHandler implements IWailaInfo {
 		super(isMultipart, tile);
 	}
 
-	public List<ILogicInfo> clientInfo;
-	public List<ILogicInfo> lastInfo;
+	public ArrayList<ILogicInfo> cachedInfo = new ArrayList();
+	public ArrayList<ILogicInfo> lastInfo = new ArrayList();
+	// public List<ILogicInfo> clientInfo;
+	// public List<ILogicInfo> lastInfo;
 
 	private int primaryUpdate = 0;
 	private int secondaryUpdate = 0;
@@ -48,6 +47,9 @@ public class InfoReaderHandler extends TileHandler implements IWailaInfo {
 		if (te.getWorldObj().isRemote) {
 			return;
 		}
+		INetworkCache network = LogisticsAPI.getCableHelper().getNetwork(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite());
+		lastInfo = (ArrayList<ILogicInfo>) cachedInfo.clone();
+		cachedInfo = (ArrayList<ILogicInfo>) LogisticsAPI.getInfoHelper().getTileInfo(network).clone();
 		boolean primary = false;
 		boolean secondary = false;
 		if (primaryInfo.getObject() == null || primaryInfo.getObject().updateTicks() == 1 || primaryUpdate >= primaryInfo.getObject().updateTicks()) {
@@ -140,32 +142,10 @@ public class InfoReaderHandler extends TileHandler implements IWailaInfo {
 
 	public void sendAvailableData(TileEntity te, EntityPlayer player) {
 		if (player != null && player instanceof EntityPlayerMP) {
-			INetworkCache network = LogisticsAPI.getCableHelper().getNetwork(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite());
-			List<ILogicInfo> info = new ArrayList();
-			if (!network.getExternalBlocks(true).isEmpty()) {
-				info = LogisticsAPI.getInfoHelper().getTileInfo(network);
-			} else {
-				TileEntity target = network.getFirstTileEntity(CacheTypes.ENTITY_NODES);
-				if (target != null && target instanceof IEntityNode) {
-					info = LogisticsAPI.getInfoHelper().getEntityInfo((IEntityNode) target);
-				}
-			}
-			this.lastInfo = clientInfo;
-			List<ILogicInfo> newInfo = new ArrayList();
-			ILogicInfo lastInfo = null;
-			for (ILogicInfo blockInfo : info) {
-				if (lastInfo == null || !lastInfo.getCategory().equals(blockInfo.getCategory())) {
-					newInfo.add(CategoryInfo.createInfo(blockInfo.getCategory()));
-				}
-				newInfo.add(blockInfo);
-				lastInfo = blockInfo;
-			}
-			clientInfo = newInfo;
-			NBTTagCompound tag = new NBTTagCompound();
-			this.writeData(tag, SyncType.SPECIAL);
-			if (!tag.hasNoTags())
-				SonarCore.network.sendTo(new PacketTileSync(te.xCoord, te.yCoord, te.zCoord, tag, SyncType.SPECIAL), (EntityPlayerMP) player);
-
+			/*
+			 * INetworkCache network = LogisticsAPI.getCableHelper().getNetwork(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite()); List<ILogicInfo> info = new ArrayList(); if (!network.getExternalBlocks(true).isEmpty()) { info = LogisticsAPI.getInfoHelper().getTileInfo(network); } else { TileEntity target = network.getFirstTileEntity(CacheTypes.ENTITY_NODES); if (target != null && target instanceof IEntityNode) { info = LogisticsAPI.getInfoHelper().getEntityInfo((IEntityNode) target); } } this.lastInfo = clientInfo; List<ILogicInfo> newInfo = new ArrayList(); ILogicInfo lastInfo = null; for (ILogicInfo blockInfo : info) { if (lastInfo == null || !lastInfo.getCategory().equals(blockInfo.getCategory())) { newInfo.add(CategoryInfo.createInfo(blockInfo.getCategory())); }
+			 * newInfo.add(blockInfo); lastInfo = blockInfo; } clientInfo = newInfo; NBTTagCompound tag = new NBTTagCompound(); this.writeData(tag, SyncType.SPECIAL); if (!tag.hasNoTags()) SonarCore.network.sendTo(new PacketTileSync(te.xCoord, te.yCoord, te.zCoord, tag, SyncType.SPECIAL), (EntityPlayerMP) player);
+			 */
 		}
 	}
 
@@ -175,38 +155,14 @@ public class InfoReaderHandler extends TileHandler implements IWailaInfo {
 			emptyPrimary = nbt.getBoolean("emptyP");
 			emptySecondary = nbt.getBoolean("emptyS");
 		}
+		if (type == SyncType.SPECIAL || type == SyncType.SYNC) {
+			InfoHelper.readStorageToNBT(nbt, cachedInfo, type);
+			//cachedInfo= InfoHelper.sortInfoList(cachedInfo);
+		}
 		if (type == SyncType.SPECIAL) {
-			if (nbt.hasKey("null")) {
-				this.clientInfo = new ArrayList();
-				return;
-			}
-			NBTTagList list = nbt.getTagList("Info", 10);
-			if (this.clientInfo == null) {
-				this.clientInfo = new ArrayList();
-			}
-			for (int i = 0; i < list.tagCount(); i++) {
-				NBTTagCompound compound = list.getCompoundTagAt(i);
-				int slot = compound.getInteger("Slot");
-				boolean set = slot < clientInfo.size();
-				switch (compound.getByte("f")) {
-				case 0:
-					if (set)
-						clientInfo.set(slot, Logistics.infoTypes.readFromNBT(compound));
-					else
-						clientInfo.add(Logistics.infoTypes.readFromNBT(compound));
-					break;
-				case 1:
-					// clientInfo.get(slot).readUpdate(compound);
-					break;
-				case 2:
-					if (set)
-						clientInfo.set(slot, null);
-					else
-						clientInfo.add(slot, null);
-					break;
-				}
-			}
-
+			/*
+			 * if (nbt.hasKey("null")) { this.clientInfo = new ArrayList(); return; } NBTTagList list = nbt.getTagList("Info", 10); if (this.clientInfo == null) { this.clientInfo = new ArrayList(); } for (int i = 0; i < list.tagCount(); i++) { NBTTagCompound compound = list.getCompoundTagAt(i); int slot = compound.getInteger("Slot"); boolean set = slot < clientInfo.size(); switch (compound.getByte("f")) { case 0: if (set) clientInfo.set(slot, Logistics.infoTypes.readFromNBT(compound)); else clientInfo.add(Logistics.infoTypes.readFromNBT(compound)); break; case 1: // clientInfo.get(slot).readUpdate(compound); break; case 2: if (set) clientInfo.set(slot, null); else clientInfo.add(slot, null); break; } }
+			 */
 		}
 	}
 
@@ -216,56 +172,16 @@ public class InfoReaderHandler extends TileHandler implements IWailaInfo {
 			nbt.setBoolean("emptyP", emptyPrimary);
 			nbt.setBoolean("emptyS", emptySecondary);
 		}
+		if (type == SyncType.SPECIAL || type == SyncType.SYNC) {
+			InfoHelper.writeInfoToNBT(nbt, cachedInfo, lastInfo, type);
+		}
 		if (type == SyncType.SPECIAL) {
-			if (clientInfo == null) {
-				clientInfo = new ArrayList();
-			}
-			if (lastInfo == null) {
-				lastInfo = new ArrayList();
-			}
-			if (this.clientInfo.size() <= 0 && (!(this.lastInfo.size() <= 0))) {
-				nbt.setBoolean("null", true);
-				this.lastInfo = new ArrayList();
-				return;
-			}
-			NBTTagList list = new NBTTagList();
-			int size = Math.max(this.clientInfo.size(), this.lastInfo.size());
-			for (int i = 0; i < size; ++i) {
-				ILogicInfo current = null;
-				ILogicInfo last = null;
-				if (i < this.clientInfo.size()) {
-					current = this.clientInfo.get(i);
-				}
-				if (i < this.lastInfo.size()) {
-					last = this.lastInfo.get(i);
-				}
-				NBTTagCompound compound = new NBTTagCompound();
-				if (current != null) {
-					if (last != null) {
-						//NEEDS FIXING!!!!!!
-						if (!current.equals(last)) {
-							compound.setByte("f", (byte) 0);
-							this.lastInfo.set(i, current);
-							Logistics.infoTypes.writeToNBT(compound, this.clientInfo.get(i));
-						}
-					} else {
-						compound.setByte("f", (byte) 0);
-						this.lastInfo.add(i, current);
-						Logistics.infoTypes.writeToNBT(compound, this.clientInfo.get(i));
-					}
-				} else if (last != null) {
-					this.lastInfo.set(i, null);
-					compound.setByte("f", (byte) 2);
-				}
-				if (!compound.hasNoTags()) {
-					compound.setInteger("Slot", i);
-					list.appendTag(compound);
-				}
-
-				if (list.tagCount() != 0) {
-					nbt.setTag("Info", list);
-				}
-			}
+			/*
+			 * if (clientInfo == null) { clientInfo = new ArrayList(); } if (lastInfo == null) { lastInfo = new ArrayList(); } if (this.clientInfo.size() <= 0 && (!(this.lastInfo.size() <= 0))) { nbt.setBoolean("null", true); this.lastInfo = new ArrayList(); return; } NBTTagList list = new NBTTagList(); int size = Math.max(this.clientInfo.size(), this.lastInfo.size()); for (int i = 0; i < size; ++i) { ILogicInfo current = null; ILogicInfo last = null; if (i < this.clientInfo.size()) { current = this.clientInfo.get(i); } if (i < this.lastInfo.size()) { last = this.lastInfo.get(i); } NBTTagCompound compound = new NBTTagCompound(); if (current != null) { if (last != null) { //NEEDS FIXING!!!!!! if (!current.equals(last)) { compound.setByte("f", (byte) 0); this.lastInfo.set(i, current);
+			 * Logistics.infoTypes.writeToNBT(compound, this.clientInfo.get(i)); } } else { compound.setByte("f", (byte) 0); this.lastInfo.add(i, current); Logistics.infoTypes.writeToNBT(compound, this.clientInfo.get(i)); } } else if (last != null) { this.lastInfo.set(i, null); compound.setByte("f", (byte) 2); } if (!compound.hasNoTags()) { compound.setInteger("Slot", i); list.appendTag(compound); }
+			 * 
+			 * if (list.tagCount() != 0) { nbt.setTag("Info", list); } }
+			 */
 		}
 	}
 
