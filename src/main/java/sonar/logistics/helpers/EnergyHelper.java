@@ -13,14 +13,15 @@ import sonar.core.api.EnergyType;
 import sonar.core.api.StoredEnergyStack;
 import sonar.core.helpers.SonarHelper;
 import sonar.logistics.api.cache.INetworkCache;
+import sonar.logistics.api.info.ILogicInfo;
 import sonar.logistics.api.utils.IdentifiedCoords;
 import sonar.logistics.api.wrappers.EnergyWrapper;
 import sonar.logistics.info.types.StoredEnergyInfo;
 
 public class EnergyHelper extends EnergyWrapper {
 
-	public List<StoredEnergyInfo> getEnergyList(INetworkCache network) {
-		List<StoredEnergyInfo> energyList = new ArrayList();
+	public ArrayList<ILogicInfo> getEnergyList(INetworkCache network) {
+		ArrayList<ILogicInfo> energyList = new ArrayList();
 		Map<BlockCoords, ForgeDirection> connections = network.getExternalBlocks(true);
 		for (Map.Entry<BlockCoords, ForgeDirection> entry : connections.entrySet()) {
 			TileEntity energyTile = entry.getKey().getTileEntity();
@@ -45,8 +46,8 @@ public class EnergyHelper extends EnergyWrapper {
 		return energyList;
 	}
 
-	public List<EnergyHandler> getProviders(EnergyType type) {
-		List<EnergyHandler> providers = new ArrayList();
+	public ArrayList<EnergyHandler> getProviders(EnergyType type) {
+		ArrayList<EnergyHandler> providers = new ArrayList();
 		List<EnergyHandler> handlers = SonarCore.energyProviders.getObjects();
 		for (EnergyHandler provider : handlers) {
 			if (provider.getProvidedType().getName().equals(type.getName())) {

@@ -157,12 +157,6 @@ public class InfoReaderHandler extends TileHandler implements IWailaInfo {
 		}
 		if (type == SyncType.SPECIAL || type == SyncType.SYNC) {
 			InfoHelper.readStorageToNBT(nbt, cachedInfo, type);
-			//cachedInfo= InfoHelper.sortInfoList(cachedInfo);
-		}
-		if (type == SyncType.SPECIAL) {
-			/*
-			 * if (nbt.hasKey("null")) { this.clientInfo = new ArrayList(); return; } NBTTagList list = nbt.getTagList("Info", 10); if (this.clientInfo == null) { this.clientInfo = new ArrayList(); } for (int i = 0; i < list.tagCount(); i++) { NBTTagCompound compound = list.getCompoundTagAt(i); int slot = compound.getInteger("Slot"); boolean set = slot < clientInfo.size(); switch (compound.getByte("f")) { case 0: if (set) clientInfo.set(slot, Logistics.infoTypes.readFromNBT(compound)); else clientInfo.add(Logistics.infoTypes.readFromNBT(compound)); break; case 1: // clientInfo.get(slot).readUpdate(compound); break; case 2: if (set) clientInfo.set(slot, null); else clientInfo.add(slot, null); break; } }
-			 */
 		}
 	}
 
@@ -174,14 +168,6 @@ public class InfoReaderHandler extends TileHandler implements IWailaInfo {
 		}
 		if (type == SyncType.SPECIAL || type == SyncType.SYNC) {
 			InfoHelper.writeInfoToNBT(nbt, cachedInfo, lastInfo, type);
-		}
-		if (type == SyncType.SPECIAL) {
-			/*
-			 * if (clientInfo == null) { clientInfo = new ArrayList(); } if (lastInfo == null) { lastInfo = new ArrayList(); } if (this.clientInfo.size() <= 0 && (!(this.lastInfo.size() <= 0))) { nbt.setBoolean("null", true); this.lastInfo = new ArrayList(); return; } NBTTagList list = new NBTTagList(); int size = Math.max(this.clientInfo.size(), this.lastInfo.size()); for (int i = 0; i < size; ++i) { ILogicInfo current = null; ILogicInfo last = null; if (i < this.clientInfo.size()) { current = this.clientInfo.get(i); } if (i < this.lastInfo.size()) { last = this.lastInfo.get(i); } NBTTagCompound compound = new NBTTagCompound(); if (current != null) { if (last != null) { //NEEDS FIXING!!!!!! if (!current.equals(last)) { compound.setByte("f", (byte) 0); this.lastInfo.set(i, current);
-			 * Logistics.infoTypes.writeToNBT(compound, this.clientInfo.get(i)); } } else { compound.setByte("f", (byte) 0); this.lastInfo.add(i, current); Logistics.infoTypes.writeToNBT(compound, this.clientInfo.get(i)); } } else if (last != null) { this.lastInfo.set(i, null); compound.setByte("f", (byte) 2); } if (!compound.hasNoTags()) { compound.setInteger("Slot", i); list.appendTag(compound); }
-			 * 
-			 * if (list.tagCount() != 0) { nbt.setTag("Info", list); } }
-			 */
 		}
 	}
 

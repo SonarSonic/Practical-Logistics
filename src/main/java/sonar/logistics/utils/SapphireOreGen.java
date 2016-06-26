@@ -15,11 +15,11 @@ public class SapphireOreGen implements IWorldGenerator {
 	@Override
 	public void generate(Random random, int chunkX, int chunkZ, World world, IChunkProvider chunkGenerator, IChunkProvider chunkProvider) {
 		if (world.provider.dimensionId == 0) {
-			this.generateOre(BlockRegistry.sapphire_ore, world, random, chunkX, chunkZ, 2, 10, 25, 1, 100, Blocks.stone);
+			generateOre(BlockRegistry.sapphire_ore, world, random, chunkX, chunkZ, 2, 10, 25, 1, 100, Blocks.stone);
 		}
 	}
 
-	public void generateOre(Block block, World world, Random random, int chunkX, int chunkZ, int minVeinSize, int maxVeinSize, int chance, int minY, int maxY, Block generateIn) {
+	public static void generateOre(Block block, World world, Random random, int chunkX, int chunkZ, int minVeinSize, int maxVeinSize, int chance, int minY, int maxY, Block generateIn) {
 		int veinSize = minVeinSize + random.nextInt(maxVeinSize - minVeinSize);
 		int heightRange = maxY - minY;
 

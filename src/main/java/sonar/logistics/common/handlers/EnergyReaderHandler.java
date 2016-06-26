@@ -1,17 +1,26 @@
 package sonar.logistics.common.handlers;
 
+import io.netty.buffer.ByteBuf;
+
 import java.util.ArrayList;
 import java.util.List;
 
+import cpw.mods.fml.common.network.ByteBufUtils;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
+import sonar.core.SonarCore;
 import sonar.core.api.BlockCoords;
+import sonar.core.api.EnergyType;
+import sonar.core.api.StoredEnergyStack;
 import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.core.integration.fmp.FMPHelper;
 import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.core.network.sync.SyncGeneric;
+import sonar.core.network.sync.SyncTagType;
+import sonar.core.network.sync.SyncTagType.STRING;
+import sonar.core.network.utils.IByteBufTile;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.cache.INetworkCache;
@@ -20,12 +29,16 @@ import sonar.logistics.api.info.LogicInfo;
 import sonar.logistics.helpers.InfoHelper;
 import sonar.logistics.info.types.StoredEnergyInfo;
 
-public class EnergyReaderHandler extends TileHandler {
+public class EnergyReaderHandler extends TileHandler implements IByteBufTile {
 
-	public List<StoredEnergyInfo> stacks;
-	public List<StoredEnergyInfo> lastStacks;
+	// generally assumed to be StoredEnergyInfo
+	public ArrayList<ILogicInfo> stacks = new ArrayList();
+	public ArrayList<ILogicInfo> lastStacks = new ArrayList();
 
-	public SyncGeneric<StoredEnergyInfo> primaryInfo = new SyncGeneric(Logistics.infoTypes, 0);
+	public SyncGeneric<ILogicInfo> primaryInfo = new SyncGeneric(Logistics.infoTypes, 0);
+	// public SyncTagType.STRING energyFormat = (STRING) new SyncTagType.STRING(0).setDefault(EnergyType.RF.getStorageSuffix());
+	public boolean changed = true;
+	public EnergyType energyFormat = EnergyType.RF;
 
 	public EnergyReaderHandler(boolean isMultipart, TileEntity tile) {
 		super(isMultipart, tile);
@@ -37,24 +50,30 @@ public class EnergyReaderHandler extends TileHandler {
 			return;
 		}
 		INetworkCache network = LogisticsAPI.getCableHelper().getNetwork(te, ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite());
-		stacks = LogisticsAPI.getEnergyHelper().getEnergyList(network);
+		lastStacks = (ArrayList<ILogicInfo>) stacks.clone();
+		stacks = (ArrayList<ILogicInfo>) LogisticsAPI.getEnergyHelper().getEnergyList(network).clone();
 	}
 
 	public boolean canConnect(TileEntity te, ForgeDirection dir) {
 		return dir.equals(ForgeDirection.getOrientation(FMPHelper.getMeta(te))) || dir.equals(ForgeDirection.getOrientation(FMPHelper.getMeta(te)).getOpposite());
 	}
-/*
-	public void setCoords(BlockCoords coords) {
-		if (!BlockCoords.equalCoords(this.coords, coords)) {
-			this.coords = coords;
-		}
-	}
-	*/
+
 	public ILogicInfo currentInfo(TileEntity te) {
-		if (primaryInfo.getObject()!=null && primaryInfo.getObject().coords != null && stacks != null) {
-			for (StoredEnergyInfo stack : stacks) {
-				if (stack != null && stack.coords!=null&& stack.coords.equals(primaryInfo.getObject().coords)) {
-					return stack;
+		if (primaryInfo.getObject() != null && primaryInfo.getObject() instanceof StoredEnergyInfo) {
+			StoredEnergyInfo info = (StoredEnergyInfo) primaryInfo.getObject();
+			if (info.coords != null && stacks != null) {
+				for (ILogicInfo stack : stacks) {
+					if (stack != null && stack instanceof StoredEnergyInfo) {
+						StoredEnergyInfo energyInfo = (StoredEnergyInfo) stack;
+						if (energyInfo.coords != null && energyInfo.coords.equals(info.coords)) {
+							if(energyInfo.stack.energyType!=EnergyType.RF){
+								StoredEnergyStack energy = energyInfo.stack.copy();
+								energy.convertEnergyType(EnergyType.RF);
+								return StoredEnergyInfo.createInfo(energyInfo.coords, energy);
+							}							
+							return energyInfo;
+						}
+					}
 				}
 			}
 		}
@@ -63,130 +82,61 @@ public class EnergyReaderHandler extends TileHandler {
 
 	public void readData(NBTTagCompound nbt, SyncType type) {
 		super.readData(nbt, type);
-
-		if (type == SyncType.SAVE || type == SyncType.SYNC)
-			this.primaryInfo.readFromNBT(nbt, type);
-		if (type == SyncType.SPECIAL) {
-			if (nbt.hasKey("null")) {
-				this.stacks = new ArrayList();
-				return;
+		if (nbt.hasKey("EnergyType")) {
+			EnergyType energyType = SonarCore.energyTypes.getEnergyType(nbt.getString("EnergyType"));
+			if (energyType == null) {
+				energyFormat = EnergyType.RF;
+				changed = true;
+			} else {
+				energyFormat = energyType;
 			}
-			NBTTagList list = nbt.getTagList("Stacks", 10);
-			if (this.stacks == null) {
-				this.stacks = new ArrayList();
-			}
-			for (int i = 0; i < list.tagCount(); i++) {
-				NBTTagCompound compound = list.getCompoundTagAt(i);
-				int slot = compound.getInteger("Slot");
-				boolean set = slot < stacks.size();
-				switch (compound.getByte("f")) {
-				case 0:
-					if (set)
-						stacks.set(slot, (StoredEnergyInfo) Logistics.infoTypes.readFromNBT(compound));
-					else
-						stacks.add(slot, (StoredEnergyInfo) Logistics.infoTypes.readFromNBT(compound));
-					break;
-				case 1:
-					stacks.get(slot).readUpdate(compound);
-					break;
-				case 2:
-					if (set)
-						stacks.set(slot, null);
-					else
-						stacks.add(slot, null);
-					break;
-				}
-
-			}
-
 		}
-		if (type == SyncType.SYNC) {
-			NBTTagList list = nbt.getTagList("StoredStacks", 10);
-			this.stacks = new ArrayList();
-			for (int i = 0; i < list.tagCount(); i++) {
-				NBTTagCompound compound = list.getCompoundTagAt(i);
-				this.stacks.add((StoredEnergyInfo) Logistics.infoTypes.readFromNBT(compound));
-
-			}
+		if (type.isType(SyncType.SAVE, SyncType.SYNC)) {
+			primaryInfo.readFromNBT(nbt, type);
+		}
+		if (type == SyncType.SPECIAL || type == SyncType.SYNC) {
+			InfoHelper.readStorageToNBT(nbt, (ArrayList<ILogicInfo>) stacks, type);
 		}
 	}
 
 	public void writeData(NBTTagCompound nbt, SyncType type) {
 		super.writeData(nbt, type);
-		if (type == SyncType.SAVE || type == SyncType.SYNC)
-			this.primaryInfo.writeToNBT(nbt, type);
-		if (type == SyncType.SPECIAL) {
-
-			if (stacks == null) {
-				stacks = new ArrayList();
-			}
-			if (lastStacks == null) {
-				lastStacks = new ArrayList();
-			}
-			if (this.stacks.size() <= 0 && (!(this.lastStacks.size() <= 0))) {
-				nbt.setBoolean("null", true);
-				this.lastStacks = new ArrayList();
-				return;
-			}
-			NBTTagList list = new NBTTagList();
-			int size = Math.max(this.stacks.size(), this.lastStacks.size());
-			for (int i = 0; i < size; ++i) {
-				StoredEnergyInfo current = null;
-				StoredEnergyInfo last = null;
-				if (i < this.stacks.size()) {
-					current = this.stacks.get(i);
-				}
-				if (i < this.lastStacks.size()) {
-					last = this.lastStacks.get(i);
-				}
-				NBTTagCompound compound = new NBTTagCompound();
-				if (current != null) {
-					if (last != null) {
-						if (!last.equals(current)) {
-							this.lastStacks.set(i, current);
-							NBTTagCompound updateTag = compound;
-							last.writeUpdate(current, updateTag);
-							if (!updateTag.hasNoTags()) {
-								compound.setByte("f", (byte) 1);
-								compound = updateTag;
-							}
-							// StoredEnergyStack.writeToNBT(compound,
-							// this.stacks.get(i));
-						}
-					} else {
-						compound.setByte("f", (byte) 0);
-						this.lastStacks.add(i, current);
-						Logistics.infoTypes.writeToNBT(compound, this.stacks.get(i));
-					}
-				} else if (last != null) {
-					this.lastStacks.set(i, null);
-					compound.setByte("f", (byte) 2);
-				}
-				if (!compound.hasNoTags()) {
-					compound.setInteger("Slot", i);
-					list.appendTag(compound);
-				}
-
-			}
-			if (list.tagCount() != 0) {
-				nbt.setTag("Stacks", list);
-			}
-
+		if (changed || type == SyncType.SAVE) {
+			nbt.setString("EnergyType", energyFormat.getStorageSuffix());
+			changed = false;
 		}
-		if (type == SyncType.SYNC) {
-			NBTTagList list = new NBTTagList();
-			if (stacks == null) {
-				stacks = new ArrayList();
-			}
-			for (int i = 0; i < this.stacks.size(); i++) {
-				if (this.stacks.get(i) != null) {
-					NBTTagCompound compound = new NBTTagCompound();
-					Logistics.infoTypes.writeToNBT(compound, this.stacks.get(i));
-					list.appendTag(compound);
+		if (type == SyncType.SAVE || type == SyncType.SYNC) {
+			primaryInfo.writeToNBT(nbt, type);
+		}
+		if (type == SyncType.SPECIAL || type == SyncType.SYNC) {
+			InfoHelper.writeInfoToNBT(nbt, stacks, lastStacks, type);
+		}
+	}
+
+	@Override
+	public void writePacket(ByteBuf buf, int id) {
+	}
+
+	@Override
+	public void readPacket(ByteBuf buf, int id) {
+		if (id == 0) {
+			EnergyType format = SonarCore.energyTypes.getEnergyType(ByteBufUtils.readUTF8String(buf));
+			List<EnergyType> types = SonarCore.energyTypes.getObjects();
+			int i;
+			for (i = 0; i < types.size(); i++) {
+				EnergyType type = types.get(i);
+				if (type.getStorageSuffix().equals(energyFormat)) {
+					if (i + 1 < types.size()) {
+						i = i + 1;
+					} else {
+						i = 0;
+					}
+					break;
 				}
 			}
-
-			nbt.setTag("StoredStacks", list);
+			if (format != null)
+				energyFormat = types.get(i);
+			changed = true;
 		}
 	}
 }
