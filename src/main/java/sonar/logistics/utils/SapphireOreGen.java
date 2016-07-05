@@ -11,11 +11,13 @@ import sonar.logistics.registries.BlockRegistry;
 import cpw.mods.fml.common.IWorldGenerator;
 
 public class SapphireOreGen implements IWorldGenerator {
-
+	public static int sapphireOreveinmin;
+	public static int sapphireOreveinmax;
+	public static int sapphireOreveinchance;
 	@Override
 	public void generate(Random random, int chunkX, int chunkZ, World world, IChunkProvider chunkGenerator, IChunkProvider chunkProvider) {
 		if (world.provider.dimensionId == 0) {
-			generateOre(BlockRegistry.sapphire_ore, world, random, chunkX, chunkZ, 2, 10, 25, 1, 100, Blocks.stone);
+			generateOre(BlockRegistry.sapphire_ore, world, random, chunkX, chunkZ, sapphireOreveinmin, sapphireOreveinmax, sapphireOreveinchance, 1, 100, Blocks.stone);
 		}
 	}
 
