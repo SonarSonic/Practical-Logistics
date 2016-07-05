@@ -22,8 +22,8 @@ public class LogisticsConfig extends Logistics {
 		config.load();
 		sapphireOre = config.getBoolean("Generate Ore", "settings", true, "Sapphire Ore");
 		sapphireOreveinmin = config.get("Minimum sapphire Ore vein size",2).getInt();
-		sapphireOreveinmax = config.get("Maximum sapphire Ore vein size",5).getInt();
-		sapphireOreveinchance = config.get("Maximum sapphire Ore vein chance",5).getInt();
+		sapphireOreveinmax = config.get("Maximum sapphire Ore vein size",10).getInt();
+		sapphireOreveinchance = config.get("Maximum sapphire Ore vein chance",25).getInt();
 		displayMana = config.getBoolean("Mana", "settings", false, "Display Mana Percentage");
 		config.save();
 
