@@ -2,9 +2,8 @@ package sonar.logistics.client.gui;
 
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.StatCollector;
+import sonar.core.client.gui.GuiSonar;
 import sonar.core.helpers.FontHelper;
-import sonar.core.inventory.GuiSonar;
 import sonar.logistics.common.containers.ContainerHammer;
 import sonar.logistics.common.tileentity.TileEntityHammer;
 
@@ -25,7 +24,7 @@ public class GuiHammer extends GuiSonar {
 	@Override
 	public void drawGuiContainerForegroundLayer(int x, int y) {
 		super.drawGuiContainerForegroundLayer(x, y);
-		FontHelper.textCentre(StatCollector.translateToLocal("tile.Hammer.name"), xSize, 6, 0);
+		FontHelper.textCentre(FontHelper.translate("tile.Hammer.name"), xSize, 6, 0);
 	}
 	@Override
 	protected void drawGuiContainerBackgroundLayer(float var1, int var2, int var3) {

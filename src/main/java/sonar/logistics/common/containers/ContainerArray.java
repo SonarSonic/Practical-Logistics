@@ -4,27 +4,25 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import sonar.core.inventory.ContainerSync;
-import sonar.logistics.common.containers.slots.ArraySlot;
-import sonar.logistics.common.handlers.ArrayHandler;
+import sonar.core.inventory.ContainerMultipartSync;
+import sonar.logistics.parts.ArrayPart;
 
-public class ContainerArray extends ContainerSync {
+public class ContainerArray extends ContainerMultipartSync {
 
-	public ContainerArray(InventoryPlayer player, ArrayHandler handler, TileEntity tile) {
-		super(handler, tile);
+	public ContainerArray(EntityPlayer player, ArrayPart part) {
+		super(part);
 		for (int k = 0; k < 8; ++k) {
-			this.addSlotToContainer(new ArraySlot(handler, k, 17 + k * 18, 20));
+			this.addSlotToContainer(new ArraySlot(part, k, 17 + k * 18, 20));
 		}
 
 		for (int j = 0; j < 3; ++j) {
 			for (int k = 0; k < 9; ++k) {
-				this.addSlotToContainer(new Slot(player, k + j * 9 + 9, 8 + k * 18, 51 + j * 18));
+				this.addSlotToContainer(new Slot(player.inventory, k + j * 9 + 9, 8 + k * 18, 51 + j * 18));
 			}
 		}
 
 		for (int j = 0; j < 9; ++j) {
-			this.addSlotToContainer(new Slot(player, j, 8 + j * 18, 109));
+			this.addSlotToContainer(new Slot(player.inventory, j, 8 + j * 18, 109));
 		}
 	}
 
@@ -57,6 +55,20 @@ public class ContainerArray extends ContainerSync {
 	@Override
 	public boolean canInteractWith(EntityPlayer player) {
 		return true;
+	}
+
+	public static class ArraySlot extends Slot {
+
+		ArrayPart part;
+
+		public ArraySlot(ArrayPart part, int index, int x, int y) {
+			super(part.inventory, index, x, y);
+			this.part = part;
+		}
+
+		public boolean isItemValid(ItemStack stack) {
+			return part.inventory.isItemValidForSlot(this.getSlotIndex(), stack);
+		}
 	}
 
 }

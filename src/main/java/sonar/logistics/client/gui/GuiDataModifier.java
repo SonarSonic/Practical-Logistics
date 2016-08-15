@@ -1,15 +1,15 @@
 package sonar.logistics.client.gui;
 
-import net.minecraft.client.gui.GuiTextField;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ResourceLocation;
+import java.io.IOException;
 
 import org.lwjgl.input.Keyboard;
 
+import net.minecraft.client.gui.GuiTextField;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ResourceLocation;
 import sonar.core.SonarCore;
+import sonar.core.client.gui.GuiSonar;
 import sonar.core.helpers.FontHelper;
-import sonar.core.inventory.GuiSonar;
-import sonar.core.network.PacketTextField;
 import sonar.logistics.common.containers.ContainerEmptySync;
 import sonar.logistics.common.handlers.DataModifierHandler;
 
@@ -35,15 +35,15 @@ public class GuiDataModifier extends GuiSonar {
 		this.ySize = 80;
 		this.guiLeft = (this.width - this.xSize) / 2;
 		this.guiTop = (this.height - this.ySize) / 2;
-		subCategory = new GuiTextField(this.fontRendererObj, 42, 20, 126, 12);
+		subCategory = new GuiTextField(0, this.fontRendererObj, 42, 20, 126, 12);
 		subCategory.setMaxStringLength(21);
 		subCategory.setText(this.getText(0));
 
-		prefix = new GuiTextField(this.fontRendererObj, 42, 40, 126, 12);
+		prefix = new GuiTextField(1, this.fontRendererObj, 42, 40, 126, 12);
 		prefix.setMaxStringLength(21);
 		prefix.setText(this.getText(1));
 
-		suffix = new GuiTextField(this.fontRendererObj, 42, 60, 126, 12);
+		suffix = new GuiTextField(2, this.fontRendererObj, 42, 60, 126, 12);
 		suffix.setMaxStringLength(21);
 		suffix.setText(this.getText(2));
 	}
@@ -62,7 +62,11 @@ public class GuiDataModifier extends GuiSonar {
 
 	@Override
 	protected void mouseClicked(int i, int j, int k) {
-		super.mouseClicked(i, j, k);
+		try {
+			super.mouseClicked(i, j, k);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		subCategory.mouseClicked(i - guiLeft, j - guiTop, k);
 		prefix.mouseClicked(i - guiLeft, j - guiTop, k);
 		suffix.mouseClicked(i - guiLeft, j - guiTop, k);
@@ -110,7 +114,11 @@ public class GuiDataModifier extends GuiSonar {
 
 			}
 		} else {
-			super.keyTyped(c, i);
+			try {
+				super.keyTyped(c, i);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -131,7 +139,7 @@ public class GuiDataModifier extends GuiSonar {
 	}
 
 	public void setString(String string, int id) {
-		SonarCore.network.sendToServer(new PacketTextField(string, entity.xCoord, entity.yCoord, entity.zCoord, id));
+		SonarCore.sendPacketToServer(entity, string, id);
 		switch (id) {
 		case 1:
 			handler.prefix.setObject(string);

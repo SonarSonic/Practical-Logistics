@@ -6,50 +6,40 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.common.registry.GameRegistry.UniqueIdentifier;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import sonar.core.SonarCore;
-import sonar.core.api.ActionType;
-import sonar.core.api.BlockCoords;
-import sonar.core.api.InventoryHandler;
-import sonar.core.api.InventoryHandler.StorageSize;
 import sonar.core.api.SonarAPI;
-import sonar.core.api.StoredItemStack;
-import sonar.core.helpers.NBTHelper.SyncType;
+import sonar.core.api.StorageSize;
+import sonar.core.api.inventories.InventoryHandler;
+import sonar.core.api.inventories.StoredItemStack;
+import sonar.core.api.utils.ActionType;
+import sonar.core.api.utils.BlockCoords;
 import sonar.core.network.PacketInvUpdate;
+import sonar.core.utils.SortingDirection;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.cache.CacheTypes;
 import sonar.logistics.api.cache.INetworkCache;
-import sonar.logistics.api.cache.IStorageCache;
 import sonar.logistics.api.connecting.IEntityNode;
+import sonar.logistics.api.readers.InventoryReader.SortingType;
 import sonar.logistics.api.wrappers.ItemWrapper;
+import sonar.logistics.monitoring.MonitoredItemStack;
 
 public class ItemHelper extends ItemWrapper {
 
-	public StorageItems getItems(INetworkCache network) {
-		if (network instanceof IStorageCache) {
-			return ((IStorageCache) network).getStoredItems();
-		}
-		return StorageItems.EMPTY;
-	}
-
-	public StorageSize getTileInventory(List<StoredItemStack> storedStacks, StorageSize storage, Map<BlockCoords, ForgeDirection> connections) {
-		for (Map.Entry<BlockCoords, ForgeDirection> entry : connections.entrySet()) {
+	public StorageSize getTileInventory(List<StoredItemStack> storedStacks, StorageSize storage, Map<BlockCoords, EnumFacing> connections) {
+		for (Map.Entry<BlockCoords, EnumFacing> entry : connections.entrySet()) {
 			storage = getTileInventory(storedStacks, storage, entry);
 		}
 		return storage;
 	}
 
-	public StorageSize getTileInventory(List<StoredItemStack> storedStacks, StorageSize storage, Entry<BlockCoords, ForgeDirection> entry) {
+	public StorageSize getTileInventory(List<StoredItemStack> storedStacks, StorageSize storage, Entry<BlockCoords, EnumFacing> entry) {
 		TileEntity tile = entry.getKey().getTileEntity();
 		if (tile == null) {
 			return storage;
@@ -87,8 +77,8 @@ public class ItemHelper extends ItemWrapper {
 	}
 
 	public StoredItemStack addItems(StoredItemStack add, INetworkCache network, ActionType action) {
-		Map<BlockCoords, ForgeDirection> connections = network.getExternalBlocks(true);
-		for (Map.Entry<BlockCoords, ForgeDirection> entry : connections.entrySet()) {
+		Map<BlockCoords, EnumFacing> connections = network.getExternalBlocks(true);
+		for (Map.Entry<BlockCoords, EnumFacing> entry : connections.entrySet()) {
 			TileEntity tile = entry.getKey().getTileEntity();
 			for (InventoryHandler provider : SonarCore.inventoryProviders.getObjects()) {
 				if (provider.canHandleItems(tile, entry.getValue())) {
@@ -103,8 +93,8 @@ public class ItemHelper extends ItemWrapper {
 	}
 
 	public StoredItemStack removeItems(StoredItemStack remove, INetworkCache network, ActionType action) {
-		Map<BlockCoords, ForgeDirection> connections = network.getExternalBlocks(true);
-		for (Map.Entry<BlockCoords, ForgeDirection> entry : connections.entrySet()) {
+		Map<BlockCoords, EnumFacing> connections = network.getExternalBlocks(true);
+		for (Map.Entry<BlockCoords, EnumFacing> entry : connections.entrySet()) {
 			TileEntity tile = entry.getKey().getTileEntity();
 			for (InventoryHandler provider : SonarCore.inventoryProviders.getObjects()) {
 				if (provider.canHandleItems(tile, entry.getValue())) {
@@ -119,7 +109,7 @@ public class ItemHelper extends ItemWrapper {
 	}
 
 	public StoredItemStack getStack(INetworkCache network, int slot) {
-		Entry<BlockCoords, ForgeDirection> block = network.getExternalBlock(true);
+		Entry<BlockCoords, EnumFacing> block = network.getExternalBlock(true);
 		StoredItemStack stack = getTileStack(network, slot);
 		if (stack == null) {
 			network.getFirstConnection(CacheTypes.EMITTER);
@@ -156,8 +146,8 @@ public class ItemHelper extends ItemWrapper {
 	}
 
 	public StoredItemStack getTileStack(INetworkCache network, int slot) {
-		Map<BlockCoords, ForgeDirection> connections = network.getExternalBlocks(true);
-		for (Map.Entry<BlockCoords, ForgeDirection> entry : connections.entrySet()) {
+		Map<BlockCoords, EnumFacing> connections = network.getExternalBlocks(true);
+		for (Map.Entry<BlockCoords, EnumFacing> entry : connections.entrySet()) {
 			for (InventoryHandler provider : SonarCore.inventoryProviders.getObjects()) {
 				TileEntity tile = entry.getKey().getTileEntity();
 				if (tile != null && provider.canHandleItems(tile, entry.getValue())) {
@@ -339,99 +329,9 @@ public class ItemHelper extends ItemWrapper {
 			player.inventory.setInventorySlotContents(slot, add);
 		}
 	}
-
-	public static boolean writeStorageToNBT(NBTTagCompound tag, boolean lastWasNull, StorageItems stacks, SyncType type) {
-		if (type == SyncType.SYNC) {
-			NBTTagList list = new NBTTagList();
-			for (int i = 0; i < stacks.items.size(); i++) {
-				if (stacks.items.get(i) != null) {
-					NBTTagCompound compound = new NBTTagCompound();
-					StoredItemStack.writeToNBT(compound, stacks.items.get(i));
-					list.appendTag(compound);
-				}
-			}
-			if (list.tagCount() != 0) {
-				tag.setTag("c", list);
-				return false;
-			} else {
-				tag.setBoolean("n", true);
-				return true;
-			}
-		} else if (type == SyncType.SPECIAL) {
-			if ((stacks.items == null || stacks.items.isEmpty())) {
-				if (!lastWasNull)
-					tag.setBoolean("n", true);
-				return true;
-			}
-			NBTTagList list = new NBTTagList();
-			for (int l = 0; l < 2; l++) {
-				ArrayList<StoredItemStack> stackList = null;
-				switch (l) {
-				case 0:
-					stackList = stacks.changed;
-					break;
-				case 1:
-					stackList = stacks.removed;
-					break;
-				}
-				for (int i = 0; i < stackList.size(); i++) {
-					if (stackList.get(i) != null) {
-						NBTTagCompound compound = new NBTTagCompound();
-						if (l == 1) {
-							compound.setBoolean("r", true);
-						}
-						StoredItemStack.writeToNBT(compound, stackList.get(i));
-						list.appendTag(compound);
-					}
-				}
-			}
-			if (list.tagCount() != 0) {
-				tag.setTag("s", list);
-			}
-		}
-		return false;
-	}
-
-	public static void readStorageToNBT(NBTTagCompound tag, ArrayList<StoredItemStack> current, SyncType type) {
-		if (tag.hasKey("n")) {
-			current.clear();
-			return;
-		}
-		if (type == SyncType.SYNC) {
-			if(!tag.hasKey("c")){
-				return;
-			}
-			NBTTagList list = tag.getTagList("c", 10);
-			current.clear();
-			for (int i = 0; i < list.tagCount(); i++) {
-				NBTTagCompound compound = list.getCompoundTagAt(i);
-				current.add(StoredItemStack.readFromNBT(compound));
-			}
-		} else if (type == SyncType.SPECIAL) {
-			if(!tag.hasKey("s")){
-				return;
-			}
-			NBTTagList list = tag.getTagList("s", 10);
-			tags: for (int i = 0; i < list.tagCount(); i++) {
-				NBTTagCompound compound = list.getCompoundTagAt(i);
-				StoredItemStack stack = StoredItemStack.readFromNBT(compound);
-				for (StoredItemStack stored : (ArrayList<StoredItemStack>) current.clone()) {
-					if (stored.equalStack(stack.getItemStack())) {
-						if (compound.getBoolean("r")) {
-							current.remove(stored);
-						} else {
-							stored.setStackSize(stack.getStackSize());
-						}
-						continue tags;
-					}
-				}
-				current.add(stack);
-			}
-		}
-	}
-
-	public static void sortItemList(ArrayList<StoredItemStack> current, final SortingDirection dir, SortingType type) {
-		current.sort(new Comparator<StoredItemStack>() {
+	
+	public static void sortItemList(ArrayList<MonitoredItemStack> info, final SortingDirection dir, SortingType type) {
+		info.sort(new Comparator<StoredItemStack>() {
 			public int compare(StoredItemStack str1, StoredItemStack str2) {
 				int res = String.CASE_INSENSITIVE_ORDER.compare(str1.getItemStack().getDisplayName(), str2.getItemStack().getDisplayName());
 				if (res == 0) {
@@ -443,7 +343,7 @@ public class ItemHelper extends ItemWrapper {
 
 		switch (type) {
 		case STORED:
-			current.sort(new Comparator<StoredItemStack>() {
+			info.sort(new Comparator<StoredItemStack>() {
 				public int compare(StoredItemStack str1, StoredItemStack str2) {
 					if (str1.stored < str2.stored)
 						return dir == SortingDirection.DOWN ? 1 : -1;
@@ -454,13 +354,13 @@ public class ItemHelper extends ItemWrapper {
 			});
 			break;
 		case MODID:
-			current.sort(new Comparator<StoredItemStack>() {
+			info.sort(new Comparator<StoredItemStack>() {
 				public int compare(StoredItemStack str1, StoredItemStack str2) {
-					UniqueIdentifier ui1 = GameRegistry.findUniqueIdentifierFor(str1.getItemStack().getItem());
-					UniqueIdentifier ui2 = GameRegistry.findUniqueIdentifierFor(str2.getItemStack().getItem());
-					int res = String.CASE_INSENSITIVE_ORDER.compare(ui1.modId, ui2.modId);
+					String modid1 =  str1.getItemStack().getItem().getRegistryName().getResourceDomain();
+					String modid2 =  str2.getItemStack().getItem().getRegistryName().getResourceDomain();
+					int res = String.CASE_INSENSITIVE_ORDER.compare(modid1, modid2);
 					if (res == 0) {
-						res = ui1.modId.compareTo(ui2.modId);
+						res = modid1.compareTo(modid2);
 					}
 					return dir == SortingDirection.DOWN ? res : -res;
 				}

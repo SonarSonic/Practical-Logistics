@@ -3,21 +3,21 @@ package sonar.logistics.common.blocks;
 import java.util.Random;
 
 import net.minecraft.block.BlockOre;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.Item;
-import net.minecraft.util.MathHelper;
-import net.minecraft.world.IBlockAccess;
-import sonar.logistics.registries.ItemRegistry;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
+import sonar.core.SonarCore;
+import sonar.logistics.LogisticsItems;
 
 public class BlockSapphireOre extends BlockOre {
-
-	private Random rand = new Random();
 
 	public BlockSapphireOre() {
 		setHarvestLevel("pickaxe", 2);
 	}
 
 	public Item getItemDropped(int meta, Random rand, int fortune) {
-		return ItemRegistry.sapphire;
+		return LogisticsItems.sapphire;
 	}
 
 	public int quantityDropped(Random rand) {
@@ -25,7 +25,7 @@ public class BlockSapphireOre extends BlockOre {
 	}
 
 	@Override
-	public int getExpDrop(IBlockAccess world, int meta, int fortune) {
-		return MathHelper.getRandomIntegerInRange(rand, 1, 3);
+	public int getExpDrop(IBlockState state, net.minecraft.world.IBlockAccess world, BlockPos pos, int fortune) {
+		return MathHelper.getRandomIntegerInRange(SonarCore.rand, 1, 3);
 	}
 }

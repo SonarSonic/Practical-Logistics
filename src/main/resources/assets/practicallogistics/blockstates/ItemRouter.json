@@ -1,0 +1,50 @@
+{
+	"forge_marker": 1,
+	"defaults": {
+        "model": "practicallogistics:ItemRouter",
+		"textures": {
+			"0": "practicallogistics:model/item_router",
+            "north": "practicallogistics:model/item_input",
+            "east": "practicallogistics:model/item_input",
+            "south": "practicallogistics:model/item_input",
+            "west": "practicallogistics:model/item_input",
+            "up": "practicallogistics:model/item_input",
+            "down": "practicallogistics:model/item_input",
+			"particle": "practicallogistics:blocks/data_cable"
+		},
+		"transform": "forge:default-block"
+	},
+	"variants": {
+		"inventory": [{}],
+		"north": {
+			"input": {"textures": {"north": "practicallogistics:model/item_input"}},
+			"output": {"textures": {"north": "practicallogistics:model/item_output"}},
+            "none": {"textures": {"north": "practicallogistics:model/item_none"}}
+		},
+        "east": {
+            "input": {"textures": {"east": "practicallogistics:model/item_input"}},
+            "output": {"textures": {"east": "practicallogistics:model/item_output"}},
+            "none": {"textures": {"east": "practicallogistics:model/item_none"}}
+        },
+        "south": {
+            "input": {"textures": {"south": "practicallogistics:model/item_input"}},
+            "output": {"textures": {"south": "practicallogistics:model/item_output"}},
+            "none": {"textures": {"south": "practicallogistics:model/item_none"}}
+        },
+        "west": {
+            "input": {"textures": {"west": "practicallogistics:model/item_input"}},
+            "output": {"textures": {"west": "practicallogistics:model/item_output"}},
+            "none": {"textures": {"west": "practicallogistics:model/item_none"}}
+        },
+        "up": {
+            "input": {"textures": {"up": "practicallogistics:model/item_input"}},
+            "output": {"textures": {"up": "practicallogistics:model/item_output"}},
+            "none": {"textures": {"up": "practicallogistics:model/item_none"}}
+        },
+        "down": {
+            "input": {"textures": {"down": "practicallogistics:model/item_input"}},
+            "output": {"textures": {"down": "practicallogistics:model/item_output"}},
+            "none": {"textures": {"down": "practicallogistics:model/item_none"}}
+        }	
+	}
+}

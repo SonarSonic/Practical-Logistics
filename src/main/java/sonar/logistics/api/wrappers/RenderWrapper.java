@@ -1,20 +1,20 @@
 package sonar.logistics.api.wrappers;
 
-import sonar.logistics.api.info.ILogicInfo;
-import sonar.logistics.api.info.LogicInfo;
+import sonar.logistics.api.info.DEADILogicInfo;
+import sonar.logistics.api.info.DEADLogicInfo;
 import sonar.logistics.api.render.ScreenType;
 
 public class RenderWrapper {
 
-	/** used for rendering {@link LogicInfo} and sometimes for other Info Types to
-	 * @param info the {@link ILogicInfo} to render
+	/** used for rendering {@link DEADLogicInfo} and sometimes for other Info Types to
+	 * @param info the {@link DEADILogicInfo} to render
 	 * @param minX screen start X
 	 * @param minY screen start Y
 	 * @param maxX screen finish X
 	 * @param maxY screen finish Y
 	 * @param zOffset screen offset
 	 * @param type screen scaling */
-	public void renderStandardInfo(ILogicInfo info, float minX, float minY, float maxX, float maxY, float zOffset, ScreenType type) {
+	public void renderStandardInfo(DEADILogicInfo info, float minX, float minY, float maxX, float maxY, float zOffset, ScreenType type) {
 	}
 
 	/** renders a string in the centre of the screen
@@ -25,7 +25,7 @@ public class RenderWrapper {
 	 * @param maxY screen finish Y
 	 * @param zOffset screen offset
 	 * @param type the {@link ScreenType} */
-	public void renderCenteredString(String string, float minX, float minY, float maxX, float maxY, ScreenType type) {
+	public void renderCenteredString(String string, float x, float y, float width, float scale, int color) {
 	}
 
 	/** gets the appropriate scaling for the given {@link ScreenType}

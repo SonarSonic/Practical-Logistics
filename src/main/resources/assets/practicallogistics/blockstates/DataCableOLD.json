@@ -1,0 +1,55 @@
+{
+    "forge_marker": 1,
+    "defaults": {
+        "model":"practicallogistics:CableCentre",
+        "textures": {
+            "0":"practicallogistics:model/cable_types",
+            "particle":"practicallogistics:blocks/data_cable"
+        }
+     },
+    "variants": {
+        "inventory": [{}],                
+         "north":{
+            "cable":{"submodel": {"north": { "model":"practicallogistics:CableConnector", "x": 90, "y": 180 }}},
+            "internal":{"submodel": {"north": { "model":"practicallogistics:CableConnector_Internal", "x": 90, "y": 180 }}},
+            "half":{"submodel": {"north": { "model":"practicallogistics:CableConnector_Half", "x": 90, "y": 180 }}},
+            "block":{"submodel": {"north": { "model":"practicallogistics:CableConnector_Block", "x": 90, "y": 180 }}},
+            "none":{}
+        },
+        "east":{
+            "cable":{"submodel": {"east": { "model":"practicallogistics:CableConnector", "x": 90, "y": 270 }}},
+            "internal":{"submodel": {"east": { "model":"practicallogistics:CableConnector_Internal", "x": 90, "y": 270 }}},
+            "half":{"submodel": {"east": { "model":"practicallogistics:CableConnector_Half", "x": 90, "y": 270 }}},
+            "block":{"submodel": {"east": { "model":"practicallogistics:CableConnector_Block", "x": 90, "y": 270 }}},
+            "none":{}
+        },
+        "south":{
+            "cable":{"submodel": {"south": { "model":"practicallogistics:CableConnector", "x": 90, "y": 0 }}},
+            "internal":{"submodel": {"south": { "model":"practicallogistics:CableConnector_Internal", "x": 90, "y": 0 }}},
+            "half":{"submodel": {"south": { "model":"practicallogistics:CableConnector_Half", "x": 90, "y": 0 }}},
+            "block":{"submodel": {"south": { "model":"practicallogistics:CableConnector_Block", "x": 90, "y": 0 }}},
+            "none":{}
+        },
+        "west":{
+            "cable":{"submodel": {"west": { "model":"practicallogistics:CableConnector", "x": 90, "y": 90 }}},
+            "internal":{"submodel": {"west": { "model":"practicallogistics:CableConnector_Internal", "x": 90, "y": 90 }}},
+            "half":{"submodel": {"west": { "model":"practicallogistics:CableConnector_Half", "x": 90, "y": 90 }}},
+            "block":{"submodel": {"west": { "model":"practicallogistics:CableConnector_Block", "x": 90, "y": 90 }}},
+            "none":{}
+        },
+        "down":{
+            "cable":{"submodel": {"down": { "model":"practicallogistics:CableConnector"}}},
+            "internal":{"submodel": {"down": { "model":"practicallogistics:CableConnector_Internal"}}},
+            "half":{"submodel": {"down": { "model":"practicallogistics:CableConnector_Half"}}},
+            "block":{"submodel": {"down": { "model":"practicallogistics:CableConnector_Block"}}},
+            "none":{}
+        },
+        "up":{
+            "cable":{"submodel": {"up": { "model":"practicallogistics:CableConnector", "x": 180}}},
+            "internal":{"submodel": {"up": { "model":"practicallogistics:CableConnector_Internal", "x": 180}}},
+            "half":{"submodel": {"up": { "model":"practicallogistics:CableConnector_Half", "x": 180}}},
+            "block":{"submodel": {"up": { "model":"practicallogistics:CableConnector_Block", "x": 180}}},
+            "none":{}
+        }
+    }
+}

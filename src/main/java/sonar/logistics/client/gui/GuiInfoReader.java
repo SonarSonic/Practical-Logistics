@@ -1,54 +1,79 @@
 package sonar.logistics.client.gui;
 
-import java.awt.Color;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiButton;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.StatCollector;
-import net.minecraftforge.client.event.GuiScreenEvent.ActionPerformedEvent;
-import net.minecraftforge.common.MinecraftForge;
-
 import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.client.renderer.RenderItem;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.client.event.GuiScreenEvent.ActionPerformedEvent;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+import sonar.core.client.gui.SonarButtons.ImageButton;
+import sonar.core.client.gui.widgets.SonarScroller;
 import sonar.core.helpers.FontHelper;
-import sonar.core.inventory.GuiSonar;
-import sonar.core.inventory.SonarButtons;
+import sonar.core.helpers.RenderHelper;
+import sonar.core.helpers.SonarHelper;
 import sonar.logistics.Logistics;
-import sonar.logistics.api.info.ILogicInfo;
+import sonar.logistics.LogisticsItems;
+import sonar.logistics.api.info.monitor.IMonitorInfo;
+import sonar.logistics.api.info.monitor.MonitorType;
+import sonar.logistics.client.RenderBlockSelection;
 import sonar.logistics.common.containers.ContainerInfoReader;
-import sonar.logistics.common.handlers.InfoReaderHandler;
-import sonar.logistics.helpers.InfoHelper;
-import sonar.logistics.info.types.CategoryInfo;
-import sonar.logistics.network.packets.PacketInfoBlock;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import sonar.logistics.connections.CacheRegistry;
+import sonar.logistics.connections.MonitoredList;
+import sonar.logistics.helpers.InfoRenderer;
+import sonar.logistics.monitoring.MonitoredBlockCoords;
+import sonar.logistics.network.PacketMonitorType;
+import sonar.logistics.parts.InfoReaderPart;
+import sonar.logistics.parts.MonitorMultipart;
 
-public class GuiInfoReader extends GuiSonar {
+public class GuiInfoReader extends GuiLogistics {
 
-	public int xCoord, yCoord, zCoord;
-	public InfoReaderHandler handler;
+	public BlockPos pos;
+	public MonitorMultipart part;
 
-	public GuiInfoReader(InfoReaderHandler handler, TileEntity tile) {
-		super(new ContainerInfoReader(handler, tile), tile);
-		this.xCoord = tile.xCoord;
-		this.yCoord = tile.yCoord;
-		this.zCoord = tile.zCoord;
-		this.handler = handler;
+	public GuiInfoReader(EntityPlayer player, InfoReaderPart part) {
+		super(new ContainerInfoReader(player, part), part);
+		this.pos = part.getPos();
+		this.part = part;
 	}
 
-	public static final ResourceLocation bground = new ResourceLocation("PracticalLogistics:textures/gui/infoselect.png");
-
-	private float currentScroll;
-	private boolean isScrolling;
-	private boolean wasClicking;
-	public int scrollerLeft, scrollerStart, scrollerEnd, scrollerWidth;
+	private int size = 11;
+	public int start, finish;
 	private GuiButton rselectButton;
+	public ArrayList<IMonitorInfo> infoList = new ArrayList();
+	public ArrayList<IMonitorInfo> coords = new ArrayList();
+	public GuiState state = GuiState.INFO;
+
+	public enum GuiState {
+		INFO(MonitorType.INFO), CHANNEL(MonitorType.CHANNEL);
+
+		public String getButtonString() {
+			return this == INFO ? "Configure Channel" : "Configure Data";
+		}
+
+		public MonitorType type;
+
+		GuiState(MonitorType type) {
+			this.type = type;
+		}
+	}
+
+	public ItemStack getButtonStack() {
+		return state == GuiState.INFO ? new ItemStack(LogisticsItems.partNode, 1) : part.getItemStack();
+	}
 
 	@Override
 	public void initGui() {
@@ -56,169 +81,143 @@ public class GuiInfoReader extends GuiSonar {
 		this.mc.thePlayer.openContainer = this.inventorySlots;
 		this.xSize = 176 + 72;
 		this.ySize = 166;
-
 		this.guiLeft = (this.width - this.xSize) / 2;
 		this.guiTop = (this.height - this.ySize) / 2;
-		scrollerLeft = this.guiLeft + 164 + 72;
-		scrollerStart = this.guiTop + 29;
-		scrollerEnd = scrollerStart + 134;
-		scrollerWidth = 10;
-		for (int i = 0; i < 11; i++) {
-			this.buttonList.add(new NetworkButton(10 + i, guiLeft + 7, guiTop + 29 + (i * 12)));
+		scroller = new SonarScroller(this.guiLeft + 164 + 71, this.guiTop + 29, 134, 10);
+		for (int i = 0; i < size; i++) {
+			this.buttonList.add(new SelectionButton(10 + i, guiLeft + 7, guiTop + 29 + (i * 12)));
 		}
 	}
 
-	public int getDataPosition() {
-		if (getPrimaryInfo() == null) {
-			return -1;
-		}
-		if (getInfo() == null) {
-			return -1;
-		}
-		int start = (int) (infoSize() * this.currentScroll);
-		int finish = Math.min(start + 11, infoSize());
-		for (int i = start; i < finish; i++) {
-			if (getInfo().get(i) != null) {
-				ILogicInfo info = getInfo().get(i);
-				if (info != null) {
-					if (info.isMatchingInfo(getPrimaryInfo())) {
-						return i - start;
+	public int getColour(int i) {
+		switch (state) {
+		case CHANNEL:
+			// MonitoredBlockCoords coordIndo = (MonitoredBlockCoords) coords.get(i + start);
+			return selectedColour;
+		case INFO:
+			IMonitorInfo info = infoList.get(i + start);
+			if (info == null || info.isHeader()) {
+				return grey_base;
+			}
+			ArrayList<IMonitorInfo> selectedInfo = part.getSelectedInfo();
+			int pos = 0;
+			for (IMonitorInfo selected : selectedInfo) {
+				if (selected != null && !selected.isHeader() && info.isMatchingType(selected) && info.isMatchingInfo(selected)) {
+					switch (pos) {
+					case 0:
+						return selectedColour;
+					case 1:
+						return selectedColour2;
+					case 2:
+						return selectedColour3;
+					case 3:
+						return selectedColour4;
 					}
 				}
+				pos++;
 			}
+			return grey_base;
+		default:
+			return grey_base;
+
 		}
-		return -1;
 	}
 
-	public int getSecondaryPosition() {
-		if (getSecondInfo() == null) {
-			return -1;
+	public ArrayList<Integer> getDataPositions() {
+		ArrayList<Integer> pos = new ArrayList();
+		ArrayList<IMonitorInfo> selectedInfo = part.getSelectedInfo();
+		if (getCurrentList() == null || (state != GuiState.CHANNEL && selectedInfo.isEmpty())) {
+			return pos;
 		}
-		if (getInfo() == null) {
-			return -1;
-		}
-		int start = (int) (infoSize() * this.currentScroll);
-		int finish = Math.min(start + 11, infoSize());
 		for (int i = start; i < finish; i++) {
-			if (getInfo().get(i) != null) {
-				ILogicInfo info = getInfo().get(i);
-				if (info != null) {
-					if (info.isMatchingInfo(getSecondInfo())) {
-						return i - start;
+			IMonitorInfo info = getCurrentList().get(i);
+			if (info != null && !info.isHeader()) {
+				if (state == GuiState.INFO) {
+					for (IMonitorInfo selected : selectedInfo) {
+						if (selected != null && !selected.isHeader() && info.isMatchingType(selected) && info.isMatchingInfo(selected)) {
+							pos.add(i - start);
+						}
+					}
+				} else {
+					if (CacheRegistry.handler.validateInfo(info) && part.getMonitoringCoords().contains(((MonitoredBlockCoords) info).coords)) {
+						pos.add(i - start);
 					}
 				}
+
 			}
 		}
-		return -1;
+		return pos;
 	}
 
-	public List<Integer> getCategoryPositions() {
-		if (getInfo() == null) {
-			return null;
+	public ArrayList<Integer> getCategoryPositions() {
+		ArrayList<Integer> pos = new ArrayList();
+		if (getCurrentList() == null) {
+			return pos;
 		}
-		List<Integer> positions = new ArrayList();
-		int start = (int) (infoSize() * this.currentScroll);
-		int finish = Math.min(start + 11, infoSize());
 		for (int i = start; i < finish; i++) {
-			if (getInfo().get(i) != null) {
-				ILogicInfo info = getInfo().get(i);
-				if (info instanceof CategoryInfo) {
-					positions.add(i - start);
-
+			IMonitorInfo info = getCurrentList().get(i);
+			if (info != null && info.isHeader()) {
+				pos.add(i - start);
+			} else if (RenderBlockSelection.getPosition() != null && info instanceof MonitoredBlockCoords) {
+				if (RenderBlockSelection.getPosition().equals(((MonitoredBlockCoords) info).coords)) {
+					pos.add(i - start);
 				}
 			}
 		}
-		return positions;
+		return pos;
 	}
 
 	@Override
 	public void drawGuiContainerForegroundLayer(int x, int y) {
-		super.drawGuiContainerForegroundLayer(x, y);
-		FontHelper.textCentre(StatCollector.translateToLocal("tile.InfoReader.name"), xSize, 6, 1);
-		FontHelper.textCentre("Select the data you wish to monitor", xSize, 18, 0);
-		if (getInfo() != null) {
-			int start = (int) (infoSize() * this.currentScroll);
-			int finish = Math.min(start + 11, infoSize());
-			for (int i = start; i < finish; i++) {
-				ILogicInfo info = getInfo().get(i);
-				if (info != null) {
-					boolean isSelected = info.isMatchingInfo(getPrimaryInfo());
-					if (!(info instanceof CategoryInfo)) {
-						int colour = isSelected ? Color.green.getRGB() : Color.lightGray.getRGB();
-						FontHelper.text(info.getSubCategory().substring(0, Math.min(15, info.getSubCategory().length())), 10, 31 + (12 * i) - (12 * start), colour);
-						FontHelper.text(info.getDisplayableData().substring(0, Math.min(25, info.getDisplayableData().length())), 10 + 92, 31 + (12 * i) - (12 * start), colour);
+		setInfo();
+		start = (int) (infoSize() * scroller.getCurrentScroll());
+		finish = Math.min(start + size, infoSize());
 
-					} else {
-						FontHelper.text(info.getSubCategory(), 10, 31 + (12 * i) - (12 * start), Color.BLACK.getRGB());
-					}
-				}
-
+		FontHelper.textCentre(FontHelper.translate("item.InfoReader.name"), xSize, 6, white_text);
+		FontHelper.textCentre(String.format("Select the %s you wish to monitor", state == GuiState.INFO ? "data" : "channel"), xSize, 18, grey_text);
+		GL11.glPushMatrix();
+		GL11.glScaled(0.75, 0.75, 0.75);
+		int identifierLeft = (int) ((1.0 / 0.75) * 10);
+		int objectLeft = (int) ((1.0 / 0.75) * (10 + 92));
+		int kindLeft = (int) ((1.0 / 0.75) * (10 + 92 + 92));
+		for (int i = start; i < finish; i++) {
+			IMonitorInfo info = getCurrentList().get(i);
+			if (info != null) {
+				int yPos = (int) ((1.0 / 0.75) * (32 + (12 * i) - (12 * start)));
+				InfoRenderer.renderMonitorInfoInGUI(info, yPos, white_text);
 			}
-
 		}
+		GL11.glPopMatrix();
+		super.drawGuiContainerForegroundLayer(x, y);
+
+		GlStateManager.enableDepth();
+		OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240.0F, 240.0F);
+		GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+		RenderItem item = this.mc.getRenderItem();
+		ItemStack stack = getButtonStack();
+		if (stack != null) {
+			item.zLevel = 0.0F;
+			item.renderItemIntoGUI(stack, -18, 11);
+			item.renderItemOverlayIntoGUI(this.fontRendererObj, stack, -18, 11, "");
+		}
+		if (x > guiLeft - 20 && x < guiLeft && y > guiTop + 10 && y < guiTop + 30) {
+			this.drawCreativeTabHoveringText(state.getButtonString(), x - guiLeft, y - guiTop);
+		}
+
 	}
 
-	public void handleMouseInput() {
+	public void handleMouseInput() throws IOException {
 		super.handleMouseInput();
-		float lastScroll = currentScroll;
-		int i = Mouse.getEventDWheel();
-
-		if (i != 0 && this.needsScrollBars()) {
-			int j = infoSize() + 1;
-
-			if (i > 0) {
-				i = 1;
-			}
-
-			if (i < 0) {
-				i = -1;
-			}
-
-			this.currentScroll = (float) ((double) this.currentScroll - (double) i / (double) j);
-
-			if (this.currentScroll < 0.0F) {
-				this.currentScroll = 0.0F;
-			}
-
-			if (this.currentScroll > 1.0F) {
-				this.currentScroll = 1.0F;
-			}
-		}
-
+		scroller.handleMouse(needsScrollBars(), infoSize());
 	}
 
 	public void drawScreen(int x, int y, float var) {
 		super.drawScreen(x, y, var);
-		float lastScroll = currentScroll;
-		boolean flag = Mouse.isButtonDown(0);
-
-		if (!this.wasClicking && flag && x >= scrollerLeft && y >= scrollerStart && x < scrollerLeft + scrollerWidth && y < scrollerEnd) {
-			this.isScrolling = this.needsScrollBars();
-		}
-
-		if (!flag) {
-			this.isScrolling = false;
-		}
-
-		this.wasClicking = flag;
-
-		if (this.isScrolling) {
-			this.currentScroll = ((float) (y - scrollerStart) - 7.5F) / ((float) (scrollerEnd - scrollerStart) - 15.0F);
-
-			if (this.currentScroll < 0.0F) {
-				this.currentScroll = 0.0F;
-			}
-
-			if (this.currentScroll > 1.0F) {
-				this.currentScroll = 1.0F;
-			}
-
-		}
-
+		scroller.drawScreen(x, y, needsScrollBars());
 	}
 
 	@Override
-	protected void mouseClicked(int x, int y, int button) {
+	protected void mouseClicked(int x, int y, int button) throws IOException {
 		super.mouseClicked(x, y, button);
 		if (button == 1) {
 			for (int l = 0; l < this.buttonList.size(); ++l) {
@@ -227,67 +226,60 @@ public class GuiInfoReader extends GuiSonar {
 					ActionPerformedEvent.Pre event = new ActionPerformedEvent.Pre(this, guibutton, this.buttonList);
 					if (MinecraftForge.EVENT_BUS.post(event))
 						break;
-					this.rselectButton = event.button;
-					event.button.func_146113_a(this.mc.getSoundHandler());
-					this.buttonPressed(event.button, 1);
+					this.rselectButton = event.getButton();
+					event.getButton().playPressSound(this.mc.getSoundHandler());
+					this.buttonPressed(event.getButton(), 1);
 					if (this.equals(this.mc.currentScreen))
-						MinecraftForge.EVENT_BUS.post(new ActionPerformedEvent.Post(this, event.button, this.buttonList));
+						MinecraftForge.EVENT_BUS.post(new ActionPerformedEvent.Post(this, event.getButton(), this.buttonList));
 				}
 			}
 		}
+
+		if (x > guiLeft - 20 && x < guiLeft && y > guiTop + 10 && y < guiTop + 30) {
+			state = SonarHelper.incrementEnum(state, state.values());
+			scroller.currentScroll = 0;
+			setInfo();
+			start = (int) (infoSize() * scroller.getCurrentScroll());
+			finish = Math.min(start + size, infoSize());
+			Logistics.network.sendToServer(new PacketMonitorType(part, state.type));
+		}
 	}
 
-	protected void mouseMovedOrUp(int x, int y, int id) {
-		super.mouseMovedOrUp(x, y, id);
-		if (this.rselectButton != null && id == 1) {
-			this.rselectButton.mouseReleased(x, y);
+	protected void mouseReleased(int mouseX, int mouseY, int state) {
+		super.mouseReleased(mouseX, mouseY, state);
+		if (this.rselectButton != null && state == 1) {
+			this.rselectButton.mouseReleased(mouseX, mouseY);
 			this.rselectButton = null;
 		}
 	}
 
 	protected void buttonPressed(GuiButton button, int buttonID) {
-		if (button != null) {
-			if (button.id >= 10) {
-				if (getInfo() != null) {
-					int start = (int) (infoSize() * this.currentScroll);
-					int network = start + button.id - 10;
-					if (network < infoSize()) {
-						ILogicInfo info = getInfo().get(network);
-						if (info == null || (info instanceof CategoryInfo)) {
-							return;
-						}
+		if (button != null && button.id >= 10) {
+			int start = (int) (infoSize() * scroller.getCurrentScroll());
+			int network = start + button.id - 10;
+			if (network < infoSize()) {
+				IMonitorInfo info = getCurrentList().get(network);
+				switch (state) {
+				case CHANNEL:
+					if (CacheRegistry.handler.validateInfo(info)) {
 						if (buttonID == 0) {
-							if (getPrimaryInfo() != null && info.isMatchingInfo(getPrimaryInfo())) {
-								Logistics.network.sendToServer(new PacketInfoBlock(xCoord, yCoord, zCoord, true));
-								//if (handler.isMultipart.getObject()) {
-									handler.primaryInfo.setObject(null);
-								//}
-							} else {
-								Logistics.network.sendToServer(new PacketInfoBlock(xCoord, yCoord, zCoord, info, true));
-								//if (handler.isMultipart.getObject()) {
-									handler.primaryInfo.setObject(info);
-								//}
-							}
-
-						} else if (buttonID == 1) {
-							if (!info.equals(getPrimaryInfo())) {
-								if (getSecondInfo() != null && info.isMatchingInfo(getSecondInfo())) {
-									Logistics.network.sendToServer(new PacketInfoBlock(xCoord, yCoord, zCoord, false));
-									//if (handler.isMultipart.getObject()) {
-										handler.secondaryInfo.setObject(null);
-									//}
-								} else {
-									Logistics.network.sendToServer(new PacketInfoBlock(xCoord, yCoord, zCoord, info, false));
-									//if (handler.isMultipart.getObject()) {
-										handler.secondaryInfo.setObject(info);
-									//}
-								}
-							}
+							part.lastSelected = ((MonitoredBlockCoords) info).coords;
+							part.sendByteBufPacket(-3);
+						} else {
+							RenderBlockSelection.setPosition(((MonitoredBlockCoords) info).coords);
 						}
 					}
+					break;
+				case INFO:
+					if (!info.isHeader() && part.getHandler().validateInfo(info)) {
+						part.selectedInfo.setInfo(info);
+						part.sendByteBufPacket(0);
+					}
+					break;
 				}
 			}
 		}
+
 	}
 
 	protected void actionPerformed(GuiButton button) {
@@ -296,57 +288,61 @@ public class GuiInfoReader extends GuiSonar {
 
 	@Override
 	protected void drawGuiContainerBackgroundLayer(float var1, int var2, int var3) {
-		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+		super.drawGuiContainerBackgroundLayer(var1, var2, var3);
+		// RenderHelper.saveBlendState();
+		int width = 225;
+		int height = 12;
+		int left = guiLeft + 7;
 
-		Minecraft.getMinecraft().getTextureManager().bindTexture(this.getBackground());
-
-		drawTexturedModalRect(this.guiLeft, this.guiTop, 0, 0, this.xSize, this.ySize);
-		List<Integer> positions = this.getCategoryPositions();
-		int primary = getDataPosition();
-		int secondary = getSecondaryPosition();
-		for (int i = 0; i < 11; i++) {
-			drawTexturedModalRect(this.guiLeft + 7, this.guiTop + 29 + (12 * i), 0, positions != null && positions.contains(i) ? 190 : i == primary ? 178 : i == secondary ? 202 : 166, 154 + 72, 12);
+		ArrayList<Integer> data = getDataPositions();
+		ArrayList<Integer> cats = getCategoryPositions();
+		for (int i = 0; i < size; i++) {
+			int top = guiTop + 29 + (height * i);
+			int mainColour = cats.contains(i) ? category : data.contains(i) ? getColour(i) : grey_base;
+			drawRect(left + 1, top + 1, left - 1 + width, top - 1 + height, mainColour);
+			drawRect(left, top, left + width, top + height, blue_overlay);
 		}
 
-		this.drawTexturedModalRect(scrollerLeft, scrollerStart + (int) ((float) (scrollerEnd - scrollerStart - 17) * this.currentScroll), 176 + 72, 0, 8, 15);
-
+		drawRect(guiLeft - 20, guiTop + 10, guiLeft, guiTop + 30, grey_base);
+		drawRect(guiLeft - 19, guiTop + 11, guiLeft - 1, guiTop + 29, blue_overlay);
+		RenderHelper.restoreBlendState();
 	}
 
 	private boolean needsScrollBars() {
 		if (infoSize() <= 11)
 			return false;
-
 		return true;
-
 	}
 
 	@SideOnly(Side.CLIENT)
-	public class NetworkButton extends SonarButtons.ImageButton {
+	public class SelectionButton extends ImageButton {
 
-		public NetworkButton(int id, int x, int y) {
-			super(id, x, y, bground, 0, 224, 154 + 72, 11);
+		public SelectionButton(int id, int x, int y) {
+			super(id, x, y, null, 0, 224, 154 + 72, 11);
 		}
+
+		public void drawButton(Minecraft mc, int x, int y) {
+
+		}
+	}
+
+	public ArrayList<IMonitorInfo> getCurrentList() {
+		return state == GuiState.CHANNEL ? coords : infoList;
+	}
+
+	public int infoSize() {
+		List list = state == GuiState.CHANNEL ? coords : infoList;
+		return list == null ? 0 : list.size();
+	}
+
+	public void setInfo() {
+		coords = (ArrayList<IMonitorInfo>) CacheRegistry.coordMap.getOrDefault(part.registryID.getObject(), MonitoredList.<MonitoredBlockCoords>newMonitoredList()).info.clone();
+		infoList = (ArrayList<IMonitorInfo>) part.getMonitoredList().info.clone();
 	}
 
 	@Override
 	public ResourceLocation getBackground() {
-		return bground;
-	}
-
-	public int infoSize() {
-		return getInfo() == null ? 0 : getInfo().size();
-	}
-
-	public List<ILogicInfo> getInfo() {
-		return InfoHelper.sortInfoList(handler.cachedInfo);
-	}
-
-	public ILogicInfo getPrimaryInfo(){
-		return handler.primaryInfo.getObject();
-	}
-
-	public ILogicInfo getSecondInfo(){
-		return handler.secondaryInfo.getObject();
+		return null;
 	}
 
 }

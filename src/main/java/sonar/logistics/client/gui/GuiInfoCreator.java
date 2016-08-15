@@ -1,15 +1,15 @@
 package sonar.logistics.client.gui;
 
-import net.minecraft.client.gui.GuiTextField;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ResourceLocation;
+import java.io.IOException;
 
 import org.lwjgl.input.Keyboard;
 
+import net.minecraft.client.gui.GuiTextField;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ResourceLocation;
 import sonar.core.SonarCore;
+import sonar.core.client.gui.GuiSonar;
 import sonar.core.helpers.FontHelper;
-import sonar.core.inventory.GuiSonar;
-import sonar.core.network.PacketTextField;
 import sonar.logistics.common.containers.ContainerEmptySync;
 import sonar.logistics.common.handlers.InfoCreatorHandler;
 
@@ -35,11 +35,11 @@ public class GuiInfoCreator extends GuiSonar {
 		this.ySize = 80;
 		this.guiLeft = (this.width - this.xSize) / 2;
 		this.guiTop = (this.height - this.ySize) / 2;
-		subCategory = new GuiTextField(this.fontRendererObj, 42, 20, 126, 12);
+		subCategory = new GuiTextField(0, this.fontRendererObj, 42, 20, 126, 12);
 		subCategory.setMaxStringLength(21);
 		subCategory.setText(this.getText(0));
 
-		data = new GuiTextField(this.fontRendererObj, 42, 40, 126, 12);
+		data = new GuiTextField(1, this.fontRendererObj, 42, 40, 126, 12);
 		data.setMaxStringLength(21);
 		data.setText(this.getText(1));
 	}
@@ -55,14 +55,14 @@ public class GuiInfoCreator extends GuiSonar {
 	}
 
 	@Override
-	protected void mouseClicked(int i, int j, int k) {
+	protected void mouseClicked(int i, int j, int k) throws IOException {
 		super.mouseClicked(i, j, k);
 		subCategory.mouseClicked(i - guiLeft, j - guiTop, k);
 		data.mouseClicked(i - guiLeft, j - guiTop, k);
 	}
 
 	@Override
-	protected void keyTyped(char c, int i) {
+	protected void keyTyped(char c, int i) throws IOException {
 		if (subCategory.isFocused()) {
 			if (c == 13 || c == 27) {
 				subCategory.setFocused(false);
@@ -110,7 +110,7 @@ public class GuiInfoCreator extends GuiSonar {
 	}
 
 	public void setString(String string, int id){
-		SonarCore.network.sendToServer(new PacketTextField(string, entity.xCoord,  entity.yCoord,  entity.zCoord, id));
+		SonarCore.sendPacketToServer(entity, string, id);
 		switch (id) {
 		case 0:
 			handler.subCategory.setObject(string);

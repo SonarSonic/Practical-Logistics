@@ -1,71 +1,74 @@
 package sonar.logistics.common.blocks;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
+
+import javax.annotation.Nullable;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
-import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.world.IBlockAccess;
+import net.minecraft.util.EnumBlockRenderType;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
-import sonar.core.helpers.SonarHelper;
 import sonar.logistics.Logistics;
+import sonar.logistics.LogisticsBlocks;
 import sonar.logistics.network.LogisticsGui;
-import sonar.logistics.registries.BlockRegistry;
-import cofh.api.block.IDismantleable;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
-public class BlockHammerAir extends Block implements IDismantleable {
+public class BlockHammerAir extends Block {
 	public BlockHammerAir() {
-		super(Material.cloth);
+		super(Material.CLOTH);
 	}
 
 	@Override
-	public int getRenderType() {
-		return -1;
-	}
-
-	@Override
-	public boolean isOpaqueCube() {
+	public boolean isOpaqueCube(IBlockState state) {
 		return false;
 	}
 
 	@Override
-	public boolean renderAsNormalBlock() {
+	public boolean isNormalCube(IBlockState state) {
 		return false;
 	}
 
 	@Override
-	public void breakBlock(World world, int x, int y, int z, Block oldblock, int oldMetadata) {
-		world.setBlockToAir(x, y, z);
-		if (world.getBlock(x, y - 1, z) == BlockRegistry.hammer) {
-			TileEntity i = world.getTileEntity(x, y - 1, z);
-			Block bi = world.getBlock(x, y - 1, z);
-			bi.dropBlockAsItem(world, x, y - 1, z, world.getBlockMetadata(x, y - 1, z), 0);
-			world.setBlockToAir(x, y - 1, z);
-		} else if (world.getBlock(x, y - 2, z) == BlockRegistry.hammer) {
-			TileEntity i = world.getTileEntity(x, y - 2, z);
-			Block bi = world.getBlock(x, y - 2, z);
-			bi.dropBlockAsItem(world, x, y - 2, z, world.getBlockMetadata(x, y - 2, z), 0);
-			world.setBlockToAir(x, y - 2, z);
+	public boolean isFullCube(IBlockState state) {
+		return false;
+	}
+
+	public EnumBlockRenderType getRenderType(IBlockState state) {
+		return EnumBlockRenderType.INVISIBLE;
+	}
+
+	@Override
+	public void breakBlock(World world, BlockPos pos, IBlockState state) {
+		world.setBlockToAir(pos);
+		IBlockState hammerState;
+		if ((hammerState = world.getBlockState(pos.offset(EnumFacing.DOWN))).getBlock() == LogisticsBlocks.hammer) {
+			TileEntity i = world.getTileEntity(pos.offset(EnumFacing.DOWN));
+			Block bi = hammerState.getBlock();
+			bi.dropBlockAsItem(world, pos.offset(EnumFacing.DOWN), hammerState, 0);
+			world.setBlockToAir(pos.offset(EnumFacing.DOWN));
+		} else if ((hammerState = world.getBlockState(pos.offset(EnumFacing.DOWN, 2))).getBlock() == LogisticsBlocks.hammer) {
+			TileEntity i = world.getTileEntity(pos.offset(EnumFacing.DOWN, 2));
+			Block bi = hammerState.getBlock();
+			bi.dropBlockAsItem(world, pos.offset(EnumFacing.DOWN, 2), hammerState, 0);
+			world.setBlockToAir(pos.offset(EnumFacing.DOWN, 2));
 		}
 
 	}
 
 	@Override
-	public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float hitx, float hity, float hitz) {
-		if (world.getBlock(x, y - 1, z) == BlockRegistry.hammer) {
-			player.openGui(Logistics.instance, LogisticsGui.hammer, world, x, y - 1, z);
+    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, @Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ){
+		if (world.getBlockState(pos.offset(EnumFacing.DOWN)).getBlock() == LogisticsBlocks.hammer) {
+			player.openGui(Logistics.instance, LogisticsGui.hammer, world, pos.getX(), pos.getY() - 1, pos.getZ());
 			return true;
-		} else if (world.getBlock(x, y - 2, z) == BlockRegistry.hammer) {
-			player.openGui(Logistics.instance, LogisticsGui.hammer, world, x, y - 2, z);
+		} else if (world.getBlockState(pos.offset(EnumFacing.DOWN, 2)).getBlock() == LogisticsBlocks.hammer) {
+			player.openGui(Logistics.instance, LogisticsGui.hammer, world, pos.getX(), pos.getY() - 2, pos.getZ());
 			return true;
 		}
 		return false;
@@ -76,38 +79,16 @@ public class BlockHammerAir extends Block implements IDismantleable {
 	public int quantityDropped(Random p_149745_1_) {
 		return 0;
 	}
-
-	@Override
-	public Item getItem(World world, int x, int y, int z) {
-		return null;
-	}
-
+/*
 	public void setBlockBoundsBasedOnState(IBlockAccess world, int x, int y, int z) {
-		if (world.getBlock(x, y - 1, z) == BlockRegistry.hammer) {
+		if (world.getBlockState(x, y - 1, z) == BlockRegistry.hammer) {
 			this.setBlockBounds(0.0F, -1.0F, 0.0F, 1.0F, 2.0F, 1.0F);
 		} else if (world.getBlock(x, y - 2, z) == BlockRegistry.hammer) {
 			this.setBlockBounds(0.0F, -2.0F, 0.0F, 1.0F, 1.0F, 1.0F);
 		}
 	}
-
-	@Override
-	public ArrayList<ItemStack> dismantleBlock(EntityPlayer player, World world, int x, int y, int z, boolean returnDrops) {
-
-		SonarHelper.dropTile(player, world.getBlock(x, y, z), world, x, y, z);
-		return null;
-	}
-
-	@Override
-	public boolean canDismantle(EntityPlayer player, World world, int x, int y, int z) {
-		return true;
-	}
-
-	public ItemStack getPickBlock(MovingObjectPosition target, World world, int x, int y, int z, EntityPlayer player) {
-		return new ItemStack(BlockRegistry.hammer, 1, 0);
-	}
-
-	@SideOnly(Side.CLIENT)
-	public void getSubBlocks(Item item, CreativeTabs tab, List list) {
-		list.add(new ItemStack(BlockRegistry.hammer_air, 1, 0));
-	}
+*/
+    public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player){
+		return new ItemStack(LogisticsBlocks.hammer, 1, 0);
+    }
 }

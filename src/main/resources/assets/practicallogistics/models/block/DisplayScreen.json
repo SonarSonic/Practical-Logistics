@@ -1,0 +1,20 @@
+{
+    "textures": {
+        "0": "practicallogistics:model/display_screen"
+    },
+    "elements": [
+        {
+            "name": "Cube",
+            "from": [ 0.0, 4.0, 0.0 ], 
+            "to": [ 16.0, 12.0, 1.0 ], 
+            "faces": {
+                "north": { "texture": "#0", "uv": [ 0.0, 6.0, 12.0, 12.0 ] },
+                "east": { "texture": "#0", "uv": [ 15.0, 0.0, 16.0, 8.0 ] },
+                "south": { "texture": "#0", "uv": [ 0.0, 0.0, 12.0, 6.0 ] },
+                "west": { "texture": "#0", "uv": [ 15.0, 0.0, 16.0, 8.0 ] },
+                "up": { "texture": "#0", "uv": [ 0.0, 15.0, 16.0, 16.0 ] },
+                "down": { "texture": "#0", "uv": [ 0.0, 14.0, 16.0, 15.0 ] }
+            }
+        }
+    ]
+}

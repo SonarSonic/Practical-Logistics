@@ -1,0 +1,28 @@
+{
+    "forge_marker": 1,
+    "defaults": {
+        "model":"practicallogistics:EntityNode_Base",
+        "textures": {
+            "node":"practicallogistics:model/entityNode",
+            "0":"practicallogistics:model/data_cable",
+            "particle":"practicallogistics:blocks/data_cable"
+        }
+     },
+    "variants": {
+        "normal":[],
+        "inventory": [{    
+            "x": 180,
+            "submodel": {
+                "node": { "model":"practicallogistics:EntityNode_Spinner" }
+             }
+        }],
+        "facing":{  
+            "north":{"x": 90, "y": 180},            
+            "south":{"x": 90, "y": 0},      
+            "west":{"x": 90, "y": 90}, 
+            "east":{"x": 90, "y": 270},
+            "up":{"x": 180},
+            "down":{}
+        }         
+    }
+}

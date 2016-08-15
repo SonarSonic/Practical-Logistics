@@ -1,16 +1,16 @@
 package sonar.logistics.api.wrappers;
 
-import sonar.logistics.api.info.ILogicInfo;
+import mezz.jei.ItemFilter;
+import sonar.logistics.api.info.DEADILogicInfo;
 import sonar.logistics.api.providers.EntityProvider;
 import sonar.logistics.api.providers.TileProvider;
 import sonar.logistics.api.render.InfoInteractionHandler;
-import sonar.logistics.api.utils.ItemFilter;
 
 public class RegistryWrapper {
 
 	/** used for registering Info Types, this should have a unique id!
-	 * @param info {@link ILogicInfo} to register */
-	public void registerInfoType(ILogicInfo info) {}
+	 * @param info {@link DEADILogicInfo} to register */
+	public void registerInfoType(DEADILogicInfo info) {}
 
 
 	/** used for registering Interaction Handlers, this should have a unique id!

@@ -4,24 +4,19 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import sonar.core.api.nbt.INBTSyncable;
 import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.core.inventory.ContainerSync;
-import sonar.core.network.utils.ISyncTile;
 
-public class ContainerEmptySync extends ContainerSync {
-	SyncType[] types = new SyncType[] { SyncType.SYNC };
+public class DEADContainerEmptySync extends ContainerSync {
+	SyncType[] types = new SyncType[] { SyncType.DEFAULT_SYNC };
 
-	public ContainerEmptySync(ISyncTile sync, TileEntity entity) {
+	public ContainerEmptySync(INBTSyncable sync, TileEntity entity) {
 		super(sync, entity);
 	}
 
 	public ContainerEmptySync(TileEntity entity) {
 		super(entity);
-	}
-
-	public ContainerEmptySync setTypes(SyncType[] types) {
-		this.types = types;
-		return this;
 	}
 
 	public boolean syncInventory() {

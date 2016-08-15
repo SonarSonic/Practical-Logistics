@@ -3,6 +3,7 @@ package sonar.logistics.common.containers;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.inventory.IContainerListener;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import sonar.core.inventory.ContainerSync;
@@ -18,8 +19,8 @@ public class ContainerDataReceiver extends ContainerSync {
 	public void detectAndSendChanges() {
 		if (tile instanceof TileEntityDataReceiver) {
 			if (sync != null) {
-				if (crafters != null) {
-					for (Object o : crafters) {
+				if (listeners != null) {
+					for (IContainerListener o : listeners) {
 						if (o != null && o instanceof EntityPlayerMP) {
 							((TileEntityDataReceiver) tile).sendAvailableData(tile, (EntityPlayerMP) o);
 						}

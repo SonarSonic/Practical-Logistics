@@ -1,47 +1,48 @@
 package sonar.logistics;
 
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.item.Item;
-import net.minecraftforge.common.MinecraftForge;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import sonar.core.SonarCore;
-import sonar.core.integration.SonarLoader;
+import mcmultipart.multipart.MultipartRegistry;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.item.Item;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.Mod.EventHandler;
+import net.minecraftforge.fml.common.Mod.Instance;
+import net.minecraftforge.fml.common.SidedProxy;
+import net.minecraftforge.fml.common.discovery.ASMDataTable;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLServerStoppingEvent;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
+import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.oredict.OreDictionary;
 import sonar.logistics.api.LogisticsAPI;
-import sonar.logistics.info.providers.EntityProviderRegistry;
-import sonar.logistics.info.providers.TileProviderRegistry;
-import sonar.logistics.integration.MineTweakerIntegration;
-import sonar.logistics.integration.multipart.ForgeMultipartHandler;
+import sonar.logistics.connections.CableRegistry;
+import sonar.logistics.connections.CacheRegistry;
+import sonar.logistics.connections.EmitterRegistry;
+import sonar.logistics.connections.LogicMonitorCache;
 import sonar.logistics.network.LogisticsCommon;
-import sonar.logistics.registries.BlockRegistry;
-import sonar.logistics.registries.CableRegistry;
-import sonar.logistics.registries.CacheRegistry;
-import sonar.logistics.registries.CraftingRegistry;
-import sonar.logistics.registries.EmitterRegistry;
-import sonar.logistics.registries.EventRegistry;
-import sonar.logistics.registries.InfoInteractionRegistry;
-import sonar.logistics.registries.InfoTypeRegistry;
-import sonar.logistics.registries.ItemFilterRegistry;
-import sonar.logistics.registries.ItemRegistry;
-import sonar.logistics.registries.OreDictRegistry;
+import sonar.logistics.parts.ArrayPart;
+import sonar.logistics.parts.DataCablePart;
+import sonar.logistics.parts.DataEmitterPart;
+import sonar.logistics.parts.DataReceiverPart;
+import sonar.logistics.parts.DisplayScreenPart;
+import sonar.logistics.parts.FluidReaderPart;
+import sonar.logistics.parts.InfoReaderPart;
+import sonar.logistics.parts.InventoryReaderPart;
+import sonar.logistics.parts.LargeDisplayScreenPart;
+import sonar.logistics.parts.NodePart;
+import sonar.logistics.registries.InfoLoaderRegistry;
+import sonar.logistics.registries.LogicRegistry;
+import sonar.logistics.registries.MonitorHandlerRegistry;
 import sonar.logistics.utils.SapphireOreGen;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.Loader;
-import cpw.mods.fml.common.Mod;
-import cpw.mods.fml.common.Mod.EventHandler;
-import cpw.mods.fml.common.Mod.Instance;
-import cpw.mods.fml.common.SidedProxy;
-import cpw.mods.fml.common.event.FMLInitializationEvent;
-import cpw.mods.fml.common.event.FMLPostInitializationEvent;
-import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import cpw.mods.fml.common.event.FMLServerStoppingEvent;
-import cpw.mods.fml.common.network.NetworkRegistry;
-import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
-import cpw.mods.fml.common.registry.GameRegistry;
 
-@Mod(modid = Logistics.MODID, name = Logistics.NAME, version = Logistics.VERSION)
+@Mod(modid = Logistics.MODID, name = Logistics.NAME, version = Logistics.VERSION, dependencies = "required-after:SonarCore")
 public class Logistics {
 
 	@SidedProxy(clientSide = "sonar.logistics.network.LogisticsClient", serverSide = "sonar.logistics.network.LogisticsCommon")
@@ -49,24 +50,24 @@ public class Logistics {
 
 	public static final String MODID = "PracticalLogistics";
 	public static final String NAME = "Practical Logistics";
-	public static final String VERSION = "0.2.4";
+	public static final String VERSION = "2.0.0";
 
 	public static SimpleNetworkWrapper network;
 	public static Logger logger = (Logger) LogManager.getLogger(MODID);
 
-	public static InfoTypeRegistry infoTypes = new InfoTypeRegistry();
-	public static InfoInteractionRegistry infoInteraction = new InfoInteractionRegistry();
-	public static ItemFilterRegistry itemFilters = new ItemFilterRegistry();
-	public static TileProviderRegistry tileProviders = new TileProviderRegistry();
-	public static EntityProviderRegistry entityProviders = new EntityProviderRegistry();
-	
+	// public static InfoTypeRegistry infoTypes = new InfoTypeRegistry();
+	// public static InfoInteractionRegistry infoInteraction = new InfoInteractionRegistry();
+	// public static ItemFilterRegistry itemFilters = new ItemFilterRegistry();
+	// public static EntityProviderRegistry entityProviders = new EntityProviderRegistry();
+	public static MonitorHandlerRegistry monitorHandlers = new MonitorHandlerRegistry();
+
 	@Instance(MODID)
 	public static Logistics instance;
 
 	public static CreativeTabs creativeTab = new CreativeTabs("Practical Logistics") {
 		@Override
 		public Item getTabIconItem() {
-			return Item.getItemFromBlock(BlockRegistry.dataCable);
+			return LogisticsItems.partCable;
 		}
 	};
 
@@ -77,73 +78,85 @@ public class Logistics {
 		} else {
 			logger.info("Successfully loaded with Sonar Core");
 		}
-		
+
 		LogisticsAPI.init();
 		logger.info("Initilised API");
-		
+
 		network = NetworkRegistry.INSTANCE.newSimpleChannel(MODID);
 		logger.info("Registered Network");
 
-		SonarCore.registerPackets();
 		LogisticsCommon.registerPackets();
 		logger.info("Registered Packets");
 
 		LogisticsConfig.initConfiguration(event);
 		logger.info("Loaded Configuration");
 
-		BlockRegistry.registerBlocks();
+		LogisticsBlocks.registerBlocks();
 		logger.info("Loaded Blocks");
 
-		ItemRegistry.registerItems();
+		LogisticsItems.registerItems();
 		logger.info("Loaded Items");
 
-		if (SonarLoader.forgeMultipartLoaded()) {
-			ForgeMultipartHandler.init();
-			logger.info("'Forge Multipart' integration was loaded");
-		} else {
-			logger.warn("'Forge Multipart' integration wasn't loaded");
-		}
+		proxy.registerRenderThings();
+		logger.info("Registered Renderers");
+		MultipartRegistry.registerPart(DataCablePart.class, "practicallogistics:DataCable");
+		MultipartRegistry.registerPart(NodePart.class, "practicallogistics:Node");
+		MultipartRegistry.registerPart(ArrayPart.class, "practicallogistics:Array");
+		MultipartRegistry.registerPart(InventoryReaderPart.class, "practicallogistics:InventoryReader");
+		MultipartRegistry.registerPart(FluidReaderPart.class, "practicallogistics:FluidReader");
+		MultipartRegistry.registerPart(InfoReaderPart.class, "practicallogistics:InfoReader");
+		MultipartRegistry.registerPart(DataEmitterPart.class, "practicallogistics:DataEmitter");
+		MultipartRegistry.registerPart(DataReceiverPart.class, "practicallogistics:DataReceiver");
+		MultipartRegistry.registerPart(DisplayScreenPart.class, "practicallogistics:DisplayScreen");
+		MultipartRegistry.registerPart(LargeDisplayScreenPart.class, "practicallogistics:LargeDisplayScreen");
+		/* MultipartRegistry.registerPart(NodePart.class, "practicallogistics:Node"); MultipartRegistry.registerPart(EntityNodePart.class, "practicallogistics:EntityNode"); MultipartRegistry.registerPart(InfoReaderPart.class, "practicallogistics:InfoReader"); MultipartRegistry.registerPart(InventoryReaderPart.class, "practicallogistics:InventoryReader"); MultipartRegistry.registerPart(EnergyReaderPart.class, "practicallogistics:EnergyReader"); MultipartRegistry.registerPart(RedstoneSignallerPart.class, "practicallogistics:RedstoneSignaller"); */
+		/* if (SonarLoader.forgeMultipartLoaded()) { ForgeMultipartHandler.init(); logger.info("'Forge Multipart' integration was loaded"); } else { logger.warn("'Forge Multipart' integration wasn't loaded"); } */
 		if (LogisticsConfig.sapphireOre) {
 			GameRegistry.registerWorldGenerator(new SapphireOreGen(), 1);
 			logger.info("Registered Sapphire World Generator");
 		} else
 			logger.info("Sapphire Ore Generation is disabled in the config");
+
+		ASMDataTable asmDataTable = event.getAsmData();
+		LogicRegistry.infoRegistries.addAll(InfoLoaderRegistry.getInfoRegistries(asmDataTable));
+		LogicRegistry.customTileHandlers.addAll(InfoLoaderRegistry.getCustomTileHandlers(asmDataTable));
+		LogicRegistry.customEntityHandlers.addAll(InfoLoaderRegistry.getCustomEntityHandlers(asmDataTable));
+		LogicRegistry.init();
 	}
 
 	@EventHandler
 	public void load(FMLInitializationEvent event) {
-		CraftingRegistry.addRecipes();
+		LogisticsCrafting.addRecipes();
 		logger.info("Registered Crafting Recipes");
 
-		OreDictRegistry.registerOres();
+		OreDictionary.registerOre("oreSapphire", LogisticsBlocks.sapphire_ore);
+		OreDictionary.registerOre("gemSapphire", LogisticsItems.sapphire);
+		OreDictionary.registerOre("dustSapphire", LogisticsItems.sapphire_dust);
 		logger.info("Registered OreDict");
 
-		MinecraftForge.EVENT_BUS.register(new EventRegistry());
-		FMLCommonHandler.instance().bus().register(new EventRegistry());
+		MinecraftForge.EVENT_BUS.register(new LogisticsEvents());
+		// FMLCommonHandler.instance().bus().register(new LogisticsEvents());
 		logger.info("Registered Events");
 		NetworkRegistry.INSTANCE.registerGuiHandler(this, new LogisticsCommon());
 		logger.info("Registered GUI Handler");
 
-		proxy.registerRenderThings();
-		logger.info("Registered Renderers");
-
-		infoTypes.register();
-		infoInteraction.register();
-		itemFilters.register();
-		tileProviders.register();
-		entityProviders.register();
+		// infoTypes.register();
+		// infoInteraction.register();
+		// itemFilters.register();
+		// entityProviders.register();
+		monitorHandlers.register();
 	}
 
 	@EventHandler
 	public void postLoad(FMLPostInitializationEvent evt) {
-		logger.info("Registered " + infoTypes.getObjects().size() + " Info Types");
-		logger.info("Registered " + infoInteraction.getObjects().size() + " Info Interactions");
-		logger.info("Registered " + itemFilters.getObjects().size() + " Item Filters");
-		logger.info("Registered " + tileProviders.getObjects().size() + " Tile Providers");
-		logger.info("Registered " + entityProviders.getObjects().size() + " Entity Providers");
+		// logger.info("Registered " + infoTypes.getObjects().size() + " Info Types");
+		// logger.info("Registered " + infoInteraction.getObjects().size() + " Info Interactions");
+		// logger.info("Registered " + itemFilters.getObjects().size() + " Item Filters");
+		// logger.info("Registered " + entityProviders.getObjects().size() + " Entity Providers");
+		logger.info("Registered " + monitorHandlers.getObjects().size() + " " + monitorHandlers.registeryType());
 
 		if (Loader.isModLoaded("MineTweaker3")) {
-			MineTweakerIntegration.integrate();
+			// MineTweakerIntegration.integrate();
 			logger.info("'Mine Tweaker' integration was loaded");
 		}
 	}
@@ -153,5 +166,6 @@ public class Logistics {
 		EmitterRegistry.removeAll();
 		CableRegistry.removeAll();
 		CacheRegistry.removeAll();
+		LogicMonitorCache.monitoredLists.clear();
 	}
 }

@@ -1,9 +1,8 @@
 package sonar.logistics.utils;
 
-import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import sonar.core.helpers.RecipeHelper;
-import sonar.logistics.registries.ItemRegistry;
+import sonar.logistics.LogisticsItems;
 
 public class HammerRecipes extends RecipeHelper {
 
@@ -19,9 +18,9 @@ public class HammerRecipes extends RecipeHelper {
 
 	@Override
 	public void addRecipes() {
-		this.addRecipe("gemSapphire", new ItemStack(ItemRegistry.sapphire_dust));
-		this.addRecipe("stone", new ItemStack(ItemRegistry.stone_plate, 4));
-		this.addRecipe("oreSapphire", new ItemStack(ItemRegistry.sapphire_dust, 2));
+		this.addRecipe("gemSapphire", new ItemStack(LogisticsItems.sapphire_dust));
+		this.addRecipe("stone", new ItemStack(LogisticsItems.stone_plate, 4));
+		this.addRecipe("oreSapphire", new ItemStack(LogisticsItems.sapphire_dust, 2));
 	}
 
 	@Override

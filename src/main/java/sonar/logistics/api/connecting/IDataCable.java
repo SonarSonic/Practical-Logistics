@@ -1,14 +1,11 @@
 package sonar.logistics.api.connecting;
 
-import net.minecraftforge.common.util.ForgeDirection;
+import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.render.ICableRenderer;
 
 /** implemented on Tile Entities and Forge Multipart parts which are cables */
 public interface IDataCable extends ICableRenderer, ILogicTile {
 	
-	/** checks if the cable is blocked in a given direction (e.g. other FMP part is blocking the connection */
-	public boolean isBlocked(ForgeDirection dir);
-
 	/** when cables join together they create networks which are stored under IDs in the registry, this returns this id */
 	public int registryID();
 
@@ -24,6 +21,10 @@ public interface IDataCable extends ICableRenderer, ILogicTile {
 	/** called when the cable is removed to the world */
 	public void removeCable();	
 
-	/** the cable should check it's connections and add them again */
+	/** the cable should check it's connections and see if it is connected to the correct ones */
 	public void refreshConnections();
+	
+	public void configureConnections(INetworkCache network);	
+	
+	public boolean hasConnections();	
 }

@@ -1,0 +1,136 @@
+itemGroup.Practical Logistics=Practical Logistics
+
+//blocks
+tile.SapphireOre.name=Sapphire Ore
+tile.EnergyScreenItem.name=Energy Screen
+tile.DisplayScreenItem.name=Display Screen
+tile.DataEmitter.name=Data Emitter
+tile.DataReceiver.name=Data Receiver
+tile.HolographicDisplay.name=Holographic Display
+tile.DataModifier.name=Data Modifier
+tile.InfoCreator.name=Info Creator
+tile.Hammer.name=Forging Hammer
+tile.Hammer_Air.name=Forging Hammer
+tile.LargeDisplayScreen.name=Large Display Screen
+tile.ItemRouter.name=Item Router
+tile.ChannelledCable.name=Channelled Cable
+tile.ChannelSelector.name=Channel Selector
+tile.Clock.name=Clock
+
+//multiparts
+item.Node.name=Node
+item.FluidReader.name=Fluid Reader
+item.InfoReader.name=Info Reader
+item.EnergyReader.name=Energy Reader
+item.InventoryReader.name=Inventory Reader
+item.Array.name=Array
+item.DataCable.name=Data Cable
+item.EntityNode.name=Entity Node
+item.RedstoneSignaller.name=Redstone Signaller
+
+//items
+item.EnergyScreenItem.name=Energy Screen
+item.DisplayScreenItem.name=Display Screen
+item.Sapphire.name=Sapphire
+item.SapphireDust.name=Sapphire Dust
+item.StonePlate.name=Stone Plate
+item.Transceiver.name=Transceiver
+
+//messages
+dataBlock.denied=Access Denied
+
+//info
+pl.Vec3i.getX=X Coord
+pl.Vec3i.getY=Y Coord
+pl.Vec3i.getZ=Z Coord
+pl.EnumFacing.toString=Direction
+
+//world
+pl.World.isBlockIndirectlyGettingPowered=Is Block Powered
+pl.WorldInfo.isRaining=Is Raining
+pl.WorldInfo.isThundering=Is Thundering
+pl.WorldInfo.getWorldName=World Name
+pl.WorldInfo.getDimension=Dimension ID
+pl.DimensionType.getName=Dimension Name
+
+//vanilla-tiles
+pl.TileEntityFurnace.furnaceBurnTime=Furnace Burn Time
+pl.TileEntityFurnace.currentItemBurnTime=Current Burn Time
+pl.TileEntityFurnace.cookTime=Cook Time
+pl.TileEntityFurnace.totalCookTime=Total Cook Time
+pl.TileEntityNote.note=Current Note
+
+//blocks
+pl.Block.isFoliage=Is foliage
+pl.Block.getUnlocalizedName=Block Name
+pl.Block.isWood=Is wood
+pl.Block.canSustainLeaves=Can sustain leaves
+pl.Block.getHarvestLevel=Harvest Level
+pl.Block.getMetaFromState=Meta
+pl.BlockCrops.isMaxAge=Is Fully Grown
+pl.Block.getWeakPower=Weak Power
+pl.Block.getStrongPower=Strong Power
+pl.Block.isSideSolid=Is Side Solid
+pl.Block.getBlockHardness=Hardness
+pl.Fluid.getLuminosity=Luminosity
+pl.Fluid.getDensity=Density
+pl.Fluid.getTemperature=Temperature
+pl.Fluid.getViscosity=Viscosity
+
+//entities
+pl.EntityLivingBase.getHealth=Health
+pl.EntityLivingBase.getMaxHealth=Max Health
+pl.EntityLivingBase.getAge=Age
+pl.EntityLivingBase.getTotalArmorValue=Total Armor Value
+pl.EntityLivingBase.getName=Name
+pl.EntityAgeable.getGrowingAge=Growing Age
+pl.EntityPlayer.isCreative=Creative Mode
+pl.EntityPlayer.isSpectator=Spectator Mode
+pl.EntityPlayer.getAbsorptionAmount=Absorption Amount
+pl.EntityPlayer.getExperiencePoints=Experience Points
+pl.FoodStats.getFoodLevel=Food Level
+pl.FoodStats.needFood=Needs Food
+pl.FoodStats.getSaturationLevel=Saturation Level
+pl.Team.getRegisteredName=Team Name
+
+//logistics
+pl.TileEntityHammer.getSpeed=Process Speed
+pl.TileEntityHammer.getProgress=Progress Time
+pl.TileEntityHammer.getCoolDown=Cool Down
+pl.TileEntityHammer.getCoolDownSpeed=Cool Down Speed
+
+//calculator
+pl.IHungerProcessor.getHungerPoints=Hunger Points
+pl.IHealthProcessor.getHealthPoints=Health Points
+pl.IGreenhouse.getTier=Tier
+pl.IGreenhouse.getCarbon=Carbon Levels
+pl.IGreenhouse.getOxygen=Oxygen Levels
+pl.IGreenhouse.maxGasLevel=Max Gas Level
+pl.IProcessMachine.getCurrentProcessTime=Current Process Time
+pl.IProcessMachine.getProcessTime=Process Time
+pl.IProcessMachine.getBaseProcessTime=Base Process Time
+pl.IProcessMachine.getEnergyUsage=Energy Usage
+pl.ITeleport.name=Name
+pl.ITeleport.teleporterID=Teleporter ID
+pl.IFlawlessGreenhouse.getPlantsHarvested=Plants Harvested
+pl.IFlawlessGreenhouse.getPlantsGrown=Plants Grown
+
+//mekanism
+pl.IHeatTransfer.getTemp=Temperature
+pl.IHeatTransfer.getInverseConductionCoefficient=Inverse Conduction Coefficient
+pl.IHeatTransfer.getInsulationCoefficient=Insulation Coefficient
+pl.IHeatTransfer.canConnectHeat=Can connect heat
+pl.IEvaporationSolar.seesSun=Can Generate
+pl.ILaserReceptor.canLasersDig=Can Lasers Dig
+
+pl.IFusionReactor.isBurning=Is Burning
+pl.IFusionReactor.isFormed=Is Formed
+pl.IFusionReactor.getCaseTemp=Case Temperature
+pl.IFusionReactor.getPlasmaTemp=Plasma Temperature
+pl.IFusionReactor.getInjectionRate=Injection Rate
+
+
+
+
+
+

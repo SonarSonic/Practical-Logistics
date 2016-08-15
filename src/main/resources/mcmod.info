@@ -10,7 +10,7 @@
   "credits": "Ollie Lansdell - Ideas, Coding, Textures, Models, SkullyGamingMC - Testing, Ideas, Additional Textures and Models",
   "logoFile": "/banner.png",
   "screenshots": [],
-  "requiredMods": [ "Forge", "SonarCore" ],
+  "requiredMods": [ "Forge", "SonarCore", "mcmultipart" ],
   "dependencies": [],
   "useDependencyInformation": "true"
 }

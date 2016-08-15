@@ -4,14 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.tileentity.TileEntity;
-import net.minecraftforge.common.util.ForgeDirection;
-import sonar.core.api.BlockCoords;
-import sonar.core.integration.fmp.FMPHelper;
+import net.minecraft.util.EnumFacing;
+import sonar.core.api.utils.BlockCoords;
+import sonar.core.integration.fmp.OLDMultipartHelper;
 import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.logistics.api.connecting.ILargeDisplay;
 import sonar.logistics.api.render.LargeScreenSizing;
-import sonar.logistics.common.handlers.LargeDisplayScreenHandler;
-import sonar.logistics.registries.DisplayRegistry;
+import sonar.logistics.connections.DisplayRegistry;
 
 public class DisplayHelper {
 
@@ -22,9 +21,9 @@ public class DisplayHelper {
 			List<Integer> ids = new ArrayList();
 
 			for (int i = 0; i < 6; i++) {
-				ForgeDirection dir = ForgeDirection.getOrientation(i);
+				EnumFacing dir = EnumFacing.getFront(i);
 				Object adjacent = BlockCoords.translateCoords(screen.getCoords(), dir).getTileEntity();
-				if (dir!=ForgeDirection.getOrientation(screen.getOrientation()) && adjacent != null && adjacent instanceof ILargeDisplay) {
+				if (dir!=EnumFacing.getFront(screen.getOrientation()) && adjacent != null && adjacent instanceof ILargeDisplay) {
 					ILargeDisplay adjTile = (ILargeDisplay) adjacent;
 					if (adjTile.getOrientation() == screen.getOrientation() && adjTile.registryID() != -2) {
 						adjacents.add(adjacent);
@@ -66,16 +65,19 @@ public class DisplayHelper {
 	}
 
 	public static LargeScreenSizing getScreenSizing(TileEntity tile) {
-		Object tileObj = FMPHelper.getHandler(FMPHelper.checkObject(tile));
+		Object tileObj = OLDMultipartHelper.getHandler(OLDMultipartHelper.checkObject(tile));
 		if (tileObj == null || !(tileObj instanceof LargeDisplayScreenHandler)) {
 			return null;
 		}
 		LargeDisplayScreenHandler remove = (LargeDisplayScreenHandler) tileObj;
-		int maxX = tile.xCoord, maxY = tile.yCoord, maxZ = tile.zCoord, minX = tile.xCoord, minY = tile.yCoord, minZ = tile.zCoord;
+		BlockCoords max = new BlockCoords(tile.getPos());
+		BlockCoords min = new BlockCoords(tile.getPos());
+		
 		int meta = tile.getBlockMetadata();
-		ForgeDirection dir = ForgeDirection.getOrientation(meta).getRotation(ForgeDirection.UP);
+		//MIGHT NEED TO CHECK THIS DIR!!
+		EnumFacing dir = EnumFacing.getFront(meta).rotateAround(EnumFacing.Axis.Y);
 		boolean north = false;
-		if (dir.offsetX == -1 || dir.offsetX == 1) {
+		if (dir.getFrontOffsetX() == -1 || dir.getFrontOffsetX() == 1) {
 			north = true;
 		}
 		int screens = 0;
@@ -83,42 +85,42 @@ public class DisplayHelper {
 		if (displays != null) {
 			for (BlockCoords coords : displays) {
 				screens++;
-				if (coords.getX() > maxX) {
-					maxX = coords.getX();
-				} else if (coords.getX() < minX) {
-					minX = coords.getX();
+				if (coords.getX() > max.getX()) {	
+					max.setX(coords.getX());
+				} else if (coords.getX() < min.getX()) {
+					min.setX(coords.getX());
 				}
-				if (coords.getY() > maxY) {
-					maxY = coords.getY();
-				} else if (coords.getY() < minY) {
-					minY = coords.getY();
+				if (coords.getY() > max.getY()) {
+					max.setY(coords.getY());
+				} else if (coords.getY() < min.getY()) {
+					min.setY(coords.getY());
 				}
-				if (coords.getZ() > maxZ) {
-					maxZ = coords.getZ();
-				} else if (coords.getZ() < minZ) {
-					minZ = coords.getZ();
+				if (coords.getZ() > max.getZ()) {
+					max.setZ(coords.getZ());
+				} else if (coords.getZ() < min.getZ()) {
+					min.setZ(coords.getZ());
 				}
 			}
 		}
-		int maxH = north ? maxX : maxZ;
-		int minH = north ? minX : minZ;
+		int maxH = north ? max.getX() : max.getZ();
+		int minH = north ? min.getX() : min.getZ();
 
 		for (int h = minH; h <= maxH; h++) {
-			for (int y = minY; y <= maxY; y++) {
-				BlockCoords coords = new BlockCoords(north ? h : tile.xCoord, y, !north ? h : tile.zCoord);
-				TileEntity target = coords.getTileEntity(tile.getWorldObj());
-				TileHandler targetObj = FMPHelper.getHandler(target);
+			for (int y = min.getY(); y <= max.getY(); y++) {
+				BlockCoords coords = new BlockCoords(north ? h : tile.getPos().getX(), y, !north ? h : tile.getPos().getZ());
+				TileEntity target = coords.getTileEntity(tile.getWorld());
+				TileHandler targetObj = OLDMultipartHelper.getHandler(target);
 				if (targetObj == null || !(targetObj instanceof LargeDisplayScreenHandler) || !(target.getBlockMetadata() == meta)) {
 					return null;
 				}
 			}
 		}
-		maxY = maxY - tile.yCoord;
-		minY = tile.yCoord - minY;
-		maxH = maxH - (north ? tile.xCoord : tile.zCoord);
-		minH = minH - (north ? tile.xCoord : tile.zCoord);
+		max.setY(max.getY() - tile.getPos().getY());
+		min.setY(tile.getPos().getY() - min.getY());
+		maxH = maxH - (north ? tile.getPos().getX() : tile.getPos().getZ());
+		minH = minH - (north ? tile.getPos().getX() : tile.getPos().getZ());
 
-		return new LargeScreenSizing(maxY, minY, maxH, minH);
+		return new LargeScreenSizing(max.getY(), min.getY(), maxH, minH);
 
 	}
 }

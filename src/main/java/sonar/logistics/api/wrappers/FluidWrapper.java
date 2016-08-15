@@ -1,51 +1,19 @@
 package sonar.logistics.api.wrappers;
 
-import java.util.ArrayList;
-
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import sonar.core.api.ActionType;
-import sonar.core.api.StoredItemStack;
-import sonar.core.api.InventoryHandler.StorageSize;
-import sonar.core.api.StoredFluidStack;
+import sonar.core.api.fluids.StoredFluidStack;
+import sonar.core.api.utils.ActionType;
 import sonar.logistics.api.cache.INetworkCache;
-import sonar.logistics.api.wrappers.ItemWrapper.StorageItems;
 
 public class FluidWrapper {
-
-	public static class StorageFluids {
-
-		public static final StorageFluids EMPTY = new StorageFluids(new ArrayList(), StorageSize.EMPTY, new ArrayList(), new ArrayList());
-		public ArrayList<StoredFluidStack> fluids;
-		/**when this is null and last time there was a list, everything should be updated, if last time was null don't do anything*/
-		public ArrayList<StoredFluidStack> changed = new ArrayList();
-		public ArrayList<StoredFluidStack> removed = new ArrayList();
-		public StorageSize sizing;
-
-		public StorageFluids(ArrayList<StoredFluidStack> items, StorageSize sizing, ArrayList<StoredFluidStack> changed, ArrayList<StoredFluidStack> removed) {
-			this.fluids = items;
-			this.sizing = sizing;
-			this.changed = changed;
-			this.removed = removed;
-		}
-
-		public StorageFluids copy() {
-			return new StorageFluids((ArrayList<StoredFluidStack>) this.fluids.clone(), sizing, (ArrayList<StoredFluidStack>) changed.clone(), (ArrayList<StoredFluidStack>) removed.clone());
-		}
-	}
-
-	/** used for getting the full list of Fluids on a given network
-	 * @param network the {@link INetworkCache}
-	 * @return list of {@link StoredFluidStack} on the network */
-	public StorageFluids getFluids(INetworkCache network) {
-		return StorageFluids.EMPTY;
-	}
 
 	/** used for adding Fluids to the network
 	 * @param add {@link StoredFluidStack} to add
 	 * @param network the {@link INetworkCache} to add to
 	 * @param action should this action be simulated
 	 * @return remaining {@link StoredFluidStack} (what wasn't added), can be null */
+	@Deprecated
 	public StoredFluidStack addFluids(StoredFluidStack add, INetworkCache network, ActionType action) {
 		return add;
 	}
@@ -55,6 +23,7 @@ public class FluidWrapper {
 	 * @param network the {@link INetworkCache} to remove from
 	 * @param action should this action be simulated
 	 * @return remaining {@link StoredFluidStack} (what wasn't removed), can be null */
+	@Deprecated
 	public StoredFluidStack removeFluids(StoredFluidStack remove, INetworkCache network, ActionType action) {
 		return remove;
 	}
@@ -65,6 +34,7 @@ public class FluidWrapper {
 	 * @param network the {@link INetworkCache} to fill from
 	 * @param action should this action be simulated
 	 * @return the new ItemStack */
+	@Deprecated
 	public ItemStack fillFluidItemStack(ItemStack container, StoredFluidStack fill, INetworkCache network, ActionType action) {
 		return container;
 	}
@@ -74,6 +44,7 @@ public class FluidWrapper {
 	 * @param network the {@link INetworkCache} to drain into
 	 * @param action should this action be simulated
 	 * @return the new ItemStack */
+	@Deprecated
 	public ItemStack drainFluidItemStack(ItemStack container, INetworkCache network, ActionType action) {
 		return container;
 	}
@@ -82,12 +53,14 @@ public class FluidWrapper {
 	 * @param player the player interacting
 	 * @param cache the network to fill from
 	 * @param toFill the {@link StoredFluidStack} to fill with */
+	@Deprecated
 	public void fillHeldItem(EntityPlayer player, INetworkCache cache, StoredFluidStack toFill) {
 	}
 
 	/** drains the players current item into the network
 	 * @param player the player interacting
 	 * @param cache the network to drain into */
+	@Deprecated
 	public void drainHeldItem(EntityPlayer player, INetworkCache cache) {
 	}
 }

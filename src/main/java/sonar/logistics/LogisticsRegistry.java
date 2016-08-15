@@ -1,20 +1,17 @@
 package sonar.logistics;
 
-import sonar.logistics.api.info.ILogicInfo;
-import sonar.logistics.api.providers.EntityProvider;
-import sonar.logistics.api.providers.TileProvider;
 import sonar.logistics.api.render.InfoInteractionHandler;
 import sonar.logistics.api.wrappers.RegistryWrapper;
 import sonar.logistics.utils.HammerRecipes;
 
 public class LogisticsRegistry extends RegistryWrapper {
 
-	public void registerInfoType(ILogicInfo info) {
+	public void registerInfoType(DEADILogicInfo info) {
 		Logistics.infoTypes.registerObject(info);
 	}
 	
 	public void registerInteractionHandler(InfoInteractionHandler handler) {
-		Logistics.infoInteraction.registerObject(handler);
+		//Logistics.infoInteraction.registerObject(handler);
 	}
 	
 	public void registerTileProvider(TileProvider provider) {

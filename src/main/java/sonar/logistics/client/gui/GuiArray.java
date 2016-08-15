@@ -1,28 +1,29 @@
 package sonar.logistics.client.gui;
 
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.tileentity.TileEntity;
+import org.lwjgl.opengl.GL11;
+
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
 import sonar.core.helpers.FontHelper;
-import sonar.core.inventory.GuiSonar;
+import sonar.core.helpers.RenderHelper;
 import sonar.logistics.common.containers.ContainerArray;
-import sonar.logistics.common.handlers.ArrayHandler;
+import sonar.logistics.parts.ArrayPart;
 
-public class GuiArray extends GuiSonar {
+public class GuiArray extends GuiLogistics {
 	public static final ResourceLocation bground = new ResourceLocation("PracticalLogistics:textures/gui/transceiverArray.png");
 
-	public ArrayHandler handler;
+	public ArrayPart part;
 
-	public GuiArray(InventoryPlayer player, ArrayHandler handler, TileEntity tile) {
-		super(new ContainerArray(player, handler, tile), tile);
-		this.handler = handler;
-		this.ySize=132;
+	public GuiArray(EntityPlayer player, ArrayPart part) {
+		super(new ContainerArray(player, part), part);
+		this.part = part;
+		this.ySize = 132;
 	}
 
 	@Override
 	public void drawGuiContainerForegroundLayer(int par1, int par2) {
 		super.drawGuiContainerForegroundLayer(par1, par2);
-		FontHelper.textCentre(FontHelper.translate("tile.TransceiverArray.name"), xSize, 6, 0);
+		FontHelper.textCentre(FontHelper.translate("item.Array.name"), xSize, 6, white_text);
 	}
 
 	@Override
@@ -30,4 +31,12 @@ public class GuiArray extends GuiSonar {
 		return bground;
 	}
 
+	@Override
+	protected void drawGuiContainerBackgroundLayer(float var1, int var2, int var3) {
+		super.drawGuiContainerBackgroundLayer(var1, var2, var3);
+		this.renderPlayerInventory(7, 50);
+		drawTexturedModalRect(this.guiLeft+16, this.guiTop+19, 0, 0, 18*8, 18);
+		RenderHelper.restoreBlendState();
+		
+	}
 }

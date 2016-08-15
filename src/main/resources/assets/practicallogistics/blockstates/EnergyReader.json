@@ -1,0 +1,24 @@
+{
+    "forge_marker": 1,
+    "defaults": {
+        "model":"practicallogistics:Reader",
+        "textures": {
+            "0":"practicallogistics:model/energyReader_new",
+            "particle":"practicallogistics:blocks/data_cable"
+        }
+     },
+    "variants": {
+        "normal":[],
+        "inventory": [{    
+            "model":"practicallogistics:Reader"
+        }],
+        "facing":{  
+            "north":{"x": 90, "y": 180},            
+            "south":{"x": 90, "y": 0},      
+            "west":{"x": 90, "y": 90}, 
+            "east":{"x": 90, "y": 270},
+            "up":{"x": 180},
+            "down":{}
+        }         
+    }
+}

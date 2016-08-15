@@ -1,15 +1,14 @@
 package sonar.logistics.client.gui;
 
+import org.lwjgl.input.Keyboard;
+
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.util.ResourceLocation;
-
-import org.lwjgl.input.Keyboard;
-
 import sonar.core.SonarCore;
+import sonar.core.client.gui.GuiSonar;
 import sonar.core.helpers.FontHelper;
-import sonar.core.inventory.GuiSonar;
-import sonar.core.network.PacketByteBufServer;
+import sonar.core.network.PacketByteBuf;
 import sonar.logistics.common.containers.ContainerEmptySync;
 import sonar.logistics.common.tileentity.TileEntityEntityNode;
 
@@ -63,7 +62,7 @@ public class GuiEntityNode extends GuiSonar {
 					entity.entityTarget.setObject(0);
 				}
 			}
-			SonarCore.network.sendToServer(new PacketByteBufServer(entity, entity.xCoord, entity.yCoord, entity.zCoord, button.id));
+			SonarCore.network.sendToServer(new PacketByteBuf(entity, entity.getPos(), button.id));
 		}
 		reset();
 	}

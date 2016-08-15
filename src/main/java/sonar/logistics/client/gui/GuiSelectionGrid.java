@@ -1,30 +1,27 @@
 package sonar.logistics.client.gui;
 
-import java.util.List;
-
-import net.minecraft.client.Minecraft;
-import net.minecraft.inventory.Container;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ResourceLocation;
+import java.io.IOException;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
-import sonar.core.inventory.GuiSonar;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.inventory.Container;
+import net.minecraft.util.ResourceLocation;
+import sonar.core.client.gui.GuiSonar;
+import sonar.core.client.gui.widgets.SonarScroller;
+import sonar.core.helpers.FontHelper;
+import sonar.core.helpers.RenderHelper;
+import sonar.core.utils.IWorldPosition;
+import sonar.logistics.api.info.monitor.IMonitorInfo;
+import sonar.logistics.connections.MonitoredList;
 
-public abstract class GuiSelectionGrid<T> extends GuiSonar {
+public abstract class GuiSelectionGrid<T extends IMonitorInfo> extends GuiLogistics {
 
-	public static final ResourceLocation bground = new ResourceLocation("PracticalLogistics:textures/gui/gridSelection.png");
 	public static final ResourceLocation sorting_icons = new ResourceLocation("PracticalLogistics:textures/gui/sorting_icons.png");
-
-	public TileEntity tile;
-	public int xCoord, yCoord, zCoord;
-
-	public float currentScroll;
-	public boolean isScrolling;
-	public boolean wasClicking;
-	public int scrollerLeft, scrollerStart, scrollerEnd, scrollerWidth;
 
 	public abstract void onGridClicked(T selection, int pos, int button, boolean empty);
 
@@ -34,24 +31,20 @@ public abstract class GuiSelectionGrid<T> extends GuiSonar {
 
 	public abstract void renderToolTip(T selection, int x, int y);
 
-	public abstract List<T> getGridList();
+	public abstract MonitoredList<T> getGridList();
 
-	public int getGridSize() {
-		return getGridList() == null ? 0 : getGridList().size();
+	public int getGridSize(MonitoredList<T> list) {
+		return getGridList() == null ? 0 : list.info.size();
 	}
 
-	private boolean needsScrollBars() {
-		if (getGridSize() <= (12 * 7))
+	private boolean needsScrollBars(MonitoredList<T> list) {
+		if (getGridSize(list) <= (12 * 7))
 			return false;
 		return true;
 	}
 
-	public GuiSelectionGrid(Container container, TileEntity entity) {
+	public GuiSelectionGrid(Container container, IWorldPosition entity) {
 		super(container, entity);
-		this.xCoord = entity.xCoord;
-		this.yCoord = entity.yCoord;
-		this.zCoord = entity.zCoord;
-		this.tile = entity;
 	}
 
 	@Override
@@ -63,23 +56,21 @@ public abstract class GuiSelectionGrid<T> extends GuiSonar {
 
 		this.guiLeft = (this.width - this.xSize) / 2;
 		this.guiTop = (this.height - this.ySize) / 2;
-		scrollerLeft = this.guiLeft + 164 + 68;
-		scrollerStart = this.guiTop + 31;
-		scrollerEnd = scrollerStart + 128;
-		scrollerWidth = 10;
+		scroller = new SonarScroller(this.guiLeft + 164 + 68, this.guiTop + 31, 128, 10);
 	}
 
 	@Override
-	protected void mouseClicked(int x, int y, int button) {
+	protected void mouseClicked(int x, int y, int button) throws IOException {
 		super.mouseClicked(x, y, button);
 		if (button == 0 || button == 1) {
+			MonitoredList<T> list = getGridList().copy();
 			if (x - guiLeft >= 13 && x - guiLeft <= 13 + (12 * 18) && y - guiTop >= 32 && y - guiTop <= 32 + (7 * 18)) {
-				int start = (int) (getGridSize() / 12 * this.currentScroll);
+				int start = (int) (getGridSize(list) / 12 * scroller.getCurrentScroll());
 				int X = (x - guiLeft - 13) / 18;
 				int Y = (y - guiTop - 32) / 18;
 				int i = (start * 12) + (12 * Y) + X;
-				if (i < getGridList().size()) {
-					T storedStack = getGridList().get(i);
+				if (i < getGridList().info.size()) {
+					T storedStack = getGridList().info.get(i);
 					if (storedStack != null) {
 						onGridClicked(storedStack, i, button, false);
 						return;
@@ -95,15 +86,15 @@ public abstract class GuiSelectionGrid<T> extends GuiSonar {
 		net.minecraft.client.renderer.RenderHelper.enableGUIStandardItemLighting();
 		renderStrings(x, y);
 		preRender();
-		List<T> list = getGridList();
-		if (list != null) {
-			int start = (int) (getGridSize() / 12 * this.currentScroll);
+		MonitoredList<T> list = getGridList().copy();
+		if (list != null && !list.info.isEmpty()) {
+			int start = (int) (getGridSize(list) / 12 * scroller.getCurrentScroll());
 			int i = start * 12;
-			int finish = Math.min(i + (12 * 7), getGridSize());
+			int finish = Math.min(i + (12 * 7), getGridSize(list));
 			for (int Y = 0; Y < 7; Y++) {
 				for (int X = 0; X < 12; X++) {
 					if (i < finish) {
-						T selection = list.get(i);
+						T selection = list.info.get(i);
 						if (selection != null) {
 							renderSelection(selection, X, Y);
 						}
@@ -114,14 +105,14 @@ public abstract class GuiSelectionGrid<T> extends GuiSonar {
 		}
 		postRender();
 		if (x - guiLeft >= 13 && x - guiLeft <= 13 + (12 * 18) && y - guiTop >= 32 && y - guiTop <= 32 + (7 * 18)) {
-			int start = (int) (getGridSize() / 12 * this.currentScroll);
+			int start = (int) (getGridSize(list) / 12 * scroller.getCurrentScroll());
 			int X = (x - guiLeft - 13) / 18;
 			int Y = (y - guiTop - 32) / 18;
 			int i = (start * 12) + X + ((Y) * 12);
 
 			if (list != null) {
-				if (i < list.size()) {
-					T selection = list.get(i);
+				if (i < list.info.size()) {
+					T selection = list.info.get(i);
 					if (selection != null) {
 
 						GL11.glDisable(GL11.GL_DEPTH_TEST);
@@ -144,68 +135,50 @@ public abstract class GuiSelectionGrid<T> extends GuiSonar {
 	public void postRender() {
 	}
 
-	public void handleMouseInput() {
+	public void handleMouseInput() throws IOException {
 		super.handleMouseInput();
-		float lastScroll = currentScroll;
-		int i = Mouse.getEventDWheel();
-
-		if (i != 0 && this.needsScrollBars()) {
-			int j = getGridSize() + 1;
-
-			if (i > 0) {
-				i = 1;
-			}
-			if (i < 0) {
-				i = -1;
-			}
-
-			this.currentScroll = (float) ((double) this.currentScroll - (double) i / (double) j);
-			if (this.currentScroll < 0.0F) {
-				this.currentScroll = 0.0F;
-			}
-			if (this.currentScroll > 1.0F) {
-				this.currentScroll = 1.0F;
-			}
-		}
+		MonitoredList<T> list = getGridList().copy();
+		scroller.handleMouse(needsScrollBars(list), getGridSize(list));
 	}
 
 	public void drawScreen(int x, int y, float var) {
 		super.drawScreen(x, y, var);
-		float lastScroll = currentScroll;
-		boolean flag = Mouse.isButtonDown(0);
-
-		if (!this.wasClicking && flag && x >= scrollerLeft && y >= scrollerStart && x < scrollerLeft + scrollerWidth && y < scrollerEnd) {
-			this.isScrolling = this.needsScrollBars();
-		}
-		if (!flag) {
-			this.isScrolling = false;
-		}
-
-		this.wasClicking = flag;
-		if (this.isScrolling) {
-			this.currentScroll = ((float) (y - scrollerStart) - 7.5F) / ((float) (scrollerEnd - scrollerStart) - 15.0F);
-
-			if (this.currentScroll < 0.0F) {
-				this.currentScroll = 0.0F;
-			}
-			if (this.currentScroll > 1.0F) {
-				this.currentScroll = 1.0F;
-			}
-		}
+		MonitoredList<T> list = getGridList().copy();
+		scroller.drawScreen(x, y, needsScrollBars(list));
 	}
 
 	@Override
 	protected void drawGuiContainerBackgroundLayer(float var1, int var2, int var3) {
+		super.drawGuiContainerBackgroundLayer(var1, var2, var3);
+		this.renderPlayerInventory(40, 173);
+
+		drawTexturedModalRect(this.guiLeft+102, this.guiTop+8, 0, 0, 18, 18);
+
+		drawRect(guiLeft+12, guiTop+ 31, guiLeft+228, guiTop+ 157, grey_base);
+		drawRect(guiLeft+13, guiTop+ 32, guiLeft+227, guiTop+ 156, blue_overlay);
+		
+		drawRect(guiLeft+12, guiTop+ 170, guiLeft+xSize-12, guiTop+ 252, grey_base);
+		drawRect(guiLeft+13, guiTop+ 171, guiLeft+xSize-13, guiTop+ 251, blue_overlay);
+		//drawRect(left, top, left + width, top + height, blue_overlay);
+		//net.minecraft.client.renderer.RenderHelper.enableGUIStandardItemLighting();
+		///OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240.0F, 240.0F);
+		//GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+		//net.minecraft.client.renderer.RenderHelper.disableStandardItemLighting();
+		RenderHelper.restoreBlendState();
+
+		
+		/*
+		RenderHelper.saveBlendState();
 		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 		Minecraft.getMinecraft().getTextureManager().bindTexture(this.getBackground());
-		drawTexturedModalRect(this.guiLeft, this.guiTop, 0, 0, this.xSize, this.ySize);
-		this.drawTexturedModalRect(scrollerLeft, scrollerStart + (int) ((float) (scrollerEnd - scrollerStart - 17) * this.currentScroll), 176 + 72, 0, 8, 15);
+		drawTransparentRect(this.guiLeft, this.guiTop, this.guiLeft + this.xSize, this.guiTop + this.ySize, FontHelper.getIntFromColor(7, 7, 9));
 
-	}
-
-	@Override
-	public ResourceLocation getBackground() {
-		return bground;
+		int scrollYPos = scrollerStart + (int) ((float) (scrollerEnd - scrollerStart - 17) * this.currentScroll);
+		drawRect(scrollerLeft, scrollerStart, scrollerLeft + 8, scrollerEnd - 2, FontHelper.getIntFromColor(5, 5, 2));
+		drawRect(scrollerLeft, scrollYPos, scrollerLeft + 8, scrollYPos + 15, FontHelper.getIntFromColor(5, 5, 16));
+		drawRect(scrollerLeft, scrollYPos, scrollerLeft + 8, scrollYPos + 15, FontHelper.getIntFromColor(5, 5, 16)); // drawTexturedModalRect(this.guiLeft, this.guiTop, 0, 0, this.xSize, this.ySize); this.drawTexturedModalRect(scrollerLeft, scrollerStart + (int) ((float) (scrollerEnd - scrollerStart - 17) * this.currentScroll), 176 + 72, 0, 8, 15); RenderHelper.restoreBlendState(); 
+		
+		*/
 	}
 
 }

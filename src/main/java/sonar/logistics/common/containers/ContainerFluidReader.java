@@ -1,42 +1,42 @@
 package sonar.logistics.common.containers;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidContainerItem;
 import sonar.core.helpers.NBTHelper.SyncType;
-import sonar.core.inventory.ContainerSync;
+import sonar.core.inventory.ContainerMultipartSync;
 import sonar.core.inventory.slots.SlotList;
-import sonar.logistics.common.handlers.FluidReaderHandler;
+import sonar.logistics.api.readers.FluidReader.Modes;
+import sonar.logistics.parts.FluidReaderPart;
 
-public class ContainerFluidReader extends ContainerSync {
+public class ContainerFluidReader extends ContainerMultipartSync {
 
 	private static final int INV_START = 1, INV_END = INV_START + 26, HOTBAR_START = INV_END + 1, HOTBAR_END = HOTBAR_START + 8;
 	public boolean stackMode = false;
-	FluidReaderHandler handler;
+	FluidReaderPart part;
 
-	public ContainerFluidReader(FluidReaderHandler handler, TileEntity entity, InventoryPlayer inventoryPlayer) {
-		super(handler, entity);
-		addSlots(handler, inventoryPlayer, handler.setting.getObject() == 0);
-		this.handler = handler;
+	public ContainerFluidReader(FluidReaderPart part, EntityPlayer player) {
+		super(part);
+		this.part = part;
+		addSlots(part, player, part.setting.getObject() == Modes.FLUID);
 	}
 
-	public void addSlots(FluidReaderHandler handler, InventoryPlayer inventoryPlayer, boolean hasStack) {
+	public void addSlots(FluidReaderPart handler, EntityPlayer player, boolean hasStack) {
 		stackMode = hasStack;
 		this.inventoryItemStacks.clear();
 		this.inventorySlots.clear();
 		for (int i = 0; i < 3; ++i) {
 			for (int j = 0; j < 9; ++j) {
-				this.addSlotToContainer(new Slot(inventoryPlayer, j + i * 9 + 9, 41 + j * 18, 174 + i * 18));
+				this.addSlotToContainer(new Slot(player.inventory, j + i * 9 + 9, 41 + j * 18, 174 + i * 18));
 			}
 		}
 
 		for (int i = 0; i < 9; ++i) {
-			this.addSlotToContainer(new Slot(inventoryPlayer, i, 41 + i * 18, 232));
+			this.addSlotToContainer(new Slot(player.inventory, i, 41 + i * 18, 232));
 		}
 	}
 
@@ -54,18 +54,19 @@ public class ContainerFluidReader extends ContainerSync {
 			itemstack = itemstack1.copy();
 
 			if (stackMode && par2 >= INV_START) {
-				if (!tile.getWorldObj().isRemote) {
+				if (!part.getWorld().isRemote) {
 					ItemStack copy = itemstack1.copy();
+					//FIXME
 					if (copy != null && copy.getItem() instanceof IFluidContainerItem) {
 						IFluidContainerItem container = (IFluidContainerItem) copy.getItem();
 						FluidStack stack = container.getFluid(copy);
 						if (stack != null) {
-							handler.current = stack;
+							//part.current = stack;
 						}
 					} else if (copy != null) {
 						FluidStack fluid = FluidContainerRegistry.getFluidForFilledItem(copy);
 						if (fluid != null) {
-							handler.current = fluid;
+							//part.current = fluid;
 						}
 					}
 				}
@@ -97,21 +98,26 @@ public class ContainerFluidReader extends ContainerSync {
 		return itemstack;
 	}
 
-	public ItemStack slotClick(int slotID, int buttonID, int flag, EntityPlayer player) {
+    public ItemStack slotClick(int slotID, int drag, ClickType click, EntityPlayer player){
 		Slot targetSlot = slotID < 0 ? null : (Slot) this.inventorySlots.get(slotID);
 		if ((targetSlot instanceof SlotList)) {
-			if (buttonID == 2) {
+			if (drag == 2) {
 				targetSlot.putStack(null);
 			} else {
 				targetSlot.putStack(player.inventory.getItemStack() == null ? null : player.inventory.getItemStack().copy());
 			}
 			return player.inventory.getItemStack();
 		}
-		return super.slotClick(slotID, buttonID, flag, player);
+		return super.slotClick(slotID, drag, click, player);
 	}
 
 	public SyncType[] getSyncTypes() {
 		return new SyncType[] { SyncType.SPECIAL };
+	}
+
+	public void onContainerClosed(EntityPlayer player) {
+		super.onContainerClosed(player);
+		part.removeViewer(player);
 	}
 
 }

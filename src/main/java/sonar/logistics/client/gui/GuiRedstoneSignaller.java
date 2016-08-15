@@ -1,18 +1,18 @@
 package sonar.logistics.client.gui;
 
+import java.io.IOException;
+
+import org.lwjgl.input.Keyboard;
+
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.inventory.Container;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
-
-import org.lwjgl.input.Keyboard;
-
 import sonar.core.SonarCore;
+import sonar.core.client.gui.GuiSonar;
 import sonar.core.helpers.FontHelper;
-import sonar.core.inventory.GuiSonar;
-import sonar.core.network.PacketByteBufServer;
-import sonar.core.network.PacketTextField;
+import sonar.core.network.PacketByteBuf;
 import sonar.logistics.common.containers.ContainerEmptySync;
 import sonar.logistics.common.tileentity.TileEntityRedstoneSignaller;
 
@@ -36,15 +36,15 @@ public abstract class GuiRedstoneSignaller extends GuiSonar {
 		this.ySize = 80;
 		this.guiLeft = (this.width - this.xSize) / 2;
 		this.guiTop = (this.height - this.ySize) / 2;
-		this.buttonList.add(new GuiButton(0, guiLeft + 80, guiTop + 6, 60, 20, this.getSyncType()));
+		this.buttonList.add(new GuiButton(0, guiLeft + 80, guiTop + 6, 60, 20, getSyncType()));
 		type=this.getGuiType();
 		if (type == 0) {
-			integerField = new GuiTextField(this.fontRendererObj, 96, 47, 70, 12);
+			integerField = new GuiTextField(0, this.fontRendererObj, 96, 47, 70, 12);
 			integerField.setMaxStringLength(9);
 			integerField.setText("" + this.getInteger());
 			this.buttonList.add(new GuiButton(1, guiLeft + 68, guiTop + 43, 20, 20, this.getIntegerTypeString()));
 		} else {
-			stringField = new GuiTextField(this.fontRendererObj, 6, 47, 164, 12);
+			stringField = new GuiTextField(1, this.fontRendererObj, 6, 47, 164, 12);
 			stringField.setMaxStringLength(30);
 			stringField.setText(this.getString());
 		}
@@ -107,7 +107,7 @@ public abstract class GuiRedstoneSignaller extends GuiSonar {
 	}
 
 	@Override
-	protected void mouseClicked(int i, int j, int k) {
+	protected void mouseClicked(int i, int j, int k) throws IOException {
 		super.mouseClicked(i, j, k);
 		if (type == 0)
 			integerField.mouseClicked(i - guiLeft, j - guiTop, k);
@@ -127,7 +127,7 @@ public abstract class GuiRedstoneSignaller extends GuiSonar {
 	}
 
 	@Override
-	protected void keyTyped(char c, int i) {
+	protected void keyTyped(char c, int i) throws IOException {
 		if (type == 0 && integerField.isFocused()) {
 			if (c == 13 || c == 27) {
 				integerField.setFocused(false);
@@ -198,7 +198,7 @@ public abstract class GuiRedstoneSignaller extends GuiSonar {
 
 		@Override
 		public void setString(String string) {
-			SonarCore.network.sendToServer(new PacketTextField(string, entity.xCoord, entity.yCoord, entity.zCoord, 1));
+			SonarCore.sendPacketToServer(entity, string, 3);
 			entity.stringName.setObject(string);
 		}
 
@@ -210,7 +210,7 @@ public abstract class GuiRedstoneSignaller extends GuiSonar {
 				entity.dataType.setObject(0);
 			}
 
-			SonarCore.network.sendToServer(new PacketByteBufServer(entity, entity.xCoord, entity.yCoord, entity.zCoord, 0));
+			SonarCore.network.sendToServer(new PacketByteBuf(entity, entity.getPos(), 0));
 		}
 
 		@Override
@@ -220,7 +220,7 @@ public abstract class GuiRedstoneSignaller extends GuiSonar {
 			} else {
 				entity.integerEmitType.setObject(0);
 			}
-			SonarCore.network.sendToServer(new PacketByteBufServer(entity, entity.xCoord, entity.yCoord, entity.zCoord, 1));
+			SonarCore.network.sendToServer(new PacketByteBuf(entity, entity.getPos(), 1));
 		}
 
 		@Override
@@ -236,7 +236,7 @@ public abstract class GuiRedstoneSignaller extends GuiSonar {
 
 		@Override
 		public void setInteger(String string) {
-			SonarCore.network.sendToServer(new PacketTextField(string, entity.xCoord, entity.yCoord, entity.zCoord, 0));
+			SonarCore.sendPacketToServer(entity, string, 2);
 			entity.integerTarget.setObject(Integer.parseInt(string));
 		}
 

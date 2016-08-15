@@ -1,21 +1,21 @@
 package sonar.logistics.client.gui;
 
+import java.io.IOException;
 import java.util.List;
-
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiButton;
-import net.minecraft.inventory.Container;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ResourceLocation;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
-import sonar.core.inventory.GuiSonar;
-import sonar.core.inventory.SonarButtons;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiButton;
+import net.minecraft.inventory.Container;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+import sonar.core.client.gui.GuiSonar;
+import sonar.core.client.gui.SonarButtons.ImageButton;
+import sonar.core.utils.IWorldPosition;
 
 public abstract class GuiSelectionList<T> extends GuiSonar {
 
@@ -26,7 +26,7 @@ public abstract class GuiSelectionList<T> extends GuiSonar {
 	private boolean wasClicking;
 	public int scrollerLeft, scrollerStart, scrollerEnd, scrollerWidth;
 
-	public GuiSelectionList(Container container, TileEntity entity) {
+	public GuiSelectionList(Container container, IWorldPosition entity) {
 		super(container, entity);
 	}
 
@@ -80,7 +80,7 @@ public abstract class GuiSelectionList<T> extends GuiSonar {
 		for (int i = start; i < finish; i++) {
 			if (getSelectionList().get(i) != null) {
 				T info = getSelectionList().get(i);
-				if (isEqualSelection(info, getCurrentSelection())) {
+				if (info!=null && isEqualSelection(info, getCurrentSelection())) {
 					return i - start;
 				}
 			}
@@ -106,7 +106,7 @@ public abstract class GuiSelectionList<T> extends GuiSonar {
 		}
 	}
 
-	public void handleMouseInput() {
+	public void handleMouseInput() throws IOException {
 		super.handleMouseInput();
 		float lastScroll = currentScroll;
 		int i = Mouse.getEventDWheel();
@@ -183,10 +183,8 @@ public abstract class GuiSelectionList<T> extends GuiSonar {
 		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 
 		Minecraft.getMinecraft().getTextureManager().bindTexture(this.getBackground());
-
 		drawTexturedModalRect(this.guiLeft, this.guiTop, 0, 0, this.xSize, this.ySize);
 		drawTexturedModalRect(scrollerLeft, scrollerStart + (int) ((float) (scrollerEnd - scrollerStart - 17) * this.currentScroll), 176 + 72, 0, 8, 15);
-
 		int pos = getDataPosition();
 		int offsetTop = 29;
 		if (getViewableSize() == 7) {
@@ -219,7 +217,7 @@ public abstract class GuiSelectionList<T> extends GuiSonar {
 	}
 
 	@SideOnly(Side.CLIENT)
-	public class SelectionButton extends SonarButtons.ImageButton {
+	public class SelectionButton extends ImageButton {
 
 		public SelectionButton(int id, int x, int y) {
 			super(id, x, y, getBackground(), 0, 202, 154 + 72, getSelectionHeight());

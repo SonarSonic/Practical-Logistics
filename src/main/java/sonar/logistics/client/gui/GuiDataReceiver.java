@@ -3,24 +3,21 @@ package sonar.logistics.client.gui;
 import java.awt.Color;
 import java.util.List;
 
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.util.StatCollector;
-import net.minecraftforge.common.util.ForgeDirection;
-
 import org.lwjgl.opengl.GL11;
 
+import net.minecraft.entity.player.InventoryPlayer;
 import sonar.core.SonarCore;
-import sonar.core.api.BlockCoords;
+import sonar.core.api.utils.BlockCoords;
 import sonar.core.helpers.FontHelper;
-import sonar.core.network.PacketByteBufServer;
-import sonar.logistics.Logistics;
+import sonar.core.network.PacketByteBuf;
+import sonar.logistics.api.connecting.IDataEmitter;
 import sonar.logistics.api.utils.ExternalCoords;
 import sonar.logistics.api.utils.IdentifiedCoords;
 import sonar.logistics.common.containers.ContainerDataReceiver;
 import sonar.logistics.common.tileentity.TileEntityDataReceiver;
-import sonar.logistics.network.packets.PacketCoordsSelection;
+import sonar.logistics.monitoring.MonitoredBlockCoords;
 
-public class GuiDataReceiver extends GuiSelectionList<IdentifiedCoords> {
+public class GuiDataReceiver extends GuiSelectionList<MonitoredBlockCoords> {
 
 	public TileEntityDataReceiver tile;
 
@@ -30,12 +27,12 @@ public class GuiDataReceiver extends GuiSelectionList<IdentifiedCoords> {
 	}
 
 	@Override
-	public List<IdentifiedCoords> getSelectionList() {
+	public List<MonitoredBlockCoords> getSelectionList() {
 		return tile.emitters;
 	}
 
 	@Override
-	public IdentifiedCoords getCurrentSelection() {
+	public MonitoredBlockCoords getCurrentSelection() {
 		ExternalCoords channel = tile.getChannel();
 		if (channel != null) {
 			return tile.getChannel().getIdentifiedCoords();
@@ -44,18 +41,18 @@ public class GuiDataReceiver extends GuiSelectionList<IdentifiedCoords> {
 	}
 
 	@Override
-	public boolean isEqualSelection(IdentifiedCoords selection, IdentifiedCoords current) {
+	public boolean isEqualSelection(MonitoredBlockCoords selection, MonitoredBlockCoords current) {
 		return BlockCoords.equalCoords(selection.blockCoords, current.blockCoords);
 	}
 
 	@Override
 	public void renderStrings(int x, int y) {
-		FontHelper.textCentre(StatCollector.translateToLocal("tile.DataReceiver.name"), xSize, 6, 1);
+		FontHelper.textCentre(FontHelper.translate("tile.DataReceiver.name"), xSize, 6, 1);
 		FontHelper.textCentre("Select the emitter you wish to connect to", xSize, 18, 0);
 	}
 
 	@Override
-	public void renderSelection(IdentifiedCoords selection, boolean isSelected, int pos) {
+	public void renderSelection(MonitoredBlockCoords selection, boolean isSelected, int pos) {
 		FontHelper.text(selection.coordString, 10, 31 + (12 * pos), isSelected ? Color.GREEN.getRGB() : Color.WHITE.getRGB());
 		GL11.glPushMatrix();
 		GL11.glScaled(0.75, 0.75, 0.75);
@@ -65,9 +62,9 @@ public class GuiDataReceiver extends GuiSelectionList<IdentifiedCoords> {
 	}
 
 	@Override
-	public void sendPacket(IdentifiedCoords selection) {
-		tile.selected = selection;
-		SonarCore.network.sendToServer(new PacketByteBufServer(tile, tile.xCoord, tile.yCoord, tile.zCoord, 0));
+	public void sendPacket(MonitoredBlockCoords selection) {
+		tile.selectedColour = selection;
+		SonarCore.network.sendToServer(new PacketByteBuf(tile, tile.getPos(), 0));
 
 	}
 

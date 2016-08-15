@@ -2,16 +2,15 @@ package sonar.logistics.client.gui;
 
 import java.text.SimpleDateFormat;
 
-import net.minecraft.client.gui.GuiButton;
-import net.minecraft.util.ResourceLocation;
-
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
+import net.minecraft.client.gui.GuiButton;
+import net.minecraft.util.ResourceLocation;
 import sonar.core.SonarCore;
+import sonar.core.client.gui.GuiSonar;
 import sonar.core.helpers.FontHelper;
-import sonar.core.inventory.GuiSonar;
-import sonar.core.network.PacketByteBufServer;
+import sonar.core.network.PacketByteBuf;
 import sonar.logistics.common.containers.ContainerEmptySync;
 import sonar.logistics.common.tileentity.TileEntityClock;
 
@@ -56,14 +55,9 @@ public class GuiClock extends GuiSonar {
 
 	}
 
-	@Override
-	protected void mouseClicked(int i, int j, int k) {
-		super.mouseClicked(i, j, k);
-	}
-
 	protected void actionPerformed(GuiButton button) {
 		if (button != null) {
-			SonarCore.network.sendToServer(new PacketByteBufServer(entity, entity.xCoord, entity.yCoord, entity.zCoord, button.id));
+			SonarCore.network.sendToServer(new PacketByteBuf(entity, entity.getPos(), button.id));
 			
 		}
 		reset();
@@ -81,6 +75,6 @@ public class GuiClock extends GuiSonar {
 
 	public void setLong(String string) {
 		entity.tickTime.setObject(Long.parseLong(string));
-		SonarCore.network.sendToServer(new PacketByteBufServer(entity, entity.xCoord, entity.yCoord, entity.zCoord, 1));
+		SonarCore.network.sendToServer(new PacketByteBuf(entity, entity.getPos(), 1));
 	}
 }

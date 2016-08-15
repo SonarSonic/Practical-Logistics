@@ -1,291 +1,140 @@
 package sonar.logistics.api.info;
 
-import io.netty.buffer.ByteBuf;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraftforge.common.util.Constants;
+import sonar.core.api.nbt.INBTSyncable;
+import sonar.core.helpers.FontHelper;
+import sonar.core.helpers.NBTHelper;
 import sonar.core.helpers.NBTHelper.SyncType;
-import sonar.logistics.api.LogisticsAPI;
-import sonar.logistics.api.providers.ICategoryProvider;
-import cpw.mods.fml.common.network.ByteBufUtils;
+import sonar.core.utils.Pair;
+import sonar.logistics.Logistics;
+import sonar.logistics.api.info.monitor.IMonitorInfo;
+import sonar.logistics.registries.LogicRegistry;
+import sonar.logistics.registries.LogicRegistry.RegistryType;
 
-public class LogicInfo<T extends LogicInfo> extends ILogicInfo<T> {
+public class LogicInfo implements IMonitorInfo<LogicInfo>, INBTSyncable, INameableInfo<LogicInfo> {
 
-	public boolean emptyData;
-	public boolean entity = false;
-	public String category = "ERROR", subCategory = "ERROR", data = "", suffix = "";
-	public int dataType;
-	public int providerID = -1, catID = -1, subCatID = -1;
+	public InfoType infoType;
+	public String identifier;
+	public RegistryType registryType;
+	public Object obj;
+	public boolean isCategory = false;
 
-	public LogicInfo() {
+	public static LogicInfo buildCategoryInfo(RegistryType type) {
+		LogicInfo info = new LogicInfo();
+		info.registryType = type;
+		info.isCategory = true;
+		return info;
 	}
 
-	public LogicInfo(int providerID, int category, int subCategory, Object data) {
-		this.providerID = providerID;
-		this.catID = category;
-		this.subCatID = subCategory;
-		this.data = data.toString();
-		this.dataType = data instanceof Long || data instanceof Integer || data instanceof Short ? 0 : 1;
-	}
+	public static LogicInfo buildDirectInfo(String identifier, RegistryType type, Object obj) {
+		LogicInfo info = new LogicInfo();
+		info.infoType = InfoType.getInfoType(obj);
+		info.obj = obj;
+		info.registryType = type;
+		info.identifier = identifier;
 
-	public LogicInfo(int providerID, String category, String subCategory, Object data) {
-		this.providerID = providerID;
-		this.category = category;
-		this.subCategory = subCategory;
-		this.data = data.toString();
-		this.dataType = data instanceof Long || data instanceof Integer || data instanceof Short ? 0 : 1;
-	}
-
-	public LogicInfo addSuffix(String suffix) {
-		this.suffix = suffix;
-		return this;
-	}
-
-	public LogicInfo isEntityData(boolean bool) {
-		this.entity = bool;
-		return this;
+		if (info.infoType == InfoType.NONE) {
+			Logistics.logger.error(String.format("Invalid Info: %s with object %s", identifier, obj));
+			return null;
+		}
+		return info;
 	}
 
 	@Override
-	public String getName() {
-		return "Standard";
+	public boolean isIdenticalInfo(LogicInfo info) {
+		return isMatchingInfo(info) && obj.equals(info.obj);
 	}
 
 	@Override
-	public int getProviderID() {
-		return providerID;
+	public boolean isMatchingInfo(LogicInfo info) {
+		return infoType.equals(info.infoType) && identifier.equals(info.identifier) && registryType.equals(info.registryType);
 	}
 
 	@Override
-	public String getCategory() {
-		ICategoryProvider provider = getRegistryObject();
-		if (providerID != -1 && provider == null) {
-			return "UNLOADED MOD";
-		}
-		return (catID == -1 || providerID == -1) ? category : provider.getCategory(catID);
+	public void updateFrom(LogicInfo info) {
+		obj = info.obj;
 	}
 
 	@Override
-	public String getSubCategory() {
-		ICategoryProvider provider = getRegistryObject();
-		if (providerID != -1 && provider == null) {
-			return "ERROR";
-		}
-		return (subCatID == -1 || providerID == -1) ? subCategory : provider.getSubCategory(subCatID);
-	}
-
-	public ICategoryProvider getRegistryObject() {
-		if (entity) {
-			return LogisticsAPI.getRegistry().getEntityProvider(providerID);
-		}
-		return LogisticsAPI.getRegistry().getTileProvider(providerID);
+	public void readData(NBTTagCompound nbt, SyncType type) {
+		infoType = InfoType.values()[nbt.getInteger("type")];
+		registryType = RegistryType.values()[nbt.getInteger("registryType")];
+		identifier = nbt.getString("id");
+		obj = NBTHelper.readNBTBase(nbt, infoType.tagType, "obj");
 	}
 
 	@Override
-	public String getData() {
-		return !emptyData ? data : this.dataType == 1 ? "NO DATA" : String.valueOf(0);
+	public NBTTagCompound writeData(NBTTagCompound nbt, SyncType type) {
+		nbt.setInteger("type", infoType.ordinal());
+		nbt.setInteger("registryType", registryType.ordinal());
+		nbt.setString("id", identifier);
+		NBTHelper.writeNBTBase(nbt, infoType.tagType, obj, "obj");
+		return nbt;
 	}
 
-	@Override
-	public String getDisplayableData() {
-		if (suffix != null) {
-			return getData() + " " + suffix;
-		} else {
-			return getData();
-		}
+	public static LogicInfo readFromNBT(NBTTagCompound nbt) {
+		LogicInfo info = new LogicInfo();
+		info.readData(nbt, SyncType.SAVE);
+		return info;
+
 	}
 
-	@Override
-	public int getDataType() {
-		return dataType;
+	public NBTTagCompound writeToNBT(NBTTagCompound tag) {
+		return writeData(tag, SyncType.SAVE);
 	}
 
-	@Override
-	public void readFromBuf(ByteBuf buf) {
-		this.entity = buf.readBoolean();
-		this.providerID = buf.readInt();
-		if (buf.readBoolean()) {
-			this.catID = buf.readInt();
-		} else {
-			this.category = ByteBufUtils.readUTF8String(buf);
-		}
-		if (buf.readBoolean()) {
-			this.subCatID = buf.readInt();
-		} else {
-			this.subCategory = ByteBufUtils.readUTF8String(buf);
-		}
-		this.data = ByteBufUtils.readUTF8String(buf);
-		this.dataType = buf.readInt();
-		this.emptyData = buf.readBoolean();
-		if (buf.readBoolean()) {
-			this.suffix = ByteBufUtils.readUTF8String(buf);
-		}
+	public String getClientIdentifier() {
+		return FontHelper.translate("pl." + identifier);
 	}
 
-	@Override
-	public void writeToBuf(ByteBuf buf) {
-		buf.writeBoolean(entity);
-		buf.writeInt(providerID);
-		if (catID != -1) {
-			buf.writeBoolean(true);
-			buf.writeInt(catID);
-		} else {
-			buf.writeBoolean(false);
-			ByteBufUtils.writeUTF8String(buf, category);
+	public String getClientObject() {
+		String prefix = "", suffix = "";
+		Pair<String, String> adjustment = LogicRegistry.infoAdjustments.get(identifier);
+		if (identifier.equals("Block.getUnlocalizedName")) {
+			return FontHelper.translate(obj.toString() + ".name");
 		}
-		if (subCatID != -1) {
-			buf.writeBoolean(true);
-			buf.writeInt(subCatID);
-		} else {
-			buf.writeBoolean(false);
-			ByteBufUtils.writeUTF8String(buf, subCategory);
+		if (adjustment != null) {
+			if (!adjustment.a.isEmpty())
+				prefix = adjustment.a + " ";
+			if (!adjustment.b.isEmpty())
+				suffix = " " + adjustment.b;
 		}
-		ByteBufUtils.writeUTF8String(buf, data);
-		buf.writeInt(dataType);
-		buf.writeBoolean(emptyData);
-		if (this.suffix != null) {
-			buf.writeBoolean(true);
-			ByteBufUtils.writeUTF8String(buf, suffix);
-		} else {
-			buf.writeBoolean(false);
-		}
+		return prefix + obj.toString() + suffix;
 	}
 
-	public void readFromNBT(NBTTagCompound tag) {
-		this.entity = tag.getBoolean("e");
-		this.providerID = tag.getInteger("prov");
-		if (tag.getBoolean("BcatID")) {
-			this.catID = tag.getInteger("catID");
-		} else {
-			this.category = tag.getString("category");
-		}
-		if (tag.getBoolean("BsubCatID")) {
-			this.subCatID = tag.getInteger("subCatID");
-		} else {
-			this.subCategory = tag.getString("subCategory");
-		}
-
-		this.data = tag.getString("data");
-		this.dataType = tag.getInteger("dataType");
-		this.emptyData = tag.getBoolean("emptyData");
-		if (tag.getBoolean("hasSuffix")) {
-			this.suffix = tag.getString("suffix");
-		}
+	public String getClientType() {
+		return infoType.toString().toLowerCase();
 	}
 
-	public void writeToNBT(NBTTagCompound tag) {
-		tag.setBoolean("e", entity);
-		tag.setInteger("prov", providerID);
-		if (catID != -1) {
-			tag.setBoolean("BcatID", true);
-			tag.setInteger("catID", catID);
-		} else {
-			tag.setBoolean("BcatID", false);
-			tag.setString("category", category);
+	public enum InfoType {
+		BOOLEAN(Constants.NBT.TAG_END, Boolean.class), BYTE(Constants.NBT.TAG_BYTE, Byte.class), SHORT(Constants.NBT.TAG_SHORT, Short.class), INTEGER(Constants.NBT.TAG_INT, Integer.class), LONG(Constants.NBT.TAG_LONG, Long.class), FLOAT(Constants.NBT.TAG_FLOAT, Float.class), DOUBLE(Constants.NBT.TAG_DOUBLE, Double.class), STRING(Constants.NBT.TAG_STRING, String.class), NONE(-1, null);
+		public int tagType;
+		public Class<?> classType;
+
+		InfoType(int tagType, Class<?> classType) {
+			this.tagType = tagType;
+			this.classType = classType;
 		}
-		if (subCatID != -1) {
-			tag.setBoolean("BsubCatID", true);
-			tag.setInteger("subCatID", subCatID);
-		} else {
-			tag.setBoolean("BsubCatID", false);
-			tag.setString("subCategory", subCategory);
-		}
-		tag.setString("data", data);
-		tag.setInteger("dataType", dataType);
-		tag.setBoolean("emptyData", emptyData);
-		if (this.suffix != null) {
-			tag.setBoolean("hasSuffix", true);
-			tag.setString("suffix", suffix);
-		} else {
-			tag.setBoolean("hasSuffix", false);
+
+		public static InfoType getInfoType(Object obj) {
+			for (InfoType type : values()) {
+				if (type.classType != null && (type.classType.isInstance(obj) || type.classType.isAssignableFrom(obj.getClass()))) {
+					return type;
+				}
+			}
+			return NONE;
 		}
 	}
 
 	@Override
-	public LogicInfo instance() {
-		return new LogicInfo();
-	}
-
-	public void setData(String string) {
-		data = string;
+	public boolean isHeader() {
+		return isCategory;
 	}
 
 	@Override
-	public void writeUpdate(LogicInfo currentInfo, NBTTagCompound tag) {
-		if (currentInfo.entity != this.entity) {
-			entity = currentInfo.entity;
-			tag.setBoolean("e", entity);
-		}
-		if (currentInfo.providerID != this.providerID) {
-			providerID = currentInfo.providerID;
-			tag.setInteger("id", providerID);
-		}
-		if (currentInfo.dataType != this.dataType) {
-			dataType = currentInfo.dataType;
-			tag.setInteger("dT", dataType);
-		}
-		if (currentInfo.catID == -1 && !currentInfo.category.equals(this.category)) {
-			category = currentInfo.category;
-			tag.setString("c", category);
-		} else if (currentInfo.catID != -1 && currentInfo.catID != this.catID) {
-			catID = currentInfo.catID;
-			tag.setInteger("cI", catID);
-		}
-		if (currentInfo.subCatID == -1 && !currentInfo.subCategory.equals(this.subCategory)) {
-			subCategory = currentInfo.subCategory;
-			tag.setString("sC", subCategory);
-
-		} else if (currentInfo.subCatID != -1 && currentInfo.subCatID != this.subCatID) {
-			subCatID = currentInfo.subCatID;
-			tag.setInteger("sCI", subCatID);
-		}
-		if (!currentInfo.data.equals(this.data)) {
-			data = currentInfo.data;
-			tag.setString("d", data);
-		}
-		if (currentInfo.suffix != null && !currentInfo.suffix.equals(this.suffix)) {
-			suffix = currentInfo.suffix;
-			tag.setString("s", suffix);
-		}
+	public boolean isMatchingType(IMonitorInfo info) {
+		return info instanceof LogicInfo;
 	}
 
-	@Override
-	public void readUpdate(NBTTagCompound tag) {
-		if (tag.hasKey("e")) {
-			entity = tag.getBoolean("e");
-		}
-		if (tag.hasKey("id")) {
-			providerID = tag.getInteger("id");
-		}
-		if (tag.hasKey("dT")) {
-			dataType = tag.getInteger("dT");
-		}
-		if (tag.hasKey("c")) {
-			category = tag.getString("c");
-		}
-		if (tag.hasKey("cI")) {
-			catID = tag.getInteger("cI");
-		}
-		if (tag.hasKey("sC")) {
-			subCategory = tag.getString("sC");
-		}
-		if (tag.hasKey("sCI")) {
-			subCatID = tag.getInteger("sCI");
-		}
-		if (tag.hasKey("d")) {
-			data = tag.getString("d");
-		}
-		if (tag.hasKey("s")) {
-			suffix = tag.getString("s");
-		}
-	}
-
-	@Override
-	public SyncType isMatchingData(T currentInfo) {	
-		if(currentInfo.getProviderID() != this.providerID || currentInfo.dataType != dataType || !currentInfo.category.equals(category) || !currentInfo.subCategory.equals(subCategory) || currentInfo.catID != catID || currentInfo.subCatID != subCatID){
-			return SyncType.SAVE;
-		}
-		if(!currentInfo.data.equals(data) || !currentInfo.suffix.equals(suffix)){
-			return SyncType.SYNC;
-		}
-		return null;
-	}
 }

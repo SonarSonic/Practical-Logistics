@@ -2,6 +2,7 @@ package sonar.logistics.common.containers;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import sonar.core.helpers.NBTHelper.SyncType;
@@ -128,11 +129,11 @@ public class ContainerItemRouter extends ContainerSync {
 		return itemstack;
 	}
 
-	public ItemStack slotClick(int slotID, int buttonID, int flag, EntityPlayer player) {
+    public ItemStack slotClick(int slotID, int drag, ClickType click, EntityPlayer player){
 		if (state == 1) {
 			Slot targetSlot = slotID < 0 ? null : (Slot) this.inventorySlots.get(slotID);
 			if ((targetSlot instanceof SlotList)) {
-				if (buttonID == 1) {
+				if (drag == 1) {
 					targetSlot.putStack(null);
 				} else {
 					targetSlot.putStack(player.inventory.getItemStack() == null ? null : player.inventory.getItemStack().copy());
@@ -140,7 +141,7 @@ public class ContainerItemRouter extends ContainerSync {
 				return player.inventory.getItemStack();
 			}
 		}
-		return super.slotClick(slotID, buttonID, flag, player);
+		return super.slotClick(slotID, drag, click, player);
 	}
 
 	public SyncType[] getSyncTypes() {

@@ -1,35 +1,22 @@
 package sonar.logistics.common.containers;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
 import sonar.core.helpers.NBTHelper.SyncType;
-import sonar.core.inventory.ContainerSync;
-import sonar.logistics.common.handlers.InfoReaderHandler;
-import sonar.logistics.common.tileentity.TileEntityInfoReader;
+import sonar.core.inventory.ContainerMultipartSync;
+import sonar.logistics.parts.InfoReaderPart;
 
-public class ContainerInfoReader extends ContainerSync {
+public class ContainerInfoReader extends ContainerMultipartSync {
 
-	public ContainerInfoReader(InfoReaderHandler handler, TileEntity tile) {
-		super(handler, tile);
+	public ContainerInfoReader(EntityPlayer player, InfoReaderPart handler) {
+		super(handler);
 	}
 
 	@Override
 	public void detectAndSendChanges() {
 		super.detectAndSendChanges();
-		if (sync != null) {
-			if (crafters != null) {
-				for (Object o : crafters) {
-					if (o != null && o instanceof EntityPlayerMP) {
-						if (tile instanceof TileEntityInfoReader) {
-							((TileEntityInfoReader) tile).sendAvailableData((EntityPlayerMP) o);
-						}
-					}
-				}
-			}
-		}
 	}
 
 	public boolean syncInventory() {
@@ -48,14 +35,14 @@ public class ContainerInfoReader extends ContainerSync {
 	}
 
 	@Override
-	public ItemStack slotClick(int slot, int button, int flag, EntityPlayer player) {
-		if (slot >= 0 && getSlot(slot) != null && getSlot(slot).getStack() == player.getHeldItem()) {
+    public ItemStack slotClick(int slotID, int drag, ClickType click, EntityPlayer player){
+		if (slotID >= 0 && getSlot(slotID) != null && getSlot(slotID).getStack() == player.getHeldItemMainhand()) {
 			return null;
 		}
-		return super.slotClick(slot, button, flag, player);
+		return super.slotClick(slotID, drag, click, player);
 	}
 
 	public SyncType[] getSyncTypes() {
-		return new SyncType[] { SyncType.SPECIAL };
+		return new SyncType[] { SyncType.DEFAULT_SYNC };
 	}
 }

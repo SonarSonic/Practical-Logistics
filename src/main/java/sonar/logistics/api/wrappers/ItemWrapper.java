@@ -1,94 +1,27 @@
 package sonar.logistics.api.wrappers;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraftforge.common.util.ForgeDirection;
-import sonar.core.api.ActionType;
-import sonar.core.api.BlockCoords;
-import sonar.core.api.InventoryHandler.StorageSize;
-import sonar.core.api.StoredItemStack;
+import net.minecraft.util.EnumFacing;
+import sonar.core.api.StorageSize;
+import sonar.core.api.inventories.StoredItemStack;
+import sonar.core.api.utils.ActionType;
+import sonar.core.api.utils.BlockCoords;
 import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.connecting.IConnectionNode;
 import sonar.logistics.api.connecting.IEntityNode;
 
 public class ItemWrapper {
-
-	public static class StorageItems {
-
-		public static final StorageItems EMPTY = new StorageItems(new ArrayList(), StorageSize.EMPTY, new ArrayList(), new ArrayList());
-		public ArrayList<StoredItemStack> items;
-		/** when this is null and last time there was a list, everything should be updated, if last time was null don't do anything */
-		public ArrayList<StoredItemStack> changed = new ArrayList();
-		public ArrayList<StoredItemStack> removed = new ArrayList();
-		public StorageSize sizing;
-
-		public StorageItems(ArrayList<StoredItemStack> items, StorageSize sizing, ArrayList<StoredItemStack> changed, ArrayList<StoredItemStack> removed) {
-			this.items = items;
-			this.sizing = sizing;
-			this.changed = changed;
-			this.removed = removed;
-		}
-
-		public StorageItems copy() {
-			return new StorageItems((ArrayList<StoredItemStack>) this.items.clone(), sizing, (ArrayList<StoredItemStack>) changed.clone(), (ArrayList<StoredItemStack>) removed.clone());
-		}
-	}
-
-	public static enum SortingDirection {
-		DOWN, UP;
-
-		public SortingDirection switchDir() {
-			switch (this) {
-			case DOWN:
-				return UP;
-			default:
-				return DOWN;
-			}
-		}
-	}
-
-	public static enum SortingType {
-		STORED, NAME, MODID;
-
-		public SortingType switchDir() {
-			switch (this) {
-			case STORED:
-				return NAME;
-			case NAME:
-				return MODID;
-			default:
-				return STORED;
-			}
-		}
-
-		public String getTypeName() {
-			switch (this) {
-			case STORED:
-				return "Items Stored";
-			case NAME:
-				return "Item Name";
-			default:
-				return "Item Name";
-			}
-		}
-	}
-	/** used for getting the full list of Items on a given network
-	 * @param network the {@link INetworkCache} to get Items from
-	 * @return list of {@link StoredItemStack} on the network */
-	public StorageItems getItems(INetworkCache network) {
-		return StorageItems.EMPTY;
-	}
-
+	
 	/** used for getting the full list of Items at a given {@link IConnectionNode}
 	 * @param storedStacks current list of {@link StoredItemStack} to be added to
 	 * @param storage currentStorageSize
 	 * @param node {@link IConnectionNode} to check from
 	 * @return list of {@link StoredItemStack} on the network */
-	public StorageSize getTileInventory(List<StoredItemStack> storedStacks, StorageSize storage, Map<BlockCoords, ForgeDirection> connections) {
+	public StorageSize getTileInventory(List<StoredItemStack> storedStacks, StorageSize storage, Map<BlockCoords, EnumFacing> connections) {
 		return storage;
 	}
 

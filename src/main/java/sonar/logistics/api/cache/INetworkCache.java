@@ -6,21 +6,22 @@ import java.util.Map.Entry;
 
 import net.minecraft.block.Block;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraftforge.common.util.ForgeDirection;
-import sonar.core.api.BlockCoords;
-import sonar.logistics.api.connecting.IChannelProvider;
+import net.minecraft.util.EnumFacing;
+import sonar.core.api.utils.BlockCoords;
 
 /** implemented on Logistics Network Caches, used for retrieving info about  */
 public interface INetworkCache {
 
 	/** used to get the first external block connected to the network.
 	 * @param includeChannels normally true, false if you are retrieving blocks from multiple connected networks, which have already been logged
-	 * @return a {@link Entry} of {@link BlockCoords} paired with {@link ForgeDirection} */
-	public Entry<BlockCoords, ForgeDirection> getExternalBlock(boolean includeChannels);
+	 * @return a {@link Entry} of {@link BlockCoords} paired with {@link EnumFacing} */
+	@Deprecated
+	public Entry<BlockCoords, EnumFacing> getExternalBlock(boolean includeChannels);
 
 	/** @param includeChannels normally true, false if you are retrieving blocks from multiple connected networks, which have already been logged
-	 * @return the {@link LinkedHashMap} of {@link BlockCoords} paired with {@link ForgeDirection} */
-	public LinkedHashMap<BlockCoords, ForgeDirection> getExternalBlocks(boolean includeChannels);
+	 * @return the {@link LinkedHashMap} of {@link BlockCoords} paired with {@link EnumFacing} */
+	@Deprecated
+	public LinkedHashMap<BlockCoords, EnumFacing> getExternalBlocks(boolean includeChannels);
 
 	/** gets the full list of Cached Coordinates for a given {@link CacheType}.
 	 * @param type the {@link CacheType} you wish to retrieve.
@@ -51,5 +52,7 @@ public interface INetworkCache {
 	 * @return same ArrayList with the Networks associated with this network added
 	 */
 	public ArrayList<Integer> getConnectedNetworks(ArrayList<Integer> networks);
+	
+	public boolean isFakeNetwork();
 	
 }

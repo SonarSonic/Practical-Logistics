@@ -1,0 +1,22 @@
+{
+    "forge_marker": 1,
+    "defaults": {
+        "textures": {
+	        "0":"practicallogistics:model/data_receiver_base",
+	        "1":"practicallogistics:model/data_receiver_connection",
+	        "2":"practicallogistics:model/data_receiver_receiver",
+            "particle":"practicallogistics:blocks/data_cable"
+	    },
+        "model":"practicallogistics:DataEmitter",        
+        "transform":"forge:default-block"
+    },
+    "variants": {  
+        "inventory": [{}],  
+        "facing": {
+            "north":{},
+            "south":{"y": 180}, 
+            "west":{"y": 270},
+            "east":{"y": 90}
+        }
+    }
+}

@@ -1,0 +1,19 @@
+{
+    "forge_marker": 1,
+    "defaults": {
+        "textures": {
+            "particle":"practicallogistics:blocks/data_cable"
+	    },
+        "model":"practicallogistics:LargeDisplayScreen",        
+        "transform":"forge:default-block"
+    },
+    "variants": {  
+        "inventory": [{}],  
+        "facing": {
+            "north":{"y": 180},
+            "south":{ }, 
+            "west":{"y": 90},
+            "east":{"y": 270}
+        }
+    }
+}
