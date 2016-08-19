@@ -3,7 +3,6 @@ package sonar.logistics.parts;
 import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.util.math.AxisAlignedBB;
 import sonar.core.integration.multipart.SonarMultipart;
-import sonar.core.network.sync.SyncCoords;
 import sonar.core.network.sync.SyncTagType;
 import sonar.core.network.sync.SyncTagType.INT;
 import sonar.logistics.api.cache.EmptyNetworkCache;
@@ -15,6 +14,7 @@ public abstract class LogisticsMultipart extends SonarMultipart implements ILogi
 	public INetworkCache network = EmptyNetworkCache.INSTANCE;
 	public SyncTagType.INT registryID = (INT) new SyncTagType.INT(0).setDefault(-1);
 	public static final PropertyDirection ORIENTATION = PropertyDirection.create("facing");
+	public static final PropertyDirection ROTATION = PropertyDirection.create("rotation");
 
 	public LogisticsMultipart() {
 		super();

@@ -1,6 +1,5 @@
 package sonar.logistics.connections;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map.Entry;
@@ -13,6 +12,9 @@ import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.core.utils.Pair;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.cache.IMonitorCache;
+import sonar.logistics.api.display.IInfoDisplay;
+import sonar.logistics.api.info.IInfoContainer;
+import sonar.logistics.api.info.InfoContainer;
 import sonar.logistics.api.info.monitor.ChannelType;
 import sonar.logistics.api.info.monitor.ILogicMonitor;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
@@ -29,6 +31,19 @@ public abstract class MonitorCache implements IMonitorCache {
 
 	public LinkedHashMap<MonitorHandler, LinkedHashMap<Pair<BlockCoords, EnumFacing>, MonitoredList<?>>> monitoredList = new LinkedHashMap();
 	public LinkedHashMap<MonitorHandler, LinkedHashMap<ILogicMonitor, MonitoredList<?>>> monitoredCollections = new LinkedHashMap();
+	public LinkedHashMap<IInfoDisplay, IInfoContainer> displayCollections = new LinkedHashMap();
+
+	public void addDisplay(IInfoDisplay display) {
+		if (!displayCollections.containsKey(display)) {
+			displayCollections.put(display, new InfoContainer());
+		}
+	}
+
+	public void removeDisplay(IInfoDisplay display) {
+		if (displayCollections.containsKey(display)) {
+			displayCollections.remove(display);
+		}
+	}
 
 	public <T extends IMonitorInfo> void addMonitor(ILogicMonitor<T> monitor) {
 		monitoredCollections.putIfAbsent(monitor.getHandler(), new LinkedHashMap());
@@ -55,7 +70,7 @@ public abstract class MonitorCache implements IMonitorCache {
 					for (T info : ((MonitoredList<T>) entry.getValue()).info) {
 						MonitorHelper.addInfoToList(list, monitor.getHandler(), info);
 					}
-					if(monitor.channelType()==ChannelType.SINGLE){
+					if (monitor.channelType() == ChannelType.SINGLE) {
 						break;
 					}
 				}

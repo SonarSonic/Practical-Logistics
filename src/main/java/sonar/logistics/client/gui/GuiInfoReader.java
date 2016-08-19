@@ -29,6 +29,7 @@ import sonar.logistics.Logistics;
 import sonar.logistics.LogisticsItems;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
 import sonar.logistics.api.info.monitor.MonitorType;
+import sonar.logistics.client.LogisticsColours;
 import sonar.logistics.client.RenderBlockSelection;
 import sonar.logistics.common.containers.ContainerInfoReader;
 import sonar.logistics.connections.CacheRegistry;
@@ -89,38 +90,51 @@ public class GuiInfoReader extends GuiLogistics {
 		}
 	}
 
-	public int getColour(int i) {
+	public int getColour(int i, int type) {
 		switch (state) {
 		case CHANNEL:
 			// MonitoredBlockCoords coordIndo = (MonitoredBlockCoords) coords.get(i + start);
-			return selectedColour;
+			return LogisticsColours.getDefaultSelection().getRGB();
 		case INFO:
 			IMonitorInfo info = infoList.get(i + start);
 			if (info == null || info.isHeader()) {
-				return grey_base;
+				return LogisticsColours.layers[1].getRGB();
 			}
-			ArrayList<IMonitorInfo> selectedInfo = part.getSelectedInfo();
+			ArrayList<IMonitorInfo> selectedInfo = type==0 ? part.getSelectedInfo() : part.getPairedInfo();
 			int pos = 0;
 			for (IMonitorInfo selected : selectedInfo) {
 				if (selected != null && !selected.isHeader() && info.isMatchingType(selected) && info.isMatchingInfo(selected)) {
-					switch (pos) {
-					case 0:
-						return selectedColour;
-					case 1:
-						return selectedColour2;
-					case 2:
-						return selectedColour3;
-					case 3:
-						return selectedColour4;
-					}
+					return LogisticsColours.infoColours[pos].getRGB();
 				}
 				pos++;
 			}
-			return grey_base;
+			return LogisticsColours.layers[1].getRGB();
 		default:
-			return grey_base;
+			return LogisticsColours.layers[1].getRGB();
 
 		}
+	}
+
+	public ArrayList<Integer> getPairedPositions() {
+		ArrayList<Integer> pos = new ArrayList();
+		if (state == GuiState.INFO) {
+			ArrayList<IMonitorInfo> pairedInfo = part.getPairedInfo();
+			if (getCurrentList() == null || (pairedInfo.isEmpty())) {
+				return pos;
+			}
+			for (int i = start; i < finish; i++) {
+				IMonitorInfo info = getCurrentList().get(i);
+				if (info != null && !info.isHeader()) {
+					for (IMonitorInfo selected : pairedInfo) {
+						if (selected != null && !selected.isHeader() && info.isMatchingType(selected) && info.isMatchingInfo(selected)) {
+							pos.add(i - start);
+							break;
+						}
+					}
+				}
+			}
+		}
+		return pos;
 	}
 
 	public ArrayList<Integer> getDataPositions() {
@@ -136,14 +150,12 @@ public class GuiInfoReader extends GuiLogistics {
 					for (IMonitorInfo selected : selectedInfo) {
 						if (selected != null && !selected.isHeader() && info.isMatchingType(selected) && info.isMatchingInfo(selected)) {
 							pos.add(i - start);
+							break;
 						}
 					}
-				} else {
-					if (CacheRegistry.handler.validateInfo(info) && part.getMonitoringCoords().contains(((MonitoredBlockCoords) info).coords)) {
-						pos.add(i - start);
-					}
+				} else if (CacheRegistry.handler.validateInfo(info) && part.getMonitoringCoords().contains(((MonitoredBlockCoords) info).coords)) {
+					pos.add(i - start);
 				}
-
 			}
 		}
 		return pos;
@@ -273,7 +285,7 @@ public class GuiInfoReader extends GuiLogistics {
 				case INFO:
 					if (!info.isHeader() && part.getHandler().validateInfo(info)) {
 						part.selectedInfo.setInfo(info);
-						part.sendByteBufPacket(0);
+						part.sendByteBufPacket(buttonID == 0 ? -9 : -10);
 					}
 					break;
 				}
@@ -295,16 +307,17 @@ public class GuiInfoReader extends GuiLogistics {
 		int left = guiLeft + 7;
 
 		ArrayList<Integer> data = getDataPositions();
+		ArrayList<Integer> pairs = getPairedPositions();
 		ArrayList<Integer> cats = getCategoryPositions();
 		for (int i = 0; i < size; i++) {
 			int top = guiTop + 29 + (height * i);
-			int mainColour = cats.contains(i) ? category : data.contains(i) ? getColour(i) : grey_base;
+			int mainColour = cats.contains(i) ? LogisticsColours.category.getRGB() : (data.contains(i)) ? getColour(i, 0) : pairs.contains(i) ? getColour(i, 1) : LogisticsColours.layers[1].getRGB();
 			drawRect(left + 1, top + 1, left - 1 + width, top - 1 + height, mainColour);
-			drawRect(left, top, left + width, top + height, blue_overlay);
+			drawRect(left, top, left + width, top + height, LogisticsColours.layers[2].getRGB());
 		}
 
-		drawRect(guiLeft - 20, guiTop + 10, guiLeft, guiTop + 30, grey_base);
-		drawRect(guiLeft - 19, guiTop + 11, guiLeft - 1, guiTop + 29, blue_overlay);
+		drawRect(guiLeft - 20, guiTop + 10, guiLeft, guiTop + 30, LogisticsColours.layers[2].getRGB());
+		drawRect(guiLeft - 19, guiTop + 11, guiLeft - 1, guiTop + 29, LogisticsColours.layers[2].getRGB());
 		RenderHelper.restoreBlendState();
 	}
 

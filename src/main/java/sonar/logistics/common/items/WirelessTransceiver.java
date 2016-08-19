@@ -15,11 +15,9 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import sonar.core.SonarCore;
 import sonar.core.api.utils.BlockCoords;
 import sonar.core.common.item.SonarItem;
 import sonar.core.helpers.FontHelper;
-import sonar.core.helpers.SonarHelper;
 import sonar.logistics.api.connecting.ITransceiver;
 
 public class WirelessTransceiver extends SonarItem implements ITransceiver {

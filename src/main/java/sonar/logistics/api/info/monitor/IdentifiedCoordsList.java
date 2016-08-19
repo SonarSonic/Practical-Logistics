@@ -84,12 +84,12 @@ public class IdentifiedCoordsList extends ArrayList<BlockCoords> implements ISyn
 	}
 
 	@Override
-	public void writeToNBT(NBTTagCompound nbt, SyncType type) {
-		BlockCoords.writeBlockCoords(nbt, this, getTagName());
+	public NBTTagCompound writeData(NBTTagCompound nbt, SyncType type) {
+		return BlockCoords.writeBlockCoords(nbt, this, getTagName());
 	}
 
 	@Override
-	public void readFromNBT(NBTTagCompound nbt, SyncType type) {
+	public void readData(NBTTagCompound nbt, SyncType type) {
 		//clear();
 		addAll(BlockCoords.readBlockCoords(nbt, getTagName()));
 	}

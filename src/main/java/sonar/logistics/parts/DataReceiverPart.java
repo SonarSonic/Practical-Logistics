@@ -10,7 +10,6 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
 import sonar.logistics.api.connecting.IDataEmitter;
 import sonar.logistics.api.connecting.IDataReceiver;
-import sonar.logistics.connections.EmitterRegistry;
 
 public class DataReceiverPart extends FacingMultipart implements IDataReceiver, ISlotOccludingPart {
 

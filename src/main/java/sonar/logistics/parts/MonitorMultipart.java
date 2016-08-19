@@ -1,7 +1,6 @@
 package sonar.logistics.parts;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.UUID;
 
 import com.google.common.collect.Lists;
@@ -10,16 +9,13 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import sonar.core.api.utils.BlockCoords;
 import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.core.network.sync.SyncUUID;
 import sonar.core.network.utils.IByteBufTile;
 import sonar.logistics.Logistics;
-import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.cache.IMonitorCache;
-import sonar.logistics.api.info.LogicInfo;
+import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.info.monitor.ChannelType;
 import sonar.logistics.api.info.monitor.ILogicMonitor;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
@@ -40,6 +36,7 @@ public abstract class MonitorMultipart<T extends IMonitorInfo> extends SidedMult
 	public SyncMonitoredType<T> selectedInfo;
 	public BlockCoords lastSelected = null;
 	public IMonitorInfo lastInfo = null;
+	public int lastPos = -1;
 
 	public MonitorMultipart(String handlerID, double width, double heightMin, double heightMax) {
 		super(width, heightMin, heightMax);
@@ -106,8 +103,10 @@ public abstract class MonitorMultipart<T extends IMonitorInfo> extends SidedMult
 
 	public abstract ArrayList<IMonitorInfo> getSelectedInfo();
 
-	public abstract void addInfo(T info);
-	
+	public abstract ArrayList<IMonitorInfo> getPairedInfo();
+
+	public abstract void addInfo(T info, int type, int pos);
+
 	@Override
 	public void readData(NBTTagCompound nbt, SyncType type) {
 		super.readData(nbt, type);
@@ -130,6 +129,12 @@ public abstract class MonitorMultipart<T extends IMonitorInfo> extends SidedMult
 		return LogicMonitorCache.getMonitoredList(this);
 	}
 
+	public int getMaxInfo() {
+		return 4;
+	}
+
+	public final int ADD = -9, PAIRED = -10, ALL = 100;
+
 	@Override
 	public void writePacket(ByteBuf buf, int id) {
 		switch (id) {
@@ -139,7 +144,8 @@ public abstract class MonitorMultipart<T extends IMonitorInfo> extends SidedMult
 		case -2:
 			uuid.writeToBuf(buf);
 			break;
-		case 0:
+		case ADD:
+		case PAIRED:
 			selectedInfo.writeToBuf(buf);
 			break;
 		}
@@ -156,7 +162,7 @@ public abstract class MonitorMultipart<T extends IMonitorInfo> extends SidedMult
 						list.clear();
 					}
 					list.add(coords);
-				}else{
+				} else {
 					list.remove(coords);
 				}
 			}
@@ -167,9 +173,13 @@ public abstract class MonitorMultipart<T extends IMonitorInfo> extends SidedMult
 			list.setIdentity(uuid.getUUID());
 			LogicMonitorCache.monitoredLists.put(this, MonitoredList.<T>newMonitoredList());
 			break;
-		case 0:
+		case PAIRED:
 			selectedInfo.readFromBuf(buf);
-			addInfo((T) selectedInfo.info);
+			addInfo((T) selectedInfo.info, 1, lastPos);
+			break;
+		case ADD:
+			selectedInfo.readFromBuf(buf);
+			addInfo((T) selectedInfo.info, 0, -1);
 			break;
 		}
 	}

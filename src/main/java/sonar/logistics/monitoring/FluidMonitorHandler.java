@@ -54,6 +54,9 @@ public class FluidMonitorHandler extends MonitorHandler<MonitoredFluidStack> {
 
 	@Override
 	public NBTTagCompound writeInfo(MonitoredFluidStack info, NBTTagCompound tag, SyncType type) {
+		if (info.fluid == null) {
+			return tag;
+		}
 		return info.writeToNBT(tag, info);
 	}
 

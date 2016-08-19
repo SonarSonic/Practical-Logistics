@@ -22,16 +22,12 @@ import sonar.logistics.network.SyncMonitoredType;
 
 public class InfoReaderPart extends ReaderMultipart<LogicInfo> implements IByteBufTile, IGuiTile {
 
-	public SyncMonitoredType<LogicInfo> selected = new SyncMonitoredType<LogicInfo>(MonitorHandler.INFO, 1);
-
 	public InfoReaderPart() {
 		super(MonitorHandler.INFO);
-		syncParts.addAll(Lists.newArrayList(selected));
 	}
 
 	public InfoReaderPart(EnumFacing face) {
 		super(MonitorHandler.INFO, face);
-		syncParts.addAll(Lists.newArrayList(selected));
 	}
 
 	@Override
@@ -58,22 +54,6 @@ public class InfoReaderPart extends ReaderMultipart<LogicInfo> implements IByteB
 	@Override
 	public ChannelType channelType() {
 		return ChannelType.SINGLE;
-	}
-
-	@Override
-	public ArrayList<IMonitorInfo> getSelectedInfo() {
-		return Lists.newArrayList(selected.getMonitoredInfo());
-	}
-
-	@Override
-	public void addInfo(LogicInfo info) {
-		if (selected.getMonitoredInfo() != null) {
-			if (selected.getMonitoredInfo().isMatchingType(info) && selected.getMonitoredInfo().isMatchingInfo(info)) {
-				selected.setInfo(null);
-				return;
-			}
-		}
-		selected.setInfo(info);
 	}
 
 }

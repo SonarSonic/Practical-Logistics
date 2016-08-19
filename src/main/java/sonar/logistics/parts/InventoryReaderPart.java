@@ -78,10 +78,4 @@ public class InventoryReaderPart extends ReaderMultipart<MonitoredItemStack> imp
 		return Lists.newArrayList();
 	}
 
-	@Override
-	public void addInfo(MonitoredItemStack info) {
-		// TODO Auto-generated method stub
-		
-	}
-
 }

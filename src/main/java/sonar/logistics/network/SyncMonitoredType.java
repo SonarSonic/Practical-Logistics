@@ -1,11 +1,14 @@
 package sonar.logistics.network;
 
+import java.util.ArrayList;
+
 import io.netty.buffer.ByteBuf;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.core.network.sync.SyncPart;
 import sonar.logistics.Logistics;
+import sonar.logistics.api.info.LogicInfo;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
 import sonar.logistics.api.info.monitor.MonitorHandler;
 
@@ -43,20 +46,23 @@ public class SyncMonitoredType<T extends IMonitorInfo> extends SyncPart {
 	public void readFromBuf(ByteBuf buf) {
 		if (buf.readBoolean()) {
 			info = handler().readInfo(ByteBufUtils.readTag(buf), SyncType.SAVE);
+		} else {
+			info = null;
 		}
 	}
 
 	@Override
-	public void writeToNBT(NBTTagCompound nbt, SyncType type) {
+	public NBTTagCompound writeData(NBTTagCompound nbt, SyncType type) {
 		if (info != null) {
-			nbt.setTag("info", handler().writeInfo((T) info, new NBTTagCompound(), type));
+			nbt.setTag(getTagName(), handler().writeInfo((T) info, new NBTTagCompound(), type));
 		}
+		return nbt;
 	}
 
 	@Override
-	public void readFromNBT(NBTTagCompound nbt, SyncType type) {
-		if (nbt.hasKey("info")) {
-			info = handler().readInfo(nbt.getCompoundTag("info"), type);
+	public void readData(NBTTagCompound nbt, SyncType type) {
+		if (nbt.hasKey(getTagName())) {
+			info = handler().readInfo(nbt.getCompoundTag(getTagName()), type);
 		}
 	}
 

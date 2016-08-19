@@ -1,15 +1,22 @@
 package sonar.logistics;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 
+import net.minecraft.util.math.ChunkPos;
+import net.minecraft.world.World;
+import net.minecraft.world.chunk.Chunk;
+import net.minecraftforge.event.world.ChunkWatchEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.cache.IRefreshCache;
 import sonar.logistics.connections.CableRegistry;
 import sonar.logistics.connections.CacheRegistry;
+import sonar.logistics.connections.LogicMonitorCache;
 
 public class LogisticsEvents {
 	@SubscribeEvent
@@ -30,12 +37,62 @@ public class LogisticsEvents {
 			}
 		}
 	}
-	/*
-	@SubscribeEvent(priority = EventPriority.NORMAL, receiveCanceled = true)
-	public void onEvent(PopulateChunkEvent.Pre event) {		
-		Chunk chunk = event.world.getChunkFromChunkCoords(event.chunkX, event.chunkZ);
-		SapphireOreGen.generateOre(BlockRegistry.sapphire_ore, event.world, event.rand, event.chunkX, event.chunkZ, 2, 10, 25, 1, 100, Blocks.stone);
-		chunk.isModified = true;		
+
+	@SubscribeEvent
+	public void onWatchChunk(ChunkWatchEvent.Watch event) {
+		if (!LogicMonitorCache.enableEvents()) {
+			return;
+		}
+		World world = event.getPlayer().getEntityWorld();
+		int dimension = world.provider.getDimension();
+		ArrayList<ChunkPos> monitored = LogicMonitorCache.monitoredChunks.putIfAbsent(dimension, new ArrayList());
+		if (!monitored.isEmpty() && monitored.contains(event.getChunk())) {
+			ArrayList<ChunkPos> chunks = LogicMonitorCache.activeChunks.putIfAbsent(event.getPlayer(), new ArrayList());
+			if (!chunks.contains(event.getChunk())) {
+				chunks.add(event.getChunk());
+			}
+		}
 	}
-	*/
+
+	@SubscribeEvent
+	public void onRespawn(PlayerEvent.PlayerRespawnEvent event) {
+		if (!LogicMonitorCache.enableEvents()) {
+			return;
+		}
+		LogicMonitorCache.activeChunks.putIfAbsent(event.player, new ArrayList()).clear();
+		LogicMonitorCache.sendFirstPacket(event.player);
+	}
+
+	@SubscribeEvent
+	public void onUnwatchChunk(ChunkWatchEvent.UnWatch event) {
+		if (!LogicMonitorCache.enableEvents()) {
+			return;
+		}
+		LogicMonitorCache.activeChunks.putIfAbsent(event.getPlayer(), new ArrayList()).remove(event.getChunk());
+	}
+
+	@SubscribeEvent
+	public void onChangeDimension(PlayerEvent.PlayerChangedDimensionEvent event) {
+		if (!LogicMonitorCache.enableEvents()) {
+			return;
+		}
+		LogicMonitorCache.activeChunks.putIfAbsent(event.player, new ArrayList()).clear();
+		LogicMonitorCache.sendFirstPacket(event.player);
+	}
+
+	@SubscribeEvent
+	public void onLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
+		if (!LogicMonitorCache.enableEvents()) {
+			return;
+		}
+		LogicMonitorCache.sendFirstPacket(event.player);
+	}
+
+	@SubscribeEvent
+	public void onLoggedOut(PlayerEvent.PlayerLoggedOutEvent event) {
+		if (!LogicMonitorCache.enableEvents()) {
+			return;
+		}
+		LogicMonitorCache.activeChunks.putIfAbsent(event.player, new ArrayList()).clear();
+	}
 }

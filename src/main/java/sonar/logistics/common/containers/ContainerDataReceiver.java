@@ -1,33 +1,15 @@
 package sonar.logistics.common.containers;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.IContainerListener;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-import sonar.core.inventory.ContainerSync;
-import sonar.logistics.common.tileentity.TileEntityDataReceiver;
+import sonar.core.inventory.ContainerMultipartSync;
+import sonar.logistics.parts.DataReceiverPart;
 
-public class ContainerDataReceiver extends ContainerSync {
+public class ContainerDataReceiver extends ContainerMultipartSync {
 
-	public ContainerDataReceiver(TileEntityDataReceiver entity, InventoryPlayer inventoryPlayer) {
+	public ContainerDataReceiver(DataReceiverPart entity) {
 		super(entity);
-	}
-
-	@Override
-	public void detectAndSendChanges() {
-		if (tile instanceof TileEntityDataReceiver) {
-			if (sync != null) {
-				if (listeners != null) {
-					for (IContainerListener o : listeners) {
-						if (o != null && o instanceof EntityPlayerMP) {
-							((TileEntityDataReceiver) tile).sendAvailableData(tile, (EntityPlayerMP) o);
-						}
-					}
-				}
-			}
-		}
 	}
 
 	@Override

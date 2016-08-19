@@ -8,7 +8,6 @@ import mcmultipart.MCMultiPartMod;
 import mcmultipart.multipart.ISlottedPart;
 import mcmultipart.multipart.PartSlot;
 import net.minecraft.block.properties.IProperty;
-import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;

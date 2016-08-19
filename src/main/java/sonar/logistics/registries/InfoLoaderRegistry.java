@@ -21,24 +21,24 @@ public class InfoLoaderRegistry {
 	private InfoLoaderRegistry() {}
 
 	public static List<IInfoRegistry> getInfoRegistries(@Nonnull ASMDataTable asmDataTable) {
-		return getInstances(asmDataTable, InfoRegistry.class, IInfoRegistry.class);
+		return getInstances(asmDataTable, InfoRegistry.class, IInfoRegistry.class, true);
 	}
 
 	public static List<ICustomTileHandler> getCustomTileHandlers(@Nonnull ASMDataTable asmDataTable) {
-		return getInstances(asmDataTable, CustomTileHandler.class, ICustomTileHandler.class);
+		return getInstances(asmDataTable, CustomTileHandler.class, ICustomTileHandler.class, true);
 	}
 
 	public static List<ICustomEntityHandler> getCustomEntityHandlers(@Nonnull ASMDataTable asmDataTable) {
-		return getInstances(asmDataTable, CustomEntityHandler.class, ICustomEntityHandler.class);
+		return getInstances(asmDataTable, CustomEntityHandler.class, ICustomEntityHandler.class, true);
 	}
 
-	private static <T> List<T> getInstances(@Nonnull ASMDataTable asmDataTable, Class annotation, Class<T> instanceClass) {
+	private static <T> List<T> getInstances(@Nonnull ASMDataTable asmDataTable, Class annotation, Class<T> instanceClass, boolean checkModid) {
 		String annotationClassName = annotation.getCanonicalName();
 		Set<ASMDataTable.ASMData> asmDatas = asmDataTable.getAll(annotationClassName);
 		List<T> instances = new ArrayList<>();
 		for (ASMDataTable.ASMData asmData : asmDatas) {
-			String modid = (String) asmData.getAnnotationInfo().get("modid");
-			if (Loader.isModLoaded(modid)) {
+			String modid = checkModid? (String) asmData.getAnnotationInfo().get("modid") : "";
+			if (!checkModid || Loader.isModLoaded(modid)) {
 				try {
 					Class<?> asmClass = Class.forName(asmData.getClassName());
 					Class<? extends T> asmInstanceClass = asmClass.asSubclass(instanceClass);

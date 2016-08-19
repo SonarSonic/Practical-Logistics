@@ -12,7 +12,6 @@ import sonar.logistics.api.info.monitor.ILogicMonitor;
 import sonar.logistics.api.info.monitor.MonitorType;
 import sonar.logistics.api.info.monitor.MonitorViewer;
 import sonar.logistics.connections.LogicMonitorCache;
-import sonar.logistics.parts.MonitorMultipart;
 
 public class PacketMonitorType implements IMessage {
 

@@ -3,17 +3,11 @@ package sonar.logistics.client.gui;
 import java.io.IOException;
 
 import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.inventory.Container;
 import net.minecraft.util.ResourceLocation;
-import sonar.core.client.gui.GuiSonar;
 import sonar.core.client.gui.widgets.SonarScroller;
-import sonar.core.helpers.FontHelper;
 import sonar.core.helpers.RenderHelper;
 import sonar.core.utils.IWorldPosition;
 import sonar.logistics.api.info.monitor.IMonitorInfo;

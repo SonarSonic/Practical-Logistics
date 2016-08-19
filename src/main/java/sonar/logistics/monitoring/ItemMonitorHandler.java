@@ -38,7 +38,7 @@ public class ItemMonitorHandler extends MonitorHandler<MonitoredItemStack> {
 			if (tile != null && provider.canHandleItems(tile, side)) {
 				List<StoredItemStack> info = new ArrayList();
 				StorageSize size = provider.getItems(info, tile, side);
-				for (StoredItemStack item : info) {			
+				for (StoredItemStack item : info) {
 					MonitorHelper.<MonitoredItemStack>addInfoToList(list, this, new MonitoredItemStack(item));
 				}
 				break;
@@ -54,6 +54,9 @@ public class ItemMonitorHandler extends MonitorHandler<MonitoredItemStack> {
 
 	@Override
 	public NBTTagCompound writeInfo(MonitoredItemStack info, NBTTagCompound tag, SyncType type) {
+		if (info.item == null) {
+			return tag;
+		}
 		return info.writeToNBT(tag, info);
 	}
 

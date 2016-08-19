@@ -1,7 +1,5 @@
 package sonar.logistics.client.gui;
 
-import org.lwjgl.opengl.GL11;
-
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
 import sonar.core.helpers.FontHelper;

@@ -8,7 +8,6 @@ import net.minecraft.item.ItemStack;
 import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.core.inventory.ContainerSync;
 import sonar.core.inventory.slots.SlotList;
-import sonar.logistics.common.tileentity.TileEntityItemRouter;
 
 public class ContainerItemRouter extends ContainerSync {
 

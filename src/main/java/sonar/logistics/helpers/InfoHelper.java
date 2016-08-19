@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.Comparator;
 
 import sonar.logistics.api.info.LogicInfo;
-import sonar.logistics.api.info.monitor.IMonitorInfo;
 
 public class InfoHelper {
 

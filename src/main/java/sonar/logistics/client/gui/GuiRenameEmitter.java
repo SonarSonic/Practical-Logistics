@@ -10,19 +10,19 @@ import net.minecraft.util.ResourceLocation;
 import sonar.core.SonarCore;
 import sonar.core.client.gui.GuiSonar;
 import sonar.core.helpers.FontHelper;
+import sonar.core.inventory.ContainerMultipartSync;
 import sonar.core.network.PacketByteBuf;
-import sonar.logistics.common.containers.ContainerEmptySync;
-import sonar.logistics.common.tileentity.TileEntityDataEmitter;
+import sonar.logistics.parts.DataEmitterPart;
 
 public class GuiRenameEmitter extends GuiSonar {
 
 	public static final ResourceLocation bground = new ResourceLocation("PracticalLogistics:textures/gui/rename.png");
 	private GuiTextField nameField;
 
-	public TileEntityDataEmitter entity;
+	public DataEmitterPart entity;
 
-	public GuiRenameEmitter(TileEntityDataEmitter entity) {
-		super(new ContainerEmptySync(entity), entity);
+	public GuiRenameEmitter(DataEmitterPart entity) {
+		super(new ContainerMultipartSync(entity), entity);
 		this.entity = entity;
 	}
 

@@ -3,9 +3,10 @@ package sonar.logistics.api.info.monitor;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import sonar.logistics.api.connecting.ILogicTile;
 import sonar.logistics.connections.MonitoredList;
 
-public interface ILogicMonitor<T extends IMonitorInfo> {
+public interface ILogicMonitor<T extends IMonitorInfo> extends ILogicTile {
 	
 	/**identifies this monitor, this will be synced across the server and client*/
 	public UUID getMonitorUUID();
@@ -23,5 +24,9 @@ public interface ILogicMonitor<T extends IMonitorInfo> {
 	public MonitoredList<T> updateInfo(MonitoredList<T> updateInfo);
 	
 	public ChannelType channelType();
+	
+	public IMonitorInfo getMonitorInfo(int pos);
+	
+	public int getMaxInfo();
 	
 }

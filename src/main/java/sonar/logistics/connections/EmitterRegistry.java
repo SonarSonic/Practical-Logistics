@@ -2,15 +2,8 @@ package sonar.logistics.connections;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
-import gnu.trove.map.hash.THashMap;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.text.TextFormatting;
-import sonar.core.api.utils.BlockCoords;
-import sonar.logistics.LogisticsBlocks;
 import sonar.logistics.api.connecting.IDataEmitter;
 
 public class EmitterRegistry {

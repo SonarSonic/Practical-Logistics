@@ -8,6 +8,7 @@ import sonar.core.registries.ISonarRegistryItem;
 import sonar.core.registries.SonarRegistryItem;
 import sonar.logistics.common.items.ItemDefaultMultipart;
 import sonar.logistics.common.items.ItemFacingMultipart;
+import sonar.logistics.common.items.ItemScreenMultipart;
 import sonar.logistics.common.items.ItemSidedMultipart;
 import sonar.logistics.common.items.WirelessTransceiver;
 import sonar.logistics.parts.ArrayPart;
@@ -48,8 +49,8 @@ public class LogisticsItems extends Logistics {
 		stone_plate = register(new SonarRegistryItem("StonePlate"));
 		partCable = register(new SonarRegistryItem(new ItemDefaultMultipart(DataCablePart.class), "DataCable"));
 		partArray = register(new SonarRegistryItem(new ItemSidedMultipart(ArrayPart.class), "Array"));
-		displayScreen = register(new SonarRegistryItem(new ItemFacingMultipart(DisplayScreenPart.class), "DisplayScreen"));
-		largeDisplayScreen = register(new SonarRegistryItem(new ItemFacingMultipart(LargeDisplayScreenPart.class), "LargeDisplayScreen"));
+		displayScreen = register(new SonarRegistryItem(new ItemScreenMultipart(DisplayScreenPart.class), "DisplayScreen"));
+		largeDisplayScreen = register(new SonarRegistryItem(new ItemScreenMultipart(LargeDisplayScreenPart.class), "LargeDisplayScreen"));
 		
 		inventoryReaderPart = register(new SonarRegistryItem(new ItemSidedMultipart(InventoryReaderPart.class), "InventoryReader"));
 		fluidReaderPart = register(new SonarRegistryItem(new ItemSidedMultipart(FluidReaderPart.class), "FluidReader"));

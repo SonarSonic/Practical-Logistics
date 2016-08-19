@@ -1,19 +1,33 @@
 {
     "forge_marker": 1,
     "defaults": {
+        "model":"practicallogistics:DisplayScreen",
         "textures": {
             "particle":"practicallogistics:blocks/data_cable"
-	    },
-        "model":"practicallogistics:DisplayScreen",        
-        "transform":"forge:default-block"
-    },
-    "variants": {  
-        "inventory": [{}],  
-        "facing": {
-            "north":{"y": 180},
-            "south":{ }, 
-            "west":{"y": 90},
-            "east":{"y": 270}
         }
+     },
+    "variants": {
+        "normal":[],
+        "inventory": [{    
+            "x": 90, "y": 0,
+            "model":"practicallogistics:DisplayScreen"
+        }],        
+        "facing=up,rotation=west":  {"x": 180, "y": 270},
+        "facing=up,rotation=south":  {"x": 180, "y": 180},
+        "facing=up,rotation=east":  {"x": 180, "y": 90},
+        "rotation":{            
+            "north":{},
+            "south":{"y": 180}, 
+            "west":{"y": 270},
+            "east":{"y": 90}
+        },
+        "facing":{  
+            "north":{"x": 90, "y": 180},            
+            "south":{"x": 90, "y": 0},      
+            "west":{"x": 90, "y": 90}, 
+            "east":{"x": 90, "y": 270},
+            "up":{"x": 180},
+            "down":{}
+        }         
     }
 }

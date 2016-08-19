@@ -7,7 +7,6 @@ import com.google.common.collect.Lists;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
-import net.minecraftforge.fluids.FluidStack;
 import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.core.network.sync.SyncEnum;
 import sonar.core.network.sync.SyncTagType;
@@ -76,11 +75,6 @@ public class FluidReaderPart extends ReaderMultipart<MonitoredFluidStack> implem
 	@Override
 	public ArrayList<IMonitorInfo> getSelectedInfo() {
 		return Lists.newArrayList(selected.getMonitoredInfo());
-	}
-
-	@Override
-	public void addInfo(MonitoredFluidStack info) {
-		
 	}
 
 }
