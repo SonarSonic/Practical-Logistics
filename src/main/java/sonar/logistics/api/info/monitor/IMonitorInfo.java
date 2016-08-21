@@ -1,9 +1,11 @@
 package sonar.logistics.api.info.monitor;
 
-import io.netty.buffer.ByteBuf;
+import sonar.core.api.nbt.INBTSyncable;
 
-public interface IMonitorInfo<T extends IMonitorInfo> {
-
+public interface IMonitorInfo<T extends IMonitorInfo> extends INBTSyncable{
+	
+	public String getID();
+	
 	/** if they are identical **/
 	public boolean isIdenticalInfo(T info);
 
@@ -14,12 +16,9 @@ public interface IMonitorInfo<T extends IMonitorInfo> {
 	public boolean isMatchingType(IMonitorInfo info);
 
 	public boolean isHeader();
-
-	public T getLastInfo();
 	
-	public boolean writeChangesToBuf(T lastInfo, ByteBuf buf);
+	public MonitorHandler<T> getHandler();
 	
-	// setting stack sizes and stuff like that
-	public void updateFrom(ByteBuf buf);
-
+	public boolean isValid();
+	
 }

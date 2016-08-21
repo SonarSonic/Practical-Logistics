@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import sonar.logistics.api.connecting.IDataCable;
 import sonar.logistics.api.connecting.ILogicTile;
+import sonar.logistics.api.info.monitor.ILogicMonitor;
 
 public enum CacheTypes {
 
@@ -18,7 +19,8 @@ public enum CacheTypes {
 	/** for all {@link ILogicTile}s and other custom blocks which should be seen as a part of the Logistics Network */
 	NETWORK,
 	/** for all {@link IChannelProvider}s and other custom blocks which can provide connections to other blocks/networks */
-	CHANNELLED;
+	CHANNELLED,
+	MONITOR;
 
 	public static boolean checkType(CacheTypes type, Object tile) {
 		switch (type) {
@@ -34,6 +36,8 @@ public enum CacheTypes {
 			return false;// tile instanceof IInfoEmitter;
 		case NETWORK:
 			return tile instanceof ILogicTile;
+		case MONITOR:
+			return tile instanceof ILogicMonitor;
 		default:
 			return false;
 		}

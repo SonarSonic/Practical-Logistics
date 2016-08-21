@@ -3,7 +3,6 @@ package sonar.logistics.monitoring;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import sonar.core.SonarCore;
@@ -11,8 +10,6 @@ import sonar.core.api.StorageSize;
 import sonar.core.api.inventories.InventoryHandler;
 import sonar.core.api.inventories.StoredItemStack;
 import sonar.core.api.utils.BlockCoords;
-import sonar.core.helpers.NBTHelper.SyncType;
-import sonar.logistics.api.info.monitor.IMonitorInfo;
 import sonar.logistics.api.info.monitor.MonitorHandler;
 import sonar.logistics.connections.MonitoredList;
 import sonar.logistics.helpers.MonitorHelper;
@@ -46,7 +43,7 @@ public class ItemMonitorHandler extends MonitorHandler<MonitoredItemStack> {
 		}
 		return list;
 	}
-
+	/*
 	@Override
 	public MonitoredItemStack readInfo(NBTTagCompound tag, SyncType type) {
 		return new MonitoredItemStack(StoredItemStack.readFromNBT(tag));
@@ -54,7 +51,7 @@ public class ItemMonitorHandler extends MonitorHandler<MonitoredItemStack> {
 
 	@Override
 	public NBTTagCompound writeInfo(MonitoredItemStack info, NBTTagCompound tag, SyncType type) {
-		if (info.item == null) {
+		if (!validateInfo(info)) {
 			return tag;
 		}
 		return info.writeToNBT(tag, info);
@@ -62,7 +59,7 @@ public class ItemMonitorHandler extends MonitorHandler<MonitoredItemStack> {
 
 	@Override
 	public boolean validateInfo(IMonitorInfo info) {
-		return info instanceof MonitoredItemStack;
+		return info instanceof MonitoredItemStack && ((MonitoredItemStack) info).item != null;
 	}
-
+	*/
 }

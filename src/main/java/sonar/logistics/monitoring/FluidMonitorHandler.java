@@ -3,7 +3,6 @@ package sonar.logistics.monitoring;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import sonar.core.SonarCore;
@@ -11,18 +10,11 @@ import sonar.core.api.StorageSize;
 import sonar.core.api.fluids.FluidHandler;
 import sonar.core.api.fluids.StoredFluidStack;
 import sonar.core.api.utils.BlockCoords;
-import sonar.core.helpers.NBTHelper.SyncType;
-import sonar.logistics.api.info.monitor.IMonitorInfo;
 import sonar.logistics.api.info.monitor.MonitorHandler;
 import sonar.logistics.connections.MonitoredList;
 import sonar.logistics.helpers.MonitorHelper;
 
 public class FluidMonitorHandler extends MonitorHandler<MonitoredFluidStack> {
-
-	@Override
-	public boolean isLoadable() {
-		return true;
-	}
 
 	@Override
 	public String getName() {
@@ -46,7 +38,7 @@ public class FluidMonitorHandler extends MonitorHandler<MonitoredFluidStack> {
 		}
 		return list;
 	}
-
+	/*
 	@Override
 	public MonitoredFluidStack readInfo(NBTTagCompound tag, SyncType type) {
 		return new MonitoredFluidStack(StoredFluidStack.readFromNBT(tag));
@@ -54,15 +46,16 @@ public class FluidMonitorHandler extends MonitorHandler<MonitoredFluidStack> {
 
 	@Override
 	public NBTTagCompound writeInfo(MonitoredFluidStack info, NBTTagCompound tag, SyncType type) {
-		if (info.fluid == null) {
+		if (!validateInfo(info)) {
 			return tag;
 		}
 		return info.writeToNBT(tag, info);
 	}
-
+	
 	@Override
 	public boolean validateInfo(IMonitorInfo info) {
-		return info instanceof MonitoredFluidStack;
+		return info instanceof MonitoredFluidStack && ((MonitoredFluidStack) info).fluid != null;
 	}
+	*/
 
 }

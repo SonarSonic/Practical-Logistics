@@ -13,7 +13,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
 import sonar.logistics.Logistics;
-import sonar.logistics.api.info.CustomTileHandler;
+import sonar.logistics.api.asm.CustomTileHandler;
 import sonar.logistics.api.info.ICustomTileHandler;
 import sonar.logistics.api.info.LogicInfo;
 import sonar.logistics.registries.LogicRegistry;

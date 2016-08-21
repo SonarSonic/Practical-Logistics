@@ -3,8 +3,8 @@ package sonar.logistics.info.registries;
 import com.google.common.collect.Lists;
 
 import sonar.logistics.Logistics;
+import sonar.logistics.api.asm.InfoRegistry;
 import sonar.logistics.api.info.IInfoRegistry;
-import sonar.logistics.api.info.InfoRegistry;
 import sonar.logistics.common.blocks.tileentity.TileEntityHammer;
 import sonar.logistics.registries.LogicRegistry;
 import sonar.logistics.registries.LogicRegistry.RegistryType;

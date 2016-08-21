@@ -1,10 +1,7 @@
 package sonar.logistics.monitoring;
 
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import sonar.core.api.utils.BlockCoords;
-import sonar.core.helpers.NBTHelper.SyncType;
-import sonar.logistics.api.info.monitor.IMonitorInfo;
 import sonar.logistics.api.info.monitor.MonitorHandler;
 import sonar.logistics.connections.MonitoredList;
 
@@ -20,7 +17,7 @@ public class ChannelMonitorHandler extends MonitorHandler<MonitoredBlockCoords> 
 		//unused
 		return previousList;
 	}
-
+	/*
 	@Override
 	public MonitoredBlockCoords readInfo(NBTTagCompound tag, SyncType type) {
 		return new MonitoredBlockCoords(BlockCoords.readFromNBT(tag), tag.getString("name"));
@@ -36,5 +33,6 @@ public class ChannelMonitorHandler extends MonitorHandler<MonitoredBlockCoords> 
 	public boolean validateInfo(IMonitorInfo info) {
 		return info instanceof MonitoredBlockCoords;
 	}
+	*/
 
 }

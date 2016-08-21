@@ -7,10 +7,8 @@ import com.google.common.collect.Lists;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import sonar.core.api.utils.BlockCoords;
-import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.core.network.sync.SyncUUID;
 import sonar.core.network.utils.IByteBufTile;
 import sonar.logistics.Logistics;
@@ -30,7 +28,7 @@ public abstract class MonitorMultipart<T extends IMonitorInfo> extends SidedMult
 
 	protected IdentifiedCoordsList list = new IdentifiedCoordsList(-1);
 	protected ArrayList<MonitorViewer> viewers = new ArrayList<MonitorViewer>();
-	protected SyncUUID uuid = new SyncUUID(-2);
+	protected SyncUUID uuid = new SyncUUID("id");
 	protected MonitorHandler handler = null;
 	protected String handlerID;
 	public SyncMonitoredType<T> selectedInfo;
@@ -52,9 +50,25 @@ public abstract class MonitorMultipart<T extends IMonitorInfo> extends SidedMult
 		selectedInfo = new SyncMonitoredType<T>(handlerID, 0);
 	}
 
+	public void onLoaded() {
+		super.onLoaded();
+		LogicMonitorCache.addMonitor(this);
+	}
+
+	public void onRemoved() {
+		super.onRemoved();
+		LogicMonitorCache.removeMonitor(this);
+	}
+
+	public void onUnloaded() {
+		super.onUnloaded();
+		LogicMonitorCache.removeMonitor(this);
+	}
+
 	public void onFirstTick() {
 		super.onFirstTick();
 		this.setUUID();
+		LogicMonitorCache.addMonitor(this);
 	}
 
 	public void setUUID() {
@@ -101,22 +115,6 @@ public abstract class MonitorMultipart<T extends IMonitorInfo> extends SidedMult
 		return uuid.getUUID();
 	}
 
-	public abstract ArrayList<IMonitorInfo> getSelectedInfo();
-
-	public abstract ArrayList<IMonitorInfo> getPairedInfo();
-
-	public abstract void addInfo(T info, int type, int pos);
-
-	@Override
-	public void readData(NBTTagCompound nbt, SyncType type) {
-		super.readData(nbt, type);
-	}
-
-	@Override
-	public NBTTagCompound writeData(NBTTagCompound nbt, SyncType type) {
-		return super.writeData(nbt, type);
-	}
-
 	public void setLocalNetworkCache(INetworkCache network) {
 		super.setLocalNetworkCache(network);
 		if (network instanceof IMonitorCache) {
@@ -144,10 +142,6 @@ public abstract class MonitorMultipart<T extends IMonitorInfo> extends SidedMult
 		case -2:
 			uuid.writeToBuf(buf);
 			break;
-		case ADD:
-		case PAIRED:
-			selectedInfo.writeToBuf(buf);
-			break;
 		}
 	}
 
@@ -172,14 +166,6 @@ public abstract class MonitorMultipart<T extends IMonitorInfo> extends SidedMult
 			uuid.readFromBuf(buf);
 			list.setIdentity(uuid.getUUID());
 			LogicMonitorCache.monitoredLists.put(this, MonitoredList.<T>newMonitoredList());
-			break;
-		case PAIRED:
-			selectedInfo.readFromBuf(buf);
-			addInfo((T) selectedInfo.info, 1, lastPos);
-			break;
-		case ADD:
-			selectedInfo.readFromBuf(buf);
-			addInfo((T) selectedInfo.info, 0, -1);
 			break;
 		}
 	}

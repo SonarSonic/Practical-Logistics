@@ -115,13 +115,11 @@ public class ItemHelper extends ItemWrapper {
 			network.getFirstConnection(CacheTypes.EMITTER);
 		}
 		return stack;
-		/*
-		 * if (block != null) { return getTileStack(network, slot); } else {
+		/* if (block != null) { return getTileStack(network, slot); } else {
 		 * 
 		 * } for (BlockCoords connect : connections) { Object tile = connect.getTileEntity(); if (tile != null) { if (tile instanceof IConnectionNode) { return getTileStack((IConnectionNode) tile, slot); } if (tile instanceof IEntityNode) { return getEntityStack((IEntityNode) tile, slot); } } }
 		 * 
-		 * return null;
-		 */
+		 * return null; */
 	}
 
 	public StoredItemStack getEntityStack(IEntityNode node, int slot) {
@@ -329,13 +327,14 @@ public class ItemHelper extends ItemWrapper {
 			player.inventory.setInventorySlotContents(slot, add);
 		}
 	}
-	
+
 	public static void sortItemList(ArrayList<MonitoredItemStack> info, final SortingDirection dir, SortingType type) {
-		info.sort(new Comparator<StoredItemStack>() {
-			public int compare(StoredItemStack str1, StoredItemStack str2) {
-				int res = String.CASE_INSENSITIVE_ORDER.compare(str1.getItemStack().getDisplayName(), str2.getItemStack().getDisplayName());
+		info.sort(new Comparator<MonitoredItemStack>() {
+			public int compare(MonitoredItemStack str1, MonitoredItemStack str2) {
+				StoredItemStack item1 = str1.itemStack.getObject(), item2 = str2.itemStack.getObject();
+				int res = String.CASE_INSENSITIVE_ORDER.compare(item1.getItemStack().getDisplayName(), item2.getItemStack().getDisplayName());
 				if (res == 0) {
-					res = str1.getItemStack().getDisplayName().compareTo(str2.getItemStack().getDisplayName());
+					res = item1.getItemStack().getDisplayName().compareTo(item2.getItemStack().getDisplayName());
 				}
 				return dir == SortingDirection.DOWN ? res : -res;
 			}
@@ -343,21 +342,23 @@ public class ItemHelper extends ItemWrapper {
 
 		switch (type) {
 		case STORED:
-			info.sort(new Comparator<StoredItemStack>() {
-				public int compare(StoredItemStack str1, StoredItemStack str2) {
-					if (str1.stored < str2.stored)
+			info.sort(new Comparator<MonitoredItemStack>() {
+				public int compare(MonitoredItemStack str1, MonitoredItemStack str2) {
+					StoredItemStack item1 = str1.itemStack.getObject(), item2 = str2.itemStack.getObject();
+					if (item1.stored < item2.stored)
 						return dir == SortingDirection.DOWN ? 1 : -1;
-					if (str1.stored == str2.stored)
+					if (item1.stored == item2.stored)
 						return 0;
 					return dir == SortingDirection.DOWN ? -1 : 1;
 				}
 			});
 			break;
 		case MODID:
-			info.sort(new Comparator<StoredItemStack>() {
-				public int compare(StoredItemStack str1, StoredItemStack str2) {
-					String modid1 =  str1.getItemStack().getItem().getRegistryName().getResourceDomain();
-					String modid2 =  str2.getItemStack().getItem().getRegistryName().getResourceDomain();
+			info.sort(new Comparator<MonitoredItemStack>() {
+				public int compare(MonitoredItemStack str1, MonitoredItemStack str2) {
+					StoredItemStack item1 = str1.itemStack.getObject(), item2 = str2.itemStack.getObject();
+					String modid1 = item1.getItemStack().getItem().getRegistryName().getResourceDomain();
+					String modid2 = item2.getItemStack().getItem().getRegistryName().getResourceDomain();
 					int res = String.CASE_INSENSITIVE_ORDER.compare(modid1, modid2);
 					if (res == 0) {
 						res = modid1.compareTo(modid2);

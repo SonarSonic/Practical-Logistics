@@ -7,15 +7,12 @@ import net.minecraft.inventory.Container;
 import net.minecraft.util.ResourceLocation;
 import sonar.core.client.gui.GuiSonar;
 import sonar.core.client.gui.widgets.SonarScroller;
-import sonar.core.helpers.FontHelper;
 import sonar.core.helpers.RenderHelper;
 import sonar.core.utils.IWorldPosition;
 import sonar.logistics.client.LogisticsColours;
 
 public class GuiLogistics extends GuiSonar {
 
-	public static int grey_text = FontHelper.getIntFromColor(105, 105, 116);
-	public static int white_text = FontHelper.getIntFromColor(170, 170, 170);
 	public static final ResourceLocation playerInv = new ResourceLocation("PracticalLogistics:textures/gui/player_inventory.png");
 	public SonarScroller scroller;
 

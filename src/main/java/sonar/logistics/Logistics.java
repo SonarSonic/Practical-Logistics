@@ -118,6 +118,7 @@ public class Logistics {
 			logger.info("Sapphire Ore Generation is disabled in the config");
 
 		ASMDataTable asmDataTable = event.getAsmData();
+		InfoLoaderRegistry.loadInfoTypes(asmDataTable);
 		LogicRegistry.infoRegistries.addAll(InfoLoaderRegistry.getInfoRegistries(asmDataTable));
 		LogicRegistry.customTileHandlers.addAll(InfoLoaderRegistry.getCustomTileHandlers(asmDataTable));
 		LogicRegistry.customEntityHandlers.addAll(InfoLoaderRegistry.getCustomEntityHandlers(asmDataTable));
@@ -166,6 +167,6 @@ public class Logistics {
 		EmitterRegistry.removeAll();
 		CableRegistry.removeAll();
 		CacheRegistry.removeAll();
-		LogicMonitorCache.monitoredLists.clear();
+		LogicMonitorCache.onServerClosed();
 	}
 }

@@ -1,19 +1,33 @@
 package sonar.logistics.monitoring;
 
+import com.google.common.collect.Lists;
+
 import sonar.core.api.utils.BlockCoords;
 import sonar.core.helpers.FontHelper;
+import sonar.core.network.sync.SyncCoords;
+import sonar.core.network.sync.SyncTagType;
+import sonar.logistics.Logistics;
+import sonar.logistics.api.asm.LogicInfoType;
+import sonar.logistics.api.info.BaseInfo;
 import sonar.logistics.api.info.INameableInfo;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
-import sonar.logistics.connections.CacheRegistry;
+import sonar.logistics.api.info.monitor.MonitorHandler;
 
-public class MonitoredBlockCoords implements IMonitorInfo<MonitoredBlockCoords>, INameableInfo<MonitoredBlockCoords> {
+@LogicInfoType(id = MonitoredBlockCoords.id, modid = Logistics.MODID)
+public class MonitoredBlockCoords extends BaseInfo<MonitoredBlockCoords> implements INameableInfo<MonitoredBlockCoords> {
 
-	public BlockCoords coords;
-	public String unlocalizedName;
+	public static final String id = "coords";
+	public static MonitorHandler<MonitoredBlockCoords> handler = Logistics.monitorHandlers.getRegisteredObject(MonitorHandler.CHANNEL);
+	public SyncCoords coords = new SyncCoords(1);
+	public SyncTagType.STRING unlocalizedName = new SyncTagType.STRING(2);
+
+	{
+		syncParts.addAll(Lists.newArrayList(coords, unlocalizedName));
+	}
 
 	public MonitoredBlockCoords(BlockCoords coords, String unlocalizedName) {
-		this.coords = coords;
-		this.unlocalizedName = unlocalizedName;
+		this.coords.setCoords(coords);
+		this.unlocalizedName.setObject(unlocalizedName);
 	}
 
 	@Override
@@ -27,18 +41,8 @@ public class MonitoredBlockCoords implements IMonitorInfo<MonitoredBlockCoords>,
 	}
 
 	@Override
-	public void updateFrom(MonitoredBlockCoords info) {
-		coords = info.coords;
-	}
-
-	@Override
-	public boolean isHeader() {
-		return false;
-	}
-
-	@Override
 	public boolean isMatchingType(IMonitorInfo info) {
-		return CacheRegistry.handler.validateInfo(info);
+		return info instanceof MonitoredBlockCoords;
 	}
 
 	@Override
@@ -48,7 +52,7 @@ public class MonitoredBlockCoords implements IMonitorInfo<MonitoredBlockCoords>,
 
 	@Override
 	public String getClientObject() {
-		return coords.toString();
+		return coords.getCoords().toString();
 	}
 
 	@Override
@@ -62,6 +66,21 @@ public class MonitoredBlockCoords implements IMonitorInfo<MonitoredBlockCoords>,
 			return monitoredCoords.coords.equals(coords) && monitoredCoords.unlocalizedName.equals(unlocalizedName);
 		}
 		return false;
+	}
+
+	@Override
+	public MonitorHandler<MonitoredBlockCoords> getHandler() {
+		return handler;
+	}
+
+	@Override
+	public boolean isValid() {
+		return coords.getCoords()!=null;
+	}
+
+	@Override
+	public String getID() {
+		return id;
 	}
 
 }

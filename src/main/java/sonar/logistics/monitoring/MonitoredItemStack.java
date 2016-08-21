@@ -1,38 +1,49 @@
 package sonar.logistics.monitoring;
 
-import net.minecraft.item.ItemStack;
 import sonar.core.api.inventories.StoredItemStack;
+import sonar.core.network.sync.SyncNBTAbstract;
+import sonar.logistics.Logistics;
+import sonar.logistics.api.asm.LogicInfoType;
+import sonar.logistics.api.info.BaseInfo;
 import sonar.logistics.api.info.monitor.IJoinableInfo;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
+import sonar.logistics.api.info.monitor.MonitorHandler;
 
-public class MonitoredItemStack extends StoredItemStack implements IJoinableInfo<MonitoredItemStack> {
+@LogicInfoType(id = MonitoredItemStack.id, modid = Logistics.MODID)
+public class MonitoredItemStack extends BaseInfo<MonitoredItemStack> implements IJoinableInfo<MonitoredItemStack> {
 
-	public MonitoredItemStack(ItemStack stack) {
-		super(stack);
+	public static final String id = "item";
+	public static final MonitorHandler<MonitoredItemStack> handler = Logistics.monitorHandlers.getRegisteredObject(MonitorHandler.ITEMS);
+	public SyncNBTAbstract<StoredItemStack> itemStack = new SyncNBTAbstract<StoredItemStack>(StoredItemStack.class, 0);
+
+	{
+		syncParts.add(itemStack);
 	}
 
-	public MonitoredItemStack(ItemStack stack, long stored) {
-		super(stack, stored);
-	}
+	public MonitoredItemStack() {}
 
 	public MonitoredItemStack(StoredItemStack stack) {
-		super(stack.item, stack.stored);
+		this.itemStack.setObject(stack);
 	}
 
 	@Override
 	public boolean isIdenticalInfo(MonitoredItemStack info) {
-		return equals(info);
+		return itemStack.getObject().equals(info.itemStack.getObject());
 	}
 
 	@Override
 	public boolean isMatchingInfo(MonitoredItemStack info) {
-		return equalStack(info.item);
+		return itemStack.getObject().equalStack(info.itemStack.getObject().item);
 	}
 
 	@Override
-	public void updateFrom(MonitoredItemStack info) {
-		this.item = info.item;
-		this.stored = info.stored;
+	public boolean isMatchingType(IMonitorInfo info) {
+		return info instanceof MonitoredItemStack;
+	}
+
+	@Override
+	public MonitorHandler<MonitoredItemStack> getHandler() {
+		return handler;
 	}
 
 	@Override
@@ -42,17 +53,18 @@ public class MonitoredItemStack extends StoredItemStack implements IJoinableInfo
 
 	@Override
 	public IJoinableInfo joinInfo(MonitoredItemStack info) {
-		add((MonitoredItemStack) info);
+		itemStack.getObject().add(info.itemStack.getObject());
 		return this;
 	}
 
 	@Override
-	public boolean isHeader() {
-		return true;
+	public boolean isValid() {
+		return itemStack.getObject()!=null && itemStack.getObject().item != null;
 	}
 
 	@Override
-	public boolean isMatchingType(IMonitorInfo info) {
-		return info instanceof MonitoredItemStack;
+	public String getID() {
+		return id;
 	}
+
 }

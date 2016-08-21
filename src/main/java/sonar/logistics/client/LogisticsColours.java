@@ -1,6 +1,5 @@
 package sonar.logistics.client;
 
-import sonar.core.helpers.FontHelper;
 import sonar.core.utils.CustomColour;
 
 public class LogisticsColours {
@@ -9,6 +8,8 @@ public class LogisticsColours {
 	public static CustomColour grey_base = new CustomColour(5, 5, 2);
 	public static CustomColour blue_overlay = new CustomColour(5, 5, 16);
 	public static CustomColour category = new CustomColour(25, 25, 35);
+	public static CustomColour grey_text = new CustomColour(105, 105, 116);
+	public static CustomColour white_text = new CustomColour(170, 170, 170);
 
 	public static CustomColour[] layers = new CustomColour[]{
 			backgroundColour,//

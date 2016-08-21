@@ -38,12 +38,13 @@ import sonar.logistics.helpers.InfoRenderer;
 import sonar.logistics.monitoring.MonitoredBlockCoords;
 import sonar.logistics.network.PacketMonitorType;
 import sonar.logistics.parts.InfoReaderPart;
+import sonar.logistics.parts.LogicReaderPart;
 import sonar.logistics.parts.MonitorMultipart;
 
 public class GuiInfoReader extends GuiLogistics {
 
 	public BlockPos pos;
-	public MonitorMultipart part;
+	public LogicReaderPart part;
 
 	public GuiInfoReader(EntityPlayer player, InfoReaderPart part) {
 		super(new ContainerInfoReader(player, part), part);
@@ -100,7 +101,7 @@ public class GuiInfoReader extends GuiLogistics {
 			if (info == null || info.isHeader()) {
 				return LogisticsColours.layers[1].getRGB();
 			}
-			ArrayList<IMonitorInfo> selectedInfo = type==0 ? part.getSelectedInfo() : part.getPairedInfo();
+			ArrayList<IMonitorInfo> selectedInfo = type == 0 ? part.getSelectedInfo() : part.getPairedInfo();
 			int pos = 0;
 			for (IMonitorInfo selected : selectedInfo) {
 				if (selected != null && !selected.isHeader() && info.isMatchingType(selected) && info.isMatchingInfo(selected)) {
@@ -153,7 +154,7 @@ public class GuiInfoReader extends GuiLogistics {
 							break;
 						}
 					}
-				} else if (CacheRegistry.handler.validateInfo(info) && part.getMonitoringCoords().contains(((MonitoredBlockCoords) info).coords)) {
+				} else if (info.isValid() && part.getMonitoringCoords().contains(((MonitoredBlockCoords) info).coords)) {
 					pos.add(i - start);
 				}
 			}
@@ -185,8 +186,8 @@ public class GuiInfoReader extends GuiLogistics {
 		start = (int) (infoSize() * scroller.getCurrentScroll());
 		finish = Math.min(start + size, infoSize());
 
-		FontHelper.textCentre(FontHelper.translate("item.InfoReader.name"), xSize, 6, white_text);
-		FontHelper.textCentre(String.format("Select the %s you wish to monitor", state == GuiState.INFO ? "data" : "channel"), xSize, 18, grey_text);
+		FontHelper.textCentre(FontHelper.translate("item.InfoReader.name"), xSize, 6, LogisticsColours.white_text);
+		FontHelper.textCentre(String.format("Select the %s you wish to monitor", state == GuiState.INFO ? "data" : "channel"), xSize, 18, LogisticsColours.grey_text);
 		GL11.glPushMatrix();
 		GL11.glScaled(0.75, 0.75, 0.75);
 		int identifierLeft = (int) ((1.0 / 0.75) * 10);
@@ -196,7 +197,7 @@ public class GuiInfoReader extends GuiLogistics {
 			IMonitorInfo info = getCurrentList().get(i);
 			if (info != null) {
 				int yPos = (int) ((1.0 / 0.75) * (32 + (12 * i) - (12 * start)));
-				InfoRenderer.renderMonitorInfoInGUI(info, yPos, white_text);
+				InfoRenderer.renderMonitorInfoInGUI(info, yPos, LogisticsColours.white_text.getRGB());
 			}
 		}
 		GL11.glPopMatrix();
@@ -273,17 +274,17 @@ public class GuiInfoReader extends GuiLogistics {
 				IMonitorInfo info = getCurrentList().get(network);
 				switch (state) {
 				case CHANNEL:
-					if (CacheRegistry.handler.validateInfo(info)) {
+					if (info.isValid()) {
 						if (buttonID == 0) {
-							part.lastSelected = ((MonitoredBlockCoords) info).coords;
+							part.lastSelected = ((MonitoredBlockCoords) info).coords.getCoords();
 							part.sendByteBufPacket(-3);
 						} else {
-							RenderBlockSelection.setPosition(((MonitoredBlockCoords) info).coords);
+							RenderBlockSelection.setPosition(((MonitoredBlockCoords) info).coords.getCoords());
 						}
 					}
 					break;
 				case INFO:
-					if (!info.isHeader() && part.getHandler().validateInfo(info)) {
+					if (!info.isHeader() && info.isValid()) {
 						part.selectedInfo.setInfo(info);
 						part.sendByteBufPacket(buttonID == 0 ? -9 : -10);
 					}

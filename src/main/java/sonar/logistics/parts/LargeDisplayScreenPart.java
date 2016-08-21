@@ -6,6 +6,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
 import sonar.logistics.LogisticsItems;
+import sonar.logistics.api.display.ScreenLayout;
+import sonar.logistics.api.info.IInfoContainer;
+import sonar.logistics.api.info.InfoUUID;
 
 public class LargeDisplayScreenPart extends ScreenMultipart {
 
@@ -53,6 +56,30 @@ public class LargeDisplayScreenPart extends ScreenMultipart {
 
 	@Override
 	public boolean canConnect(EnumFacing dir) {
+		return false;
+	}
+
+	@Override
+	public IInfoContainer container() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ScreenLayout getLayout() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public int maxInfo() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public boolean monitorsUUID(InfoUUID id) {
+		// TODO Auto-generated method stub
 		return false;
 	}
 }

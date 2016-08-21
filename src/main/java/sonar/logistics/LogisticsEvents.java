@@ -1,17 +1,13 @@
 package sonar.logistics;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.World;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraftforge.event.world.ChunkWatchEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
+import net.minecraftforge.fml.relauncher.Side;
 import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.cache.IRefreshCache;
 import sonar.logistics.connections.CableRegistry;
@@ -21,6 +17,9 @@ import sonar.logistics.connections.LogicMonitorCache;
 public class LogisticsEvents {
 	@SubscribeEvent
 	public void onServerTick(TickEvent.ServerTickEvent event) {
+		if (event.side == Side.CLIENT) {
+			return;
+		}
 		if (event.phase == Phase.START) {
 			LinkedHashMap<Integer, INetworkCache> networks = (LinkedHashMap<Integer, INetworkCache>) CacheRegistry.getNetworkCache().clone();
 			if (networks.isEmpty()) {
@@ -35,9 +34,10 @@ public class LogisticsEvents {
 					CacheRegistry.getNetworkCache().remove(Integer.valueOf(cache.getNetworkID()));
 				}
 			}
+			LogicMonitorCache.onServerTick();
 		}
 	}
-
+	/*
 	@SubscribeEvent
 	public void onWatchChunk(ChunkWatchEvent.Watch event) {
 		if (!LogicMonitorCache.enableEvents()) {
@@ -71,28 +71,20 @@ public class LogisticsEvents {
 		LogicMonitorCache.activeChunks.putIfAbsent(event.getPlayer(), new ArrayList()).remove(event.getChunk());
 	}
 
+	*/
 	@SubscribeEvent
 	public void onChangeDimension(PlayerEvent.PlayerChangedDimensionEvent event) {
-		if (!LogicMonitorCache.enableEvents()) {
-			return;
-		}
-		LogicMonitorCache.activeChunks.putIfAbsent(event.player, new ArrayList()).clear();
-		LogicMonitorCache.sendFirstPacket(event.player);
+		//if (!LogicMonitorCache.enableEvents()) {
+		//	return;
+		//}
+		LogicMonitorCache.sendFullPacket(event.player);
 	}
 
 	@SubscribeEvent
 	public void onLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
-		if (!LogicMonitorCache.enableEvents()) {
-			return;
-		}
-		LogicMonitorCache.sendFirstPacket(event.player);
-	}
-
-	@SubscribeEvent
-	public void onLoggedOut(PlayerEvent.PlayerLoggedOutEvent event) {
-		if (!LogicMonitorCache.enableEvents()) {
-			return;
-		}
-		LogicMonitorCache.activeChunks.putIfAbsent(event.player, new ArrayList()).clear();
+		//if (!LogicMonitorCache.enableEvents()) {
+		//	return;
+		//}
+		LogicMonitorCache.sendFullPacket(event.player);
 	}
 }

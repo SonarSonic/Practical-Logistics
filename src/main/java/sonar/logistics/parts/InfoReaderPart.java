@@ -1,9 +1,5 @@
 package sonar.logistics.parts;
 
-import java.util.ArrayList;
-
-import com.google.common.collect.Lists;
-
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
@@ -12,15 +8,13 @@ import sonar.core.utils.IGuiTile;
 import sonar.logistics.LogisticsItems;
 import sonar.logistics.api.info.LogicInfo;
 import sonar.logistics.api.info.monitor.ChannelType;
-import sonar.logistics.api.info.monitor.IMonitorInfo;
 import sonar.logistics.api.info.monitor.MonitorHandler;
 import sonar.logistics.client.gui.GuiInfoReader;
 import sonar.logistics.common.containers.ContainerInfoReader;
 import sonar.logistics.connections.MonitoredList;
 import sonar.logistics.helpers.InfoHelper;
-import sonar.logistics.network.SyncMonitoredType;
 
-public class InfoReaderPart extends ReaderMultipart<LogicInfo> implements IByteBufTile, IGuiTile {
+public class InfoReaderPart extends LogicReaderPart<LogicInfo> implements IByteBufTile, IGuiTile {
 
 	public InfoReaderPart() {
 		super(MonitorHandler.INFO);
@@ -46,7 +40,7 @@ public class InfoReaderPart extends ReaderMultipart<LogicInfo> implements IByteB
 	}
 
 	@Override
-	public MonitoredList<LogicInfo> updateInfo(MonitoredList<LogicInfo> updateInfo) {
+	public MonitoredList<LogicInfo> sortMonitoredList(MonitoredList<LogicInfo> updateInfo) {
 		updateInfo.info = InfoHelper.sortInfoList(updateInfo.info);
 		return updateInfo;
 	}

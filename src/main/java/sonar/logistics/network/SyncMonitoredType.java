@@ -1,16 +1,14 @@
 package sonar.logistics.network;
 
-import java.util.ArrayList;
-
 import io.netty.buffer.ByteBuf;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.core.network.sync.SyncPart;
 import sonar.logistics.Logistics;
-import sonar.logistics.api.info.LogicInfo;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
 import sonar.logistics.api.info.monitor.MonitorHandler;
+import sonar.logistics.helpers.InfoHelper;
 
 public class SyncMonitoredType<T extends IMonitorInfo> extends SyncPart {
 
@@ -34,9 +32,10 @@ public class SyncMonitoredType<T extends IMonitorInfo> extends SyncPart {
 
 	@Override
 	public void writeToBuf(ByteBuf buf) {
-		if (info != null) {
+		if (info != null && info.isValid()) {
 			buf.writeBoolean(true);
-			ByteBufUtils.writeTag(buf, handler().writeInfo((T) info, new NBTTagCompound(), SyncType.SAVE));
+			buf.writeInt(InfoHelper.getName(info.getID()));
+			ByteBufUtils.writeTag(buf, info.writeData(new NBTTagCompound(), SyncType.SAVE));
 		} else {
 			buf.writeBoolean(false);
 		}
@@ -45,7 +44,8 @@ public class SyncMonitoredType<T extends IMonitorInfo> extends SyncPart {
 	@Override
 	public void readFromBuf(ByteBuf buf) {
 		if (buf.readBoolean()) {
-			info = handler().readInfo(ByteBufUtils.readTag(buf), SyncType.SAVE);
+			int id = buf.readInt();
+			info = InfoHelper.loadInfo(id, ByteBufUtils.readTag(buf));
 		} else {
 			info = null;
 		}
@@ -53,8 +53,8 @@ public class SyncMonitoredType<T extends IMonitorInfo> extends SyncPart {
 
 	@Override
 	public NBTTagCompound writeData(NBTTagCompound nbt, SyncType type) {
-		if (info != null) {
-			nbt.setTag(getTagName(), handler().writeInfo((T) info, new NBTTagCompound(), type));
+		if (info != null && info.isValid()) {
+			nbt.setTag(getTagName(), InfoHelper.writeInfoToNBT(new NBTTagCompound(),info, type));
 		}
 		return nbt;
 	}
@@ -62,7 +62,7 @@ public class SyncMonitoredType<T extends IMonitorInfo> extends SyncPart {
 	@Override
 	public void readData(NBTTagCompound nbt, SyncType type) {
 		if (nbt.hasKey(getTagName())) {
-			info = handler().readInfo(nbt.getCompoundTag(getTagName()), type);
+			info = InfoHelper.readInfoFromNBT(nbt.getCompoundTag(getTagName()));
 		}
 	}
 

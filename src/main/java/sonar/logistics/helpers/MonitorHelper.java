@@ -29,11 +29,12 @@ public class MonitorHelper {
 		}
 		list.info.add(info);
 	}
-	//FIXME - to use updateWriting for some of the tags, like ILogicInfo
+
+	// FIXME - to use updateWriting for some of the tags, like ILogicInfo
 	public static <T extends IMonitorInfo> NBTTagCompound writeMonitoredList(NBTTagCompound tag, boolean lastWasNull, MonitorHandler<T> handler, MonitoredList<T> stacks, SyncType type) {
 		if (type.isType(SyncType.DEFAULT_SYNC)) {
 			NBTTagList list = new NBTTagList();
-			stacks.info.forEach(info -> list.appendTag(handler.writeInfo(info, new NBTTagCompound(), SyncType.SAVE)));
+			stacks.info.forEach(info -> list.appendTag(InfoHelper.writeInfoToNBT(new NBTTagCompound(), info, SyncType.SAVE)));
 			if (list.tagCount() != 0) {
 				tag.setTag(SYNC, list);
 				return tag;
@@ -48,14 +49,15 @@ public class MonitorHelper {
 				return tag;
 			}
 			NBTTagList list = new NBTTagList();
-			for (int l = 0; l < 2; l++) {
-				ArrayList<T> stackList = l == 0 ? stacks.changed : stacks.removed;
+			for (int listType = 0; listType < 2; listType++) {
+				ArrayList<T> stackList = listType == 0 ? stacks.changed : stacks.removed;
 				for (int i = 0; i < stackList.size(); i++) {
-					if (stackList.get(i) != null) {
+					T info = stackList.get(i);
+					if (info != null) {
 						NBTTagCompound compound = new NBTTagCompound();
-						if (l == 1)
+						if (listType == 1)
 							compound.setBoolean(REMOVED, true);
-						list.appendTag(handler.writeInfo(stackList.get(i), compound, SyncType.SAVE));
+						list.appendTag(InfoHelper.writeInfoToNBT(compound, info, listType == 1 ? SyncType.SAVE : SyncType.SAVE));
 					}
 				}
 			}
@@ -78,7 +80,7 @@ public class MonitorHelper {
 			NBTTagList list = tag.getTagList(SYNC, 10);
 			stacks.info.clear();
 			for (int i = 0; i < list.tagCount(); i++) {
-				stacks.info.add(handler.readInfo(list.getCompoundTagAt(i), SyncType.SAVE));
+				stacks.info.add((T) InfoHelper.readInfoFromNBT(list.getCompoundTagAt(i)));
 			}
 		} else if (type.isType(SyncType.SPECIAL)) {
 			if (!tag.hasKey(SPECIAL)) {
@@ -86,14 +88,14 @@ public class MonitorHelper {
 			}
 			NBTTagList list = tag.getTagList(SPECIAL, 10);
 			tags: for (int i = 0; i < list.tagCount(); i++) {
-				NBTTagCompound compound = list.getCompoundTagAt(i);
-				T stack = handler.readInfo(compound, SyncType.SAVE);
+				NBTTagCompound infoTag = list.getCompoundTagAt(i);
+				T stack = (T) InfoHelper.readInfoFromNBT(infoTag);
 				for (T stored : (ArrayList<T>) stacks.info.clone()) {
 					if (stack.isMatchingInfo(stored)) {
-						if (compound.getBoolean(REMOVED)) {
+						if (infoTag.getBoolean(REMOVED)) {
 							stacks.info.remove(stored);
 						} else {
-							stored.updateFrom(stack);
+							stored.readData(infoTag, SyncType.SAVE);
 						}
 						continue tags;
 					}

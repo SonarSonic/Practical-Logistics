@@ -2,15 +2,12 @@ package sonar.logistics.monitoring;
 
 import java.util.List;
 
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import sonar.core.SonarCore;
 import sonar.core.api.energy.EnergyHandler;
 import sonar.core.api.energy.StoredEnergyStack;
 import sonar.core.api.utils.BlockCoords;
-import sonar.core.helpers.NBTHelper.SyncType;
-import sonar.logistics.api.info.monitor.IMonitorInfo;
 import sonar.logistics.api.info.monitor.MonitorHandler;
 import sonar.logistics.connections.MonitoredList;
 import sonar.logistics.helpers.MonitorHelper;
@@ -42,7 +39,7 @@ public class EnergyMonitorHandler extends MonitorHandler<MonitoredEnergyStack> {
 		}
 		return null;
 	}
-
+	/*
 	@Override
 	public MonitoredEnergyStack readInfo(NBTTagCompound tag, SyncType type) {
 		return new MonitoredEnergyStack(StoredEnergyStack.readFromNBT(tag));
@@ -57,5 +54,5 @@ public class EnergyMonitorHandler extends MonitorHandler<MonitoredEnergyStack> {
 	public boolean validateInfo(IMonitorInfo info) {
 		return info instanceof MonitoredEnergyStack;
 	}
-
+	*/
 }

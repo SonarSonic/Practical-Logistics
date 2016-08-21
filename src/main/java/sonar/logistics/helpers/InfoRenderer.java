@@ -25,7 +25,7 @@ public class InfoRenderer extends RenderWrapper {
 		GL11.glScaled(1.0f / itemScale, 1.0f / itemScale, 1.0f / itemScale);
 
 		String category = info.getClientIdentifier();
-		String data = info.obj.toString();
+		String data = info.getClientObject();
 		if (category.isEmpty() || category.equals(" ")) {
 			rend.drawString(data, -rend.getStringWidth(data) / 2, -4, -1);
 		} else {
@@ -89,7 +89,7 @@ public class InfoRenderer extends RenderWrapper {
 				FontHelper.text(directInfo.getClientType(), kindLeft, yPos, colour);
 			} else {
 				if (directInfo instanceof LogicInfo) {
-					String category = ((LogicInfo)directInfo).registryType.name();
+					String category = ((LogicInfo)directInfo).getRegistryType().name();
 					FontHelper.text(category.substring(0, 1) + category.substring(1).toLowerCase(), identifierLeft + 4, yPos, colour);
 				}
 			}

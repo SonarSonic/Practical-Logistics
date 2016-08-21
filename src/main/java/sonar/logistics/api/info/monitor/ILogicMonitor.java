@@ -21,7 +21,9 @@ public interface ILogicMonitor<T extends IMonitorInfo> extends ILogicTile {
 	public ArrayList<MonitorViewer> getViewers();
 	
 	/**this is when the list should be set and added to the ClinetMonitoredLists*/
-	public MonitoredList<T> updateInfo(MonitoredList<T> updateInfo);
+	public MonitoredList<T> sortMonitoredList(MonitoredList<T> updateInfo);
+	
+	public void setMonitoredInfo(MonitoredList<T> updateInfo);
 	
 	public ChannelType channelType();
 	

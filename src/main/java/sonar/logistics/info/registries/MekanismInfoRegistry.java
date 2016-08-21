@@ -7,8 +7,8 @@ import mekanism.api.IHeatTransfer;
 import mekanism.api.lasers.ILaserReceptor;
 import mekanism.api.reactor.IFusionReactor;
 import mekanism.api.reactor.IReactorBlock;
+import sonar.logistics.api.asm.InfoRegistry;
 import sonar.logistics.api.info.IInfoRegistry;
-import sonar.logistics.api.info.InfoRegistry;
 import sonar.logistics.registries.LogicRegistry;
 import sonar.logistics.registries.LogicRegistry.RegistryType;
 

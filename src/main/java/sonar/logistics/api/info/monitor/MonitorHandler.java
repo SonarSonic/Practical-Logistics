@@ -1,10 +1,8 @@
 package sonar.logistics.api.info.monitor;
 
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import sonar.core.api.IRegistryObject;
 import sonar.core.api.utils.BlockCoords;
-import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.logistics.connections.MonitoredList;
 
 public abstract class MonitorHandler<I extends IMonitorInfo> implements IRegistryObject {
@@ -22,14 +20,14 @@ public abstract class MonitorHandler<I extends IMonitorInfo> implements IRegistr
 
 	/** @param tag the save to read from
 	 * @return the info */
-	public abstract I readInfo(NBTTagCompound tag, SyncType type);
+	//public abstract I readInfo(NBTTagCompound tag, SyncType type);
 
 	/** @param info to save
 	 * @return tag with the info saved */
-	public abstract NBTTagCompound writeInfo(I info, NBTTagCompound tag, SyncType type);
+	//public abstract NBTTagCompound writeInfo(I info, NBTTagCompound tag, SyncType type);
 
 	/** @param info to check
 	 * @return if this info is valid for use with the InfoHandler */
-	public abstract boolean validateInfo(IMonitorInfo info);
+	//public abstract boolean validateInfo(IMonitorInfo info);
 
 }

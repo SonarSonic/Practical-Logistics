@@ -1,40 +1,49 @@
 package sonar.logistics.api.info;
 
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.common.util.Constants;
+import com.google.common.collect.Lists;
+
 import sonar.core.api.nbt.INBTSyncable;
 import sonar.core.helpers.FontHelper;
-import sonar.core.helpers.NBTHelper;
-import sonar.core.helpers.NBTHelper.SyncType;
+import sonar.core.network.sync.ObjectType;
+import sonar.core.network.sync.SyncEnum;
+import sonar.core.network.sync.SyncTagType;
+import sonar.core.network.sync.SyncUnidentifiedObject;
 import sonar.core.utils.Pair;
 import sonar.logistics.Logistics;
+import sonar.logistics.api.asm.LogicInfoType;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
+import sonar.logistics.api.info.monitor.MonitorHandler;
 import sonar.logistics.registries.LogicRegistry;
 import sonar.logistics.registries.LogicRegistry.RegistryType;
 
-public class LogicInfo implements IMonitorInfo<LogicInfo>, INBTSyncable, INameableInfo<LogicInfo> {
+@LogicInfoType(id = LogicInfo.id, modid = Logistics.MODID)
+public class LogicInfo extends BaseInfo<LogicInfo> implements INBTSyncable, INameableInfo<LogicInfo> {
 
-	public InfoType infoType;
-	public String identifier;
-	public RegistryType registryType;
-	public Object obj;
-	public boolean isCategory = false;
+	public static final String id = "logic";
+	public static final MonitorHandler<LogicInfo> handler = Logistics.monitorHandlers.getRegisteredObject(MonitorHandler.INFO);
+
+	private SyncTagType.STRING identifier = new SyncTagType.STRING(0);
+	private SyncEnum<RegistryType> registryType = new SyncEnum(RegistryType.values(), 2);
+	private SyncUnidentifiedObject obj = new SyncUnidentifiedObject(3);
+	private boolean isCategory = false;
+
+	{
+		syncParts.addAll(Lists.newArrayList(identifier, registryType, obj));
+	}
 
 	public static LogicInfo buildCategoryInfo(RegistryType type) {
 		LogicInfo info = new LogicInfo();
-		info.registryType = type;
+		info.registryType.setObject(type);
 		info.isCategory = true;
 		return info;
 	}
 
 	public static LogicInfo buildDirectInfo(String identifier, RegistryType type, Object obj) {
 		LogicInfo info = new LogicInfo();
-		info.infoType = InfoType.getInfoType(obj);
-		info.obj = obj;
-		info.registryType = type;
-		info.identifier = identifier;
-
-		if (info.infoType == InfoType.NONE) {
+		info.obj.set(obj, ObjectType.getInfoType(obj));
+		info.registryType.setObject(type);
+		info.identifier.setObject(identifier);
+		if (info.obj.objectType == ObjectType.NONE) {
 			Logistics.logger.error(String.format("Invalid Info: %s with object %s", identifier, obj));
 			return null;
 		}
@@ -42,46 +51,22 @@ public class LogicInfo implements IMonitorInfo<LogicInfo>, INBTSyncable, INameab
 	}
 
 	@Override
-	public boolean isIdenticalInfo(LogicInfo info) {
-		return isMatchingInfo(info) && obj.equals(info.obj);
+	public MonitorHandler<LogicInfo> getHandler() {
+		return handler;
+	}
+
+	@Override
+	public boolean isIdenticalInfo(LogicInfo info) {		
+		return isMatchingInfo(info) && obj.get().equals(info.obj.get());
 	}
 
 	@Override
 	public boolean isMatchingInfo(LogicInfo info) {
-		return infoType.equals(info.infoType) && identifier.equals(info.identifier) && registryType.equals(info.registryType);
+		return obj.objectType!=null && obj.objectType.equals(info.obj.objectType) && identifier.getObject().equals(info.identifier.getObject()) && registryType.getObject().equals(info.registryType.getObject());
 	}
 
-	@Override
-	public void updateFrom(LogicInfo info) {
-		obj = info.obj;
-	}
-
-	@Override
-	public void readData(NBTTagCompound nbt, SyncType type) {
-		infoType = InfoType.values()[nbt.getInteger("type")];
-		registryType = RegistryType.values()[nbt.getInteger("registryType")];
-		identifier = nbt.getString("id");
-		obj = NBTHelper.readNBTBase(nbt, infoType.tagType, "obj");
-	}
-
-	@Override
-	public NBTTagCompound writeData(NBTTagCompound nbt, SyncType type) {
-		nbt.setInteger("type", infoType.ordinal());
-		nbt.setInteger("registryType", registryType.ordinal());
-		nbt.setString("id", identifier);
-		NBTHelper.writeNBTBase(nbt, infoType.tagType, obj, "obj");
-		return nbt;
-	}
-
-	public static LogicInfo readFromNBT(NBTTagCompound nbt) {
-		LogicInfo info = new LogicInfo();
-		info.readData(nbt, SyncType.SAVE);
-		return info;
-
-	}
-
-	public NBTTagCompound writeToNBT(NBTTagCompound tag) {
-		return writeData(tag, SyncType.SAVE);
+	public RegistryType getRegistryType() {
+		return registryType.getObject();
 	}
 
 	public String getClientIdentifier() {
@@ -90,9 +75,9 @@ public class LogicInfo implements IMonitorInfo<LogicInfo>, INBTSyncable, INameab
 
 	public String getClientObject() {
 		String prefix = "", suffix = "";
-		Pair<String, String> adjustment = LogicRegistry.infoAdjustments.get(identifier);
-		if (identifier.equals("Block.getUnlocalizedName")) {
-			return FontHelper.translate(obj.toString() + ".name");
+		Pair<String, String> adjustment = LogicRegistry.infoAdjustments.get(identifier.getObject());
+		if (identifier.getObject().equals("Block.getUnlocalizedName")) {
+			return FontHelper.translate(obj.get().toString() + ".name");
 		}
 		if (adjustment != null) {
 			if (!adjustment.a.isEmpty())
@@ -100,31 +85,11 @@ public class LogicInfo implements IMonitorInfo<LogicInfo>, INBTSyncable, INameab
 			if (!adjustment.b.isEmpty())
 				suffix = " " + adjustment.b;
 		}
-		return prefix + obj.toString() + suffix;
+		return prefix + obj.get().toString() + suffix;
 	}
 
 	public String getClientType() {
-		return infoType.toString().toLowerCase();
-	}
-
-	public enum InfoType {
-		BOOLEAN(Constants.NBT.TAG_END, Boolean.class), BYTE(Constants.NBT.TAG_BYTE, Byte.class), SHORT(Constants.NBT.TAG_SHORT, Short.class), INTEGER(Constants.NBT.TAG_INT, Integer.class), LONG(Constants.NBT.TAG_LONG, Long.class), FLOAT(Constants.NBT.TAG_FLOAT, Float.class), DOUBLE(Constants.NBT.TAG_DOUBLE, Double.class), STRING(Constants.NBT.TAG_STRING, String.class), NONE(-1, null);
-		public int tagType;
-		public Class<?> classType;
-
-		InfoType(int tagType, Class<?> classType) {
-			this.tagType = tagType;
-			this.classType = classType;
-		}
-
-		public static InfoType getInfoType(Object obj) {
-			for (InfoType type : values()) {
-				if (type.classType != null && (type.classType.isInstance(obj) || type.classType.isAssignableFrom(obj.getClass()))) {
-					return type;
-				}
-			}
-			return NONE;
-		}
+		return obj.objectType.toString().toLowerCase();
 	}
 
 	@Override
@@ -135,6 +100,16 @@ public class LogicInfo implements IMonitorInfo<LogicInfo>, INBTSyncable, INameab
 	@Override
 	public boolean isMatchingType(IMonitorInfo info) {
 		return info instanceof LogicInfo;
+	}
+
+	@Override
+	public boolean isValid() {
+		return obj.get() != null;
+	}
+
+	@Override
+	public String getID() {
+		return id;
 	}
 
 }

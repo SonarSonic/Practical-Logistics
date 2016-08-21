@@ -212,12 +212,12 @@ public class FluidHelper extends FluidWrapper {
 	}
 	
 	public static void sortFluidList(ArrayList<MonitoredFluidStack> current, final SortingDirection dir, SortingType type) {
-		current.sort(new Comparator<StoredFluidStack>() {
-			public int compare(StoredFluidStack str1, StoredFluidStack str2) {
-				
-				int res = String.CASE_INSENSITIVE_ORDER.compare(str1.getFullStack().getLocalizedName(), str2.getFullStack().getLocalizedName());
+		current.sort(new Comparator<MonitoredFluidStack>() {
+			public int compare(MonitoredFluidStack str1, MonitoredFluidStack str2) {
+				StoredFluidStack flu1 = str1.fluidStack.getObject(), flu2 = str2.fluidStack.getObject();
+				int res = String.CASE_INSENSITIVE_ORDER.compare(flu1.getFullStack().getLocalizedName(), flu2.getFullStack().getLocalizedName());
 				if (res == 0) {
-					res = str1.getFullStack().getLocalizedName().compareTo(str2.getFullStack().getLocalizedName());
+					res = flu1.getFullStack().getLocalizedName().compareTo(flu2.getFullStack().getLocalizedName());
 				}
 				return dir == SortingDirection.DOWN ? res : -res;
 			}
@@ -225,22 +225,24 @@ public class FluidHelper extends FluidWrapper {
 
 		switch (type) {
 		case STORED:
-			current.sort(new Comparator<StoredFluidStack>() {
-				public int compare(StoredFluidStack str1, StoredFluidStack str2) {
-					if (str1.stored < str2.stored)
+			current.sort(new Comparator<MonitoredFluidStack>() {
+				public int compare(MonitoredFluidStack str1, MonitoredFluidStack str2) {
+					StoredFluidStack flu1 = str1.fluidStack.getObject(), flu2 = str2.fluidStack.getObject();
+					if (flu1.stored < flu2.stored)
 						return dir == SortingDirection.DOWN ? 1 : -1;
-					if (str1.stored == str2.stored)
+					if (flu1.stored == flu2.stored)
 						return 0;
 					return dir == SortingDirection.DOWN ? -1 : 1;
 				}
 			});
 			break;
 		case MODID:
-			current.sort(new Comparator<StoredFluidStack>() {
-				public int compare(StoredFluidStack str1, StoredFluidStack str2) {
-					if (str1.getFullStack().getFluid().getTemperature() < str2.getFullStack().getFluid().getTemperature())
+			current.sort(new Comparator<MonitoredFluidStack>() {
+				public int compare(MonitoredFluidStack str1, MonitoredFluidStack str2) {
+					StoredFluidStack flu1 = str1.fluidStack.getObject(), flu2 = str2.fluidStack.getObject();
+					if (flu1.getFullStack().getFluid().getTemperature() < flu2.getFullStack().getFluid().getTemperature())
 						return dir == SortingDirection.DOWN ? 1 : -1;
-					if (str1.getFullStack().getFluid().getTemperature() == str2.getFullStack().getFluid().getTemperature())
+					if (flu1.getFullStack().getFluid().getTemperature() == flu2.getFullStack().getFluid().getTemperature())
 						return 0;
 					return dir == SortingDirection.DOWN ? -1 : 1;
 				}

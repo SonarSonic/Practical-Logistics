@@ -55,7 +55,7 @@ public class PacketMonitoredList implements IMessage {
 		@Override
 		public IMessage onMessage(PacketMonitoredList message, MessageContext ctx) {
 			if (message.list != null) {
-				LogicMonitorCache.monitoredLists.put(message.monitor, message.monitor.updateInfo(message.list));
+				LogicMonitorCache.monitoredLists.put(message.monitor, message.monitor.sortMonitoredList(message.list));
 			}
 			return null;
 		}

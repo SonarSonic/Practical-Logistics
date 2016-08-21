@@ -5,12 +5,14 @@ import java.io.IOException;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.inventory.Container;
 import net.minecraft.util.ResourceLocation;
 import sonar.core.client.gui.widgets.SonarScroller;
 import sonar.core.helpers.RenderHelper;
 import sonar.core.utils.IWorldPosition;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
+import sonar.logistics.client.LogisticsColours;
 import sonar.logistics.connections.MonitoredList;
 
 public abstract class GuiSelectionGrid<T extends IMonitorInfo> extends GuiLogistics {
@@ -120,6 +122,7 @@ public abstract class GuiSelectionGrid<T extends IMonitorInfo> extends GuiLogist
 				}
 			}
 		}
+		//GlStateManager.disableCull();
 		super.drawGuiContainerForegroundLayer(x, y);
 	}
 
@@ -148,11 +151,11 @@ public abstract class GuiSelectionGrid<T extends IMonitorInfo> extends GuiLogist
 
 		drawTexturedModalRect(this.guiLeft+102, this.guiTop+8, 0, 0, 18, 18);
 
-		drawRect(guiLeft+12, guiTop+ 31, guiLeft+228, guiTop+ 157, grey_base);
-		drawRect(guiLeft+13, guiTop+ 32, guiLeft+227, guiTop+ 156, blue_overlay);
+		drawRect(guiLeft+12, guiTop+ 31, guiLeft+228, guiTop+ 157, LogisticsColours.grey_base.getRGB());
+		drawRect(guiLeft+13, guiTop+ 32, guiLeft+227, guiTop+ 156, LogisticsColours.blue_overlay.getRGB());
 		
-		drawRect(guiLeft+12, guiTop+ 170, guiLeft+xSize-12, guiTop+ 252, grey_base);
-		drawRect(guiLeft+13, guiTop+ 171, guiLeft+xSize-13, guiTop+ 251, blue_overlay);
+		drawRect(guiLeft+12, guiTop+ 170, guiLeft+xSize-12, guiTop+ 252, LogisticsColours.grey_base.getRGB());
+		drawRect(guiLeft+13, guiTop+ 171, guiLeft+xSize-13, guiTop+ 251, LogisticsColours.blue_overlay.getRGB());
 		//drawRect(left, top, left + width, top + height, blue_overlay);
 		//net.minecraft.client.renderer.RenderHelper.enableGUIStandardItemLighting();
 		///OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240.0F, 240.0F);

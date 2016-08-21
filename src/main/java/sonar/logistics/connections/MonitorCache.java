@@ -35,7 +35,7 @@ public abstract class MonitorCache implements IMonitorCache {
 
 	public void addDisplay(IInfoDisplay display) {
 		if (!displayCollections.containsKey(display)) {
-			displayCollections.put(display, new InfoContainer());
+			displayCollections.put(display, new InfoContainer(display));
 		}
 	}
 
@@ -60,7 +60,7 @@ public abstract class MonitorCache implements IMonitorCache {
 
 	public <T extends IMonitorInfo> void getAndSendFullMonitoredList(ILogicMonitor<T> monitor, MonitoredList<T> lastList) {
 		List<MonitorViewer> viewers = monitor.getViewers();
-		if (!viewers.isEmpty()) {
+		if (!viewers.isEmpty() || true) { //FIXME - change the true so it checks if a display is connected to this monitor
 			MonitoredList<T> list = MonitoredList.<T>newMonitoredList();
 			monitoredList.putIfAbsent(monitor.getHandler(), new LinkedHashMap());
 			LinkedHashMap<Pair<BlockCoords, EnumFacing>, MonitoredList<?>> infoList = monitoredList.get(monitor.getHandler());
@@ -75,25 +75,28 @@ public abstract class MonitorCache implements IMonitorCache {
 					}
 				}
 			}
+			monitor.sortMonitoredList(list);
 			list.updateList(lastList);
+			monitor.setMonitoredInfo(list);
+			if (!viewers.isEmpty()) {
+				// FIXME make it so these are only retrieved if needed...
+				NBTTagCompound syncTag = MonitorHelper.writeMonitoredList(new NBTTagCompound(), lastList.info.isEmpty(), monitor.getHandler(), list.copy(), SyncType.DEFAULT_SYNC);
+				NBTTagCompound specialTag = MonitorHelper.writeMonitoredList(new NBTTagCompound(), lastList.info.isEmpty(), monitor.getHandler(), list.copy(), SyncType.SPECIAL);
 
-			// FIXME make it so these are only retrieved if needed...
-			NBTTagCompound syncTag = MonitorHelper.writeMonitoredList(new NBTTagCompound(), lastList.info.isEmpty(), monitor.getHandler(), list.copy(), SyncType.DEFAULT_SYNC);
-			NBTTagCompound specialTag = MonitorHelper.writeMonitoredList(new NBTTagCompound(), lastList.info.isEmpty(), monitor.getHandler(), list.copy(), SyncType.SPECIAL);
-
-			MonitoredList<MonitoredBlockCoords> coords = CacheRegistry.coordMap.get(getNetworkID());
-			NBTTagCompound coordTag = MonitorHelper.writeMonitoredList(new NBTTagCompound(), true, CacheRegistry.handler, coords.copy(), SyncType.DEFAULT_SYNC);
-			viewers.forEach(viewer -> {
-				switch (viewer.type) {
-				case CHANNEL:
-					if (!viewer.wasSent(MonitorType.CHANNEL))
-						Logistics.network.sendTo(new PacketMonitoredCoords(getNetworkID(), coordTag), (EntityPlayerMP) viewer.player);
-					break;
-				case INFO:
-					Logistics.network.sendTo(new PacketMonitoredList(monitor, !viewer.wasSent(viewer.type) ? syncTag : specialTag, !viewer.wasSent(viewer.type) ? SyncType.DEFAULT_SYNC : SyncType.SPECIAL), (EntityPlayerMP) viewer.player);
-					break;
-				}
-			});
+				MonitoredList<MonitoredBlockCoords> coords = CacheRegistry.coordMap.get(getNetworkID());
+				NBTTagCompound coordTag = MonitorHelper.writeMonitoredList(new NBTTagCompound(), true, CacheRegistry.handler, coords.copy(), SyncType.DEFAULT_SYNC);
+				viewers.forEach(viewer -> {
+					switch (viewer.type) {
+					case CHANNEL:
+						if (!viewer.wasSent(MonitorType.CHANNEL))
+							Logistics.network.sendTo(new PacketMonitoredCoords(getNetworkID(), coordTag), (EntityPlayerMP) viewer.player);
+						break;
+					case INFO:
+						Logistics.network.sendTo(new PacketMonitoredList(monitor, !viewer.wasSent(viewer.type) ? syncTag : specialTag, !viewer.wasSent(viewer.type) ? SyncType.DEFAULT_SYNC : SyncType.SPECIAL), (EntityPlayerMP) viewer.player);
+						break;
+					}
+				});
+			}
 
 			monitoredCollections.get(monitor.getHandler()).put(monitor, list);
 		}

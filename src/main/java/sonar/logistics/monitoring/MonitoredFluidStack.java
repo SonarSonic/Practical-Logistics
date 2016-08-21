@@ -1,43 +1,50 @@
 package sonar.logistics.monitoring;
 
-import net.minecraftforge.fluids.FluidStack;
 import sonar.core.api.fluids.StoredFluidStack;
+import sonar.core.network.sync.SyncNBTAbstract;
+import sonar.logistics.Logistics;
+import sonar.logistics.api.asm.LogicInfoType;
+import sonar.logistics.api.info.BaseInfo;
 import sonar.logistics.api.info.monitor.IJoinableInfo;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
+import sonar.logistics.api.info.monitor.MonitorHandler;
 
-public class MonitoredFluidStack extends StoredFluidStack implements IJoinableInfo<MonitoredFluidStack> {
+@LogicInfoType(id = MonitoredFluidStack.id, modid = Logistics.MODID)
+public class MonitoredFluidStack extends BaseInfo<MonitoredFluidStack> implements IJoinableInfo<MonitoredFluidStack> {
 
-	public MonitoredFluidStack(FluidStack stack) {
-		super(stack);
+	public static final String id = "fluid";
+	public static final MonitorHandler<MonitoredFluidStack> handler = Logistics.monitorHandlers.getRegisteredObject(MonitorHandler.FLUIDS);
+	public SyncNBTAbstract<StoredFluidStack> fluidStack = new SyncNBTAbstract<StoredFluidStack>(StoredFluidStack.class, 0);
+
+	{
+		syncParts.add(fluidStack);
 	}
 
-	public MonitoredFluidStack(FluidStack stack, long capacity) {
-		super(stack, capacity);
-	}
-
-	public MonitoredFluidStack(FluidStack stack, long stored, long capacity) {
-		super(stack, stored, capacity);
+	public MonitoredFluidStack() {
 	}
 
 	public MonitoredFluidStack(StoredFluidStack stack) {
-		super(stack.fluid, stack.stored, stack.capacity);
+		this.fluidStack.setObject(stack);
 	}
 
 	@Override
 	public boolean isIdenticalInfo(MonitoredFluidStack info) {
-		return equals(info);
+		return fluidStack.getObject().equals(info.fluidStack.getObject());
 	}
 
 	@Override
 	public boolean isMatchingInfo(MonitoredFluidStack info) {
-		return equalStack(info.fluid);
+		return fluidStack.getObject().equalStack(info.fluidStack.getObject().fluid);
 	}
 
 	@Override
-	public void updateFrom(MonitoredFluidStack info) {
-		this.fluid = info.fluid;
-		this.capacity = info.capacity;
-		this.stored = info.stored;
+	public boolean isMatchingType(IMonitorInfo info) {
+		return info instanceof MonitoredFluidStack;
+	}
+
+	@Override
+	public MonitorHandler<MonitoredFluidStack> getHandler() {
+		return handler;
 	}
 
 	@Override
@@ -47,17 +54,18 @@ public class MonitoredFluidStack extends StoredFluidStack implements IJoinableIn
 
 	@Override
 	public IJoinableInfo joinInfo(MonitoredFluidStack info) {
-		add((MonitoredFluidStack) info);
+		fluidStack.getObject().add(info.fluidStack.getObject());
 		return this;
 	}
 
 	@Override
-	public boolean isHeader() {
-		return true;
+	public boolean isValid() {
+		return fluidStack.getObject()!=null && fluidStack.getObject().fluid != null;
 	}
 
 	@Override
-	public boolean isMatchingType(IMonitorInfo info) {
-		return info instanceof MonitoredFluidStack;
+	public String getID() {
+		return id;
 	}
+
 }

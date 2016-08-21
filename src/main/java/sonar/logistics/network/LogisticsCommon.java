@@ -17,6 +17,7 @@ public class LogisticsCommon implements IGuiHandler {
 		Logistics.network.registerMessage(PacketMonitoredList.Handler.class, PacketMonitoredList.class, 0, Side.CLIENT);
 		Logistics.network.registerMessage(PacketMonitoredCoords.Handler.class, PacketMonitoredCoords.class, 1, Side.CLIENT);
 		Logistics.network.registerMessage(PacketMonitorType.Handler.class, PacketMonitorType.class, 2, Side.SERVER);
+		Logistics.network.registerMessage(PacketInfoList.Handler.class, PacketInfoList.class, 3, Side.CLIENT);
 		/*
 		Logistics.network.registerMessage(PacketProviders.Handler.class, PacketProviders.class, 0, Side.CLIENT);
 		// Logistics.network.registerMessage(PacketInfoBlock.Handler.class, PacketInfoBlock.class, 1, Side.SERVER);

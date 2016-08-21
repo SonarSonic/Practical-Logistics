@@ -15,6 +15,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import sonar.core.api.fluids.StoredFluidStack;
 import sonar.core.client.gui.SonarButtons.AnimatedButton;
 import sonar.core.helpers.FontHelper;
 import sonar.logistics.api.readers.FluidReader;
@@ -101,19 +102,21 @@ public class GuiFluidReader extends GuiSelectionGrid<MonitoredFluidStack> {
 		}
 		if (getSetting() == Modes.FLUID) {
 			if (x - guiLeft >= 103 && x - guiLeft <= 103 + 16 && y - guiTop >= 9 && y - guiTop <= 9 + 16) {
+				/*
 				if (!part.getSelectedInfo().isEmpty()) {
 					MonitoredFluidStack stack = ((MonitoredFluidStack) part.getSelectedInfo().get(0));
 					if (stack != null) {
 						GL11.glDisable(GL11.GL_DEPTH_TEST);
 						GL11.glDisable(GL11.GL_LIGHTING);
 						List list = new ArrayList();
-						list.add(stack.fluid.getLocalizedName());
+						list.add(stack.fluidStack.getObject().fluid.getLocalizedName());
 						drawHoveringText(list, x - guiLeft, y - guiTop, fontRendererObj);
 						GL11.glEnable(GL11.GL_LIGHTING);
 						GL11.glEnable(GL11.GL_DEPTH_TEST);
 						net.minecraft.client.renderer.RenderHelper.enableGUIStandardItemLighting();
 					}
 				}
+				*/
 			}
 		}
 		super.drawGuiContainerForegroundLayer(x, y);
@@ -178,7 +181,8 @@ public class GuiFluidReader extends GuiSelectionGrid<MonitoredFluidStack> {
 		else {
 			MonitoredList<MonitoredFluidStack> searchList = MonitoredList.<MonitoredFluidStack>newMonitoredList();
 			for (MonitoredFluidStack stack : (ArrayList<MonitoredFluidStack>) part.getMonitoredList().info.clone()) {
-				if (stack != null && stack.fluid != null && stack.fluid.getLocalizedName().toLowerCase().contains(searchField.getText().toLowerCase())) {
+				StoredFluidStack fluidStack = stack.fluidStack.getObject();
+				if (stack != null && fluidStack.fluid != null && fluidStack.fluid.getLocalizedName().toLowerCase().contains(searchField.getText().toLowerCase())) {
 					searchList.info.add(stack);
 				}
 			}
@@ -235,28 +239,30 @@ public class GuiFluidReader extends GuiSelectionGrid<MonitoredFluidStack> {
 	}
 
 	public void postRender() {
+		/*
 		if (!part.getSelectedInfo().isEmpty()) {
 			MonitoredFluidStack stack = ((MonitoredFluidStack) part.getSelectedInfo().get(0));
 			if (stack != null) {
+				StoredFluidStack fluidStack = stack.fluidStack.getObject();
 				final int br = 16 << 20 | 16 << 4;
 				final int var11 = br % 65536;
 				final int var12 = br / 65536;
-				/* Minecraft.getMinecraft().getTextureManager().bindTexture( TextureMap.locationBlocksTexture); if (STACK == part.setting.getObject()) RenderItem.getInstance().renderIcon(103, 9, part.current.getFluid().getIcon(), 16, 16); */
 				GL11.glPushMatrix();
 				GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-				this.drawTexturedModalRect(103, 9, mc.getTextureMapBlocks().getAtlasSprite(stack.fluid.getFluid().getStill().toString()), 16, 16);
+				this.drawTexturedModalRect(103, 9, mc.getTextureMapBlocks().getAtlasSprite(fluidStack.fluid.getFluid().getStill().toString()), 16, 16);
 				GL11.glPopMatrix();
 			}
 		}
-
+		 */
 	}
 
 	@Override
 	public void renderSelection(MonitoredFluidStack selection, int x, int y) {
-		if (selection.fluid != null) {
+		StoredFluidStack fluidStack = selection.fluidStack.getObject();
+		if (fluidStack.fluid != null) {
 			//GL11.glPushMatrix();
 			GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-			ResourceLocation location = selection.fluid.getFluid().getStill();
+			ResourceLocation location = fluidStack.fluid.getFluid().getStill();
 			this.drawTexturedModalRect(13 + (x * 18), 32 + (y * 18), mc.getTextureMapBlocks().getAtlasSprite(location.toString()), 16, 16);
 			//GL11.glPopMatrix();
 		}
@@ -264,10 +270,11 @@ public class GuiFluidReader extends GuiSelectionGrid<MonitoredFluidStack> {
 
 	@Override
 	public void renderToolTip(MonitoredFluidStack selection, int x, int y) {
+		StoredFluidStack fluidStack = selection.fluidStack.getObject();
 		List list = new ArrayList();
-		list.add(selection.fluid.getFluid().getLocalizedName(selection.fluid));
-		if (selection.stored != 0) {
-			list.add(TextFormatting.GRAY + (String) "Stored: " + selection.stored + " mB");
+		list.add(fluidStack.fluid.getFluid().getLocalizedName(fluidStack.fluid));
+		if (fluidStack.stored != 0) {
+			list.add(TextFormatting.GRAY + (String) "Stored: " + fluidStack.stored + " mB");
 		}
 		drawHoveringText(list, x, y, fontRendererObj);
 	}

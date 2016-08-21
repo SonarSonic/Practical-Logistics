@@ -5,48 +5,69 @@ import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.server.management.PlayerChunkMap;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
-import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.WorldServer;
+import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import sonar.core.api.utils.BlockCoords;
+import sonar.core.helpers.NBTHelper;
+import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.core.utils.Pair;
+import sonar.logistics.Logistics;
 import sonar.logistics.api.display.IInfoDisplay;
-import sonar.logistics.api.info.IDisplayInfo;
 import sonar.logistics.api.info.IInfoContainer;
 import sonar.logistics.api.info.InfoUUID;
 import sonar.logistics.api.info.monitor.ILogicMonitor;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
+import sonar.logistics.helpers.InfoHelper;
+import sonar.logistics.network.PacketInfoList;
 
 public class LogicMonitorCache {
 
 	public static final int UPDATE_RADIUS = 64;
 
 	// chunk syncing - the player won't necessarily be inside the chunk itself but will be within the range.
-	public static LinkedHashMap<Integer, ArrayList<StoredChunkPos>> monitoredChunks = new LinkedHashMap(); // The dimension id then the Chunk Pos which contain monitors...
-	public static LinkedHashMap<EntityPlayer, ArrayList<StoredChunkPos>> activeChunks = new LinkedHashMap(); // these chunks will always be the same dimension as the player
+	// public static LinkedHashMap<Integer, ArrayList<StoredChunkPos>> monitoredChunks = new LinkedHashMap(); // The dimension id then the Chunk Pos which contain monitors...
+	// public static LinkedHashMap<EntityPlayer, ArrayList<StoredChunkPos>> activeChunks = new LinkedHashMap(); // these chunks will always be the same dimension as the player
 
 	// server side
 	public static final ArrayList<ILogicMonitor> monitors = new ArrayList();
 	public static final ArrayList<IInfoDisplay> displays = new ArrayList();
-	public static LinkedHashMap<InfoUUID, IMonitorInfo> lastInfo = new LinkedHashMap();
 	// client side
 	public static LinkedHashMap<ILogicMonitor, MonitoredList<?>> monitoredLists = new LinkedHashMap();
 
 	// both
+	public static ArrayList<InfoUUID> changedInfo = new ArrayList();
+
+	public static LinkedHashMap<InfoUUID, IMonitorInfo> lastInfo = new LinkedHashMap();
 	public static LinkedHashMap<InfoUUID, IMonitorInfo> info = new LinkedHashMap();
 	// public static LinkedHashMap<IInfoDisplay, IInfoContainer> displayLists = new LinkedHashMap();
 
+	public static void onServerClosed(){
+		monitors.clear();
+		displays.clear();
+		monitoredLists.clear();
+		changedInfo.clear();
+		lastInfo.clear();
+		info.clear();
+	}
+	
 	public static boolean enableEvents() {
 		return !displays.isEmpty();
 	}
 
 	public static void addMonitor(ILogicMonitor monitor) {
+		if (FMLCommonHandler.instance().getEffectiveSide().isClient()) {
+			return;
+		}
 		if (monitors.contains(monitor)) {
 			return;
 		}
@@ -54,6 +75,9 @@ public class LogicMonitorCache {
 	}
 
 	public static void addDisplay(IInfoDisplay display) {
+		if (FMLCommonHandler.instance().getEffectiveSide().isClient()) {
+			return;
+		}
 		if (displays.contains(display)) {
 			return;
 		}
@@ -62,58 +86,38 @@ public class LogicMonitorCache {
 	}
 
 	public static boolean removeMonitor(ILogicMonitor monitor) {
+		if (FMLCommonHandler.instance().getEffectiveSide().isClient()) {
+			return true;
+		}
 		return monitors.remove(monitor);
 	}
 
 	public static boolean removeDisplay(IInfoDisplay display) {
+		if (FMLCommonHandler.instance().getEffectiveSide().isClient()) {
+			return true;
+		}
 		onChunkRemoved(new StoredChunkPos(display.getCoords()));
 		return displays.remove(display);
 	}
 
 	public static void onChunkAdded(StoredChunkPos pos) {
-		monitoredChunks.putIfAbsent(pos.dim, new ArrayList());
-		for (StoredChunkPos chunk : monitoredChunks.get(pos.dim)) {
-			if (chunk.equals(pos)) {
-				chunk.addMonitor();
-				return;
-			}
-		}
-		pos.addMonitor();
-		monitoredChunks.get(pos.dim).add(pos);
+		/* monitoredChunks.putIfAbsent(pos.dim, new ArrayList()); for (StoredChunkPos chunk : monitoredChunks.get(pos.dim)) { if (chunk.equals(pos)) { chunk.addMonitor(); return; } } pos.addMonitor(); monitoredChunks.get(pos.dim).add(pos); */
 	}
 
 	public static void onChunkRemoved(StoredChunkPos pos) {
-		if (monitoredChunks.get(pos.dim).contains(pos)) {
-			for (StoredChunkPos chunk : monitoredChunks.get(pos.dim)) {
-				if (chunk.equals(pos)) {
-					if (chunk.removeMonitor() <= 0) {
-						monitoredChunks.get(pos.dim).remove(chunk);
-					}
-					return;
-				}
-			}
-		}
+		/* if (monitoredChunks.get(pos.dim).contains(pos)) { for (StoredChunkPos chunk : monitoredChunks.get(pos.dim)) { if (chunk.equals(pos)) { if (chunk.removeMonitor() <= 0) { monitoredChunks.get(pos.dim).remove(chunk); } return; } } } */
 	}
 
-	public static void sendFirstPacket(EntityPlayer player) {
-
-	}
-
-	public static ArrayList<IInfoDisplay> getDisplaysInRadius(TargetPoint point) {
-		ArrayList<IInfoDisplay> displays = new ArrayList();
-		for (IInfoDisplay monitor : displays) {
-			BlockCoords coords = (BlockCoords) monitor.getCoords();
-			if (coords.getDimension() == point.dimension) {
-				double d4 = point.x - coords.getX();
-				double d5 = point.y - coords.getY();
-				double d6 = point.z - coords.getZ();
-
-				if (d4 * d4 + d5 * d5 + d6 * d6 < point.range * point.range) {
-					displays.add(monitor);
-				}
+	public static ArrayList<IInfoDisplay> getViewableDisplays(EntityPlayer player) {
+		ArrayList<IInfoDisplay> viewable = new ArrayList();
+		World world = player.getEntityWorld();
+		PlayerChunkMap manager = ((WorldServer) world).getPlayerChunkMap();
+		for (IInfoDisplay display : displays) {
+			if (manager.isPlayerWatchingChunk((EntityPlayerMP) player, display.getCoords().getX() >> 4, display.getCoords().getZ() >> 4)) {
+				viewable.add(display);
 			}
 		}
-		return displays;
+		return viewable;
 	}
 
 	// server methods
@@ -126,11 +130,22 @@ public class LogicMonitorCache {
 		return null;
 	}
 
-	public static void sendFullPacket(EntityPlayer player, ByteBuf buf) {
+	public static void sendFullPacket(EntityPlayer player) {
 		if (player != null) {
-			ArrayList<IMonitorInfo> infoList = getInfoFromUUIDs(getUUIDsToSync(getDisplaysInRadius(getTargetPointFromPlayer(player))));
+			ArrayList<IMonitorInfo> infoList = getInfoFromUUIDs(getUUIDsToSync(getViewableDisplays(player)));
+			if (infoList.isEmpty()) {
+				return;
+			}
+			NBTTagList packetList = new NBTTagList();
 			for (IMonitorInfo info : infoList) {
-
+				if (info != null && info.isValid() && !info.isHeader()) {
+					packetList.appendTag(InfoHelper.writeInfoToNBT(new NBTTagCompound(), info, SyncType.SAVE));
+				}
+			}
+			if (!packetList.hasNoTags()) {
+				NBTTagCompound packetTag = new NBTTagCompound();
+				packetTag.setTag("infoList", packetList);
+				Logistics.network.sendTo(new PacketInfoList(packetTag, SyncType.SAVE), (EntityPlayerMP) player);
 			}
 		}
 	}
@@ -152,8 +167,9 @@ public class LogicMonitorCache {
 	public static ArrayList<InfoUUID> getUUIDsToSync(ArrayList<IInfoDisplay> displays) {
 		ArrayList<InfoUUID> ids = new ArrayList();
 		for (IInfoDisplay display : displays) {
-			for (IDisplayInfo info : display.container().getStoredInfo()) {
-				InfoUUID id = info.getInfoUUID();
+			IInfoContainer container = display.container();
+			for (int i = 0; i < container.getMaxCapacity(); i++) {
+				InfoUUID id = container.getInfoUUID(i);
 				if (id.valid() && !ids.contains(id)) {
 					ids.add(id);
 				}
@@ -195,6 +211,100 @@ public class LogicMonitorCache {
 		return MonitoredList.<T>newMonitoredList();
 	}
 
+	public static void onServerTick() {
+		if (FMLCommonHandler.instance().getEffectiveSide().isClient()) {
+			return;
+		}
+		if (!changedInfo.isEmpty() && !displays.isEmpty()) {
+			ArrayList<InfoUUID> infoToSync = (ArrayList<InfoUUID>) changedInfo.clone();
+			LinkedHashMap<World, LinkedHashMap<ChunkPos, ArrayList<InfoUUID>>> positions = new LinkedHashMap();
+			// get all the displays which are monitoring this info
+			for (InfoUUID id : changedInfo) {
+				boolean isSynced = false;
+				if (id.valid()) {
+					for (IInfoDisplay display : displays) {
+						if (display.monitorsUUID(id)) {
+							World world = display.getCoords().getWorld();
+							positions.putIfAbsent(world, new LinkedHashMap());
+							ChunkPos pos = new ChunkPos(display.getCoords().getBlockPos());
+							positions.get(world).putIfAbsent(pos, new ArrayList());
+							if (!positions.get(world).get(pos).contains(id)) {
+								positions.get(world).get(pos).add(id);
+							}
+							isSynced = true;
+						}
+					}
+				}
+				if (!isSynced)
+					infoToSync.remove(id);
+			}
+			changedInfo.clear();
+			if (infoToSync.isEmpty()) {
+				return;
+			}
+			LinkedHashMap<EntityPlayer, ArrayList<InfoUUID>> monitoring = new LinkedHashMap();
+
+			for (Entry<World, LinkedHashMap<ChunkPos, ArrayList<InfoUUID>>> chunks : positions.entrySet()) {
+				World world = chunks.getKey();
+				PlayerChunkMap manager = ((WorldServer) world).getPlayerChunkMap();
+				for (EntityPlayer player : world.playerEntities) {
+					NBTTagList packetList = new NBTTagList();
+					for (Entry<ChunkPos, ArrayList<InfoUUID>> chunkInfo : chunks.getValue().entrySet()) {
+						ChunkPos pos = chunkInfo.getKey();
+						if (manager.isPlayerWatchingChunk((EntityPlayerMP) player, pos.chunkXPos, pos.chunkZPos)) {
+							for (InfoUUID info : chunkInfo.getValue()) {
+								monitoring.putIfAbsent(player, new ArrayList());
+								if (!monitoring.get(player).contains(info)) {
+									monitoring.get(player).add(info);
+									IMonitorInfo monitorInfo = LogicMonitorCache.info.get(info);
+									if (!(monitorInfo == null)) {
+										//NBTTagCompound updateTag = monitorInfo.writeData(new NBTTagCompound(), SyncType.DEFAULT_SYNC);
+										NBTTagCompound updateTag =  InfoHelper.writeInfoToNBT(new NBTTagCompound(), monitorInfo, SyncType.SAVE);
+										if (!updateTag.hasNoTags()) {
+											packetList.appendTag(info.writeData(updateTag, SyncType.SAVE));
+										}
+									}
+								}
+							}
+						}
+					}
+					if (!packetList.hasNoTags()) {
+						NBTTagCompound packetTag = new NBTTagCompound();
+						packetTag.setTag("infoList", packetList);
+						Logistics.network.sendTo(new PacketInfoList(packetTag, SyncType.DEFAULT_SYNC), (EntityPlayerMP) player);
+					}
+
+				}
+			}
+		}
+	}
+
+	public static void onInfoPacket(NBTTagCompound packetTag, SyncType type) {
+		NBTTagList packetList = packetTag.getTagList("infoList", NBT.TAG_COMPOUND);
+		boolean save = type.isType(SyncType.SAVE);
+		for (int i = 0; i < packetList.tagCount(); i++) {
+			NBTTagCompound infoTag = packetList.getCompoundTagAt(i);
+			InfoUUID id = NBTHelper.instanceNBTSyncable(InfoUUID.class, infoTag);
+			if (!save) {
+				LogicMonitorCache.info.put(id, InfoHelper.readInfoFromNBT(infoTag));
+				/*
+				IMonitorInfo info = LogicMonitorCache.info.get(id);
+				if (info != null) {
+					info.readData(infoTag, SyncType.DEFAULT_SYNC);
+				}
+				*/
+			} else {
+				LogicMonitorCache.info.put(id, InfoHelper.readInfoFromNBT(infoTag));
+			}
+		}
+	}
+
+	public static void changeInfo(InfoUUID id, IMonitorInfo newInfo) {
+		LogicMonitorCache.lastInfo.put(id, LogicMonitorCache.info.get(id));
+		LogicMonitorCache.info.put(id, newInfo);
+		changedInfo.add(id);
+	}
+
 	public static class StoredChunkPos extends ChunkPos {
 
 		// these won't be included in the hashCode
@@ -216,6 +326,17 @@ public class LogicMonitorCache {
 
 		public int removeMonitor() {
 			return monitorCount--;
+		}
+
+		public boolean equals(Object obj) {
+			if (this == obj) {
+				return true;
+			} else if (!(obj instanceof StoredChunkPos)) {
+				return false;
+			} else {
+				StoredChunkPos chunkpos = (StoredChunkPos) obj;
+				return this.chunkXPos == chunkpos.chunkXPos && this.chunkZPos == chunkpos.chunkZPos && dim == chunkpos.dim;
+			}
 		}
 
 	}

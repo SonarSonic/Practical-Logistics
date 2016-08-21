@@ -23,8 +23,8 @@ import net.minecraft.world.storage.WorldInfo;
 import net.minecraftforge.fluids.BlockFluidBase;
 import net.minecraftforge.fluids.Fluid;
 import sonar.logistics.Logistics;
+import sonar.logistics.api.asm.InfoRegistry;
 import sonar.logistics.api.info.IInfoRegistry;
-import sonar.logistics.api.info.InfoRegistry;
 import sonar.logistics.registries.LogicRegistry;
 import sonar.logistics.registries.LogicRegistry.RegistryType;
 

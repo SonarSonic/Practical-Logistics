@@ -4,32 +4,81 @@ import java.util.List;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraftforge.fml.common.network.ByteBufUtils;
+import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.core.network.sync.SyncEnum;
 import sonar.core.network.sync.SyncUUID;
 import sonar.core.network.utils.IByteBufTile;
 import sonar.logistics.LogisticsItems;
-import sonar.logistics.api.display.IInfoDisplay;
 import sonar.logistics.api.display.ScreenLayout;
-import sonar.logistics.api.info.DisplayInfo;
 import sonar.logistics.api.info.IInfoContainer;
 import sonar.logistics.api.info.InfoContainer;
+import sonar.logistics.api.info.InfoUUID;
+import sonar.logistics.api.info.monitor.ILogicMonitor;
+import sonar.logistics.connections.LogicMonitorCache;
 
-public class DisplayScreenPart extends ScreenMultipart implements IInfoDisplay, IByteBufTile {
+public class DisplayScreenPart extends ScreenMultipart implements IByteBufTile {
 
 	protected SyncUUID uuid = new SyncUUID(-2);
 	public SyncEnum<ScreenLayout> layout = new SyncEnum(ScreenLayout.values(), 0);
-	public InfoContainer container;	
+	public InfoContainer container = new InfoContainer(this);
+	{
+		syncParts.add(layout);
+	}
+
+	public void update() {
+		super.update();
+		if (this.isClient()) {
+			return;
+		}
+		// don't leave this here, i'm just testing stuff
+		// System.out.println(container().getInfoUUID(0));
+		if (container().getInfoUUID(0) == null) {
+			if (!LogicMonitorCache.monitors.isEmpty()) {
+				ILogicMonitor monitor = LogicMonitorCache.monitors.get(0);
+				if (monitor != null) {
+					InfoUUID id = new InfoUUID(monitor.getMonitorUUID().hashCode(), 0);
+					container().setUUID(id, 0);
+					LogicMonitorCache.changedInfo.add(id);
+					sendUpdatePacket();
+				}
+			}
+		}
+	}
+
+	public void writeUpdatePacket(PacketBuffer buf) {
+		super.writeUpdatePacket(buf);
+		ByteBufUtils.writeTag(buf, container.writeData(new NBTTagCompound(), SyncType.SAVE));
+	}
+
+	public void readUpdatePacket(PacketBuffer buf) {
+		super.readUpdatePacket(buf);
+		container.readData(ByteBufUtils.readTag(buf), SyncType.SAVE);
+	}
+
+	@Override
+	public NBTTagCompound writeData(NBTTagCompound tag, SyncType type) {
+		super.writeData(tag, type);
+		container.writeData(tag, type);
+		return tag;
+	}
+
+	@Override
+	public void readData(NBTTagCompound tag, SyncType type) {
+		super.readData(tag, type);
+		container.readData(tag, type);
+	}
 
 	public DisplayScreenPart() {
 		super();
-		this.container().addInfo(new DisplayInfo());
 	}
 
 	public DisplayScreenPart(EnumFacing dir, EnumFacing rotation) {
 		super(dir, rotation);
-		this.container().addInfo(new DisplayInfo());
 	}
 
 	public void addSelectionBoxes(List<AxisAlignedBB> list) {
@@ -77,10 +126,7 @@ public class DisplayScreenPart extends ScreenMultipart implements IInfoDisplay, 
 	}
 
 	@Override
-	public IInfoContainer container(){
-		if(container==null){
-			container=new InfoContainer(this);
-		}
+	public IInfoContainer container() {
 		return container;
 	}
 
@@ -92,5 +138,10 @@ public class DisplayScreenPart extends ScreenMultipart implements IInfoDisplay, 
 	@Override
 	public int maxInfo() {
 		return 2;
+	}
+
+	@Override
+	public boolean monitorsUUID(InfoUUID id) {
+		return true;// container().getStoredInfo();
 	}
 }

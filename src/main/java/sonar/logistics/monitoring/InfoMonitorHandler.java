@@ -2,16 +2,13 @@ package sonar.logistics.monitoring;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import sonar.core.api.utils.BlockCoords;
-import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.logistics.api.info.ICustomTileHandler;
 import sonar.logistics.api.info.LogicInfo;
-import sonar.logistics.api.info.monitor.IMonitorInfo;
 import sonar.logistics.api.info.monitor.MonitorHandler;
 import sonar.logistics.connections.MonitoredList;
 import sonar.logistics.registries.LogicRegistry;
@@ -40,7 +37,7 @@ public class InfoMonitorHandler extends MonitorHandler<LogicInfo> {
 		}		
 		return list;
 	}
-
+	/*
 	@Override
 	public LogicInfo readInfo(NBTTagCompound tag, SyncType type) {
 		return LogicInfo.readFromNBT(tag);
@@ -55,5 +52,5 @@ public class InfoMonitorHandler extends MonitorHandler<LogicInfo> {
 	public boolean validateInfo(IMonitorInfo info) {
 		return info instanceof LogicInfo;
 	}
-
+	*/
 }

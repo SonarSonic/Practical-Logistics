@@ -62,7 +62,7 @@ public class FluidReaderPart extends ReaderMultipart<MonitoredFluidStack> implem
 	}
 
 	@Override
-	public MonitoredList<MonitoredFluidStack> updateInfo(MonitoredList<MonitoredFluidStack> updateInfo) {
+	public MonitoredList<MonitoredFluidStack> sortMonitoredList(MonitoredList<MonitoredFluidStack> updateInfo) {
 		FluidHelper.sortFluidList(updateInfo.info, sortingOrder.getObject(), sortingType.getObject());
 		return updateInfo;
 	}
@@ -73,8 +73,8 @@ public class FluidReaderPart extends ReaderMultipart<MonitoredFluidStack> implem
 	}
 
 	@Override
-	public ArrayList<IMonitorInfo> getSelectedInfo() {
-		return Lists.newArrayList(selected.getMonitoredInfo());
+	public void setMonitoredInfo(MonitoredList<MonitoredFluidStack> updateInfo) {
+		
 	}
 
 }

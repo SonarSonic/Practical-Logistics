@@ -17,6 +17,7 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import sonar.core.SonarCore;
+import sonar.core.api.inventories.StoredItemStack;
 import sonar.core.client.gui.SonarButtons.AnimatedButton;
 import sonar.core.helpers.FontHelper;
 import sonar.core.helpers.RenderHelper;
@@ -30,11 +31,11 @@ import sonar.logistics.parts.InventoryReaderPart;
 
 public class GuiInventoryReader extends GuiSelectionGrid<MonitoredItemStack> {
 
-	//public static final ResourceLocation stackBGround = new ResourceLocation("PracticalLogistics:textures/gui/inventoryReader_stack.png");
-	//public static final ResourceLocation clearBGround = new ResourceLocation("PracticalLogistics:textures/gui/inventoryReader_clear.png");
+	// public static final ResourceLocation stackBGround = new ResourceLocation("PracticalLogistics:textures/gui/inventoryReader_stack.png");
+	// public static final ResourceLocation clearBGround = new ResourceLocation("PracticalLogistics:textures/gui/inventoryReader_clear.png");
 
 	public static final ResourceLocation sorting_icons = new ResourceLocation("PracticalLogistics:textures/gui/sorting_icons.png");
-	
+
 	private InventoryReaderPart part;
 	private GuiTextField slotField;
 	private GuiTextField searchField;
@@ -79,17 +80,17 @@ public class GuiInventoryReader extends GuiSelectionGrid<MonitoredItemStack> {
 		if (button != null) {
 			if (button.id == -1) {
 				part.setting.incrementEnum();
-				SonarCore.network.sendToServer(new PacketByteBuf(part, part.getPos(), 1));
+				part.sendByteBufPacket(1);
 				switchState();
 				reset();
 			}
 			if (button.id == 0) {
 				part.sortingOrder.incrementEnum();
-				SonarCore.network.sendToServer(new PacketByteBuf(part, part.getPos(), 4));
+				part.sendByteBufPacket(4);
 			}
 			if (button.id == 1) {
 				part.sortingType.incrementEnum();
-				SonarCore.network.sendToServer(new PacketByteBuf(part, part.getPos(), 5));
+				part.sendByteBufPacket(5);
 			}
 		}
 	}
@@ -100,6 +101,7 @@ public class GuiInventoryReader extends GuiSelectionGrid<MonitoredItemStack> {
 
 	@Override
 	public void drawGuiContainerForegroundLayer(int x, int y) {
+		RenderHelper.restoreBlendState();
 		switch (getSetting()) {
 		case SLOT:
 		case POS:
@@ -163,12 +165,12 @@ public class GuiInventoryReader extends GuiSelectionGrid<MonitoredItemStack> {
 
 	public void setTargetSlot(String string) {
 		part.targetSlot.setObject(Integer.parseInt(string));
-		part.sendByteBufPacket(1);
+		part.sendByteBufPacket(2);
 	}
 
 	public void setPosSlot(String string) {
 		part.posSlot.setObject(Integer.parseInt(string));
-		part.sendByteBufPacket(2);
+		part.sendByteBufPacket(3);
 	}
 
 	public String getSettingsString() {
@@ -182,8 +184,9 @@ public class GuiInventoryReader extends GuiSelectionGrid<MonitoredItemStack> {
 			return part.getMonitoredList();
 		else {
 			MonitoredList<MonitoredItemStack> searchList = MonitoredList.newMonitoredList();
-			for (MonitoredItemStack stack : (ArrayList<MonitoredItemStack>)part.getMonitoredList().info.clone()) {
-				if (stack != null && stack.item != null && stack.item.getDisplayName().toLowerCase().contains(search.toLowerCase())) {
+			for (MonitoredItemStack stack : (ArrayList<MonitoredItemStack>) part.getMonitoredList().info.clone()) {
+				StoredItemStack item = stack.itemStack.getObject();
+				if (stack != null && item != null && item.item.getDisplayName().toLowerCase().contains(search.toLowerCase())) {
 					searchList.info.add(stack);
 				}
 			}
@@ -210,40 +213,39 @@ public class GuiInventoryReader extends GuiSelectionGrid<MonitoredItemStack> {
 
 	@Override
 	public void renderSelection(MonitoredItemStack selection, int x, int y) {
-		ItemStack stack = selection.item;
-		stack.stackSize = (int) selection.stored;
+		StoredItemStack storedStack = selection.itemStack.getObject();
+		if(storedStack==null){
+			return;
+		}
+		ItemStack stack = storedStack.item;
 		this.itemRender.zLevel = 0.0F;
-		// this.itemRender.renderItemIntoGUI(stack, 13 + (x * 18), 32 + (y * 18));
-		// this.itemRender.renderItemOverlayIntoGUI(this.fontRendererObj, stack, 13 + (x * 18), 32 + (y * 18), "" + selection.stored);
 		RenderHelper.renderItem(this, 13 + (x * 18), 32 + (y * 18), stack);
-		RenderHelper.renderStoredItemStackOverlay(stack, selection.stored, 13 + (x * 18), 32 + (y * 18), null);
+		//this.itemRender.renderItemOverlayIntoGUI(this.fontRendererObj, stack, 13 + (x * 18), 32 + (y * 18), "" + storedStack.stored);
+		RenderHelper.renderStoredItemStackOverlay(stack, storedStack.stored, 13 + (x * 18), 32 + (y * 18), null);
 	}
 
 	@Override
 	public void renderToolTip(MonitoredItemStack selection, int x, int y) {
-		List list = selection.item.getTooltip(this.mc.thePlayer, this.mc.gameSettings.advancedItemTooltips);
-		list.add(1, "Stored: " + selection.stored);
+		StoredItemStack storedStack = selection.itemStack.getObject();
+		if(storedStack==null){
+			return;
+		}
+		List list = storedStack.item.getTooltip(this.mc.thePlayer, this.mc.gameSettings.advancedItemTooltips);
+		list.add(1, "Stored: " + storedStack.stored);
 		for (int k = 0; k < list.size(); ++k) {
 			if (k == 0) {
-				list.set(k, selection.item.getRarity().rarityColor + (String) list.get(k));
+				list.set(k, storedStack.item.getRarity().rarityColor + (String) list.get(k));
 			} else {
 				list.set(k, TextFormatting.GRAY + (String) list.get(k));
 			}
 		}
 
-		FontRenderer font = selection.item.getItem().getFontRenderer(selection.item);
+		FontRenderer font = storedStack.item.getItem().getFontRenderer(storedStack.item);
 		drawHoveringText(list, x, y, (font == null ? fontRendererObj : font));
 
 	}
-	/*
-	@Override
-	public ResourceLocation getBackground() {
-		if (getSetting() == Modes.STACK) {
-			return stackBGround;
-		}
-		return clearBGround;
-	}
-	*/
+
+	/* @Override public ResourceLocation getBackground() { if (getSetting() == Modes.STACK) { return stackBGround; } return clearBGround; } */
 	@SideOnly(Side.CLIENT)
 	public class FilterButton extends AnimatedButton {
 		public int id;

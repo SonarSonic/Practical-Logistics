@@ -8,8 +8,8 @@ import sonar.calculator.mod.api.machines.ITeleport;
 import sonar.calculator.mod.api.nutrition.IHealthProcessor;
 import sonar.calculator.mod.api.nutrition.IHungerProcessor;
 import sonar.core.api.machines.IProcessMachine;
+import sonar.logistics.api.asm.InfoRegistry;
 import sonar.logistics.api.info.IInfoRegistry;
-import sonar.logistics.api.info.InfoRegistry;
 import sonar.logistics.registries.LogicRegistry;
 import sonar.logistics.registries.LogicRegistry.RegistryType;
 

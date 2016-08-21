@@ -1,50 +1,50 @@
 package sonar.logistics.monitoring;
 
-import sonar.core.api.energy.EnergyType;
 import sonar.core.api.energy.StoredEnergyStack;
+import sonar.core.network.sync.SyncNBTAbstract;
+import sonar.logistics.Logistics;
+import sonar.logistics.api.asm.LogicInfoType;
+import sonar.logistics.api.info.BaseInfo;
 import sonar.logistics.api.info.monitor.IJoinableInfo;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
+import sonar.logistics.api.info.monitor.MonitorHandler;
 
-public class MonitoredEnergyStack extends StoredEnergyStack implements IJoinableInfo<MonitoredEnergyStack> {
+@LogicInfoType(id = MonitoredEnergyStack.id, modid = Logistics.MODID)
+public class MonitoredEnergyStack extends BaseInfo<MonitoredEnergyStack> implements IJoinableInfo<MonitoredEnergyStack> {
 
-	public MonitoredEnergyStack(EnergyType type) {
-		super(type);
+	public static final String id = "energy";
+	public static final MonitorHandler<MonitoredEnergyStack> handler = Logistics.monitorHandlers.getRegisteredObject(MonitorHandler.ITEMS);
+	public SyncNBTAbstract<StoredEnergyStack> energyStack = new SyncNBTAbstract<StoredEnergyStack>(StoredEnergyStack.class, 0);
+
+	{
+		syncParts.add(energyStack);
+	}
+
+	public MonitoredEnergyStack() {
 	}
 
 	public MonitoredEnergyStack(StoredEnergyStack stack) {
-		super(stack.energyType);
-		stored = stack.stored;
-		capacity = stack.stored;
-		input = stack.input;
-		output = stack.output;
-		usage = stack.usage;
-		hasStorage = stack.hasStorage;
-		hasInput = stack.hasInput;
-		hasOutput = stack.hasOutput;
-		hasUsage = stack.hasUsage;
+		this.energyStack.setObject(stack);
 	}
 
 	@Override
 	public boolean isIdenticalInfo(MonitoredEnergyStack info) {
-		return equals(info);
+		return energyStack.getObject().equals(info.energyStack.getObject());
 	}
 
 	@Override
 	public boolean isMatchingInfo(MonitoredEnergyStack info) {
-		return energyType.equals(info.energyType);
+		return energyStack.getObject().energyType.equals(info.energyStack.getObject().energyType);
 	}
 
 	@Override
-	public void updateFrom(MonitoredEnergyStack info) {
-		info.stored = stored;
-		info.capacity = stored;
-		info.input = input;
-		info.output = output;
-		info.usage = usage;
-		info.hasStorage = hasStorage;
-		info.hasInput = hasInput;
-		info.hasOutput = hasOutput;
-		info.hasUsage = hasUsage;
+	public boolean isMatchingType(IMonitorInfo info) {
+		return info instanceof MonitoredEnergyStack;
+	}
+
+	@Override
+	public MonitorHandler<MonitoredEnergyStack> getHandler() {
+		return handler;
 	}
 
 	@Override
@@ -54,17 +54,18 @@ public class MonitoredEnergyStack extends StoredEnergyStack implements IJoinable
 
 	@Override
 	public IJoinableInfo joinInfo(MonitoredEnergyStack info) {
-		add((MonitoredEnergyStack) info);
+		energyStack.getObject().add(info.energyStack.getObject());
 		return this;
 	}
 
 	@Override
-	public boolean isHeader() {
-		return true;
+	public boolean isValid() {
+		return energyStack.getObject() != null && energyStack.getObject().energyType != null;
 	}
 
 	@Override
-	public boolean isMatchingType(IMonitorInfo info) {
-		return info instanceof MonitoredEnergyStack;
+	public String getID() {
+		return id;
 	}
+
 }

@@ -1,59 +1,52 @@
 package sonar.logistics.registries;
 
-import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Set;
 
 import javax.annotation.Nonnull;
 
-import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.discovery.ASMDataTable;
-import sonar.logistics.Logistics;
-import sonar.logistics.api.info.CustomEntityHandler;
-import sonar.logistics.api.info.CustomTileHandler;
+import sonar.core.helpers.ASMLoader;
+import sonar.core.utils.Pair;
+import sonar.logistics.api.asm.CustomEntityHandler;
+import sonar.logistics.api.asm.CustomTileHandler;
+import sonar.logistics.api.asm.InfoRegistry;
+import sonar.logistics.api.asm.LogicInfoType;
 import sonar.logistics.api.info.ICustomEntityHandler;
 import sonar.logistics.api.info.ICustomTileHandler;
 import sonar.logistics.api.info.IInfoRegistry;
-import sonar.logistics.api.info.InfoRegistry;
+import sonar.logistics.api.info.monitor.IMonitorInfo;
 
 public class InfoLoaderRegistry {
-	
-	private InfoLoaderRegistry() {}
+
+	private static int currentID = 0;
+	public static LinkedHashMap<Integer, String> infoNames = new LinkedHashMap();
+	public static LinkedHashMap<String, Integer> infoIds = new LinkedHashMap();
+	public static LinkedHashMap<String, Class<? extends IMonitorInfo>> infoClasses = new LinkedHashMap();
+
+	private InfoLoaderRegistry() {
+	}
 
 	public static List<IInfoRegistry> getInfoRegistries(@Nonnull ASMDataTable asmDataTable) {
-		return getInstances(asmDataTable, InfoRegistry.class, IInfoRegistry.class, true);
+		return ASMLoader.getInstances(asmDataTable, InfoRegistry.class, IInfoRegistry.class, true);
 	}
 
 	public static List<ICustomTileHandler> getCustomTileHandlers(@Nonnull ASMDataTable asmDataTable) {
-		return getInstances(asmDataTable, CustomTileHandler.class, ICustomTileHandler.class, true);
+		return ASMLoader.getInstances(asmDataTable, CustomTileHandler.class, ICustomTileHandler.class, true);
 	}
 
 	public static List<ICustomEntityHandler> getCustomEntityHandlers(@Nonnull ASMDataTable asmDataTable) {
-		return getInstances(asmDataTable, CustomEntityHandler.class, ICustomEntityHandler.class, true);
+		return ASMLoader.getInstances(asmDataTable, CustomEntityHandler.class, ICustomEntityHandler.class, true);
 	}
 
-	private static <T> List<T> getInstances(@Nonnull ASMDataTable asmDataTable, Class annotation, Class<T> instanceClass, boolean checkModid) {
-		String annotationClassName = annotation.getCanonicalName();
-		Set<ASMDataTable.ASMData> asmDatas = asmDataTable.getAll(annotationClassName);
-		List<T> instances = new ArrayList<>();
-		for (ASMDataTable.ASMData asmData : asmDatas) {
-			String modid = checkModid? (String) asmData.getAnnotationInfo().get("modid") : "";
-			if (!checkModid || Loader.isModLoaded(modid)) {
-				try {
-					Class<?> asmClass = Class.forName(asmData.getClassName());
-					Class<? extends T> asmInstanceClass = asmClass.asSubclass(instanceClass);
-					T instance = asmInstanceClass.newInstance();
-					instances.add(instance);
-					Logistics.logger.info(instanceClass.getSimpleName() + " loaded successfully: {}", asmData.getClassName());
-					continue;
-				} catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
-					Logistics.logger.error(instanceClass.getSimpleName() + " couldn't be loaded: {}", asmData.getClassName());
-					continue;
-				}				
-			} else {
-				Logistics.logger.error(String.format("Couldn't load" + instanceClass.getSimpleName() +  "%s for modid %s", asmData.getClassName(), modid));
-			}
+	public static void loadInfoTypes(@Nonnull ASMDataTable asmDataTable) {
+		List<Pair<ASMDataTable.ASMData, Class<? extends IMonitorInfo>>> infoTypes = ASMLoader.getClasses(asmDataTable, LogicInfoType.class, IMonitorInfo.class, true);
+		for (Pair<ASMDataTable.ASMData, Class<? extends IMonitorInfo>> info : infoTypes) {
+			String name = (String) info.a.getAnnotationInfo().get("id");
+			int id = currentID++;
+			infoNames.put(id, name);
+			infoIds.put(name, id);
+			infoClasses.put(name, info.b);
 		}
-		return instances;
 	}
 }

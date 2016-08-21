@@ -3,10 +3,15 @@ package sonar.logistics.api.info;
 import net.minecraft.nbt.NBTTagCompound;
 import sonar.core.api.nbt.INBTSyncable;
 import sonar.core.helpers.NBTHelper.SyncType;
+import sonar.logistics.Logistics;
+import sonar.logistics.api.asm.LogicInfoType;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
+import sonar.logistics.api.info.monitor.MonitorHandler;
 
+@LogicInfoType(id = ProgressInfo.id, modid = Logistics.MODID)
 public class ProgressInfo implements IMonitorInfo<ProgressInfo>, INBTSyncable, INameableInfo<ProgressInfo> {
 
+	public static final String id = "progress";
 	public LogicInfo first, second;
 
 	public ProgressInfo(LogicInfo first, LogicInfo second) {
@@ -55,14 +60,25 @@ public class ProgressInfo implements IMonitorInfo<ProgressInfo>, INBTSyncable, I
 	}
 
 	@Override
-	public void updateFrom(ProgressInfo info) {
-
-	}
-
-	@Override
 	public boolean isHeader() {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+
+	@Override
+	public MonitorHandler<ProgressInfo> getHandler() {
+		return null;
+	}
+
+	@Override
+	public boolean isValid() {
+		return true;
+	}
+
+	@Override
+	public String getID() {
+		return id;
 	}
 
 }

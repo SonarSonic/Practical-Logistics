@@ -14,8 +14,10 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import sonar.core.helpers.NBTHelper.SyncType;
+import sonar.logistics.api.display.IInfoDisplay;
+import sonar.logistics.connections.LogicMonitorCache;
 
-public abstract class ScreenMultipart extends LogisticsMultipart implements INormallyOccludingPart {
+public abstract class ScreenMultipart extends LogisticsMultipart implements INormallyOccludingPart, IInfoDisplay {
 
 	public EnumFacing rotation, face;
 
@@ -29,11 +31,31 @@ public abstract class ScreenMultipart extends LogisticsMultipart implements INor
 		this.face = face;
 	}
 
+	public void onFirstTick() {
+		super.onFirstTick();
+		LogicMonitorCache.addDisplay(this);
+	}
+
+	public void onLoaded() {
+		super.onLoaded();
+		LogicMonitorCache.addDisplay(this);
+	}
+
+	public void onRemoved() {
+		super.onRemoved();
+		LogicMonitorCache.removeDisplay(this);
+	}
+
+	public void onUnloaded() {
+		super.onUnloaded();
+		LogicMonitorCache.removeDisplay(this);
+	}
+
 	@Override
-	public void addOcclusionBoxes(List<AxisAlignedBB> list) {		
+	public void addOcclusionBoxes(List<AxisAlignedBB> list) {
 		this.addSelectionBoxes(list);
 	}
-	
+
 	@Override
 	public NBTTagCompound writeData(NBTTagCompound tag, SyncType type) {
 		super.writeData(tag, type);
