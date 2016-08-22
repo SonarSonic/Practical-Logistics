@@ -24,7 +24,9 @@ public interface IDataCable extends ICableRenderer, ILogicTile {
 	/** the cable should check it's connections and see if it is connected to the correct ones */
 	public void refreshConnections();
 	
+	/**ensures all connections are connected to the same network*/
 	public void configureConnections(INetworkCache network);	
 	
+	/**if this cable has connected ILogicTiles within it's multipart*/
 	public boolean hasConnections();	
 }

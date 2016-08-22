@@ -41,7 +41,7 @@ public class InfoReaderPart extends LogicReaderPart<LogicInfo> implements IByteB
 
 	@Override
 	public MonitoredList<LogicInfo> sortMonitoredList(MonitoredList<LogicInfo> updateInfo) {
-		updateInfo.info = InfoHelper.sortInfoList(updateInfo.info);
+		InfoHelper.sortInfoList(updateInfo);
 		return updateInfo;
 	}
 

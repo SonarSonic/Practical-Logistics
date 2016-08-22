@@ -28,27 +28,28 @@ import sonar.logistics.api.info.ICustomTileHandler;
 import sonar.logistics.api.info.IInfoRegistry;
 import sonar.logistics.api.info.LogicInfo;
 
+/**where all the registering for LogicInfo happens*/
 public class LogicRegistry {
 
-	// the cache of methods/fields applicable to a given tile.
+	/** the cache of methods/fields applicable to a given tile.*/
 	public static LinkedHashMap<Class<?>, ArrayList<Method>> cachedMethods = new LinkedHashMap();
 	public static LinkedHashMap<Class<?>, ArrayList<Field>> cachedFields = new LinkedHashMap();
 
-	// all the registries which can provide valid returns, methods and fields
+	/** all the registries which can provide valid returns, methods and fields*/
 	public static ArrayList<IInfoRegistry> infoRegistries = new ArrayList();
 
-	// all custom handlers which can provide custom info on blocks for tricky situations
+	/** all custom handlers which can provide custom info on blocks for tricky situations*/
 	public static ArrayList<ICustomTileHandler> customTileHandlers = new ArrayList();
 	public static ArrayList<ICustomEntityHandler> customEntityHandlers = new ArrayList();
 
-	// all the register validated returns, methods and fields from the registries
+	/** all the register validated returns, methods and fields from the registries*/
 	public static ArrayList<Class<?>> registeredReturnTypes = Lists.newArrayList();
 	public static LinkedHashMap<RegistryType, LinkedHashMap<Class<?>, ArrayList<Method>>> infoMethods = new LinkedHashMap();
 	public static LinkedHashMap<RegistryType, LinkedHashMap<Class<?>, ArrayList<Field>>> infoFields = new LinkedHashMap();
 	public static LinkedHashMap<Class<?>, Map<String, Integer>> invFields = new LinkedHashMap();
 	public static LinkedHashMap<String, Pair<String, String>> infoAdjustments = new LinkedHashMap();
 
-	// the default accepted returns
+	/** the default accepted returns*/
 	public static ArrayList<Class<?>> acceptedTypes = RegistryType.buildArrayList();
 	public static ArrayList<Class<?>> defaultReturnTypes = Lists.newArrayList(String.class);
 

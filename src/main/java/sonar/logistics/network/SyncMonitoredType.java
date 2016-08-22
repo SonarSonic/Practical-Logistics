@@ -34,8 +34,7 @@ public class SyncMonitoredType<T extends IMonitorInfo> extends SyncPart {
 	public void writeToBuf(ByteBuf buf) {
 		if (info != null && info.isValid()) {
 			buf.writeBoolean(true);
-			buf.writeInt(InfoHelper.getName(info.getID()));
-			ByteBufUtils.writeTag(buf, info.writeData(new NBTTagCompound(), SyncType.SAVE));
+			ByteBufUtils.writeTag(buf, this.writeData(new NBTTagCompound(), SyncType.SAVE));
 		} else {
 			buf.writeBoolean(false);
 		}
@@ -44,8 +43,7 @@ public class SyncMonitoredType<T extends IMonitorInfo> extends SyncPart {
 	@Override
 	public void readFromBuf(ByteBuf buf) {
 		if (buf.readBoolean()) {
-			int id = buf.readInt();
-			info = InfoHelper.loadInfo(id, ByteBufUtils.readTag(buf));
+			readData(ByteBufUtils.readTag(buf), SyncType.SAVE);
 		} else {
 			info = null;
 		}
@@ -54,7 +52,7 @@ public class SyncMonitoredType<T extends IMonitorInfo> extends SyncPart {
 	@Override
 	public NBTTagCompound writeData(NBTTagCompound nbt, SyncType type) {
 		if (info != null && info.isValid()) {
-			nbt.setTag(getTagName(), InfoHelper.writeInfoToNBT(new NBTTagCompound(),info, type));
+			nbt.setTag(getTagName(), InfoHelper.writeInfoToNBT(new NBTTagCompound(), info, type));
 		}
 		return nbt;
 	}

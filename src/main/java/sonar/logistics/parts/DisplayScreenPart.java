@@ -3,6 +3,9 @@ package sonar.logistics.parts;
 import java.util.List;
 
 import io.netty.buffer.ByteBuf;
+import mcmultipart.multipart.IMultipart;
+import mcmultipart.multipart.ISlottedPart;
+import mcmultipart.multipart.PartSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
@@ -21,10 +24,17 @@ import sonar.logistics.api.info.InfoUUID;
 import sonar.logistics.api.info.monitor.ILogicMonitor;
 import sonar.logistics.connections.LogicMonitorCache;
 
-public class DisplayScreenPart extends ScreenMultipart implements IByteBufTile {
+public class DisplayScreenPart extends ScreenMultipart {
 
 	protected SyncUUID uuid = new SyncUUID(-2);
 	public SyncEnum<ScreenLayout> layout = new SyncEnum(ScreenLayout.values(), 0);
+	public DisplayState state = DisplayState.NONE;
+	public ILogicMonitor monitor = null;
+
+	public static enum DisplayState {
+		NONE, SET;
+	}
+
 	public InfoContainer container = new InfoContainer(this);
 	{
 		syncParts.add(layout);
@@ -35,19 +45,35 @@ public class DisplayScreenPart extends ScreenMultipart implements IByteBufTile {
 		if (this.isClient()) {
 			return;
 		}
-		// don't leave this here, i'm just testing stuff
-		// System.out.println(container().getInfoUUID(0));
-		if (container().getInfoUUID(0) == null) {
-			if (!LogicMonitorCache.monitors.isEmpty()) {
-				ILogicMonitor monitor = LogicMonitorCache.monitors.get(0);
-				if (monitor != null) {
-					InfoUUID id = new InfoUUID(monitor.getMonitorUUID().hashCode(), 0);
-					container().setUUID(id, 0);
-					LogicMonitorCache.changedInfo.add(id);
-					sendUpdatePacket();
-				}
+		switch (state) {
+		case SET:
+			if (monitor == null) {
+				state = DisplayState.NONE;
 			}
+			break;
+		case NONE:
+			ISlottedPart part = getContainer().getPartInSlot(PartSlot.getFaceSlot(face));
+			monitor = (part != null && part instanceof ILogicMonitor) ? (ILogicMonitor) part : this.getNetwork().getFirstConnection(ILogicMonitor.class);
+			if (monitor != null) {
+				state = DisplayState.SET;
+				int max = Math.min(container().getMaxCapacity(), monitor.getMaxInfo());
+				for (int i = 0; i < max; i++) {
+					InfoUUID id = new InfoUUID(monitor.getMonitorUUID().hashCode(), i);
+					container().setUUID(id, i);
+					LogicMonitorCache.changedInfo.add(id);
+				}
+				this.sendUpdatePacket();
+			}
+			break;
+		default:
+			break;
+
 		}
+	}
+
+	public void onPartChanged(IMultipart changedPart) {
+		super.onPartChanged(changedPart);
+		state = DisplayState.NONE;
 	}
 
 	public void writeUpdatePacket(PacketBuffer buf) {
@@ -113,16 +139,6 @@ public class DisplayScreenPart extends ScreenMultipart implements IByteBufTile {
 	@Override
 	public ItemStack getItemStack() {
 		return new ItemStack(LogisticsItems.displayScreen);
-	}
-
-	@Override
-	public void writePacket(ByteBuf buf, int id) {
-
-	}
-
-	@Override
-	public void readPacket(ByteBuf buf, int id) {
-
 	}
 
 	@Override

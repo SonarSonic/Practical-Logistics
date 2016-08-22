@@ -28,7 +28,7 @@ public abstract class MonitorMultipart<T extends IMonitorInfo> extends SidedMult
 
 	protected IdentifiedCoordsList list = new IdentifiedCoordsList(-1);
 	protected ArrayList<MonitorViewer> viewers = new ArrayList<MonitorViewer>();
-	protected SyncUUID uuid = new SyncUUID("id");
+	protected SyncUUID uuid = new SyncUUID(-2);
 	protected MonitorHandler handler = null;
 	protected String handlerID;
 	public SyncMonitoredType<T> selectedInfo;
@@ -40,14 +40,14 @@ public abstract class MonitorMultipart<T extends IMonitorInfo> extends SidedMult
 		super(width, heightMin, heightMax);
 		this.handlerID = handlerID;
 		this.syncParts.addAll(Lists.newArrayList(list, uuid));
-		selectedInfo = new SyncMonitoredType<T>(handlerID, 0);
+		selectedInfo = new SyncMonitoredType<T>(handlerID, -4);
 	}
 
 	public MonitorMultipart(String handlerID, EnumFacing face, double width, double heightMin, double heightMax) {
 		super(face, width, heightMin, heightMax);
 		this.handlerID = handlerID;
 		this.syncParts.addAll(Lists.newArrayList(list, uuid));
-		selectedInfo = new SyncMonitoredType<T>(handlerID, 0);
+		selectedInfo = new SyncMonitoredType<T>(handlerID, -4);
 	}
 
 	public void onLoaded() {
@@ -112,6 +112,9 @@ public abstract class MonitorMultipart<T extends IMonitorInfo> extends SidedMult
 	}
 
 	public UUID getMonitorUUID() {
+		if (uuid.getUUID() == null) {
+			setUUID();
+		}
 		return uuid.getUUID();
 	}
 

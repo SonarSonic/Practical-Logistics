@@ -29,10 +29,10 @@ public class InfoMonitorHandler extends MonitorHandler<LogicInfo> {
 	public MonitoredList<LogicInfo> updateInfo(MonitoredList<LogicInfo> previousList, BlockCoords coords, EnumFacing dir) {
 		MonitoredList<LogicInfo> list = MonitoredList.<LogicInfo>newMonitoredList();
 		World world =coords.getWorld(); IBlockState state = coords.getBlockState(world); BlockPos pos = coords.getBlockPos(); Block block = coords.getBlock(world); TileEntity tile = coords.getTileEntity(world);
-		LogicRegistry.getTileInfo(list.info, world, state, pos, dir, block, tile);		
+		LogicRegistry.getTileInfo(list, world, state, pos, dir, block, tile);		
 		for(ICustomTileHandler handler : LogicRegistry.customTileHandlers){
 			if(handler.canProvideInfo(world, state, pos, dir, tile, block)){
-				handler.addInfo(list.info, world, state, pos, dir, tile, block);
+				handler.addInfo(list, world, state, pos, dir, tile, block);
 			}
 		}		
 		return list;

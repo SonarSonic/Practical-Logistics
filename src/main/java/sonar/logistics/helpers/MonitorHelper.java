@@ -17,33 +17,25 @@ public class MonitorHelper {
 	public static final String REMOVED = "r";
 	public static final String SPECIAL = "spe";
 
-	public static <T extends IMonitorInfo> void addInfoToList(MonitoredList<T> list, MonitorHandler<T> handler, T info) {
-		if (info instanceof IJoinableInfo) {
-			IJoinableInfo joinableInfo = (IJoinableInfo) info;
-			for (T storedInfo : list.info) {
-				if (((IJoinableInfo) storedInfo).canJoinInfo(joinableInfo)) {
-					storedInfo = (T) ((IJoinableInfo) storedInfo).joinInfo(joinableInfo);
-					return;
-				}
-			}
-		}
-		list.info.add(info);
-	}
-
 	// FIXME - to use updateWriting for some of the tags, like ILogicInfo
-	public static <T extends IMonitorInfo> NBTTagCompound writeMonitoredList(NBTTagCompound tag, boolean lastWasNull, MonitorHandler<T> handler, MonitoredList<T> stacks, SyncType type) {
+	public static <T extends IMonitorInfo> NBTTagCompound writeMonitoredList(NBTTagCompound tag, boolean lastWasNull, MonitoredList<T> stacks, SyncType type) {
 		if (type.isType(SyncType.DEFAULT_SYNC)) {
 			NBTTagList list = new NBTTagList();
-			stacks.info.forEach(info -> list.appendTag(InfoHelper.writeInfoToNBT(new NBTTagCompound(), info, SyncType.SAVE)));
+			stacks.forEach(info -> {
+				if (info != null && info.isValid()) {
+					list.appendTag(InfoHelper.writeInfoToNBT(new NBTTagCompound(), info, SyncType.SAVE));
+				}
+			});
 			if (list.tagCount() != 0) {
 				tag.setTag(SYNC, list);
 				return tag;
 			} else {
-				tag.setBoolean(DELETE, true);
+				if (!lastWasNull)
+					tag.setBoolean(DELETE, true);
 				return tag;
 			}
 		} else if (type.isType(SyncType.SPECIAL)) {
-			if ((stacks.info == null || stacks.info.isEmpty())) {
+			if ((stacks == null || stacks.isEmpty())) {
 				if (!lastWasNull)
 					tag.setBoolean(DELETE, true);
 				return tag;
@@ -53,11 +45,11 @@ public class MonitorHelper {
 				ArrayList<T> stackList = listType == 0 ? stacks.changed : stacks.removed;
 				for (int i = 0; i < stackList.size(); i++) {
 					T info = stackList.get(i);
-					if (info != null) {
+					if (info != null && info.isValid()) {
 						NBTTagCompound compound = new NBTTagCompound();
 						if (listType == 1)
 							compound.setBoolean(REMOVED, true);
-						list.appendTag(InfoHelper.writeInfoToNBT(compound, info, listType == 1 ? SyncType.SAVE : SyncType.SAVE));
+						//list.appendTag(InfoHelper.writeInfoToNBT(compound, info, listType == 1 ? SyncType.SAVE : SyncType.SAVE));
 					}
 				}
 			}
@@ -68,9 +60,9 @@ public class MonitorHelper {
 		return tag;
 	}
 
-	public static <T extends IMonitorInfo> MonitoredList<T> readMonitoredList(NBTTagCompound tag, MonitorHandler<T> handler, MonitoredList<T> stacks, SyncType type) {
+	public static <T extends IMonitorInfo> MonitoredList<T> readMonitoredList(NBTTagCompound tag, MonitoredList<T> stacks, SyncType type) {
 		if (tag.hasKey(DELETE)) {
-			stacks.info.clear();
+			stacks.clear();
 			return stacks;
 		}
 		if (type.isType(SyncType.DEFAULT_SYNC)) {
@@ -78,9 +70,9 @@ public class MonitorHelper {
 				return stacks;
 			}
 			NBTTagList list = tag.getTagList(SYNC, 10);
-			stacks.info.clear();
+			stacks.clear();
 			for (int i = 0; i < list.tagCount(); i++) {
-				stacks.info.add((T) InfoHelper.readInfoFromNBT(list.getCompoundTagAt(i)));
+				stacks.add((T) InfoHelper.readInfoFromNBT(list.getCompoundTagAt(i)));
 			}
 		} else if (type.isType(SyncType.SPECIAL)) {
 			if (!tag.hasKey(SPECIAL)) {
@@ -90,17 +82,17 @@ public class MonitorHelper {
 			tags: for (int i = 0; i < list.tagCount(); i++) {
 				NBTTagCompound infoTag = list.getCompoundTagAt(i);
 				T stack = (T) InfoHelper.readInfoFromNBT(infoTag);
-				for (T stored : (ArrayList<T>) stacks.info.clone()) {
+				for (T stored : (ArrayList<T>) stacks.clone()) {
 					if (stack.isMatchingInfo(stored)) {
 						if (infoTag.getBoolean(REMOVED)) {
-							stacks.info.remove(stored);
+							stacks.remove(stored);
 						} else {
 							stored.readData(infoTag, SyncType.SAVE);
 						}
 						continue tags;
 					}
 				}
-				stacks.info.add(stack);
+				stacks.add(stack);
 			}
 		}
 		return stacks;

@@ -6,40 +6,37 @@ import sonar.logistics.api.connecting.IDataCable;
 import sonar.logistics.api.connecting.ILogicTile;
 import sonar.logistics.api.info.monitor.ILogicMonitor;
 
-public enum CacheTypes {
+public enum DEADCacheTypes {
 
 	/** any type of {@link IDataCable} */
-	CABLE,
+	CABLE(IDataCable.class),
 	/** a multipart cable which has other types connected to it **/
-	CONNECTED_CABLE,
+	CONNECTED_CABLE(IDataCable.class),
 	/** for all external blocks, this is normally not applicable to Machines, unless they provide storage, energy or fluid */
-	BLOCK,
+	BLOCK(IDataCable.class),
 	/** for all {@link IInfoEmitter}s and other custom blocks which can provide Info */
-	EMITTER,
 	/** for all {@link ILogicTile}s and other custom blocks which should be seen as a part of the Logistics Network */
-	NETWORK,
+	NETWORK(ILogicTile.class),
 	/** for all {@link IChannelProvider}s and other custom blocks which can provide connections to other blocks/networks */
-	CHANNELLED,
-	MONITOR;
+	MONITOR(ILogicMonitor.class);
+
+	public Class<? extends ILogicTile> logicType;
+
+	CacheTypes(Class<? extends ILogicTile> type) {
+		this.logicType = type;
+	}
 
 	public static boolean checkType(CacheTypes type, Object tile) {
-		switch (type) {
-		//case BLOCK:
-		//	break;
-		case CONNECTED_CABLE:
-			return tile instanceof IDataCable && ((IDataCable)tile).hasConnections();
-		case CABLE:				
-			return tile instanceof IDataCable && !((IDataCable)tile).hasConnections();
-		case CHANNELLED:
-			return false; //tile instanceof IChannelProvider;
-		case EMITTER:
-			return false;// tile instanceof IInfoEmitter;
-		case NETWORK:
-			return tile instanceof ILogicTile;
-		case MONITOR:
-			return tile instanceof ILogicMonitor;
-		default:
+		if (tile == null || !type.logicType.isInstance(tile)) {
 			return false;
+		}
+		switch (type) {
+		case CONNECTED_CABLE:
+			return ((IDataCable) tile).hasConnections();
+		case CABLE:
+			return !((IDataCable) tile).hasConnections();
+		default:
+			return true;
 		}
 	}
 

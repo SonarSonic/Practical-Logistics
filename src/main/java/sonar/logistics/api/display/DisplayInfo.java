@@ -15,6 +15,7 @@ import sonar.logistics.api.info.monitor.IMonitorInfo;
 import sonar.logistics.client.LogisticsColours;
 import sonar.logistics.connections.LogicMonitorCache;
 
+/**default implementation of the Display Info used on displays*/
 public class DisplayInfo implements IDisplayInfo {
 
 	public IMonitorInfo cachedInfo = null;

@@ -184,10 +184,10 @@ public class GuiInventoryReader extends GuiSelectionGrid<MonitoredItemStack> {
 			return part.getMonitoredList();
 		else {
 			MonitoredList<MonitoredItemStack> searchList = MonitoredList.newMonitoredList();
-			for (MonitoredItemStack stack : (ArrayList<MonitoredItemStack>) part.getMonitoredList().info.clone()) {
+			for (MonitoredItemStack stack : (ArrayList<MonitoredItemStack>) part.getMonitoredList().clone()) {
 				StoredItemStack item = stack.itemStack.getObject();
 				if (stack != null && item != null && item.item.getDisplayName().toLowerCase().contains(search.toLowerCase())) {
-					searchList.info.add(stack);
+					searchList.add(stack);
 				}
 			}
 			return searchList;

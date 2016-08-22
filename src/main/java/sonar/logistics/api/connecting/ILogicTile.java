@@ -2,6 +2,7 @@ package sonar.logistics.api.connecting;
 
 import net.minecraft.util.EnumFacing;
 import sonar.core.api.utils.BlockCoords;
+import sonar.logistics.api.cache.INetworkCache;
 
 /** implemented by Tile Entities which can connect to Data Cables */
 public interface ILogicTile {

@@ -23,7 +23,6 @@ import sonar.core.api.utils.BlockCoords;
 import sonar.core.network.PacketInvUpdate;
 import sonar.core.utils.SortingDirection;
 import sonar.logistics.api.LogisticsAPI;
-import sonar.logistics.api.cache.CacheTypes;
 import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.connecting.IEntityNode;
 import sonar.logistics.api.readers.InventoryReader.SortingType;
@@ -112,7 +111,7 @@ public class ItemHelper extends ItemWrapper {
 		Entry<BlockCoords, EnumFacing> block = network.getExternalBlock(true);
 		StoredItemStack stack = getTileStack(network, slot);
 		if (stack == null) {
-			network.getFirstConnection(CacheTypes.EMITTER);
+			//network.getFirstConnection(CacheTypes.EMITTER);
 		}
 		return stack;
 		/* if (block != null) { return getTileStack(network, slot); } else {

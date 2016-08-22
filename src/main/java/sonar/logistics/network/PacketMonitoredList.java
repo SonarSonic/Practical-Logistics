@@ -34,10 +34,10 @@ public class PacketMonitoredList implements IMessage {
 	public void fromBytes(ByteBuf buf) {
 		Pair<ILogicMonitor, MonitoredList<?>> pair = LogicMonitorCache.getMonitorFromServer(buf.readInt());
 		if (pair != null) {
-			list = pair.b == null ? MonitoredList.newMonitoredList() : pair.b.copy();
+			list = pair.b == null ? MonitoredList.newMonitoredList() : pair.b.copyInfo();
 			monitor = pair.a;
 			type = SyncType.values()[buf.readInt()];
-			list = MonitorHelper.readMonitoredList(ByteBufUtils.readTag(buf), monitor.getHandler(), list, type);
+			list = MonitorHelper.readMonitoredList(ByteBufUtils.readTag(buf), list, type);
 		} else {
 			Logistics.logger.error("Couldn't get monitor for hashcode ");
 		}

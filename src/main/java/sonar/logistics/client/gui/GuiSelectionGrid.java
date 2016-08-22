@@ -30,7 +30,7 @@ public abstract class GuiSelectionGrid<T extends IMonitorInfo> extends GuiLogist
 	public abstract MonitoredList<T> getGridList();
 
 	public int getGridSize(MonitoredList<T> list) {
-		return getGridList() == null ? 0 : list.info.size();
+		return getGridList() == null ? 0 : list.size();
 	}
 
 	private boolean needsScrollBars(MonitoredList<T> list) {
@@ -59,14 +59,14 @@ public abstract class GuiSelectionGrid<T extends IMonitorInfo> extends GuiLogist
 	protected void mouseClicked(int x, int y, int button) throws IOException {
 		super.mouseClicked(x, y, button);
 		if (button == 0 || button == 1) {
-			MonitoredList<T> list = getGridList().copy();
+			MonitoredList<T> list = getGridList().copyInfo();
 			if (x - guiLeft >= 13 && x - guiLeft <= 13 + (12 * 18) && y - guiTop >= 32 && y - guiTop <= 32 + (7 * 18)) {
 				int start = (int) (getGridSize(list) / 12 * scroller.getCurrentScroll());
 				int X = (x - guiLeft - 13) / 18;
 				int Y = (y - guiTop - 32) / 18;
 				int i = (start * 12) + (12 * Y) + X;
-				if (i < getGridList().info.size()) {
-					T storedStack = getGridList().info.get(i);
+				if (i < getGridList().size()) {
+					T storedStack = getGridList().get(i);
 					if (storedStack != null) {
 						onGridClicked(storedStack, i, button, false);
 						return;
@@ -82,15 +82,15 @@ public abstract class GuiSelectionGrid<T extends IMonitorInfo> extends GuiLogist
 		net.minecraft.client.renderer.RenderHelper.enableGUIStandardItemLighting();
 		renderStrings(x, y);
 		preRender();
-		MonitoredList<T> list = getGridList().copy();
-		if (list != null && !list.info.isEmpty()) {
+		MonitoredList<T> list = getGridList().copyInfo();
+		if (list != null && !list.isEmpty()) {
 			int start = (int) (getGridSize(list) / 12 * scroller.getCurrentScroll());
 			int i = start * 12;
 			int finish = Math.min(i + (12 * 7), getGridSize(list));
 			for (int Y = 0; Y < 7; Y++) {
 				for (int X = 0; X < 12; X++) {
 					if (i < finish) {
-						T selection = list.info.get(i);
+						T selection = list.get(i);
 						if (selection != null) {
 							renderSelection(selection, X, Y);
 						}
@@ -107,8 +107,8 @@ public abstract class GuiSelectionGrid<T extends IMonitorInfo> extends GuiLogist
 			int i = (start * 12) + X + ((Y) * 12);
 
 			if (list != null) {
-				if (i < list.info.size()) {
-					T selection = list.info.get(i);
+				if (i < list.size()) {
+					T selection = list.get(i);
 					if (selection != null) {
 
 						GL11.glDisable(GL11.GL_DEPTH_TEST);
@@ -134,13 +134,13 @@ public abstract class GuiSelectionGrid<T extends IMonitorInfo> extends GuiLogist
 
 	public void handleMouseInput() throws IOException {
 		super.handleMouseInput();
-		MonitoredList<T> list = getGridList().copy();
+		MonitoredList<T> list = getGridList().copyInfo();
 		scroller.handleMouse(needsScrollBars(list), getGridSize(list));
 	}
 
 	public void drawScreen(int x, int y, float var) {
 		super.drawScreen(x, y, var);
-		MonitoredList<T> list = getGridList().copy();
+		MonitoredList<T> list = getGridList().copyInfo();
 		scroller.drawScreen(x, y, needsScrollBars(list));
 	}
 

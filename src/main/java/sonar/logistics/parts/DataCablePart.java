@@ -30,6 +30,7 @@ import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.cache.EmptyNetworkCache;
 import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.cache.IRefreshCache;
+import sonar.logistics.api.cache.RefreshType;
 import sonar.logistics.api.connecting.CableType;
 import sonar.logistics.api.connecting.IDataCable;
 import sonar.logistics.api.connecting.ILogicTile;
@@ -147,7 +148,7 @@ public class DataCablePart extends SonarMultipart implements ISlotOccludingPart,
 				INetworkCache cache = LogisticsAPI.getCableHelper().getNetwork(registryID);
 				if (cache instanceof IRefreshCache) {
 					IRefreshCache toRefresh = (IRefreshCache) cache;
-					toRefresh.refreshCache(cache.getNetworkID(), true);
+					toRefresh.refreshCache(cache.getNetworkID(), RefreshType.FULL);
 				}
 			}
 			refreshConnections();
@@ -238,7 +239,7 @@ public class DataCablePart extends SonarMultipart implements ISlotOccludingPart,
 			INetworkCache cache = LogisticsAPI.getCableHelper().getNetwork(registryID);
 			if (cache instanceof IRefreshCache) {
 				IRefreshCache toRefresh = (IRefreshCache) cache;
-				toRefresh.refreshCache(cache.getNetworkID(), true);
+				toRefresh.refreshCache(cache.getNetworkID(), RefreshType.FULL);
 			}
 		}
 	}

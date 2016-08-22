@@ -154,7 +154,7 @@ public class GuiInfoReader extends GuiLogistics {
 							break;
 						}
 					}
-				} else if (info.isValid() && part.getMonitoringCoords().contains(((MonitoredBlockCoords) info).coords)) {
+				} else if (info.isValid() && part.getMonitoringCoords().contains(((MonitoredBlockCoords) info).coords.getCoords())) {
 					pos.add(i - start);
 				}
 			}
@@ -350,8 +350,8 @@ public class GuiInfoReader extends GuiLogistics {
 	}
 
 	public void setInfo() {
-		coords = (ArrayList<IMonitorInfo>) CacheRegistry.coordMap.getOrDefault(part.registryID.getObject(), MonitoredList.<MonitoredBlockCoords>newMonitoredList()).info.clone();
-		infoList = (ArrayList<IMonitorInfo>) part.getMonitoredList().info.clone();
+		coords = (ArrayList<IMonitorInfo>) CacheRegistry.coordMap.getOrDefault(part.registryID.getObject(), MonitoredList.<MonitoredBlockCoords>newMonitoredList()).clone();
+		infoList = (ArrayList<IMonitorInfo>) part.getMonitoredList().cloneInfo();
 	}
 
 	@Override

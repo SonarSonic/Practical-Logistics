@@ -31,7 +31,7 @@ public class FluidMonitorHandler extends MonitorHandler<MonitoredFluidStack> {
 				List<StoredFluidStack> info = new ArrayList();
 				StorageSize size = provider.getFluids(info, fluidTile, side);
 				for (StoredFluidStack fluid : info) {
-					MonitorHelper.<MonitoredFluidStack>addInfoToList(list, this, new MonitoredFluidStack(fluid));
+					list.addInfoToList(new MonitoredFluidStack(fluid));
 				}
 				break;
 			}

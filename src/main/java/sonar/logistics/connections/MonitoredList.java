@@ -4,12 +4,13 @@ import java.util.ArrayList;
 
 import sonar.core.api.StorageSize;
 import sonar.core.utils.Pair;
+import sonar.logistics.api.info.monitor.IJoinableInfo;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
 
-public class MonitoredList<T extends IMonitorInfo> {
+public class MonitoredList<T extends IMonitorInfo> extends ArrayList<T> {
 
 	// public MonitoredList<T> EMPTY = newMonitoredList();
-	public ArrayList<T> info = new ArrayList<T>();
+	//public ArrayList<T> info = new ArrayList<T>();
 	public ArrayList<T> changed = new ArrayList<T>();
 	public ArrayList<T> removed = new ArrayList<T>();
 	public StorageSize sizing;
@@ -18,7 +19,7 @@ public class MonitoredList<T extends IMonitorInfo> {
 	}
 
 	public MonitoredList(ArrayList<T> items, StorageSize sizing, ArrayList<T> changed, ArrayList<T> removed) {
-		this.info = items;
+		this.addAll(items);
 		this.sizing = sizing;
 		this.changed = changed;
 		this.removed = removed;
@@ -28,13 +29,37 @@ public class MonitoredList<T extends IMonitorInfo> {
 		return new MonitoredList<I>();
 	}
 
-	public MonitoredList<T> copy() {
-		return new MonitoredList<T>((ArrayList<T>) this.info.clone(), sizing, (ArrayList<T>) changed.clone(), (ArrayList<T>) removed.clone());
+	public ArrayList<T> cloneInfo(){
+		return (ArrayList<T>) super.clone();
+	}
+	
+	public void setInfo(ArrayList<T> info){
+		this.clear();
+		this.addAll(info);
+	}
+	public MonitoredList<T> copyInfo() {
+		return new MonitoredList<T>((ArrayList<T>) cloneInfo(), sizing, (ArrayList<T>) changed.clone(), (ArrayList<T>) removed.clone());
+	}
+	//public MonitoredList<T> clone() {
+	//	return new MonitoredList<T>((ArrayList<T>) cloneInfo(), sizing, (ArrayList<T>) changed.clone(), (ArrayList<T>) removed.clone());
+	//}
+
+	public void addInfoToList(T newInfo) {
+		if (newInfo instanceof IJoinableInfo) {
+			IJoinableInfo joinableInfo = (IJoinableInfo) newInfo;
+			for (T storedInfo : this) {
+				if (((IJoinableInfo) storedInfo).canJoinInfo(newInfo)) {
+					((IJoinableInfo) storedInfo).joinInfo(newInfo);
+					return;
+				}
+			}
+		}
+		add(newInfo);
 	}
 
-	public void updateList(MonitoredList<T> lastList) {
-		ArrayList<T> changed = ((ArrayList<T>) info.clone());
-		ArrayList<T> removed = ((ArrayList<T>) lastList.info.clone());
+	public MonitoredList<T> updateList(MonitoredList<T> lastList) {
+		ArrayList<T> changed = ((ArrayList<T>) cloneInfo());
+		ArrayList<T> removed = ((ArrayList<T>) lastList.cloneInfo());
 		if (lastList != null) {
 			changed.removeAll(removed);
 		}
@@ -45,12 +70,13 @@ public class MonitoredList<T extends IMonitorInfo> {
 		}));
 		this.changed = changed;
 		this.removed = removed;
+		return this;
 	}
 
 	/** @param info the info type you wish to check
 	 * @return a boolean for if the info was changed and the new info */
 	public Pair<Boolean, IMonitorInfo> getLatestInfo(IMonitorInfo oldInfo) {
-		for (T newInfo : info) {
+		for (T newInfo : cloneInfo()) {
 			if (newInfo.isMatchingType(oldInfo) && newInfo.isMatchingInfo(oldInfo) && !newInfo.isIdenticalInfo(oldInfo)) {
 				return new Pair(true, newInfo);
 			}

@@ -43,7 +43,7 @@ public abstract class LogicReaderPart<T extends IMonitorInfo> extends ReaderMult
 
 	public ArrayList<IMonitorInfo> getPairedInfo() {
 		ArrayList<IMonitorInfo> cachedPaired = Lists.<IMonitorInfo>newArrayList();
-		selected.forEach(info -> cachedPaired.add(info.getMonitoredInfo()));
+		paired.forEach(info -> cachedPaired.add(info.getMonitoredInfo()));
 		return cachedPaired;
 	}
 
@@ -51,31 +51,33 @@ public abstract class LogicReaderPart<T extends IMonitorInfo> extends ReaderMult
 	public void setMonitoredInfo(MonitoredList<T> updateInfo) {
 		ArrayList<IMonitorInfo> cachedSelected = this.getSelectedInfo();
 		ArrayList<IMonitorInfo> cachedPaired = this.getPairedInfo();
-
 		for (int i = 0; i < this.getMaxInfo(); i++) {
-			IMonitorInfo info = cachedSelected.get(i);
-			if (info != null) {
-				IMonitorInfo latestInfo = info;
-				Pair<Boolean, IMonitorInfo> newInfo = updateInfo.getLatestInfo(info);
+			InfoUUID id = new InfoUUID(getMonitorUUID().hashCode(), i);
+			IMonitorInfo selectedInfo = cachedSelected.get(i);
+			IMonitorInfo lastInfo = LogicMonitorCache.info.get(id);
+			if (selectedInfo != null) {
+				IMonitorInfo latestInfo = selectedInfo;
+				Pair<Boolean, IMonitorInfo> newInfo = updateInfo.getLatestInfo(selectedInfo);
 				if (cachedPaired != null) {
 					IMonitorInfo paired = cachedPaired.get(i);
 					if (paired != null) {
 						Pair<Boolean, IMonitorInfo> newPaired = updateInfo.getLatestInfo(paired);
-						if (newPaired.a && newInfo.a)
+						//if (newPaired.a && newInfo.a)
 							latestInfo = new ProgressInfo((LogicInfo) newInfo.b, (LogicInfo) newPaired.b);
 					}
 				}
-				if (!newInfo.a) {
+				if (!newInfo.a && lastInfo != null && !lastInfo.isIdenticalInfo(newInfo.b)) {
 					continue;
 				} else {
-					latestInfo = newInfo.b;
+					//latestInfo = newInfo.b;
 				}
 
-				InfoUUID id = new InfoUUID(getMonitorUUID().hashCode(), i);
 				LogicMonitorCache.changeInfo(id, latestInfo);
+			}else if(lastInfo!=null){
+				//set to empty info type
+				LogicMonitorCache.changeInfo(id, null);
 			}
 		}
-
 	}
 
 	// this is kind of messy, could be made better for sure
@@ -85,7 +87,7 @@ public abstract class LogicReaderPart<T extends IMonitorInfo> extends ReaderMult
 			int pos = 0;
 			for (SyncMonitoredType<T> sync : syncInfo) {
 				if (sync.getMonitoredInfo() != null) {
-					if (sync.getMonitoredInfo().isMatchingType(info) && sync.getMonitoredInfo().isMatchingInfo((T) info)) {
+					if (sync.getMonitoredInfo().isMatchingType(info) && sync.getMonitoredInfo().isMatchingInfo(info)) {
 						sync.setInfo(null);
 						(type != 0 ? selected : paired).get(pos).setInfo(null);
 						sendByteBufPacket(100);
@@ -115,7 +117,6 @@ public abstract class LogicReaderPart<T extends IMonitorInfo> extends ReaderMult
 			for (SyncMonitoredType<T> sync : paired) {
 				sync.writeToBuf(buf);
 			}
-			return;
 		}
 		switch (id) {
 		case ADD:
@@ -135,7 +136,6 @@ public abstract class LogicReaderPart<T extends IMonitorInfo> extends ReaderMult
 			for (SyncMonitoredType<T> sync : paired) {
 				sync.readFromBuf(buf);
 			}
-			return;
 		}
 		switch (id) {
 		case PAIRED:

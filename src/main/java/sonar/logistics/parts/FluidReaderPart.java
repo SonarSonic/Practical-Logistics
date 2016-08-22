@@ -63,7 +63,7 @@ public class FluidReaderPart extends ReaderMultipart<MonitoredFluidStack> implem
 
 	@Override
 	public MonitoredList<MonitoredFluidStack> sortMonitoredList(MonitoredList<MonitoredFluidStack> updateInfo) {
-		FluidHelper.sortFluidList(updateInfo.info, sortingOrder.getObject(), sortingType.getObject());
+		FluidHelper.sortFluidList(updateInfo, sortingOrder.getObject(), sortingType.getObject());
 		return updateInfo;
 	}
 

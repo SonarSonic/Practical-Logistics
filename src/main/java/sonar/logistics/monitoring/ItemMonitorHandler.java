@@ -30,36 +30,24 @@ public class ItemMonitorHandler extends MonitorHandler<MonitoredItemStack> {
 	public MonitoredList<MonitoredItemStack> updateInfo(MonitoredList<MonitoredItemStack> previousList, BlockCoords coords, EnumFacing side) {
 		MonitoredList<MonitoredItemStack> list = MonitoredList.<MonitoredItemStack>newMonitoredList();
 		List<InventoryHandler> providers = SonarCore.inventoryProviders.getObjects();
-		for (InventoryHandler provider : providers) {
-			TileEntity tile = coords.getTileEntity();
-			if (tile != null && provider.canHandleItems(tile, side)) {
-				List<StoredItemStack> info = new ArrayList();
-				StorageSize size = provider.getItems(info, tile, side);
-				for (StoredItemStack item : info) {
-					MonitorHelper.<MonitoredItemStack>addInfoToList(list, this, new MonitoredItemStack(item));
+		TileEntity tile = coords.getTileEntity();
+		if (tile != null) {
+			for (InventoryHandler provider : providers) {
+				if (provider.canHandleItems(tile, side)) {
+					List<StoredItemStack> info = new ArrayList();
+					StorageSize size = provider.getItems(info, tile, side);
+					for (StoredItemStack item : info) {
+						list.addInfoToList(new MonitoredItemStack(item));
+					}
+					break;
 				}
-				break;
 			}
 		}
 		return list;
 	}
-	/*
-	@Override
-	public MonitoredItemStack readInfo(NBTTagCompound tag, SyncType type) {
-		return new MonitoredItemStack(StoredItemStack.readFromNBT(tag));
-	}
-
-	@Override
-	public NBTTagCompound writeInfo(MonitoredItemStack info, NBTTagCompound tag, SyncType type) {
-		if (!validateInfo(info)) {
-			return tag;
-		}
-		return info.writeToNBT(tag, info);
-	}
-
-	@Override
-	public boolean validateInfo(IMonitorInfo info) {
-		return info instanceof MonitoredItemStack && ((MonitoredItemStack) info).item != null;
-	}
-	*/
+	/* @Override public MonitoredItemStack readInfo(NBTTagCompound tag, SyncType type) { return new MonitoredItemStack(StoredItemStack.readFromNBT(tag)); }
+	 * 
+	 * @Override public NBTTagCompound writeInfo(MonitoredItemStack info, NBTTagCompound tag, SyncType type) { if (!validateInfo(info)) { return tag; } return info.writeToNBT(tag, info); }
+	 * 
+	 * @Override public boolean validateInfo(IMonitorInfo info) { return info instanceof MonitoredItemStack && ((MonitoredItemStack) info).item != null; } */
 }

@@ -8,15 +8,12 @@ import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.core.network.sync.ISyncPart;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
 
+/**typical implementation of IMonitorInfo which has a sync parts list for all the Info things it also has the required constructor which required empty constructor*/
 public abstract class BaseInfo<T extends IMonitorInfo> implements IMonitorInfo<T> {
 
 	protected ArrayList<ISyncPart> syncParts = new ArrayList<ISyncPart>();
 
 	public BaseInfo() {}
-
-	public BaseInfo(NBTTagCompound tag) {
-		this.readData(tag, SyncType.SAVE);
-	}
 
 	@Override
 	public void readData(NBTTagCompound nbt, SyncType type) {

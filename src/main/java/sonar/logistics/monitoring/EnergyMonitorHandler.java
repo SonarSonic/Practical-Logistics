@@ -33,7 +33,7 @@ public class EnergyMonitorHandler extends MonitorHandler<MonitoredEnergyStack> {
 			if (tile != null && provider.canProvideEnergy(tile, side)) {
 				StoredEnergyStack info = provider.getEnergy(new StoredEnergyStack(provider.getProvidedType()), tile, side);
 				if (info != null)
-					MonitorHelper.<MonitoredEnergyStack>addInfoToList(list, this, new MonitoredEnergyStack(info));
+					list.addInfoToList(new MonitoredEnergyStack(info));
 
 			}
 		}

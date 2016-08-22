@@ -21,6 +21,7 @@ import sonar.core.utils.IGuiTile;
 import sonar.logistics.Logistics;
 import sonar.logistics.LogisticsItems;
 import sonar.logistics.api.cache.IRefreshCache;
+import sonar.logistics.api.cache.RefreshType;
 import sonar.logistics.api.connecting.IConnectionNode;
 import sonar.logistics.api.connecting.ITransceiver;
 import sonar.logistics.client.gui.GuiArray;
@@ -64,7 +65,7 @@ public class ArrayPart extends SidedMultipart implements ISlottedPart, IConnecti
 		this.coordList = coordList;
 		if (network instanceof IRefreshCache) {
 			IRefreshCache toRefresh = (IRefreshCache) network;
-			toRefresh.refreshCache(network.getNetworkID(), true);
+			toRefresh.refreshCache(network.getNetworkID(), RefreshType.FULL);
 		}
 	}
 

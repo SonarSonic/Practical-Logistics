@@ -16,19 +16,24 @@ import sonar.logistics.api.info.monitor.MonitorHandler;
 import sonar.logistics.registries.LogicRegistry;
 import sonar.logistics.registries.LogicRegistry.RegistryType;
 
+/**default info type, created by the LogicRegistry*/
 @LogicInfoType(id = LogicInfo.id, modid = Logistics.MODID)
 public class LogicInfo extends BaseInfo<LogicInfo> implements INBTSyncable, INameableInfo<LogicInfo> {
 
 	public static final String id = "logic";
 	public static final MonitorHandler<LogicInfo> handler = Logistics.monitorHandlers.getRegisteredObject(MonitorHandler.INFO);
 
-	private SyncTagType.STRING identifier = new SyncTagType.STRING(0);
+	private SyncTagType.STRING identifier = new SyncTagType.STRING(1);
 	private SyncEnum<RegistryType> registryType = new SyncEnum(RegistryType.values(), 2);
 	private SyncUnidentifiedObject obj = new SyncUnidentifiedObject(3);
 	private boolean isCategory = false;
 
 	{
 		syncParts.addAll(Lists.newArrayList(identifier, registryType, obj));
+	}
+	
+	public LogicInfo(){
+		super();
 	}
 
 	public static LogicInfo buildCategoryInfo(RegistryType type) {

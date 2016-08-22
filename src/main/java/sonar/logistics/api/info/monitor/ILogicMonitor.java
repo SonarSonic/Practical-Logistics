@@ -3,6 +3,7 @@ package sonar.logistics.api.info.monitor;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.connecting.ILogicTile;
 import sonar.logistics.connections.MonitoredList;
 
@@ -30,5 +31,7 @@ public interface ILogicMonitor<T extends IMonitorInfo> extends ILogicTile {
 	public IMonitorInfo getMonitorInfo(int pos);
 	
 	public int getMaxInfo();
+	
+	public INetworkCache getNetwork();
 	
 }

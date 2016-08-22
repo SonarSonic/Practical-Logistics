@@ -22,6 +22,7 @@ import sonar.core.helpers.NBTHelper;
 import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.core.utils.Pair;
 import sonar.logistics.Logistics;
+import sonar.logistics.api.cache.IMonitorCache;
 import sonar.logistics.api.display.IInfoDisplay;
 import sonar.logistics.api.info.IInfoContainer;
 import sonar.logistics.api.info.InfoUUID;
@@ -51,7 +52,7 @@ public class LogicMonitorCache {
 	public static LinkedHashMap<InfoUUID, IMonitorInfo> info = new LinkedHashMap();
 	// public static LinkedHashMap<IInfoDisplay, IInfoContainer> displayLists = new LinkedHashMap();
 
-	public static void onServerClosed(){
+	public static void onServerClosed() {
 		monitors.clear();
 		displays.clear();
 		monitoredLists.clear();
@@ -59,7 +60,7 @@ public class LogicMonitorCache {
 		lastInfo.clear();
 		info.clear();
 	}
-	
+
 	public static boolean enableEvents() {
 		return !displays.isEmpty();
 	}
@@ -88,6 +89,9 @@ public class LogicMonitorCache {
 	public static boolean removeMonitor(ILogicMonitor monitor) {
 		if (FMLCommonHandler.instance().getEffectiveSide().isClient()) {
 			return true;
+		}
+		if (!monitor.getNetwork().isFakeNetwork() && monitor.getNetwork() instanceof IMonitorCache) {
+			((IMonitorCache) monitor.getNetwork()).removeMonitor(monitor);
 		}
 		return monitors.remove(monitor);
 	}
@@ -258,8 +262,8 @@ public class LogicMonitorCache {
 									monitoring.get(player).add(info);
 									IMonitorInfo monitorInfo = LogicMonitorCache.info.get(info);
 									if (!(monitorInfo == null)) {
-										//NBTTagCompound updateTag = monitorInfo.writeData(new NBTTagCompound(), SyncType.DEFAULT_SYNC);
-										NBTTagCompound updateTag =  InfoHelper.writeInfoToNBT(new NBTTagCompound(), monitorInfo, SyncType.SAVE);
+										// NBTTagCompound updateTag = monitorInfo.writeData(new NBTTagCompound(), SyncType.DEFAULT_SYNC);
+										NBTTagCompound updateTag = InfoHelper.writeInfoToNBT(new NBTTagCompound(), monitorInfo, SyncType.SAVE);
 										if (!updateTag.hasNoTags()) {
 											packetList.appendTag(info.writeData(updateTag, SyncType.SAVE));
 										}
@@ -287,12 +291,7 @@ public class LogicMonitorCache {
 			InfoUUID id = NBTHelper.instanceNBTSyncable(InfoUUID.class, infoTag);
 			if (!save) {
 				LogicMonitorCache.info.put(id, InfoHelper.readInfoFromNBT(infoTag));
-				/*
-				IMonitorInfo info = LogicMonitorCache.info.get(id);
-				if (info != null) {
-					info.readData(infoTag, SyncType.DEFAULT_SYNC);
-				}
-				*/
+				/* IMonitorInfo info = LogicMonitorCache.info.get(id); if (info != null) { info.readData(infoTag, SyncType.DEFAULT_SYNC); } */
 			} else {
 				LogicMonitorCache.info.put(id, InfoHelper.readInfoFromNBT(infoTag));
 			}

@@ -25,6 +25,7 @@ public class LogisticsEvents {
 			if (networks.isEmpty()) {
 				return;
 			}
+			//System.out.println("tick");
 			for (Entry<Integer, INetworkCache> set : networks.entrySet()) {
 				INetworkCache cache = set.getValue();
 				if (cache instanceof IRefreshCache) {

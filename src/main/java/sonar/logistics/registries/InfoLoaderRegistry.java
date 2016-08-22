@@ -24,8 +24,7 @@ public class InfoLoaderRegistry {
 	public static LinkedHashMap<String, Integer> infoIds = new LinkedHashMap();
 	public static LinkedHashMap<String, Class<? extends IMonitorInfo>> infoClasses = new LinkedHashMap();
 
-	private InfoLoaderRegistry() {
-	}
+	private InfoLoaderRegistry() {}
 
 	public static List<IInfoRegistry> getInfoRegistries(@Nonnull ASMDataTable asmDataTable) {
 		return ASMLoader.getInstances(asmDataTable, InfoRegistry.class, IInfoRegistry.class, true);

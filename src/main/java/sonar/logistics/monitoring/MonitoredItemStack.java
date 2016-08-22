@@ -13,14 +13,15 @@ import sonar.logistics.api.info.monitor.MonitorHandler;
 public class MonitoredItemStack extends BaseInfo<MonitoredItemStack> implements IJoinableInfo<MonitoredItemStack> {
 
 	public static final String id = "item";
-	public static final MonitorHandler<MonitoredItemStack> handler = Logistics.monitorHandlers.getRegisteredObject(MonitorHandler.ITEMS);
+	public final MonitorHandler<MonitoredItemStack> handler = Logistics.monitorHandlers.getRegisteredObject(MonitorHandler.ITEMS);
 	public SyncNBTAbstract<StoredItemStack> itemStack = new SyncNBTAbstract<StoredItemStack>(StoredItemStack.class, 0);
 
 	{
 		syncParts.add(itemStack);
 	}
 
-	public MonitoredItemStack() {}
+	public MonitoredItemStack() {
+	}
 
 	public MonitoredItemStack(StoredItemStack stack) {
 		this.itemStack.setObject(stack);
@@ -59,12 +60,18 @@ public class MonitoredItemStack extends BaseInfo<MonitoredItemStack> implements 
 
 	@Override
 	public boolean isValid() {
-		return itemStack.getObject()!=null && itemStack.getObject().item != null;
+		return itemStack.getObject() != null && itemStack.getObject().item != null;
 	}
 
 	@Override
 	public String getID() {
 		return id;
+	}
+
+	public String toString() {
+		if (itemStack.getObject() != null)
+			return itemStack.getObject().toString();
+		return super.toString() + " : NULL";
 	}
 
 }

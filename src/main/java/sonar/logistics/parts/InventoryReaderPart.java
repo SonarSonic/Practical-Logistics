@@ -65,7 +65,7 @@ public class InventoryReaderPart extends ReaderMultipart<MonitoredItemStack> imp
 
 	@Override
 	public MonitoredList<MonitoredItemStack> sortMonitoredList(MonitoredList<MonitoredItemStack> updateInfo) {
-		ItemHelper.sortItemList(updateInfo.info, sortingOrder.getObject(), sortingType.getObject());
+		ItemHelper.sortItemList(updateInfo, sortingOrder.getObject(), sortingType.getObject());
 		return updateInfo;
 	}
 
@@ -83,8 +83,8 @@ public class InventoryReaderPart extends ReaderMultipart<MonitoredItemStack> imp
 			break;
 		case POS:
 			int pos = posSlot.getObject();
-			if (pos < updateInfo.info.size())
-				info = updateInfo.info.get(posSlot.getObject());
+			if (pos < updateInfo.size())
+				info = updateInfo.get(posSlot.getObject());
 			break;
 		case SLOT:
 			// make a way of getting the slot

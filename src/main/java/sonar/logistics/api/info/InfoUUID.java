@@ -7,6 +7,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import sonar.core.api.nbt.INBTSyncable;
 import sonar.core.helpers.NBTHelper.SyncType;
 
+/**used to identify info and find the monitor which created it*/
 public class InfoUUID implements INBTSyncable {
 
 	public int hashCode;

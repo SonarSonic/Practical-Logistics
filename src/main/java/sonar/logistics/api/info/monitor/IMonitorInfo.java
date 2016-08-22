@@ -1,9 +1,12 @@
 package sonar.logistics.api.info.monitor;
 
 import sonar.core.api.nbt.INBTSyncable;
+import sonar.logistics.api.asm.LogicInfoType;
 
+/**for your info to be registered you must use {@link LogicInfoType} implement this for all types of info*/
 public interface IMonitorInfo<T extends IMonitorInfo> extends INBTSyncable{
 	
+	/**this must be the same as the ID specified in {@link LogicInfoType}*/
 	public String getID();
 	
 	/** if they are identical **/

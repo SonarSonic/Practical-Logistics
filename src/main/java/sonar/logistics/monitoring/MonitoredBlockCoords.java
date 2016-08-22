@@ -24,7 +24,8 @@ public class MonitoredBlockCoords extends BaseInfo<MonitoredBlockCoords> impleme
 	{
 		syncParts.addAll(Lists.newArrayList(coords, unlocalizedName));
 	}
-
+	public MonitoredBlockCoords(){}
+	
 	public MonitoredBlockCoords(BlockCoords coords, String unlocalizedName) {
 		this.coords.setCoords(coords);
 		this.unlocalizedName.setObject(unlocalizedName);

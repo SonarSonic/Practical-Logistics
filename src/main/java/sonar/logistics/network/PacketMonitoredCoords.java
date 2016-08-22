@@ -31,7 +31,7 @@ public class PacketMonitoredCoords implements IMessage {
 		registryID = buf.readInt();
 		listTag = ByteBufUtils.readTag(buf);
 		if (listTag != null)
-			list = MonitorHelper.readMonitoredList(listTag, CacheRegistry.handler, CacheRegistry.coordMap.getOrDefault(registryID, MonitoredList.newMonitoredList()), SyncType.DEFAULT_SYNC);
+			list = MonitorHelper.readMonitoredList(listTag, CacheRegistry.coordMap.getOrDefault(registryID, MonitoredList.newMonitoredList()).copyInfo(), SyncType.DEFAULT_SYNC);
 	}
 
 	@Override
@@ -43,8 +43,8 @@ public class PacketMonitoredCoords implements IMessage {
 	public static class Handler implements IMessageHandler<PacketMonitoredCoords, IMessage> {
 		@Override
 		public IMessage onMessage(PacketMonitoredCoords message, MessageContext ctx) {
-			if (message.list != null)
-				CacheRegistry.coordMap.put(message.registryID, message.list);
+			//if (message.list != null)
+				//CacheRegistry.coordMap.put(message.registryID, message.list);
 			return null;
 		}
 	}

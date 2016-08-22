@@ -83,7 +83,7 @@ public class InfoRenderer extends RenderWrapper {
 	public static void renderMonitorInfoInGUI(IMonitorInfo info, int yPos, int colour) {
 		if (info instanceof INameableInfo) {
 			INameableInfo directInfo = (INameableInfo) info;
-			if (!directInfo.isHeader()) {
+			if (!directInfo.isHeader() && directInfo.isValid()) {
 				FontHelper.text(directInfo.getClientIdentifier(), identifierLeft, yPos, colour);
 				FontHelper.text(directInfo.getClientObject(), objectLeft, yPos, colour);
 				FontHelper.text(directInfo.getClientType(), kindLeft, yPos, colour);
