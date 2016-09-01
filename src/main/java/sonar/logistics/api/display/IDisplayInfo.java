@@ -5,6 +5,7 @@ import javax.annotation.Nullable;
 import sonar.core.api.nbt.INBTSyncable;
 import sonar.core.utils.CustomColour;
 import sonar.logistics.api.info.InfoUUID;
+import sonar.logistics.api.info.RenderInfoProperties;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
 
 /** used within a IInfoContainer */
@@ -21,5 +22,6 @@ public interface IDisplayInfo extends INBTSyncable {
 	public CustomColour getTextColour();
 
 	public CustomColour getBackgroundColour();
-
+	
+	public RenderInfoProperties getRenderProperties();
 }

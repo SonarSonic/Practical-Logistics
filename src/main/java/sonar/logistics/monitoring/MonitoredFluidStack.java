@@ -1,19 +1,34 @@
 package sonar.logistics.monitoring;
 
+import org.lwjgl.opengl.GL11;
+
+import mcmultipart.raytrace.PartMOP;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumHand;
+import net.minecraftforge.fluids.FluidStack;
 import sonar.core.api.fluids.StoredFluidStack;
+import sonar.core.helpers.FontHelper;
 import sonar.core.network.sync.SyncNBTAbstract;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.asm.LogicInfoType;
+import sonar.logistics.api.display.DisplayType;
 import sonar.logistics.api.info.BaseInfo;
+import sonar.logistics.api.info.IClickableInfo;
+import sonar.logistics.api.info.RenderInfoProperties;
 import sonar.logistics.api.info.monitor.IJoinableInfo;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
 import sonar.logistics.api.info.monitor.MonitorHandler;
+import sonar.logistics.helpers.InfoRenderer;
 
 @LogicInfoType(id = MonitoredFluidStack.id, modid = Logistics.MODID)
-public class MonitoredFluidStack extends BaseInfo<MonitoredFluidStack> implements IJoinableInfo<MonitoredFluidStack> {
+public class MonitoredFluidStack extends BaseInfo<MonitoredFluidStack> implements IJoinableInfo<MonitoredFluidStack>, IClickableInfo {
 
 	public static final String id = "fluid";
-	public static final MonitorHandler<MonitoredFluidStack> handler = Logistics.monitorHandlers.getRegisteredObject(MonitorHandler.FLUIDS);
+	public final MonitorHandler<MonitoredFluidStack> handler = Logistics.monitorHandlers.getRegisteredObject(MonitorHandler.FLUIDS);
 	public SyncNBTAbstract<StoredFluidStack> fluidStack = new SyncNBTAbstract<StoredFluidStack>(StoredFluidStack.class, 0);
 
 	{
@@ -60,12 +75,40 @@ public class MonitoredFluidStack extends BaseInfo<MonitoredFluidStack> implement
 
 	@Override
 	public boolean isValid() {
-		return fluidStack.getObject()!=null && fluidStack.getObject().fluid != null;
+		return fluidStack.getObject() != null && fluidStack.getObject().fluid != null;
 	}
 
 	@Override
 	public String getID() {
 		return id;
+	}
+
+	@Override
+	public MonitoredFluidStack copy() {
+		return new MonitoredFluidStack(fluidStack.getObject().copy());
+	}
+
+	@Override
+	public void renderInfo(DisplayType displayType, double width, double height, double scale, int infoPos) {
+		FluidStack stack = fluidStack.getObject().fluid;
+		if (stack != null) {
+			GL11.glPushMatrix();
+			GL11.glPushMatrix();
+			GlStateManager.disableLighting();
+			GL11.glTranslated(-1, -0.0625 * 12, +0.004);
+			TextureAtlasSprite sprite = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(stack.getFluid().getStill(stack).toString());
+			InfoRenderer.renderProgressBarWithSprite(sprite, width, height, scale, fluidStack.getObject().stored, fluidStack.getObject().capacity);
+			GlStateManager.enableLighting();
+			GL11.glTranslated(0, 0, -0.001);
+			GL11.glPopMatrix();
+			InfoRenderer.renderNormalInfo(displayType, width, height, scale, stack.getLocalizedName(), FontHelper.formatFluidSize(stack.amount));
+			GL11.glPopMatrix();
+		}
+	}
+
+	@Override
+	public boolean onClicked(RenderInfoProperties renderInfo, EntityPlayer player, EnumHand hand, ItemStack stack, PartMOP hit) {
+		return false;
 	}
 
 }

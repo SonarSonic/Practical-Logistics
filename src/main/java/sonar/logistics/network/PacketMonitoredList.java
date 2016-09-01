@@ -39,7 +39,7 @@ public class PacketMonitoredList implements IMessage {
 			type = SyncType.values()[buf.readInt()];
 			list = MonitorHelper.readMonitoredList(ByteBufUtils.readTag(buf), list, type);
 		} else {
-			Logistics.logger.error("Couldn't get monitor for hashcode ");
+			Logistics.logger.error("Couldn't get monitor for hashcode");
 		}
 	}
 

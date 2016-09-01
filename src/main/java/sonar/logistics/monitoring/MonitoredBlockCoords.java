@@ -8,10 +8,12 @@ import sonar.core.network.sync.SyncCoords;
 import sonar.core.network.sync.SyncTagType;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.asm.LogicInfoType;
+import sonar.logistics.api.display.DisplayType;
 import sonar.logistics.api.info.BaseInfo;
 import sonar.logistics.api.info.INameableInfo;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
 import sonar.logistics.api.info.monitor.MonitorHandler;
+import sonar.logistics.helpers.InfoRenderer;
 
 @LogicInfoType(id = MonitoredBlockCoords.id, modid = Logistics.MODID)
 public class MonitoredBlockCoords extends BaseInfo<MonitoredBlockCoords> implements INameableInfo<MonitoredBlockCoords> {
@@ -82,6 +84,17 @@ public class MonitoredBlockCoords extends BaseInfo<MonitoredBlockCoords> impleme
 	@Override
 	public String getID() {
 		return id;
+	}
+
+	@Override
+	public MonitoredBlockCoords copy() {
+		return new MonitoredBlockCoords(coords.getCoords(), unlocalizedName.getObject());
+	}
+
+	@Override
+	public void renderInfo(DisplayType displayType, double width, double height, double scale, int infoPos) {
+		InfoRenderer.renderNormalInfo(displayType, width, height, scale, getClientIdentifier(), getClientObject());
+		
 	}
 
 }

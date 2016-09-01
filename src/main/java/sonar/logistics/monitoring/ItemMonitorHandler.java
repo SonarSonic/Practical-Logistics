@@ -12,7 +12,6 @@ import sonar.core.api.inventories.StoredItemStack;
 import sonar.core.api.utils.BlockCoords;
 import sonar.logistics.api.info.monitor.MonitorHandler;
 import sonar.logistics.connections.MonitoredList;
-import sonar.logistics.helpers.MonitorHelper;
 
 public class ItemMonitorHandler extends MonitorHandler<MonitoredItemStack> {
 
@@ -36,6 +35,7 @@ public class ItemMonitorHandler extends MonitorHandler<MonitoredItemStack> {
 				if (provider.canHandleItems(tile, side)) {
 					List<StoredItemStack> info = new ArrayList();
 					StorageSize size = provider.getItems(info, tile, side);
+					list.sizing.add(size);
 					for (StoredItemStack item : info) {
 						list.addInfoToList(new MonitoredItemStack(item));
 					}
@@ -45,9 +45,4 @@ public class ItemMonitorHandler extends MonitorHandler<MonitoredItemStack> {
 		}
 		return list;
 	}
-	/* @Override public MonitoredItemStack readInfo(NBTTagCompound tag, SyncType type) { return new MonitoredItemStack(StoredItemStack.readFromNBT(tag)); }
-	 * 
-	 * @Override public NBTTagCompound writeInfo(MonitoredItemStack info, NBTTagCompound tag, SyncType type) { if (!validateInfo(info)) { return tag; } return info.writeToNBT(tag, info); }
-	 * 
-	 * @Override public boolean validateInfo(IMonitorInfo info) { return info instanceof MonitoredItemStack && ((MonitoredItemStack) info).item != null; } */
 }

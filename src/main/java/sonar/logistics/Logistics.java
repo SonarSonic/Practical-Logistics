@@ -3,7 +3,6 @@ package sonar.logistics;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import mcmultipart.multipart.MultipartRegistry;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraftforge.common.MinecraftForge;
@@ -27,16 +26,6 @@ import sonar.logistics.connections.CacheRegistry;
 import sonar.logistics.connections.EmitterRegistry;
 import sonar.logistics.connections.LogicMonitorCache;
 import sonar.logistics.network.LogisticsCommon;
-import sonar.logistics.parts.ArrayPart;
-import sonar.logistics.parts.DataCablePart;
-import sonar.logistics.parts.DataEmitterPart;
-import sonar.logistics.parts.DataReceiverPart;
-import sonar.logistics.parts.DisplayScreenPart;
-import sonar.logistics.parts.FluidReaderPart;
-import sonar.logistics.parts.InfoReaderPart;
-import sonar.logistics.parts.InventoryReaderPart;
-import sonar.logistics.parts.LargeDisplayScreenPart;
-import sonar.logistics.parts.NodePart;
 import sonar.logistics.registries.InfoLoaderRegistry;
 import sonar.logistics.registries.LogicRegistry;
 import sonar.logistics.registries.MonitorHandlerRegistry;
@@ -73,6 +62,7 @@ public class Logistics {
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
+		logger.info("Releasing the Kraken");
 		if (!Loader.isModLoaded("SonarCore")) {
 			logger.fatal("Sonar Core is not loaded");
 		} else {
@@ -99,18 +89,7 @@ public class Logistics {
 
 		proxy.registerRenderThings();
 		logger.info("Registered Renderers");
-		MultipartRegistry.registerPart(DataCablePart.class, "practicallogistics:DataCable");
-		MultipartRegistry.registerPart(NodePart.class, "practicallogistics:Node");
-		MultipartRegistry.registerPart(ArrayPart.class, "practicallogistics:Array");
-		MultipartRegistry.registerPart(InventoryReaderPart.class, "practicallogistics:InventoryReader");
-		MultipartRegistry.registerPart(FluidReaderPart.class, "practicallogistics:FluidReader");
-		MultipartRegistry.registerPart(InfoReaderPart.class, "practicallogistics:InfoReader");
-		MultipartRegistry.registerPart(DataEmitterPart.class, "practicallogistics:DataEmitter");
-		MultipartRegistry.registerPart(DataReceiverPart.class, "practicallogistics:DataReceiver");
-		MultipartRegistry.registerPart(DisplayScreenPart.class, "practicallogistics:DisplayScreen");
-		MultipartRegistry.registerPart(LargeDisplayScreenPart.class, "practicallogistics:LargeDisplayScreen");
-		/* MultipartRegistry.registerPart(NodePart.class, "practicallogistics:Node"); MultipartRegistry.registerPart(EntityNodePart.class, "practicallogistics:EntityNode"); MultipartRegistry.registerPart(InfoReaderPart.class, "practicallogistics:InfoReader"); MultipartRegistry.registerPart(InventoryReaderPart.class, "practicallogistics:InventoryReader"); MultipartRegistry.registerPart(EnergyReaderPart.class, "practicallogistics:EnergyReader"); MultipartRegistry.registerPart(RedstoneSignallerPart.class, "practicallogistics:RedstoneSignaller"); */
-		/* if (SonarLoader.forgeMultipartLoaded()) { ForgeMultipartHandler.init(); logger.info("'Forge Multipart' integration was loaded"); } else { logger.warn("'Forge Multipart' integration wasn't loaded"); } */
+		/* MultipartRegistry.registerPart(NodePart.class, "practicallogistics:Node"); MultipartRegistry.registerPart(EntityNodePart.class, "practicallogistics:EntityNode"); MultipartRegistry.registerPart(InfoReaderPart.class, "practicallogistics:InfoReader");  MultipartRegistry.registerPart(RedstoneSignallerPart.class, "practicallogistics:RedstoneSignaller"); */
 		if (LogisticsConfig.sapphireOre) {
 			GameRegistry.registerWorldGenerator(new SapphireOreGen(), 1);
 			logger.info("Registered Sapphire World Generator");
@@ -127,6 +106,7 @@ public class Logistics {
 
 	@EventHandler
 	public void load(FMLInitializationEvent event) {
+		logger.info("Breaking into the pentagon");
 		LogisticsCrafting.addRecipes();
 		logger.info("Registered Crafting Recipes");
 
@@ -146,10 +126,12 @@ public class Logistics {
 		// itemFilters.register();
 		// entityProviders.register();
 		monitorHandlers.register();
+		proxy.registerTextures();
 	}
 
 	@EventHandler
 	public void postLoad(FMLPostInitializationEvent evt) {
+		logger.info("Please Wait: We are saving Harambe with a time machine");
 		// logger.info("Registered " + infoTypes.getObjects().size() + " Info Types");
 		// logger.info("Registered " + infoInteraction.getObjects().size() + " Info Interactions");
 		// logger.info("Registered " + itemFilters.getObjects().size() + " Item Filters");

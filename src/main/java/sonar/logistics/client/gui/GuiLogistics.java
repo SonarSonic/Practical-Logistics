@@ -26,7 +26,7 @@ public class GuiLogistics extends GuiSonar {
 	}
 
 	@Override
-	protected void drawGuiContainerBackgroundLayer(float var1, int var2, int var3) {
+	public void drawGuiContainerBackgroundLayer(float var1, int var2, int var3) {
 		RenderHelper.saveBlendState();
 		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 		drawTransparentRect(this.guiLeft, this.guiTop, this.guiLeft + this.xSize, this.guiTop + this.ySize, LogisticsColours.layers[1].getRGB());

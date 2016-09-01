@@ -13,26 +13,8 @@ public class ChannelMonitorHandler extends MonitorHandler<MonitoredBlockCoords> 
 	}
 
 	@Override
-	public MonitoredList<MonitoredBlockCoords> updateInfo(MonitoredList<MonitoredBlockCoords> previousList, BlockCoords coords, EnumFacing side) {
-		//unused
-		return previousList;
+	public MonitoredList<MonitoredBlockCoords> updateInfo(MonitoredList<MonitoredBlockCoords> info, BlockCoords coords, EnumFacing side) {
+		return info;
 	}
-	/*
-	@Override
-	public MonitoredBlockCoords readInfo(NBTTagCompound tag, SyncType type) {
-		return new MonitoredBlockCoords(BlockCoords.readFromNBT(tag), tag.getString("name"));
-	}
-
-	@Override
-	public NBTTagCompound writeInfo(MonitoredBlockCoords info, NBTTagCompound tag, SyncType type) {
-		tag.setString("name", info.unlocalizedName);
-		return BlockCoords.writeToNBT(tag, info.coords);
-	}
-
-	@Override
-	public boolean validateInfo(IMonitorInfo info) {
-		return info instanceof MonitoredBlockCoords;
-	}
-	*/
 
 }

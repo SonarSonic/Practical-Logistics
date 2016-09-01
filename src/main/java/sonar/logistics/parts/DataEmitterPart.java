@@ -71,7 +71,7 @@ public class DataEmitterPart extends FacingMultipart implements IDataEmitter, IS
 
 	public int getConnectedNetwork() {
 		IDataCable cable = LogisticsAPI.getCableHelper().getCableFromCoords(BlockCoords.translateCoords(this.getCoords(), face));
-		return cable == null ? -1 : cable.registryID();
+		return cable == null ? -1 : cable.getNetworkID();
 	}
 
 	public void onNeighborTileChange(EnumFacing facing) {

@@ -39,9 +39,9 @@ public class ContainerInventoryReader extends ContainerMultipartSync {
 
 		for (int i = 0; i < 9; ++i) {
 			this.addSlotToContainer(new Slot(inventoryPlayer, i, 41 + i * 18, 232));
-		}
+		}		
 		if (hasStack)
-			addSlotToContainer(new SlotList(handler.inventory, 0, 103, 9));
+			addSlotToContainer(new SlotList(handler.inventory, 0, 103, 9));		
 	}
 
 	@Override
@@ -57,19 +57,17 @@ public class ContainerInventoryReader extends ContainerMultipartSync {
 			itemstack = itemstack1.copy();
 			if (id < 36) {
 				if (!part.getWorld().isRemote) {
-					StoredItemStack stack = new StoredItemStack(itemstack);
-					if (lastStack != null && ItemStack.areItemStackTagsEqual(itemstack1, lastStack) && lastStack.isItemEqual(itemstack1))
-						LogisticsAPI.getItemHelper().insertInventoryFromPlayer(player, part.network, slot.getSlotIndex());
-					else {
+					StoredItemStack stack = new StoredItemStack(itemstack1);
+					if (lastStack != null && ItemStack.areItemStackTagsEqual(itemstack1, lastStack) && lastStack.isItemEqual(itemstack1)) {
+						LogisticsAPI.getItemHelper().addItemsFromPlayer(stack, player, part.network, ActionType.PERFORM);
+					} else {
 						StoredItemStack perform = LogisticsAPI.getItemHelper().addItems(stack, part.network, ActionType.PERFORM);
-						lastStack = itemstack1;
-						if (perform == null || perform.stored == 0) {
-							itemstack1.stackSize = 0;
-						} else {
-							itemstack1.stackSize = (int) (perform.getStackSize());
-						}
+						lastStack = itemstack1;		
+						
+						itemstack1.stackSize = (int) (perform == null || perform.stored == 0 ? 0 : (perform.getStackSize()));
+						player.inventory.markDirty();
 					}
-					// this.detectAndSendChanges();
+					this.detectAndSendChanges();
 				}
 			} else if (id < 27) {
 				if (!this.mergeItemStack(itemstack1, 27, 36, false)) {
@@ -102,15 +100,10 @@ public class ContainerInventoryReader extends ContainerMultipartSync {
 		if (slotID < this.inventorySlots.size()) {
 			Slot targetSlot = slotID < 0 ? null : (Slot) this.inventorySlots.get(slotID);
 			if ((targetSlot instanceof SlotList)) {
-				if (drag == 2) {
-					targetSlot.putStack(null);
-				} else {
-					targetSlot.putStack(player.inventory.getItemStack() == null ? null : player.inventory.getItemStack().copy());
-				}
+				targetSlot.putStack(drag == 2 ? null : player.inventory.getItemStack() == null ? null : player.inventory.getItemStack().copy());
 				return player.inventory.getItemStack();
 			}
 			return super.slotClick(slotID, drag, click, player);
-
 		}
 		return null;
 	}

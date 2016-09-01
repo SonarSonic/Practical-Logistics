@@ -10,6 +10,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import sonar.core.SonarCore;
+import sonar.core.api.IFlexibleGui;
 import sonar.core.helpers.NBTHelper;
 import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.core.network.PacketMultipartSync;
@@ -23,7 +24,7 @@ import sonar.logistics.api.info.monitor.MonitorType;
 import sonar.logistics.api.info.monitor.MonitorViewer;
 import sonar.logistics.connections.LogicMonitorCache;
 
-public abstract class ReaderMultipart<T extends IMonitorInfo> extends MonitorMultipart<T> implements ISlottedPart, IReader<T> {
+public abstract class ReaderMultipart<T extends IMonitorInfo> extends MonitorMultipart<T> implements ISlottedPart, IReader<T>, IFlexibleGui {
 
 	public ReaderMultipart(String handlerID) {
 		super(handlerID, 6 * 0.0625, 0.0625 * 1, 0.0625 * 6);
@@ -35,10 +36,11 @@ public abstract class ReaderMultipart<T extends IMonitorInfo> extends MonitorMul
 
 	@Override
 	public boolean onActivated(EntityPlayer player, EnumHand hand, ItemStack heldItem, PartMOP hit) {
-		if (!this.getWorld().isRemote && this instanceof IGuiTile) {
-			this.addViewer(new MonitorViewer(player, MonitorType.INFO));
-			SonarCore.network.sendTo(new PacketMultipartSync(getPos(), this.writeData(new NBTTagCompound(), SyncType.SYNC_OVERRIDE), SyncType.SYNC_OVERRIDE, getUUID()), (EntityPlayerMP) player);
-			this.openGui(player, Logistics.instance);
+		if (this instanceof IFlexibleGui) {
+			if (!getWorld().isRemote)
+				SonarCore.network.sendTo(new PacketMultipartSync(getPos(), writeData(new NBTTagCompound(), SyncType.SYNC_OVERRIDE), SyncType.SYNC_OVERRIDE, getUUID()), (EntityPlayerMP) player);
+			addViewer(new MonitorViewer(player, MonitorType.INFO));
+			openBasicGui(player, 0);
 		}
 		return true;
 	}

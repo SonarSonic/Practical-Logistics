@@ -16,17 +16,17 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import sonar.core.SonarCore;
 import sonar.core.api.inventories.StoredItemStack;
 import sonar.core.client.gui.SonarButtons.AnimatedButton;
 import sonar.core.helpers.FontHelper;
 import sonar.core.helpers.RenderHelper;
-import sonar.core.network.PacketByteBuf;
+import sonar.logistics.Logistics;
 import sonar.logistics.api.readers.InventoryReader.Modes;
 import sonar.logistics.api.readers.InventoryReader.SortingType;
 import sonar.logistics.common.containers.ContainerInventoryReader;
 import sonar.logistics.connections.MonitoredList;
 import sonar.logistics.monitoring.MonitoredItemStack;
+import sonar.logistics.network.PacketInventoryReader;
 import sonar.logistics.parts.InventoryReaderPart;
 
 public class GuiInventoryReader extends GuiSelectionGrid<MonitoredItemStack> {
@@ -76,7 +76,7 @@ public class GuiInventoryReader extends GuiSelectionGrid<MonitoredItemStack> {
 		// searchField.setText("");
 	}
 
-	protected void actionPerformed(GuiButton button) {
+	public void actionPerformed(GuiButton button) {
 		if (button != null) {
 			if (button.id == -1) {
 				part.setting.incrementEnum();
@@ -96,12 +96,20 @@ public class GuiInventoryReader extends GuiSelectionGrid<MonitoredItemStack> {
 	}
 
 	public void switchState() {
-		/* Logistics.network.sendToServer(new PacketGuiChange(part.getPos(), getSetting() == STACK, LogisticsGui.inventoryReader)); if (this.mc.thePlayer.openContainer instanceof ContainerInventoryReader) { ((ContainerInventoryReader) this.mc.thePlayer.openContainer).addSlots(part, inventoryPlayer, getSetting() == STACK); } this.inventorySlots = this.mc.thePlayer.openContainer; */
+		/*
+		 * FIXME
+		Logistics.network.sendToServer(new PacketGuiChange(part.getPos(), getSetting() == STACK, LogisticsGui.inventoryReader));
+		if (this.mc.thePlayer.openContainer instanceof ContainerInventoryReader) {
+			((ContainerInventoryReader) this.mc.thePlayer.openContainer).addSlots(part, inventoryPlayer, getSetting() == STACK);
+		}
+		this.inventorySlots = this.mc.thePlayer.openContainer;
+		*/
 	}
 
 	@Override
 	public void drawGuiContainerForegroundLayer(int x, int y) {
 		RenderHelper.restoreBlendState();
+		super.drawGuiContainerForegroundLayer(x, y);
 		switch (getSetting()) {
 		case SLOT:
 		case POS:
@@ -111,11 +119,10 @@ public class GuiInventoryReader extends GuiSelectionGrid<MonitoredItemStack> {
 			break;
 		}
 		searchField.drawTextBox();
-		super.drawGuiContainerForegroundLayer(x, y);
 	}
 
 	@Override
-	protected void mouseClicked(int i, int j, int k) throws IOException {
+	public void mouseClicked(int i, int j, int k) throws IOException {
 		super.mouseClicked(i, j, k);
 		switch (getSetting()) {
 		case SLOT:
@@ -132,7 +139,7 @@ public class GuiInventoryReader extends GuiSelectionGrid<MonitoredItemStack> {
 	}
 
 	@Override
-	protected void keyTyped(char c, int i) throws IOException {
+	public void keyTyped(char c, int i) throws IOException {
 		if ((getSetting() == Modes.SLOT || getSetting() == Modes.POS) && slotField.isFocused()) {
 			if (c == 13 || c == 27) {
 				slotField.setFocused(false);
@@ -200,9 +207,9 @@ public class GuiInventoryReader extends GuiSelectionGrid<MonitoredItemStack> {
 			button = 2;
 		}
 		if (!empty) {
-			// Logistics.network.sendToServer(new PacketInventoryReader(part.getUUID(), part.getPos(), selection.item, button));
+			Logistics.network.sendToServer(new PacketInventoryReader(part.getUUID(), part.getPos(), selection.itemStack.getObject().item, button));
 		} else {
-			// Logistics.network.sendToServer(new PacketInventoryReader(part.getUUID(), part.getPos(), null, button));
+			Logistics.network.sendToServer(new PacketInventoryReader(part.getUUID(), part.getPos(), null, button));
 		}
 		/* if (getSetting() == STACK) { handler.current = selection.item; handler.current.stackSize = 1; Logistics.network.sendToServer(new PacketInventoryReader(tile.xCoord, tile.yCoord, tile.zCoord, handler.current)); } if (getSetting() == POS) { List<StoredItemStack> currentList = (List<StoredItemStack>) ((ArrayList<StoredItemStack>) handler.stacks).clone(); int position = 0; for (StoredItemStack stack : currentList) { if (stack != null) { if (stack.equals(selection)) { String posString = String.valueOf(position); slotField.setText(posString); setPosSlot(posString); } } position++; } } */
 	}
@@ -214,20 +221,19 @@ public class GuiInventoryReader extends GuiSelectionGrid<MonitoredItemStack> {
 	@Override
 	public void renderSelection(MonitoredItemStack selection, int x, int y) {
 		StoredItemStack storedStack = selection.itemStack.getObject();
-		if(storedStack==null){
+		if (storedStack == null) {
 			return;
 		}
 		ItemStack stack = storedStack.item;
-		this.itemRender.zLevel = 0.0F;
 		RenderHelper.renderItem(this, 13 + (x * 18), 32 + (y * 18), stack);
-		//this.itemRender.renderItemOverlayIntoGUI(this.fontRendererObj, stack, 13 + (x * 18), 32 + (y * 18), "" + storedStack.stored);
+		// this.itemRender.renderItemOverlayIntoGUI(this.fontRendererObj, stack, 13 + (x * 18), 32 + (y * 18), "" + storedStack.stored);
 		RenderHelper.renderStoredItemStackOverlay(stack, storedStack.stored, 13 + (x * 18), 32 + (y * 18), null);
 	}
 
 	@Override
 	public void renderToolTip(MonitoredItemStack selection, int x, int y) {
 		StoredItemStack storedStack = selection.itemStack.getObject();
-		if(storedStack==null){
+		if (storedStack == null) {
 			return;
 		}
 		List list = storedStack.item.getTooltip(this.mc.thePlayer, this.mc.gameSettings.advancedItemTooltips);
@@ -243,6 +249,15 @@ public class GuiInventoryReader extends GuiSelectionGrid<MonitoredItemStack> {
 		FontRenderer font = storedStack.item.getItem().getFontRenderer(storedStack.item);
 		drawHoveringText(list, x, y, (font == null ? fontRendererObj : font));
 
+	}
+
+	@Override
+	public void drawGuiContainerBackgroundLayer(float var1, int var2, int var3) {
+		super.drawGuiContainerBackgroundLayer(var1, var2, var3);
+		// RenderHelper.saveBlendState();
+		// StorageSize size = getGridList().sizing;
+		// drawRect(guiLeft+172, guiTop+ 150, guiLeft+180, guiTop+ 180, LogisticsColours.grey_base.getRGB());
+		// RenderHelper.restoreBlendState();
 	}
 
 	/* @Override public ResourceLocation getBackground() { if (getSetting() == Modes.STACK) { return stackBGround; } return clearBGround; } */

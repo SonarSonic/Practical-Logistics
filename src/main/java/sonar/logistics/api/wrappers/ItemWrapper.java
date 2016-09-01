@@ -42,6 +42,8 @@ public class ItemWrapper {
 		return add;
 	}
 
+	public void addItemsFromPlayer(StoredItemStack add, EntityPlayer player, INetworkCache network, ActionType action) {}
+	
 	/** used for removing Items from the network
 	 * @param remove {@link StoredItemStack} to remove
 	 * @param network the {@link INetworkCache} to remove from
@@ -51,6 +53,8 @@ public class ItemWrapper {
 		return remove;
 	}
 
+	public void removeItemsFromPlayer(StoredItemStack add, EntityPlayer player, INetworkCache network, ActionType action) {}
+	
 	/** gets the {@link StoredItemStack} in the given slot of the first valid inventory on the network, used by the Inventory Reader
 	 * @param network the {@link INetworkCache} to get the stack from
 	 * @param slot id of the slot to look for the stack in
@@ -81,6 +85,7 @@ public class ItemWrapper {
 	 * @param enderChest should change player Ender Chest or their normal inventory
 	 * @param action what type of action should be carried out
 	 * @return remaining {@link StoredItemStack} (what wasn't added), can be null */
+	@Deprecated
 	public StoredItemStack addStackToPlayer(StoredItemStack add, EntityPlayer player, boolean enderChest, ActionType action) {
 		return add;
 	}
@@ -91,6 +96,7 @@ public class ItemWrapper {
 	 * @param enderChest should change player Ender Chest or their normal inventory
 	 * @param action what type of action should be carried out
 	 * @return remaining {@link StoredItemStack} (what wasn't removed), can be null */
+	@Deprecated
 	public StoredItemStack removeStackFromPlayer(StoredItemStack remove, EntityPlayer player, boolean enderChest, ActionType action) {
 		return remove;
 	}
@@ -101,6 +107,7 @@ public class ItemWrapper {
 	 * @param network the {@link INetworkCache} to remove from
 	 * @param player
 	 * @return the {@link StoredItemStack} to add to the player */
+	//@Deprecated
 	public StoredItemStack removeToPlayerInventory(StoredItemStack stack, long extractSize, INetworkCache network, EntityPlayer player, ActionType type) {
 		return null;
 	}
@@ -111,6 +118,7 @@ public class ItemWrapper {
 	 * @param network the {@link INetworkCache} to add to
 	 * @param player
 	 * @return the {@link StoredItemStack} to add to the player */
+	@Deprecated
 	public StoredItemStack addFromPlayerInventory(StoredItemStack stack, long extractSize, INetworkCache network, EntityPlayer player, ActionType type) {
 		return null;
 	}
@@ -119,6 +127,7 @@ public class ItemWrapper {
 	 * @param cache the network to remove from
 	 * @param stack the stack to remove
 	 * @return the removed stack */
+	@Deprecated
 	public StoredItemStack extractItem(INetworkCache cache, StoredItemStack stack) {
 		return null;
 	}
@@ -127,6 +136,7 @@ public class ItemWrapper {
 	 * @param player the player who is inserting the items
 	 * @param cache the network to add them to
 	 * @param slot the slot of the item to be added */
+	@Deprecated
 	public void insertInventoryFromPlayer(EntityPlayer player, INetworkCache cache, int slotID) {
 	}
 
@@ -134,6 +144,7 @@ public class ItemWrapper {
 	 * @param player the player who is inserting the items
 	 * @param cache the network to add them to
 	 * @param slot the slot to remove from */
+	@Deprecated
 	public void insertItemFromPlayer(EntityPlayer player, INetworkCache cache, int slot) {
 	}
 }

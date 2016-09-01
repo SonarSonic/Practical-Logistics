@@ -8,21 +8,12 @@ import sonar.logistics.api.info.IInfoRegistry;
 public class CoFHInfoRegistry extends IInfoRegistry {
 
 	@Override
-	public void registerBaseReturns() {
-		// TODO Auto-generated method stub
-		
-	}
+	public void registerBaseReturns() {}
 
 	@Override
-	public void registerBaseMethods() {
-		// TODO Auto-generated method stub
-		
-	}
+	public void registerBaseMethods() {}
 
 	@Override
-	public void registerAllFields() {
-		// TODO Auto-generated method stub
-		
-	}
+	public void registerAllFields() {}
 
 }

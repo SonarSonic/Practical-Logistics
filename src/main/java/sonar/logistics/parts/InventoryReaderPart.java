@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import sonar.core.api.inventories.StoredItemStack;
 import sonar.core.helpers.NBTHelper.SyncType;
@@ -17,18 +18,24 @@ import sonar.core.utils.Pair;
 import sonar.core.utils.SortingDirection;
 import sonar.logistics.LogisticsItems;
 import sonar.logistics.api.info.InfoUUID;
+import sonar.logistics.api.info.LogicInfo;
+import sonar.logistics.api.info.LogicInfoList;
+import sonar.logistics.api.info.ProgressInfo;
 import sonar.logistics.api.info.monitor.ChannelType;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
 import sonar.logistics.api.info.monitor.MonitorHandler;
 import sonar.logistics.api.readers.InventoryReader;
+import sonar.logistics.client.gui.GuiInfoReader;
 import sonar.logistics.client.gui.GuiInventoryReader;
+import sonar.logistics.common.containers.ContainerInfoReader;
 import sonar.logistics.common.containers.ContainerInventoryReader;
 import sonar.logistics.connections.LogicMonitorCache;
 import sonar.logistics.connections.MonitoredList;
 import sonar.logistics.helpers.ItemHelper;
 import sonar.logistics.monitoring.MonitoredItemStack;
+import sonar.logistics.registries.LogicRegistry.RegistryType;
 
-public class InventoryReaderPart extends ReaderMultipart<MonitoredItemStack> implements IByteBufTile, IGuiTile {
+public class InventoryReaderPart extends ReaderMultipart<MonitoredItemStack> implements IByteBufTile {
 
 	public SonarMultipartInventory inventory = new SonarMultipartInventory(this, 1);
 	public SyncEnum<InventoryReader.Modes> setting = (SyncEnum) new SyncEnum(InventoryReader.Modes.values(), 1).addSyncType(SyncType.SPECIAL);
@@ -54,16 +61,6 @@ public class InventoryReaderPart extends ReaderMultipart<MonitoredItemStack> imp
 	}
 
 	@Override
-	public Object getGuiContainer(EntityPlayer player) {
-		return new ContainerInventoryReader(this, player);
-	}
-
-	@Override
-	public Object getGuiScreen(EntityPlayer player) {
-		return new GuiInventoryReader(this, player);
-	}
-
-	@Override
 	public MonitoredList<MonitoredItemStack> sortMonitoredList(MonitoredList<MonitoredItemStack> updateInfo) {
 		ItemHelper.sortItemList(updateInfo, sortingOrder.getObject(), sortingType.getObject());
 		return updateInfo;
@@ -79,7 +76,7 @@ public class InventoryReaderPart extends ReaderMultipart<MonitoredItemStack> imp
 		IMonitorInfo info = null;
 		switch (setting.getObject()) {
 		case INVENTORIES:
-			// make inventory info
+			info = new LogicInfoList(this.getMonitorUUID(), MonitoredItemStack.id);
 			break;
 		case POS:
 			int pos = posSlot.getObject();
@@ -98,7 +95,7 @@ public class InventoryReaderPart extends ReaderMultipart<MonitoredItemStack> imp
 			}
 			break;
 		case STORAGE:
-			// make a way of getting the storage :P
+			info = new ProgressInfo(LogicInfo.buildDirectInfo("stored", RegistryType.TILE, updateInfo.sizing.getStored()), LogicInfo.buildDirectInfo("max", RegistryType.TILE, updateInfo.sizing.getMaxStored()));
 			break;
 		default:
 			break;
@@ -106,10 +103,28 @@ public class InventoryReaderPart extends ReaderMultipart<MonitoredItemStack> imp
 		if (info != null) {
 			InfoUUID id = new InfoUUID(getMonitorUUID().hashCode(), 0);
 			IMonitorInfo oldInfo = LogicMonitorCache.info.get(id);
-			if (oldInfo == null || !oldInfo.isIdenticalInfo(info)) {
+			if (oldInfo == null || !oldInfo.isMatchingType(info) || !oldInfo.isIdenticalInfo(info)) {
 				LogicMonitorCache.changeInfo(id, info);
 			}
 		}
+	}
+
+	@Override
+	public Object getServerElement(int id, EntityPlayer player, Object obj, NBTTagCompound tag) {
+		switch (id) {
+		case 0:
+			return new ContainerInventoryReader(this, player);
+		}
+		return null;
+	}
+
+	@Override
+	public Object getClientElement(int id, EntityPlayer player, Object obj, NBTTagCompound tag) {
+		switch (id) {
+		case 0:
+			return new GuiInventoryReader(this, player);
+		}
+		return null;
 	}
 
 }

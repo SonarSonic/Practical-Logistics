@@ -22,55 +22,53 @@ import sonar.logistics.api.info.monitor.ILogicMonitor;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
 import sonar.logistics.api.info.monitor.IdentifiedCoordsList;
 import sonar.logistics.api.info.monitor.MonitorHandler;
-import sonar.logistics.api.info.monitor.MonitorType;
 import sonar.logistics.api.info.monitor.MonitorViewer;
 import sonar.logistics.helpers.MonitorHelper;
 import sonar.logistics.monitoring.MonitoredBlockCoords;
-import sonar.logistics.monitoring.MonitoredItemStack;
 import sonar.logistics.network.PacketMonitoredCoords;
 import sonar.logistics.network.PacketMonitoredList;
 
 public abstract class MonitorCache implements IMonitorCache {
 
-	public LinkedHashMap<MonitorHandler, LinkedHashMap<Pair<BlockCoords, EnumFacing>, MonitoredList<?>>> monitoredList = new LinkedHashMap(); // block coords stored with the info gathered
-	public LinkedHashMap<MonitorHandler, LinkedHashMap<ILogicMonitor, MonitoredList<?>>> monitoredCollections = new LinkedHashMap();
-	public LinkedHashMap<IInfoDisplay, IInfoContainer> displayCollections = new LinkedHashMap();
+	public final Map<MonitorHandler, Map<Pair<BlockCoords, EnumFacing>, MonitoredList<?>>> connectionInfo = new LinkedHashMap(); // block coords stored with the info gathered
+	public final Map<MonitorHandler, Map<ILogicMonitor, MonitoredList<?>>> monitorInfo = new LinkedHashMap();
+	public final Map<IInfoDisplay, IInfoContainer> connectedDisplays = new LinkedHashMap();
+	public final ArrayList<ILogicMonitor> localMonitors = new ArrayList();
 
 	public void addDisplay(IInfoDisplay display) {
-		if (!displayCollections.containsKey(display)) {
-			displayCollections.put(display, new InfoContainer(display));
+		if (!connectedDisplays.containsKey(display)) {
+			connectedDisplays.put(display, new InfoContainer(display));
 		}
 	}
 
 	public void removeDisplay(IInfoDisplay display) {
-		if (displayCollections.containsKey(display)) {
-			displayCollections.remove(display);
+		if (connectedDisplays.containsKey(display)) {
+			connectedDisplays.remove(display);
 		}
 	}
 
 	public <T extends IMonitorInfo> void addMonitor(ILogicMonitor<T> monitor) {
-		monitoredCollections.putIfAbsent(monitor.getHandler(), new LinkedHashMap());
-		if (!monitoredCollections.get(monitor.getHandler()).containsKey(monitor)) {
-			monitoredCollections.get(monitor.getHandler()).put(monitor, MonitoredList.<T>newMonitoredList());
+		monitorInfo.putIfAbsent(monitor.getHandler(), new LinkedHashMap());
+		if (!monitorInfo.get(monitor.getHandler()).containsKey(monitor)) {
+			monitorInfo.get(monitor.getHandler()).put(monitor, MonitoredList.<T>newMonitoredList());
 		}
 		compileCoordsList(monitor.getHandler());
 	}
 
 	public <T extends IMonitorInfo> void removeMonitor(ILogicMonitor<T> monitor) {
-		monitoredCollections.get(monitor.getHandler()).remove(monitor);
+		monitorInfo.get(monitor.getHandler()).remove(monitor);
 		compileCoordsList(monitor.getHandler());
 	}
 
-	public int ticks = 0;
-
-	public <T extends IMonitorInfo> MonitoredList<T> updateMonitoredList(ILogicMonitor<T> monitor, Map<Pair<BlockCoords, EnumFacing>, MonitoredList<?>> connections) {		
-		MonitoredList<T> updateList = MonitoredList.<T>newMonitoredList(); // make a new list
-		IdentifiedCoordsList monitoredCoords = monitor.getMonitoringCoords(); // get all the connections which the monitor can view
-		for (Entry<Pair<BlockCoords, EnumFacing>, MonitoredList<?>> entry : connections.entrySet()) {//go through all the connections on the network		
-			if ((entry.getValue() != null && !entry.getValue().isEmpty()) && (monitoredCoords.isEmpty() || monitoredCoords.contains(entry.getKey().a) )) { // make sure it can display the connections info
-				for (T coordInfo : ((MonitoredList<T>)entry.getValue())) { //go through all the info
-					updateList.addInfoToList(coordInfo); // add the info to the new list
+	public <T extends IMonitorInfo> MonitoredList<T> updateMonitoredList(ILogicMonitor<T> monitor, Map<Pair<BlockCoords, EnumFacing>, MonitoredList<?>> connections) {
+		MonitoredList<T> updateList = MonitoredList.<T>newMonitoredList();
+		IdentifiedCoordsList channels = monitor.getChannels();
+		for (Entry<Pair<BlockCoords, EnumFacing>, MonitoredList<?>> entry : connections.entrySet()) {
+			if ((entry.getValue() != null && !entry.getValue().isEmpty()) && (channels.isEmpty() || channels.contains(entry.getKey().a))) {
+				for (T coordInfo : (MonitoredList<T>) entry.getValue()) {
+					updateList.addInfoToList(coordInfo);
 				}
+				updateList.sizing.add(entry.getValue().sizing);
 				if (monitor.channelType() == ChannelType.SINGLE) {
 					break;
 				}
@@ -79,36 +77,38 @@ public abstract class MonitorCache implements IMonitorCache {
 		return updateList;
 	}
 
-	public void sendPacketsToViewer(ILogicMonitor monitor, List<MonitorViewer> viewers, MonitoredList saveList, MonitoredList lastList) {
-		NBTTagCompound syncTag = MonitorHelper.writeMonitoredList(new NBTTagCompound(), lastList.isEmpty(), saveList, SyncType.DEFAULT_SYNC);
-		NBTTagCompound specialTag = MonitorHelper.writeMonitoredList(new NBTTagCompound(), lastList.isEmpty(), saveList, SyncType.SPECIAL);
+	public void sendPacketsToViewer(ILogicMonitor monitor, List<MonitorViewer> viewers, boolean fullPacket, MonitoredList saveList, MonitoredList lastList) {
+		NBTTagCompound tag = MonitorHelper.writeMonitoredList(new NBTTagCompound(), lastList.isEmpty(), saveList, fullPacket ? SyncType.DEFAULT_SYNC : SyncType.SPECIAL);
 
-		MonitoredList<MonitoredBlockCoords> coords = CacheRegistry.coordMap.get(getNetworkID());
-		NBTTagCompound coordTag = MonitorHelper.writeMonitoredList(new NBTTagCompound(), coords.isEmpty(), coords.copyInfo(), SyncType.DEFAULT_SYNC);
-		viewers.forEach(viewer -> {
-			switch (viewer.type) {
-			case CHANNEL:
-				if (!viewer.wasSent(MonitorType.CHANNEL) && !coordTag.hasNoTags())
-					Logistics.network.sendTo(new PacketMonitoredCoords(getNetworkID(), coordTag), (EntityPlayerMP) viewer.player);
-				break;
-			case INFO:
-				Logistics.network.sendTo(new PacketMonitoredList(monitor, !viewer.wasSent(viewer.type) ? syncTag : specialTag, !viewer.wasSent(viewer.type) ? SyncType.DEFAULT_SYNC : SyncType.SPECIAL), (EntityPlayerMP) viewer.player);
-				break;
-			}
-		});
+		MonitoredList<MonitoredBlockCoords> coords = fullPacket ? CacheRegistry.coordMap.get(getNetworkID()) : null;
+		NBTTagCompound coordTag = fullPacket ? MonitorHelper.writeMonitoredList(new NBTTagCompound(), coords.isEmpty(), coords.copyInfo(), SyncType.DEFAULT_SYNC) : null;
+		if (fullPacket || !tag.hasNoTags()) {
+			viewers.forEach(viewer -> {
+				switch (viewer.type) {
+				case CHANNEL:
+					if (fullPacket && !coordTag.hasNoTags())
+						Logistics.network.sendTo(new PacketMonitoredCoords(getNetworkID(), coordTag), (EntityPlayerMP) viewer.player);
+					break;
+				case INFO:
+					Logistics.network.sendTo(new PacketMonitoredList(monitor, tag, fullPacket ? SyncType.DEFAULT_SYNC : SyncType.SPECIAL), (EntityPlayerMP) viewer.player);
+					break;
+				}
+				if (fullPacket) {
+					monitor.sentViewerPacket(viewer, true);
+				}
+			});
+		}
 
 	}
 
-	public <T extends IMonitorInfo> MonitoredList<T> getMonitoredList(MonitorHandler<T> type) {
-		monitoredList.putIfAbsent(type, new LinkedHashMap());
-		LinkedHashMap<Pair<BlockCoords, EnumFacing>, MonitoredList<?>> infoList = monitoredList.get(type);
-		LinkedHashMap<Pair<BlockCoords, EnumFacing>, MonitoredList<?>> coordInfo = new LinkedHashMap();
+	public <T extends IMonitorInfo> Map<Pair<BlockCoords, EnumFacing>, MonitoredList<?>> getMonitoredList(MonitorHandler<T> type) {
+		Map<Pair<BlockCoords, EnumFacing>, MonitoredList<?>> infoList = connectionInfo.getOrDefault(type, new LinkedHashMap());
+		Map<Pair<BlockCoords, EnumFacing>, MonitoredList<?>> coordInfo = new LinkedHashMap();
 		for (Entry<Pair<BlockCoords, EnumFacing>, MonitoredList<?>> entry : infoList.entrySet()) {
 			MonitoredList<T> list = type.updateInfo((MonitoredList<T>) entry.getValue(), entry.getKey().a, entry.getKey().b);
 			coordInfo.put(entry.getKey(), list);
 		}
-		this.monitoredList.put(type, coordInfo);
-		return null;
+		return coordInfo;
 	}
 
 	public abstract <T extends IMonitorInfo> void compileCoordsList(MonitorHandler<T> type);

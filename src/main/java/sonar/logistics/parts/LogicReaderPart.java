@@ -20,8 +20,8 @@ public abstract class LogicReaderPart<T extends IMonitorInfo> extends ReaderMult
 	private ArrayList<SyncMonitoredType<T>> selected = Lists.newArrayListWithCapacity(getMaxInfo()), paired = Lists.newArrayListWithCapacity(getMaxInfo());
 	{
 		for (int i = 0; i < getMaxInfo(); i++) {
-			selected.add(i, new SyncMonitoredType<T>(handlerID, i + 1));
-			paired.add(i, new SyncMonitoredType<T>(handlerID, i + 1 + 10));
+			selected.add(i, new SyncMonitoredType<T>(i + 10));
+			paired.add(i, new SyncMonitoredType<T>(i + 10 + 100));
 		}
 		selected.forEach(part -> syncParts.add(part));
 		paired.forEach(part -> syncParts.add(part));
@@ -62,11 +62,11 @@ public abstract class LogicReaderPart<T extends IMonitorInfo> extends ReaderMult
 					IMonitorInfo paired = cachedPaired.get(i);
 					if (paired != null) {
 						Pair<Boolean, IMonitorInfo> newPaired = updateInfo.getLatestInfo(paired);
-						//if (newPaired.a && newInfo.a)
+						if (newInfo.b instanceof LogicInfo && newPaired.b instanceof LogicInfo)
 							latestInfo = new ProgressInfo((LogicInfo) newInfo.b, (LogicInfo) newPaired.b);
 					}
 				}
-				if (!newInfo.a && lastInfo != null && !lastInfo.isIdenticalInfo(newInfo.b)) {
+				if (!newInfo.a && lastInfo != null && lastInfo.isMatchingType(newInfo.b) && !lastInfo.isIdenticalInfo(newInfo.b)) {
 					continue;
 				} else {
 					//latestInfo = newInfo.b;
@@ -104,7 +104,8 @@ public abstract class LogicReaderPart<T extends IMonitorInfo> extends ReaderMult
 			lastPos = newPos;
 		}
 		syncInfo.get(newPos == -1 ? 0 : newPos).setInfo(info);
-		sendByteBufPacket(100);
+		sendSyncPacket();
+		//sendByteBufPacket(100);
 	}
 
 	@Override

@@ -2,7 +2,10 @@ package sonar.logistics.api.info;
 
 import com.google.common.collect.Lists;
 
-import sonar.core.api.nbt.INBTSyncable;
+import mcmultipart.raytrace.PartMOP;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumHand;
 import sonar.core.helpers.FontHelper;
 import sonar.core.network.sync.ObjectType;
 import sonar.core.network.sync.SyncEnum;
@@ -11,14 +14,17 @@ import sonar.core.network.sync.SyncUnidentifiedObject;
 import sonar.core.utils.Pair;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.asm.LogicInfoType;
+import sonar.logistics.api.display.DisplayType;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
 import sonar.logistics.api.info.monitor.MonitorHandler;
+import sonar.logistics.helpers.InfoHelper;
+import sonar.logistics.helpers.InfoRenderer;
 import sonar.logistics.registries.LogicRegistry;
 import sonar.logistics.registries.LogicRegistry.RegistryType;
 
-/**default info type, created by the LogicRegistry*/
+/** default info type, created by the LogicRegistry */
 @LogicInfoType(id = LogicInfo.id, modid = Logistics.MODID)
-public class LogicInfo extends BaseInfo<LogicInfo> implements INBTSyncable, INameableInfo<LogicInfo> {
+public class LogicInfo extends BaseInfo<LogicInfo> implements INameableInfo<LogicInfo>, IClickableInfo {
 
 	public static final String id = "logic";
 	public static final MonitorHandler<LogicInfo> handler = Logistics.monitorHandlers.getRegisteredObject(MonitorHandler.INFO);
@@ -31,8 +37,8 @@ public class LogicInfo extends BaseInfo<LogicInfo> implements INBTSyncable, INam
 	{
 		syncParts.addAll(Lists.newArrayList(identifier, registryType, obj));
 	}
-	
-	public LogicInfo(){
+
+	public LogicInfo() {
 		super();
 	}
 
@@ -61,13 +67,13 @@ public class LogicInfo extends BaseInfo<LogicInfo> implements INBTSyncable, INam
 	}
 
 	@Override
-	public boolean isIdenticalInfo(LogicInfo info) {		
+	public boolean isIdenticalInfo(LogicInfo info) {
 		return isMatchingInfo(info) && obj.get().equals(info.obj.get());
 	}
 
 	@Override
 	public boolean isMatchingInfo(LogicInfo info) {
-		return obj.objectType!=null && obj.objectType.equals(info.obj.objectType) && identifier.getObject().equals(info.identifier.getObject()) && registryType.getObject().equals(info.registryType.getObject());
+		return obj.objectType != null && obj.objectType.equals(info.obj.objectType) && identifier.getObject().equals(info.identifier.getObject()) && registryType.getObject().equals(info.registryType.getObject());
 	}
 
 	public RegistryType getRegistryType() {
@@ -97,6 +103,14 @@ public class LogicInfo extends BaseInfo<LogicInfo> implements INBTSyncable, INam
 		return obj.objectType.toString().toLowerCase();
 	}
 
+	public Object getInfo() {
+		return obj.get();
+	}
+
+	public ObjectType getInfoType() {
+		return obj.objectType;
+	}
+
 	@Override
 	public boolean isHeader() {
 		return isCategory;
@@ -115,6 +129,25 @@ public class LogicInfo extends BaseInfo<LogicInfo> implements INBTSyncable, INam
 	@Override
 	public String getID() {
 		return id;
+	}
+
+	@Override
+	public LogicInfo copy() {
+		return buildDirectInfo(identifier.getObject(), registryType.getObject(), obj.get());
+	}
+
+	@Override
+	public void renderInfo(DisplayType displayType, double width, double height, double scale, int infoPos) {
+		InfoRenderer.renderNormalInfo(displayType, width, height, scale, getClientIdentifier(), getClientObject());
+	}
+
+	@Override
+	public boolean onClicked(RenderInfoProperties renderInfo, EntityPlayer player, EnumHand hand, ItemStack stack, PartMOP hit) {
+		if (InfoHelper.canBeClickedStandard(renderInfo, player, hand, stack, hit)) {
+			FontHelper.sendMessage(getClientIdentifier() + ": " + obj.objectType + " - " + getClientObject(), player.getEntityWorld(), player);
+			return true;
+		}
+		return false;
 	}
 
 }

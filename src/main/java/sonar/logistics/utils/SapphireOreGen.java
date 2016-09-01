@@ -18,7 +18,7 @@ public class SapphireOreGen implements IWorldGenerator {
 	@Override
 	public void generate(Random random, int chunkX, int chunkZ, World world, IChunkGenerator chunkGenerator, IChunkProvider chunkProvider) {
 		if (world.provider.getDimension() == 0) {
-			generateOre(LogisticsBlocks.sapphire_ore.getDefaultState(), world, random, chunkX, chunkZ, 2, 10, 25, 1, 100, Blocks.STONE);
+			generateOre(LogisticsBlocks.sapphire_ore.getDefaultState(), world, random, chunkX, chunkZ, 2, 10, 25, 1, 50, Blocks.STONE);
 		}
 	}
 

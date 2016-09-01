@@ -82,7 +82,7 @@ public class ArrayPart extends SidedMultipart implements ISlottedPart, IConnecti
 	public boolean onActivated(EntityPlayer player, EnumHand hand, ItemStack heldItem, PartMOP hit) {
 		if (!this.getWorld().isRemote) {
 			SonarCore.network.sendTo(new PacketMultipartSync(getPos(), this.writeData(new NBTTagCompound(), SyncType.SYNC_OVERRIDE), SyncType.SYNC_OVERRIDE, getUUID()), (EntityPlayerMP) player);
-			openGui(player, Logistics.instance);
+			openBasicGui(player, int 0);
 		}
 		return false;
 	}

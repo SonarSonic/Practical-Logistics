@@ -1,5 +1,7 @@
 package sonar.logistics.api.info.monitor;
 
+import java.util.Objects;
+
 import net.minecraft.util.EnumFacing;
 import sonar.core.api.IRegistryObject;
 import sonar.core.api.utils.BlockCoords;
@@ -30,4 +32,8 @@ public abstract class MonitorHandler<I extends IMonitorInfo> implements IRegistr
 	 * @return if this info is valid for use with the InfoHandler */
 	//public abstract boolean validateInfo(IMonitorInfo info);
 
+	public int hashCode(){
+		return Objects.hashCode(getName());		
+	}
+	
 }

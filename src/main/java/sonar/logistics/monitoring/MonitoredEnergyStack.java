@@ -4,6 +4,7 @@ import sonar.core.api.energy.StoredEnergyStack;
 import sonar.core.network.sync.SyncNBTAbstract;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.asm.LogicInfoType;
+import sonar.logistics.api.display.DisplayType;
 import sonar.logistics.api.info.BaseInfo;
 import sonar.logistics.api.info.monitor.IJoinableInfo;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
@@ -66,6 +67,17 @@ public class MonitoredEnergyStack extends BaseInfo<MonitoredEnergyStack> impleme
 	@Override
 	public String getID() {
 		return id;
+	}
+
+	@Override
+	public MonitoredEnergyStack copy() {
+		return new MonitoredEnergyStack(energyStack.getObject().copy());
+	}
+
+	@Override
+	public void renderInfo(DisplayType displayType, double width, double height, double scale, int infoPos) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

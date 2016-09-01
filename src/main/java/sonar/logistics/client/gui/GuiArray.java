@@ -31,7 +31,7 @@ public class GuiArray extends GuiLogistics {
 	}
 
 	@Override
-	protected void drawGuiContainerBackgroundLayer(float var1, int var2, int var3) {
+	public void drawGuiContainerBackgroundLayer(float var1, int var2, int var3) {
 		super.drawGuiContainerBackgroundLayer(var1, var2, var3);
 		this.renderPlayerInventory(7, 50);
 		drawTexturedModalRect(this.guiLeft + 16, this.guiTop + 19, 0, 0, 18 * 8, 18);

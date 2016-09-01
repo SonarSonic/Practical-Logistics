@@ -29,18 +29,16 @@ public class WirelessTransceiver extends SonarItem implements ITransceiver {
 		if (target != null) {
 			if (!world.isRemote) {
 				NBTTagCompound tag = stack.getTagCompound();
-				if (tag == null) {
+				if (tag == null)
 					tag = new NBTTagCompound();
-				}
 				tag.setTag("coord", BlockCoords.writeToNBT(new NBTTagCompound(), new BlockCoords(pos, world.provider.getDimension())));
 				tag.setInteger("dir", side.ordinal());
 				tag.setString("targetName", target.getUnlocalizedName());
 				FontHelper.sendMessage(stack.hasTagCompound() ? "Overwritten Position" : "Saved Position", world, player);
 				stack.setTagCompound(tag);
 			}
-			return EnumActionResult.SUCCESS;
 		}
-		return EnumActionResult.PASS;
+		return EnumActionResult.SUCCESS;
 	}
 
 	@Override
@@ -59,19 +57,12 @@ public class WirelessTransceiver extends SonarItem implements ITransceiver {
 		return null;
 	}
 
-	public String getUnlocalizedName(ItemStack stack) {
-		if (stack.hasTagCompound()) {
-			return stack.getTagCompound().getString("targetName");
-		}
-		return null;
-	}
-
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean par) {
 		super.addInformation(stack, player, list, par);
 		if (stack.hasTagCompound()) {
-			list.add("Block: " + TextFormatting.ITALIC + FontHelper.translate(getUnlocalizedName(stack) + ".name"));
+			list.add("Block: " + TextFormatting.ITALIC + FontHelper.translate(stack.getTagCompound().getString("targetName") + ".name"));
 			list.add("Coords: " + TextFormatting.ITALIC + getCoords(stack).toString());
 			list.add("Side: " + TextFormatting.ITALIC + getDirection(stack).name());
 		}

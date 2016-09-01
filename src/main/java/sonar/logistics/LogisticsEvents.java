@@ -19,8 +19,8 @@ public class LogisticsEvents {
 	public void onServerTick(TickEvent.ServerTickEvent event) {
 		if (event.side == Side.CLIENT) {
 			return;
-		}
-		if (event.phase == Phase.START) {
+		}		
+		if (event.phase == Phase.END) {
 			LinkedHashMap<Integer, INetworkCache> networks = (LinkedHashMap<Integer, INetworkCache>) CacheRegistry.getNetworkCache().clone();
 			if (networks.isEmpty()) {
 				return;
@@ -37,6 +37,7 @@ public class LogisticsEvents {
 			}
 			LogicMonitorCache.onServerTick();
 		}
+		
 	}
 	/*
 	@SubscribeEvent
@@ -73,6 +74,7 @@ public class LogisticsEvents {
 	}
 
 	*/
+	
 	@SubscribeEvent
 	public void onChangeDimension(PlayerEvent.PlayerChangedDimensionEvent event) {
 		//if (!LogicMonitorCache.enableEvents()) {

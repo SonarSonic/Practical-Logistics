@@ -1,5 +1,5 @@
 package sonar.logistics.client.gui;
-
+/*
 import java.awt.Color;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -150,7 +150,7 @@ public class GuiItemRouter extends GuiSonar {
 						String type = filter.getName() + " : " + i;
 						/*
 						 * if (filter instanceof ItemStackFilter) { ItemStackFilter stackFilter = (ItemStackFilter) filter; FontHelper.textOffsetCentre("Item Stack Filter", 90, 38 + (i * 18) - (start * 18), colour); double scale = 0.5; RenderItem.getInstance().renderItemAndEffectIntoGUI(fontRendererObj, this.mc.getTextureManager(), stackFilter.getFilters().get(0), 10, 34 + (i * 18) - (start * 18)); } if (filter instanceof OreDictionaryFilter) { OreDictionaryFilter oreFilter = (OreDictionaryFilter) filter; if (oreFilter.getFilters() != null && oreFilter.getFilters().size() != 0) { RenderItem.getInstance().renderItemAndEffectIntoGUI(fontRendererObj, this.mc.getTextureManager(), oreFilter.getFilters().get(0), 10, 34 + (i * 18) - (start * 18)); } FontHelper.textOffsetCentre("Ore Dictionary Filter ", 90, 38 + (i * 18) - (start * 18), colour); }
-						 */
+						 
 					}
 
 				}
@@ -628,3 +628,4 @@ public class GuiItemRouter extends GuiSonar {
 	}
 
 }
+*/

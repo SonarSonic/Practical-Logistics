@@ -15,7 +15,10 @@ public class LogisticsInfoRegistry extends IInfoRegistry {
 	@Override
 	public void registerBaseMethods() {
 		LogicRegistry.registerMethods(TileEntityHammer.class, RegistryType.TILE, Lists.newArrayList("getSpeed", "getProgress", "getCoolDown", "getCoolDownSpeed"));
-		
 	}
 
+	@Override
+	public void registerAdjustments() {
+		LogicRegistry.registerInfoAdjustments(Lists.newArrayList("TileEntityHammer.getSpeed", "TileEntityHammer.getProgress", "TileEntityHammer.getCoolDown", "TileEntityHammer.getCoolDownSpeed"), "", "ticks");
+	}
 }

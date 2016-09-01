@@ -32,7 +32,7 @@ public interface IMonitorCache extends INetworkCache {
 	public <T extends IMonitorInfo> MonitoredList<T> updateMonitoredList(ILogicMonitor<T> monitor, Map<Pair<BlockCoords, EnumFacing>, MonitoredList<?>> connections);
 
 	/** gets the full monitored list for the Handler type */
-	public <T extends IMonitorInfo> MonitoredList<T> getMonitoredList(MonitorHandler<T> type);
+	public <T extends IMonitorInfo> Map<Pair<BlockCoords, EnumFacing>, MonitoredList<?>> getMonitoredList(MonitorHandler<T> type);
 	
 	
 }

@@ -3,6 +3,7 @@ package sonar.logistics.common.blocks.tileentity;
 import com.google.common.collect.Lists;
 
 import io.netty.buffer.ByteBuf;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
@@ -10,9 +11,12 @@ import sonar.core.common.tileentity.TileEntityInventory;
 import sonar.core.inventory.SonarInventory;
 import sonar.core.network.sync.SyncTagType;
 import sonar.core.network.utils.IByteBufTile;
+import sonar.core.utils.IGuiTile;
+import sonar.logistics.client.gui.GuiHammer;
+import sonar.logistics.common.containers.ContainerHammer;
 import sonar.logistics.utils.HammerRecipes;
 
-public class TileEntityHammer extends TileEntityInventory implements ISidedInventory, IByteBufTile {
+public class TileEntityHammer extends TileEntityInventory implements ISidedInventory, IByteBufTile, IGuiTile {
 
 	public SyncTagType.INT progress = new SyncTagType.INT(0);
 	public SyncTagType.INT coolDown = new SyncTagType.INT(1);
@@ -170,5 +174,15 @@ public class TileEntityHammer extends TileEntityInventory implements ISidedInven
 
 	public int getCoolDownSpeed() {
 		return speed * 2;
+	}
+
+	@Override
+	public Object getGuiContainer(EntityPlayer player) {
+		return new ContainerHammer(player, this);
+	}
+
+	@Override
+	public Object getGuiScreen(EntityPlayer player) {
+		return new GuiHammer(player, this);
 	}
 }

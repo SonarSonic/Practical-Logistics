@@ -5,9 +5,7 @@ import java.util.ArrayList;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import sonar.core.helpers.NBTHelper.SyncType;
-import sonar.logistics.api.info.monitor.IJoinableInfo;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
-import sonar.logistics.api.info.monitor.MonitorHandler;
 import sonar.logistics.connections.MonitoredList;
 
 public class MonitorHelper {
@@ -20,6 +18,7 @@ public class MonitorHelper {
 	// FIXME - to use updateWriting for some of the tags, like ILogicInfo
 	public static <T extends IMonitorInfo> NBTTagCompound writeMonitoredList(NBTTagCompound tag, boolean lastWasNull, MonitoredList<T> stacks, SyncType type) {
 		if (type.isType(SyncType.DEFAULT_SYNC)) {
+			stacks.sizing.writeData(tag, SyncType.SAVE);
 			NBTTagList list = new NBTTagList();
 			stacks.forEach(info -> {
 				if (info != null && info.isValid()) {
@@ -35,6 +34,7 @@ public class MonitorHelper {
 				return tag;
 			}
 		} else if (type.isType(SyncType.SPECIAL)) {
+			stacks.sizing.writeData(tag, SyncType.DEFAULT_SYNC);
 			if ((stacks == null || stacks.isEmpty())) {
 				if (!lastWasNull)
 					tag.setBoolean(DELETE, true);
@@ -49,7 +49,7 @@ public class MonitorHelper {
 						NBTTagCompound compound = new NBTTagCompound();
 						if (listType == 1)
 							compound.setBoolean(REMOVED, true);
-						//list.appendTag(InfoHelper.writeInfoToNBT(compound, info, listType == 1 ? SyncType.SAVE : SyncType.SAVE));
+						// list.appendTag(InfoHelper.writeInfoToNBT(compound, info, listType == 1 ? SyncType.SAVE : SyncType.SAVE));
 					}
 				}
 			}

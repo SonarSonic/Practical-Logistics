@@ -1,6 +1,6 @@
 package sonar.logistics.connections;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 
@@ -9,7 +9,6 @@ import sonar.core.api.utils.BlockCoords;
 import sonar.logistics.api.cache.EmptyNetworkCache;
 import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.cache.RefreshType;
-import sonar.logistics.api.connecting.ILogicTile;
 import sonar.logistics.monitoring.ChannelMonitorHandler;
 import sonar.logistics.monitoring.MonitoredBlockCoords;
 
@@ -34,9 +33,9 @@ public class CacheRegistry {
 	//	return network != null ? network.getConnections(type, true) : new ArrayList();
 	//}
 
-	public static LinkedHashMap<BlockCoords, EnumFacing> getChannelArray(int networkID) {
+	public static HashMap<BlockCoords, EnumFacing> getChannelArray(int networkID) {
 		INetworkCache network = getCache(networkID);
-		return network != null ? network.getExternalBlocks(true) : new LinkedHashMap();
+		return network != null ? network.getExternalBlocks(true) : new HashMap();
 	}
 
 	public static INetworkCache getCache(int networkID) {

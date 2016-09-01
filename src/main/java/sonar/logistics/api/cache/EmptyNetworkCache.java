@@ -56,4 +56,13 @@ public class EmptyNetworkCache implements INetworkCache {
 		return true;
 	}
 
+	@Override
+	public void addLocalMonitor(ILogicMonitor monitor) {		
+	}
+
+	@Override
+	public ILogicMonitor getLocalMonitor() {
+		return null;
+	}
+
 }

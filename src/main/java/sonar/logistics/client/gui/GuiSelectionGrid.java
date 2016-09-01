@@ -5,7 +5,6 @@ import java.io.IOException;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.inventory.Container;
 import net.minecraft.util.ResourceLocation;
 import sonar.core.client.gui.widgets.SonarScroller;
@@ -56,7 +55,7 @@ public abstract class GuiSelectionGrid<T extends IMonitorInfo> extends GuiLogist
 	}
 
 	@Override
-	protected void mouseClicked(int x, int y, int button) throws IOException {
+	public void mouseClicked(int x, int y, int button) throws IOException {
 		super.mouseClicked(x, y, button);
 		if (button == 0 || button == 1) {
 			MonitoredList<T> list = getGridList().copyInfo();
@@ -79,6 +78,8 @@ public abstract class GuiSelectionGrid<T extends IMonitorInfo> extends GuiLogist
 
 	@Override
 	public void drawGuiContainerForegroundLayer(int x, int y) {
+		GL11.glEnable(GL11.GL_DEPTH_TEST);
+		super.drawGuiContainerForegroundLayer(x, y);
 		net.minecraft.client.renderer.RenderHelper.enableGUIStandardItemLighting();
 		renderStrings(x, y);
 		preRender();
@@ -123,7 +124,6 @@ public abstract class GuiSelectionGrid<T extends IMonitorInfo> extends GuiLogist
 			}
 		}
 		//GlStateManager.disableCull();
-		super.drawGuiContainerForegroundLayer(x, y);
 	}
 
 	public void preRender() {
@@ -145,7 +145,7 @@ public abstract class GuiSelectionGrid<T extends IMonitorInfo> extends GuiLogist
 	}
 
 	@Override
-	protected void drawGuiContainerBackgroundLayer(float var1, int var2, int var3) {
+	public void drawGuiContainerBackgroundLayer(float var1, int var2, int var3) {
 		super.drawGuiContainerBackgroundLayer(var1, var2, var3);
 		this.renderPlayerInventory(40, 173);
 
@@ -156,26 +156,7 @@ public abstract class GuiSelectionGrid<T extends IMonitorInfo> extends GuiLogist
 		
 		drawRect(guiLeft+12, guiTop+ 170, guiLeft+xSize-12, guiTop+ 252, LogisticsColours.grey_base.getRGB());
 		drawRect(guiLeft+13, guiTop+ 171, guiLeft+xSize-13, guiTop+ 251, LogisticsColours.blue_overlay.getRGB());
-		//drawRect(left, top, left + width, top + height, blue_overlay);
-		//net.minecraft.client.renderer.RenderHelper.enableGUIStandardItemLighting();
-		///OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240.0F, 240.0F);
-		//GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-		//net.minecraft.client.renderer.RenderHelper.disableStandardItemLighting();
 		RenderHelper.restoreBlendState();
-
-		
-		/*
-		RenderHelper.saveBlendState();
-		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-		Minecraft.getMinecraft().getTextureManager().bindTexture(this.getBackground());
-		drawTransparentRect(this.guiLeft, this.guiTop, this.guiLeft + this.xSize, this.guiTop + this.ySize, FontHelper.getIntFromColor(7, 7, 9));
-
-		int scrollYPos = scrollerStart + (int) ((float) (scrollerEnd - scrollerStart - 17) * this.currentScroll);
-		drawRect(scrollerLeft, scrollerStart, scrollerLeft + 8, scrollerEnd - 2, FontHelper.getIntFromColor(5, 5, 2));
-		drawRect(scrollerLeft, scrollYPos, scrollerLeft + 8, scrollYPos + 15, FontHelper.getIntFromColor(5, 5, 16));
-		drawRect(scrollerLeft, scrollYPos, scrollerLeft + 8, scrollYPos + 15, FontHelper.getIntFromColor(5, 5, 16)); // drawTexturedModalRect(this.guiLeft, this.guiTop, 0, 0, this.xSize, this.ySize); this.drawTexturedModalRect(scrollerLeft, scrollerStart + (int) ((float) (scrollerEnd - scrollerStart - 17) * this.currentScroll), 176 + 72, 0, 8, 15); RenderHelper.restoreBlendState(); 
-		
-		*/
 	}
 
 }

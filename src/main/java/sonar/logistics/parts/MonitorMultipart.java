@@ -1,6 +1,8 @@
 package sonar.logistics.parts;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 import com.google.common.collect.Lists;
@@ -14,6 +16,7 @@ import sonar.core.network.utils.IByteBufTile;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.cache.IMonitorCache;
 import sonar.logistics.api.cache.INetworkCache;
+import sonar.logistics.api.connecting.IChannelledTile;
 import sonar.logistics.api.info.monitor.ChannelType;
 import sonar.logistics.api.info.monitor.ILogicMonitor;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
@@ -24,10 +27,10 @@ import sonar.logistics.connections.LogicMonitorCache;
 import sonar.logistics.connections.MonitoredList;
 import sonar.logistics.network.SyncMonitoredType;
 
-public abstract class MonitorMultipart<T extends IMonitorInfo> extends SidedMultipart implements ILogicMonitor<T>, IByteBufTile {
+public abstract class MonitorMultipart<T extends IMonitorInfo> extends SidedMultipart implements ILogicMonitor<T>, IByteBufTile, IChannelledTile {
 
 	protected IdentifiedCoordsList list = new IdentifiedCoordsList(-1);
-	protected ArrayList<MonitorViewer> viewers = new ArrayList<MonitorViewer>();
+	protected HashMap<Boolean, ArrayList<MonitorViewer>> viewers = new HashMap<Boolean, ArrayList<MonitorViewer>>();
 	protected SyncUUID uuid = new SyncUUID(-2);
 	protected MonitorHandler handler = null;
 	protected String handlerID;
@@ -40,14 +43,14 @@ public abstract class MonitorMultipart<T extends IMonitorInfo> extends SidedMult
 		super(width, heightMin, heightMax);
 		this.handlerID = handlerID;
 		this.syncParts.addAll(Lists.newArrayList(list, uuid));
-		selectedInfo = new SyncMonitoredType<T>(handlerID, -4);
+		selectedInfo = new SyncMonitoredType<T>(-4);
 	}
 
 	public MonitorMultipart(String handlerID, EnumFacing face, double width, double heightMin, double heightMax) {
 		super(face, width, heightMin, heightMax);
 		this.handlerID = handlerID;
 		this.syncParts.addAll(Lists.newArrayList(list, uuid));
-		selectedInfo = new SyncMonitoredType<T>(handlerID, -4);
+		selectedInfo = new SyncMonitoredType<T>(-4);
 	}
 
 	public void onLoaded() {
@@ -72,7 +75,7 @@ public abstract class MonitorMultipart<T extends IMonitorInfo> extends SidedMult
 	}
 
 	public void setUUID() {
-		if (!this.getWorld().isRemote) {
+		if (this.getWorld() != null && !this.getWorld().isRemote) {
 			if (uuid.getUUID() == null) {
 				uuid.setObject(UUID.randomUUID());
 				list.setIdentity(uuid.getUUID());
@@ -83,9 +86,9 @@ public abstract class MonitorMultipart<T extends IMonitorInfo> extends SidedMult
 	}
 
 	@Override
-	public IdentifiedCoordsList getMonitoringCoords() {
+	public IdentifiedCoordsList getChannels(){
 		return list;
-	}
+	}	
 
 	@Override
 	public MonitorHandler getHandler() {
@@ -93,17 +96,28 @@ public abstract class MonitorMultipart<T extends IMonitorInfo> extends SidedMult
 	}
 
 	@Override
-	public ArrayList<MonitorViewer> getViewers() {
-		return viewers;
+	public ArrayList<MonitorViewer> getViewers(boolean sentFirstPacket) {
+		return viewers.getOrDefault(sentFirstPacket, new ArrayList());
+	}
+
+	public void sentViewerPacket(MonitorViewer viewer, boolean sentFirstPacket) {
+		if (viewers.get(!sentFirstPacket).contains(viewer)) {
+			viewers.get(!sentFirstPacket).remove(viewer);
+		}
+		if (!viewers.get(!sentFirstPacket).contains(viewer)) {
+			viewers.get(!sentFirstPacket).add(viewer);
+		}
 	}
 
 	public void addViewer(MonitorViewer viewer) {
-		viewers.add(viewer);
+		viewers.putIfAbsent(false, new ArrayList());
+		viewers.get(false).add(viewer);
 	}
 
 	public void removeViewer(EntityPlayer player) {
 		ArrayList<MonitorViewer> toRemove = new ArrayList();
-		for (MonitorViewer viewer : viewers) {
+		viewers.putIfAbsent(true, new ArrayList());
+		for (MonitorViewer viewer : viewers.get(true)) {
 			if (viewer.player.getGameProfile().getId().equals(player.getGameProfile().getId())) {
 				toRemove.add(viewer);
 			}
@@ -132,6 +146,13 @@ public abstract class MonitorMultipart<T extends IMonitorInfo> extends SidedMult
 
 	public int getMaxInfo() {
 		return 4;
+	}
+
+	public void addInfo(List<String> info) {
+		super.addInfo(info);
+		info.add("Channels Configured: " + !list.isEmpty());
+		if (getMonitorUUID() != null)info.add("Monitor UUID: " + this.getMonitorUUID().hashCode());
+		info.add("Max Info: " + getMaxInfo());
 	}
 
 	public final int ADD = -9, PAIRED = -10, ALL = 100;
@@ -172,5 +193,4 @@ public abstract class MonitorMultipart<T extends IMonitorInfo> extends SidedMult
 			break;
 		}
 	}
-
 }

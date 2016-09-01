@@ -1,5 +1,5 @@
 package sonar.logistics.client.gui;
-
+/*
 import java.text.SimpleDateFormat;
 
 import org.lwjgl.input.Keyboard;
@@ -78,3 +78,4 @@ public class GuiClock extends GuiSonar {
 		SonarCore.network.sendToServer(new PacketByteBuf(entity, entity.getPos(), 1));
 	}
 }
+*/

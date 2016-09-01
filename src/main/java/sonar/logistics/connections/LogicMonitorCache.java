@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 
-import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
@@ -15,7 +14,6 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.util.Constants.NBT;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
 import sonar.core.api.utils.BlockCoords;
 import sonar.core.helpers.NBTHelper;
@@ -66,7 +64,8 @@ public class LogicMonitorCache {
 	}
 
 	public static void addMonitor(ILogicMonitor monitor) {
-		if (FMLCommonHandler.instance().getEffectiveSide().isClient()) {
+
+		if (monitor.getCoords().getWorld().isRemote) {
 			return;
 		}
 		if (monitors.contains(monitor)) {
@@ -76,7 +75,7 @@ public class LogicMonitorCache {
 	}
 
 	public static void addDisplay(IInfoDisplay display) {
-		if (FMLCommonHandler.instance().getEffectiveSide().isClient()) {
+		if (display.getCoords().getWorld().isRemote) {
 			return;
 		}
 		if (displays.contains(display)) {
@@ -87,7 +86,7 @@ public class LogicMonitorCache {
 	}
 
 	public static boolean removeMonitor(ILogicMonitor monitor) {
-		if (FMLCommonHandler.instance().getEffectiveSide().isClient()) {
+		if (monitor.getCoords().getWorld().isRemote) {
 			return true;
 		}
 		if (!monitor.getNetwork().isFakeNetwork() && monitor.getNetwork() instanceof IMonitorCache) {
@@ -97,7 +96,7 @@ public class LogicMonitorCache {
 	}
 
 	public static boolean removeDisplay(IInfoDisplay display) {
-		if (FMLCommonHandler.instance().getEffectiveSide().isClient()) {
+		if (display.getCoords().getWorld().isRemote) {
 			return true;
 		}
 		onChunkRemoved(new StoredChunkPos(display.getCoords()));
@@ -216,9 +215,6 @@ public class LogicMonitorCache {
 	}
 
 	public static void onServerTick() {
-		if (FMLCommonHandler.instance().getEffectiveSide().isClient()) {
-			return;
-		}
 		if (!changedInfo.isEmpty() && !displays.isEmpty()) {
 			ArrayList<InfoUUID> infoToSync = (ArrayList<InfoUUID>) changedInfo.clone();
 			LinkedHashMap<World, LinkedHashMap<ChunkPos, ArrayList<InfoUUID>>> positions = new LinkedHashMap();

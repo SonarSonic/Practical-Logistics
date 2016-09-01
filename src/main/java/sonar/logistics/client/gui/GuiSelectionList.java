@@ -1,6 +1,7 @@
 package sonar.logistics.client.gui;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.lwjgl.input.Keyboard;
@@ -16,6 +17,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import sonar.core.client.gui.GuiSonar;
 import sonar.core.client.gui.SonarButtons.ImageButton;
 import sonar.core.utils.IWorldPosition;
+import sonar.logistics.api.info.monitor.IMonitorInfo;
 
 public abstract class GuiSelectionList<T> extends GuiSonar {
 
@@ -80,7 +82,7 @@ public abstract class GuiSelectionList<T> extends GuiSonar {
 		for (int i = start; i < finish; i++) {
 			if (getSelectionList().get(i) != null) {
 				T info = getSelectionList().get(i);
-				if (info!=null && isEqualSelection(info, getCurrentSelection())) {
+				if (info != null && isEqualSelection(info, getCurrentSelection())) {
 					return i - start;
 				}
 			}
@@ -120,8 +122,6 @@ public abstract class GuiSelectionList<T> extends GuiSonar {
 			if (i < 0) {
 				i = -1;
 			}
-			//double round = 1.0F/(j);
-			//this.currentScroll = (float) (round*(Math.round((float)((double) this.currentScroll - (double) i / (double) j)/round)));
 			this.currentScroll = (float) ((double) this.currentScroll - (double) i / (double) j);
 			if (this.currentScroll < 0.0F) {
 				this.currentScroll = 0.0F;

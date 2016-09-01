@@ -5,7 +5,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/**use this with {@link ILogicInfo}, these must have an empty constructor*/
+/**use this with {@link ILogicInfo}, these must have an empty constructor!!*/
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface LogicInfoType {

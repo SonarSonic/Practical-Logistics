@@ -37,20 +37,4 @@ public class InfoMonitorHandler extends MonitorHandler<LogicInfo> {
 		}		
 		return list;
 	}
-	/*
-	@Override
-	public LogicInfo readInfo(NBTTagCompound tag, SyncType type) {
-		return LogicInfo.readFromNBT(tag);
-	}
-
-	@Override
-	public NBTTagCompound writeInfo(LogicInfo info, NBTTagCompound tag, SyncType type) {
-		return info.writeToNBT(tag);
-	}
-
-	@Override
-	public boolean validateInfo(IMonitorInfo info) {
-		return info instanceof LogicInfo;
-	}
-	*/
 }

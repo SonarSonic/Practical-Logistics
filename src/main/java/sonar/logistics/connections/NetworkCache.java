@@ -1,7 +1,7 @@
 package sonar.logistics.connections;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -13,6 +13,7 @@ import net.minecraft.util.EnumFacing;
 import sonar.core.api.utils.BlockCoords;
 import sonar.core.utils.IRemovable;
 import sonar.core.utils.Pair;
+import sonar.logistics.Logistics;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.cache.IRefreshCache;
@@ -31,12 +32,12 @@ public class NetworkCache extends MonitorCache implements IRefreshCache {
 
 	public int networkID = -1;
 	private ArrayList<Class<?>> cacheTypes = Lists.newArrayList(IDataCable.class, ILogicTile.class, ILogicMonitor.class);
-	private LinkedHashMap<Class<?>, ArrayList<ILogicTile>> connections = getFreshMap();
-	private LinkedHashMap<BlockCoords, EnumFacing> blockCache = new LinkedHashMap();
-	private LinkedHashMap<BlockCoords, EnumFacing> networkedCache = new LinkedHashMap();
+	private HashMap<Class<?>, ArrayList<ILogicTile>> connections = getFreshMap();
+	private HashMap<BlockCoords, EnumFacing> blockCache = new HashMap();
+	private HashMap<BlockCoords, EnumFacing> networkedCache = new HashMap();
 
-	public LinkedHashMap<Class<?>, ArrayList<ILogicTile>> getFreshMap() {
-		LinkedHashMap<Class<?>, ArrayList<ILogicTile>> connections = new LinkedHashMap();
+	public HashMap<Class<?>, ArrayList<ILogicTile>> getFreshMap() {
+		HashMap<Class<?>, ArrayList<ILogicTile>> connections = new HashMap();
 		cacheTypes.forEach(classType -> connections.put(classType, new ArrayList()));
 		return connections;
 	}
@@ -62,7 +63,7 @@ public class NetworkCache extends MonitorCache implements IRefreshCache {
 				continue;
 			} else {
 				DataCablePart cable = (DataCablePart) part;
-				LinkedHashMap<BlockCoords, EnumFacing> map = new LinkedHashMap();
+				HashMap<BlockCoords, EnumFacing> map = new HashMap();
 				cable.getContainer().getParts().forEach(multipart -> {
 					if (multipart instanceof IConnectionNode) {
 						((IConnectionNode) multipart).addConnections(map);
@@ -94,7 +95,7 @@ public class NetworkCache extends MonitorCache implements IRefreshCache {
 	}
 
 	@Override
-	public LinkedHashMap<BlockCoords, EnumFacing> getExternalBlocks(boolean includeChannels) {
+	public HashMap<BlockCoords, EnumFacing> getExternalBlocks(boolean includeChannels) {
 		return includeChannels ? networkedCache : blockCache;
 	}
 
@@ -102,7 +103,8 @@ public class NetworkCache extends MonitorCache implements IRefreshCache {
 	public void refreshCache(int networkID, RefreshType refresh) {
 		this.networkID = networkID;
 		if (refresh.shouldRefreshConnections()) {
-			LinkedHashMap<Class<?>, ArrayList<ILogicTile>> newConnections = getFreshMap();
+			localMonitors.clear();
+			HashMap<Class<?>, ArrayList<ILogicTile>> newConnections = getFreshMap();
 			for (BlockCoords coord : CableRegistry.getCables(networkID)) {
 				IDataCable tile = LogisticsAPI.getCableHelper().getCableFromCoords(coord);
 				if (tile != null) {
@@ -125,7 +127,7 @@ public class NetworkCache extends MonitorCache implements IRefreshCache {
 			}
 			this.connections = newConnections;
 		}
-		LinkedHashMap<BlockCoords, EnumFacing> map = new LinkedHashMap<BlockCoords, EnumFacing>();
+		HashMap<BlockCoords, EnumFacing> map = new HashMap<BlockCoords, EnumFacing>();
 		ArrayList<ILogicTile> toRemove = new ArrayList();
 		for (ILogicTile part : connections.getOrDefault(IDataCable.class, new ArrayList<>())) {
 			if (part == null || !(part instanceof IDataCable)) {
@@ -143,20 +145,20 @@ public class NetworkCache extends MonitorCache implements IRefreshCache {
 			}
 		}
 		toRemove.forEach(remove -> connections.getOrDefault(IDataCable.class, new ArrayList<ILogicTile>()).remove(remove));
-		this.blockCache = (LinkedHashMap<BlockCoords, EnumFacing>) map.clone();
+		this.blockCache = (HashMap<BlockCoords, EnumFacing>) map.clone();
 		ArrayList<Integer> networks = getFinalNetworkList();
 		for (Integer id : networks) {
 			INetworkCache network = CacheRegistry.getCache(id);
-			LinkedHashMap<BlockCoords, EnumFacing> blocks = ((LinkedHashMap<BlockCoords, EnumFacing>) network.getExternalBlocks(false).clone());
+			HashMap<BlockCoords, EnumFacing> blocks = (HashMap<BlockCoords, EnumFacing>) network.getExternalBlocks(false).clone();
 			for (Entry<BlockCoords, EnumFacing> set : blocks.entrySet()) {
 				if (!map.containsKey(set.getKey())) {
 					map.put(set.getKey(), set.getValue());
 				}
 			}
 		}
-		this.networkedCache = (LinkedHashMap<BlockCoords, EnumFacing>) map.clone();
+		this.networkedCache = (HashMap<BlockCoords, EnumFacing>) map.clone();
 
-		for (Entry<MonitorHandler, LinkedHashMap<ILogicMonitor, MonitoredList<?>>> handlers : monitoredCollections.entrySet()) {
+		for (Entry<MonitorHandler, Map<ILogicMonitor, MonitoredList<?>>> handlers : monitorInfo.entrySet()) {
 			this.compileCoordsList(handlers.getKey());
 		}
 
@@ -200,20 +202,24 @@ public class NetworkCache extends MonitorCache implements IRefreshCache {
 		if (networkID != this.getNetworkID()) {
 			this.refreshCache(networkID, RefreshType.FULL);
 		}
-		for (Entry<MonitorHandler, LinkedHashMap<ILogicMonitor, MonitoredList<?>>> handlers : monitoredCollections.entrySet()) {
-			if (!handlers.getValue().isEmpty()) {
-				getMonitoredList(handlers.getKey());
-				LinkedHashMap<Pair<BlockCoords, EnumFacing>, MonitoredList<?>> infoList = monitoredList.get(handlers.getKey());
-				for (Entry<ILogicMonitor, MonitoredList<?>> monitors : handlers.getValue().entrySet()) {
+		for (Entry<MonitorHandler, Map<ILogicMonitor, MonitoredList<?>>> monitorMap : monitorInfo.entrySet()) {
+			if (!monitorMap.getValue().isEmpty()) {
+				Map<Pair<BlockCoords, EnumFacing>, MonitoredList<?>> newConnections = getMonitoredList(monitorMap.getKey());
+				connectionInfo.replace(monitorMap.getKey(), newConnections);
+				for (Entry<ILogicMonitor, MonitoredList<?>> monitors : monitorMap.getValue().entrySet()) {
 					ILogicMonitor monitor = monitors.getKey();
-					if (monitor != null) {
-						MonitoredList<IMonitorInfo> updateList = updateMonitoredList(monitors.getKey(), infoList).updateList(monitors.getValue());
+					if (monitor != null && monitor.getHandler().getName().equals(monitorMap.getKey().getName())) {
+						MonitoredList<IMonitorInfo> updateList = updateMonitoredList(monitors.getKey(), newConnections).updateList(monitors.getValue());
 						monitor.sortMonitoredList(updateList);
 						monitor.setMonitoredInfo(updateList);
-						List<MonitorViewer> viewers = monitor.getViewers();
-						//if (!viewers.isEmpty()) {
-							sendPacketsToViewer(monitor, viewers, updateList, monitors.getValue());
-						//}
+						for (Boolean bool : new Boolean[] { true, false }) {
+							List<MonitorViewer> viewers = (List<MonitorViewer>) monitor.getViewers(bool).clone();
+							if (bool == true || updateList.hasChanged)
+								sendPacketsToViewer(monitor, viewers, !bool, updateList.copyInfo(), monitors.getValue().copyInfo());
+						}
+						monitors.setValue(updateList);
+					} else if (!monitor.getHandler().getName().equals(monitorMap.getKey().getName())) {
+						Logistics.logger.info("WRONG MONITOR HANDLER FOR MONITOR: " + monitorMap.getKey().getName());
 					}
 				}
 			}
@@ -221,17 +227,30 @@ public class NetworkCache extends MonitorCache implements IRefreshCache {
 	}
 
 	public <T extends IMonitorInfo> void compileCoordsList(MonitorHandler<T> type) {
-		LinkedHashMap<Pair<BlockCoords, EnumFacing>, MonitoredList<?>> compiledList = new LinkedHashMap();
+		HashMap<Pair<BlockCoords, EnumFacing>, MonitoredList<?>> compiledList = new HashMap();
 		for (Entry<BlockCoords, EnumFacing> coords : networkedCache.entrySet()) {
 			Pair pair = new Pair(coords.getKey(), coords.getValue());
 			if (!compiledList.containsKey(pair))
 				compiledList.put(pair, MonitoredList.<T>newMonitoredList());
 		}
-		monitoredList.put(type, compiledList);
+		connectionInfo.put(type, compiledList);
 	}
 
 	@Override
 	public boolean isFakeNetwork() {
 		return false;
+	}
+
+	@Override
+	public void addLocalMonitor(ILogicMonitor monitor) {
+		localMonitors.add(monitor);
+	}
+
+	@Override
+	public ILogicMonitor getLocalMonitor() {
+		if (!localMonitors.isEmpty()) {
+			return localMonitors.get(0);
+		}
+		return null;
 	}
 }

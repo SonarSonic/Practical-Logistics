@@ -1,5 +1,5 @@
 package sonar.logistics.client.gui;
-
+/*
 import java.io.IOException;
 
 import org.lwjgl.input.Keyboard;
@@ -252,3 +252,4 @@ public abstract class GuiRedstoneSignaller extends GuiSonar {
 
 	}
 }
+*/

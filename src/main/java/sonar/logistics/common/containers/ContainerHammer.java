@@ -1,7 +1,6 @@
 package sonar.logistics.common.containers;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import sonar.core.inventory.ContainerSync;
@@ -12,7 +11,7 @@ public class ContainerHammer extends ContainerSync {
 
 	private TileEntityHammer entity;
 
-	public ContainerHammer(InventoryPlayer inventory, TileEntityHammer entity) {
+	public ContainerHammer(EntityPlayer player, TileEntityHammer entity) {
 		super(entity);
 		this.entity = entity;
 
@@ -21,12 +20,12 @@ public class ContainerHammer extends ContainerSync {
 
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 9; j++) {
-				addSlotToContainer(new Slot(inventory, j + i * 9 + 9, 8 + j * 18, 62 + i * 18));
+				addSlotToContainer(new Slot(player.inventory, j + i * 9 + 9, 8 + j * 18, 62 + i * 18));
 			}
 		}
 
 		for (int i = 0; i < 9; i++) {
-			addSlotToContainer(new Slot(inventory, i, 8 + i * 18, 120));
+			addSlotToContainer(new Slot(player.inventory, i, 8 + i * 18, 120));
 		}
 	}
 

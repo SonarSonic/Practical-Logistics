@@ -3,6 +3,7 @@ package sonar.logistics.helpers;
 import java.util.ArrayList;
 import java.util.List;
 
+import mcmultipart.multipart.IMultipart;
 import mcmultipart.multipart.IMultipartContainer;
 import mcmultipart.multipart.ISlottedPart;
 import mcmultipart.multipart.MultipartHelper;
@@ -19,6 +20,7 @@ import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.connecting.CableType;
 import sonar.logistics.api.connecting.IDataCable;
 import sonar.logistics.api.connecting.ILogicTile;
+import sonar.logistics.api.display.IInfoDisplay;
 import sonar.logistics.api.wrappers.CablingWrapper;
 import sonar.logistics.connections.CableRegistry;
 import sonar.logistics.connections.CacheRegistry;
@@ -35,6 +37,38 @@ public class CableHelper extends CablingWrapper {
 		}
 		return null;
 	}
+
+	public ILogicTile getMultipart(BlockCoords coords, EnumFacing face) {
+		IMultipartContainer container = MultipartHelper.getPartContainer(coords.getWorld(), coords.getBlockPos());
+		if (container != null) {
+			ISlottedPart part = container.getPartInSlot(PartSlot.getFaceSlot(face));
+			if (part instanceof ILogicTile) {
+				return (ILogicTile) part;
+			}
+		}
+		return null;
+	}
+
+	public IInfoDisplay getDisplayScreen(BlockCoords coords, EnumFacing face) {
+		IMultipartContainer container = MultipartHelper.getPartContainer(coords.getWorld(), coords.getBlockPos());
+		if (container != null) {
+			return getDisplayScreen(container, face);
+		}
+		return null;
+	}
+
+	public IInfoDisplay getDisplayScreen(IMultipartContainer container, EnumFacing face) {
+		for (IMultipart part : container.getParts()) {
+			if (part != null && part instanceof IInfoDisplay) {
+				IInfoDisplay display = (IInfoDisplay) part;
+				if (display.getFace() == face) {
+					return display;
+				}
+			}
+		}
+		return null;
+	}
+
 	public INetworkCache addCable(IDataCable cable) {
 		ArrayList<Pair<CableType, Integer>> connections = new ArrayList();
 		int cableID = -1;
@@ -65,7 +99,7 @@ public class CableHelper extends CablingWrapper {
 	}
 
 	public void removeCable(IDataCable cable) {
-		CableRegistry.removeCable(cable.registryID(), cable);
+		CableRegistry.removeCable(cable.getNetworkID(), cable);
 	}
 
 	public void refreshConnections(IDataCable cable) {
@@ -76,8 +110,8 @@ public class CableHelper extends CablingWrapper {
 			if ((!canConnect && connection.a.canConnect(cable.getCableType()))) {
 				cable.removeCable();
 				cable.addCable();
-			} else if ((canConnect && connection.a.canConnect(cable.getCableType()) && connection.b != cable.registryID())) {
-				CableRegistry.connectNetworks(cable.registryID(), connection.b);
+			} else if ((canConnect && connection.a.canConnect(cable.getCableType()) && connection.b != cable.getNetworkID())) {
+				CableRegistry.connectNetworks(cable.getNetworkID(), connection.b);
 			}
 		}
 	}
@@ -98,74 +132,9 @@ public class CableHelper extends CablingWrapper {
 		return cache != null ? cache : EmptyNetworkCache.INSTANCE;
 	}
 
-	/*
-	public Map<BlockCoords, EnumFacing> getTileConnections(List<BlockCoords> network) {
-		if (network == null) {
-			return Collections.EMPTY_MAP;
-		}
-		Map<BlockCoords, EnumFacing> connections = new LinkedHashMap();
-		for (BlockCoords connect : network) {
-			TileEntity tile = connect.getTileEntity();
-			if (tile != null && tile instanceof IConnectionNode) {
-				((IConnectionNode) tile).addConnections(connections);
-			} else {
-				IMultipartContainer container = MultipartHelper.getPartContainer(connect.getWorld(), connect.getBlockPos());
-				if (container != null) {
-					ISlottedPart part = container.getPartInSlot(PartSlot.CENTER);
-					if (part == null) {
-						continue;
-					} else if (part instanceof IDataCable && ((IDataCable) part).hasConnections()) {
-						container.getParts().forEach(multipart -> {
-							if (multipart instanceof IConnectionNode) {
-								((IConnectionNode) multipart).addConnections(connections);
-							}
-						});
-					}
-				}
-			}
-		}
-		return connections;
-
-	}
-	public Map<BlockCoords, EnumFacing> getTileConnections(TileEntity tile, EnumFacing dir) {
-		LinkedHashMap<BlockCoords, EnumFacing> connections = new LinkedHashMap();
-		int registryID = -1;
-		CableType cableType = CableType.NONE;
-		Object adjacent = OLDMultipartHelper.getAdjacentTile(tile, dir);
-		if (adjacent != null) {
-			if (adjacent instanceof IDataCable) {
-				IDataCable cable = ((IDataCable) adjacent);
-				if (cable.isBlocked(dir.getOpposite())) {
-					return connections;
-				}
-				registryID = cable.registryID();
-				cableType = cable.getCableType();
-			} else if (adjacent instanceof IConnectionNode) {
-				IConnectionNode node = (IConnectionNode) adjacent;
-				((IConnectionNode) node).addConnections(connections);
-			}
-		}
-		if (registryID != -1) {
-			try {
-				LinkedHashMap<BlockCoords, EnumFacing> cacheList = CacheRegistry.getChannelArray(registryID);
-				if (!cacheList.isEmpty()) {
-					if (cableType.hasUnlimitedConnections()) {
-						connections.putAll(cacheList);
-					} else {
-						for (Entry<BlockCoords, EnumFacing> entry : cacheList.entrySet()) {
-							if (entry.getKey().getBlock(entry.getKey().getWorld()) != null) {
-								connections.put(entry.getKey(), entry.getValue());
-							}
-						}
-					}
-				}
-			} catch (Exception exception) {
-				Logistics.logger.error("CableHelper: " + exception.getLocalizedMessage());
-			}
-		}
-		return connections;
-	}
-	*/
+	/* public Map<BlockCoords, EnumFacing> getTileConnections(List<BlockCoords> network) { if (network == null) { return Collections.EMPTY_MAP; } Map<BlockCoords, EnumFacing> connections = new LinkedHashMap(); for (BlockCoords connect : network) { TileEntity tile = connect.getTileEntity(); if (tile != null && tile instanceof IConnectionNode) { ((IConnectionNode) tile).addConnections(connections); } else { IMultipartContainer container = MultipartHelper.getPartContainer(connect.getWorld(), connect.getBlockPos()); if (container != null) { ISlottedPart part = container.getPartInSlot(PartSlot.CENTER); if (part == null) { continue; } else if (part instanceof IDataCable && ((IDataCable) part).hasConnections()) { container.getParts().forEach(multipart -> { if (multipart instanceof IConnectionNode) { ((IConnectionNode) multipart).addConnections(connections); } }); } } } } return connections;
+	 * 
+	 * } public Map<BlockCoords, EnumFacing> getTileConnections(TileEntity tile, EnumFacing dir) { LinkedHashMap<BlockCoords, EnumFacing> connections = new LinkedHashMap(); int registryID = -1; CableType cableType = CableType.NONE; Object adjacent = OLDMultipartHelper.getAdjacentTile(tile, dir); if (adjacent != null) { if (adjacent instanceof IDataCable) { IDataCable cable = ((IDataCable) adjacent); if (cable.isBlocked(dir.getOpposite())) { return connections; } registryID = cable.registryID(); cableType = cable.getCableType(); } else if (adjacent instanceof IConnectionNode) { IConnectionNode node = (IConnectionNode) adjacent; ((IConnectionNode) node).addConnections(connections); } } if (registryID != -1) { try { LinkedHashMap<BlockCoords, EnumFacing> cacheList = CacheRegistry.getChannelArray(registryID); if (!cacheList.isEmpty()) { if (cableType.hasUnlimitedConnections()) { connections.putAll(cacheList); } else { for (Entry<BlockCoords, EnumFacing> entry : cacheList.entrySet()) { if (entry.getKey().getBlock(entry.getKey().getWorld()) != null) { connections.put(entry.getKey(), entry.getValue()); } } } } } catch (Exception exception) { Logistics.logger.error("CableHelper: " + exception.getLocalizedMessage()); } } return connections; } */
 
 	public Pair<CableType, Integer> getConnectionType(World world, BlockPos pos, EnumFacing dir, CableType cableType) {
 		BlockPos offset = pos.offset(dir);
@@ -191,6 +160,7 @@ public class CableHelper extends CablingWrapper {
 			if (centre != null && centre instanceof IDataCable) {
 				return getConnectionTypeFromObject(centre, dir, cableType);
 			}
+
 		}
 		return new Pair(CableType.NONE, -1);
 	}
@@ -199,7 +169,7 @@ public class CableHelper extends CablingWrapper {
 		if (connection instanceof IDataCable) {
 			IDataCable cable = (IDataCable) connection;
 			if (cable.getCableType().canConnect(cableType)) {
-				return cable.canConnect(dir.getOpposite()) ? new Pair(cable.getCableType(), cable.registryID()) : new Pair(CableType.NONE, -1);
+				return cable.canConnect(dir.getOpposite()) ? new Pair(cable.getCableType(), cable.getNetworkID()) : new Pair(CableType.NONE, -1);
 			}
 		} else if (connection instanceof ILogicTile) {
 			return ((ILogicTile) connection).canConnect(dir.getOpposite()) ? new Pair(CableType.BLOCK_CONNECTION, -1) : new Pair(CableType.NONE, -1);

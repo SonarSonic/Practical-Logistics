@@ -19,7 +19,6 @@ import sonar.logistics.api.info.monitor.IMonitorInfo;
 
 public class InfoLoaderRegistry {
 
-	private static int currentID = 0;
 	public static LinkedHashMap<Integer, String> infoNames = new LinkedHashMap();
 	public static LinkedHashMap<String, Integer> infoIds = new LinkedHashMap();
 	public static LinkedHashMap<String, Class<? extends IMonitorInfo>> infoClasses = new LinkedHashMap();
@@ -42,9 +41,9 @@ public class InfoLoaderRegistry {
 		List<Pair<ASMDataTable.ASMData, Class<? extends IMonitorInfo>>> infoTypes = ASMLoader.getClasses(asmDataTable, LogicInfoType.class, IMonitorInfo.class, true);
 		for (Pair<ASMDataTable.ASMData, Class<? extends IMonitorInfo>> info : infoTypes) {
 			String name = (String) info.a.getAnnotationInfo().get("id");
-			int id = currentID++;
-			infoNames.put(id, name);
-			infoIds.put(name, id);
+			int hashCode = name.hashCode();
+			infoNames.put(hashCode, name);
+			infoIds.put(name, hashCode);
 			infoClasses.put(name, info.b);
 		}
 	}

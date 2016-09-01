@@ -1,11 +1,10 @@
 package sonar.logistics.api.cache;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 
-import net.minecraft.block.Block;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import sonar.core.api.utils.BlockCoords;
 import sonar.logistics.api.connecting.ILogicTile;
@@ -24,7 +23,7 @@ public interface INetworkCache {
 	/** @param includeChannels normally true, false if you are retrieving blocks from multiple connected networks, which have already been logged
 	 * @return the {@link LinkedHashMap} of {@link BlockCoords} paired with {@link EnumFacing} */
 	@Deprecated
-	public LinkedHashMap<BlockCoords, EnumFacing> getExternalBlocks(boolean includeChannels);
+	public HashMap<BlockCoords, EnumFacing> getExternalBlocks(boolean includeChannels);
 
 	/** gets the full list of Cached Coordinates for a given {@link CacheType}.
 	 * 
@@ -51,4 +50,8 @@ public interface INetworkCache {
 	/** quick method to check this network can be used/edited typically only and EmptyNetworkCache would return true */
 	public boolean isFakeNetwork();
 
+	public void addLocalMonitor(ILogicMonitor monitor);
+	
+	public ILogicMonitor getLocalMonitor();
+	
 }

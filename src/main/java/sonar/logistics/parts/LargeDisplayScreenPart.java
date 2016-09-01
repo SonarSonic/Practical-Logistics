@@ -2,12 +2,15 @@ package sonar.logistics.parts;
 
 import java.util.List;
 
+import mcmultipart.raytrace.RayTraceUtils.AdvancedRayTraceResultPart;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.AxisAlignedBB;
 import sonar.logistics.LogisticsItems;
-import sonar.logistics.api.display.ScreenLayout;
-import sonar.logistics.api.info.IInfoContainer;
+import sonar.logistics.api.connecting.OperatorMode;
+import sonar.logistics.api.display.DisplayType;
 import sonar.logistics.api.info.InfoUUID;
 
 public class LargeDisplayScreenPart extends ScreenMultipart {
@@ -55,31 +58,17 @@ public class LargeDisplayScreenPart extends ScreenMultipart {
 	}
 
 	@Override
-	public boolean canConnect(EnumFacing dir) {
-		return false;
-	}
-
-	@Override
-	public IInfoContainer container() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ScreenLayout getLayout() {
-		// TODO Auto-generated method stub
-		return null;
+	public DisplayType getDisplayType() {
+		return DisplayType.LARGE;
 	}
 
 	@Override
 	public int maxInfo() {
-		// TODO Auto-generated method stub
-		return 0;
+		return 4;
 	}
 
 	@Override
 	public boolean monitorsUUID(InfoUUID id) {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 }

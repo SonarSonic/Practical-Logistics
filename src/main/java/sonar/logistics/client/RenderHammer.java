@@ -109,9 +109,7 @@ public class RenderHammer extends TileEntitySpecialRenderer {
 
 			if (target != null) {
 				if (!(target.getItem() instanceof ItemBlock)) {
-
 					GL11.glRotated(90, 1, 0, 0);
-
 					GL11.glTranslated(0.0625 * 8, 0.3, -0.885);
 
 				} else {

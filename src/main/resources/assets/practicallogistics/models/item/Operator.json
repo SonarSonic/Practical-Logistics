@@ -1,0 +1,10 @@
+{
+    "parent": "item/handheld",
+    "textures": {
+        "layer0":"practicallogistics:items/operator"
+    },
+    "variants": {
+        "normal": [{}],
+        "inventory": [{}]
+    }
+}

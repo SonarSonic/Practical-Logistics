@@ -1,19 +1,18 @@
 package sonar.logistics.client.gui;
 
-import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
 import sonar.core.client.gui.GuiSonar;
 import sonar.core.helpers.FontHelper;
+import sonar.logistics.common.blocks.tileentity.TileEntityHammer;
 import sonar.logistics.common.containers.ContainerHammer;
-import sonar.logistics.common.tileentity.TileEntityHammer;
 
 public class GuiHammer extends GuiSonar {
 	public TileEntityHammer entity;
-
 	public static final ResourceLocation bground = new ResourceLocation("PracticalLogistics:textures/gui/hammer.png");
 
-	public GuiHammer(InventoryPlayer inventoryPlayer, TileEntityHammer entity) {
-		super(new ContainerHammer(inventoryPlayer, entity), entity);
+	public GuiHammer(EntityPlayer player, TileEntityHammer entity) {
+		super(new ContainerHammer(player, entity), entity);
 
 		this.entity = entity;
 
@@ -26,11 +25,12 @@ public class GuiHammer extends GuiSonar {
 		super.drawGuiContainerForegroundLayer(x, y);
 		FontHelper.textCentre(FontHelper.translate("tile.Hammer.name"), xSize, 6, 0);
 	}
+
 	@Override
 	protected void drawGuiContainerBackgroundLayer(float var1, int var2, int var3) {
-		super.drawGuiContainerBackgroundLayer(var1, var2, var3);;
-		int l = this.entity.progress.getObject() * 23 / this.entity.speed;
-		drawTexturedModalRect(this.guiLeft + 76, this.guiTop + 24, 176, 0, l, 16);
+		super.drawGuiContainerBackgroundLayer(var1, var2, var3);
+		int l = entity.getProgress() * 23 / entity.getSpeed();
+		drawTexturedModalRect(guiLeft + 76, guiTop + 24, 176, 0, l, 16);
 	}
 
 	@Override

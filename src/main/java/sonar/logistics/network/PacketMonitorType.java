@@ -18,7 +18,8 @@ public class PacketMonitorType implements IMessage {
 	public ILogicMonitor monitor;
 	public MonitorType type;
 
-	public PacketMonitorType() {}
+	public PacketMonitorType() {
+	}
 
 	public PacketMonitorType(ILogicMonitor monitor, MonitorType type) {
 		this.monitor = monitor;
@@ -43,8 +44,8 @@ public class PacketMonitorType implements IMessage {
 		public IMessage onMessage(PacketMonitorType message, MessageContext ctx) {
 			EntityPlayer player = SonarCore.proxy.getPlayerEntity(ctx);
 			if (message.monitor != null && player != null) {
-				for (MonitorViewer viewer : (ArrayList<MonitorViewer>) message.monitor.getViewers()) {
-					if(viewer.player.getGameProfile().getId().equals(player.getGameProfile().getId())){
+				for (MonitorViewer viewer : (ArrayList<MonitorViewer>) message.monitor.getViewers(true)) {
+					if (viewer.player.getGameProfile().getId().equals(player.getGameProfile().getId())) {
 						viewer.setMonitorType(message.type);
 						break;
 					}

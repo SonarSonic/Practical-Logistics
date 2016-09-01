@@ -2,6 +2,7 @@ package sonar.logistics.api.info.monitor;
 
 import sonar.core.api.nbt.INBTSyncable;
 import sonar.logistics.api.asm.LogicInfoType;
+import sonar.logistics.api.display.DisplayType;
 
 /**for your info to be registered you must use {@link LogicInfoType} implement this for all types of info*/
 public interface IMonitorInfo<T extends IMonitorInfo> extends INBTSyncable{
@@ -24,4 +25,7 @@ public interface IMonitorInfo<T extends IMonitorInfo> extends INBTSyncable{
 	
 	public boolean isValid();
 	
+	public T copy();
+	
+	public void renderInfo(DisplayType displayType, double width, double height, double scale, int infoPos);
 }

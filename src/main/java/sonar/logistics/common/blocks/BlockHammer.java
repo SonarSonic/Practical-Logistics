@@ -12,10 +12,10 @@ import net.minecraft.world.World;
 import sonar.core.api.utils.BlockInteraction;
 import sonar.core.common.block.SonarMachineBlock;
 import sonar.core.common.block.SonarMaterials;
+import sonar.core.utils.IGuiTile;
 import sonar.logistics.Logistics;
 import sonar.logistics.LogisticsBlocks;
 import sonar.logistics.common.blocks.tileentity.TileEntityHammer;
-import sonar.logistics.network.LogisticsGui;
 
 public class BlockHammer extends SonarMachineBlock {
 
@@ -31,7 +31,7 @@ public class BlockHammer extends SonarMachineBlock {
 	@Override
 	public boolean operateBlock(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, BlockInteraction interact){
 		if (player != null) {
-			player.openGui(Logistics.instance, LogisticsGui.hammer, world, pos.getX(), pos.getY(), pos.getZ());
+			player.openGui(Logistics.instance, IGuiTile.ID, world, pos.getX(), pos.getY(), pos.getZ());
 			return true;
 		}
 		return false;

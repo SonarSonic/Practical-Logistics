@@ -71,7 +71,7 @@ public class GuiFluidReader extends GuiSelectionGrid<MonitoredFluidStack> {
 		searchField.setMaxStringLength(20);
 	}
 
-	protected void actionPerformed(GuiButton button) {
+	public void actionPerformed(GuiButton button) {
 		if (button != null) {
 			if (button.id == -1) {
 				part.setting.incrementEnum();
@@ -102,28 +102,14 @@ public class GuiFluidReader extends GuiSelectionGrid<MonitoredFluidStack> {
 		}
 		if (getSetting() == Modes.FLUID) {
 			if (x - guiLeft >= 103 && x - guiLeft <= 103 + 16 && y - guiTop >= 9 && y - guiTop <= 9 + 16) {
-				/*
-				if (!part.getSelectedInfo().isEmpty()) {
-					MonitoredFluidStack stack = ((MonitoredFluidStack) part.getSelectedInfo().get(0));
-					if (stack != null) {
-						GL11.glDisable(GL11.GL_DEPTH_TEST);
-						GL11.glDisable(GL11.GL_LIGHTING);
-						List list = new ArrayList();
-						list.add(stack.fluidStack.getObject().fluid.getLocalizedName());
-						drawHoveringText(list, x - guiLeft, y - guiTop, fontRendererObj);
-						GL11.glEnable(GL11.GL_LIGHTING);
-						GL11.glEnable(GL11.GL_DEPTH_TEST);
-						net.minecraft.client.renderer.RenderHelper.enableGUIStandardItemLighting();
-					}
-				}
-				*/
+				/* if (!part.getSelectedInfo().isEmpty()) { MonitoredFluidStack stack = ((MonitoredFluidStack) part.getSelectedInfo().get(0)); if (stack != null) { GL11.glDisable(GL11.GL_DEPTH_TEST); GL11.glDisable(GL11.GL_LIGHTING); List list = new ArrayList(); list.add(stack.fluidStack.getObject().fluid.getLocalizedName()); drawHoveringText(list, x - guiLeft, y - guiTop, fontRendererObj); GL11.glEnable(GL11.GL_LIGHTING); GL11.glEnable(GL11.GL_DEPTH_TEST); net.minecraft.client.renderer.RenderHelper.enableGUIStandardItemLighting(); } } */
 			}
 		}
 		super.drawGuiContainerForegroundLayer(x, y);
 	}
 
 	@Override
-	protected void mouseClicked(int i, int j, int k) throws IOException {
+	public void mouseClicked(int i, int j, int k) throws IOException {
 		super.mouseClicked(i, j, k);
 		switch (getSetting()) {
 		case POS:
@@ -139,7 +125,7 @@ public class GuiFluidReader extends GuiSelectionGrid<MonitoredFluidStack> {
 	}
 
 	@Override
-	protected void keyTyped(char c, int i) {
+	public void keyTyped(char c, int i) {
 		if ((getSetting() == Modes.POS) && slotField.isFocused()) {
 			if (c == 13 || c == 27) {
 				slotField.setFocused(false);
@@ -180,10 +166,10 @@ public class GuiFluidReader extends GuiSelectionGrid<MonitoredFluidStack> {
 			return part.getMonitoredList();
 		else {
 			MonitoredList<MonitoredFluidStack> searchList = MonitoredList.<MonitoredFluidStack>newMonitoredList();
-			for (MonitoredFluidStack stack : (ArrayList<MonitoredFluidStack>) part.getMonitoredList().info.clone()) {
+			for (MonitoredFluidStack stack : (ArrayList<MonitoredFluidStack>) part.getMonitoredList().clone()) {
 				StoredFluidStack fluidStack = stack.fluidStack.getObject();
 				if (stack != null && fluidStack.fluid != null && fluidStack.fluid.getLocalizedName().toLowerCase().contains(searchField.getText().toLowerCase())) {
-					searchList.info.add(stack);
+					searchList.add(stack);
 				}
 			}
 			return searchList;
@@ -196,11 +182,11 @@ public class GuiFluidReader extends GuiSelectionGrid<MonitoredFluidStack> {
 			return;
 		}
 		if (getSetting() == Modes.FLUID) {
-			part.lastInfo = selection;
-			part.sendByteBufPacket(0);
+			part.selected.setInfo(selection);
+			part.sendByteBufPacket(1);
 		}
 		if (getSetting() == Modes.POS) {
-			ArrayList<MonitoredFluidStack> currentList = (ArrayList<MonitoredFluidStack>) this.getGridList().info.clone();
+			ArrayList<MonitoredFluidStack> currentList = (ArrayList<MonitoredFluidStack>) this.getGridList().clone();
 			int position = 0;
 			for (MonitoredFluidStack stack : currentList) {
 				if (stack != null) {
@@ -239,9 +225,8 @@ public class GuiFluidReader extends GuiSelectionGrid<MonitoredFluidStack> {
 	}
 
 	public void postRender() {
-		/*
-		if (!part.getSelectedInfo().isEmpty()) {
-			MonitoredFluidStack stack = ((MonitoredFluidStack) part.getSelectedInfo().get(0));
+		if (part.selected.getMonitoredInfo() != null) {
+			MonitoredFluidStack stack = part.selected.getMonitoredInfo();
 			if (stack != null) {
 				StoredFluidStack fluidStack = stack.fluidStack.getObject();
 				final int br = 16 << 20 | 16 << 4;
@@ -253,18 +238,17 @@ public class GuiFluidReader extends GuiSelectionGrid<MonitoredFluidStack> {
 				GL11.glPopMatrix();
 			}
 		}
-		 */
 	}
 
 	@Override
 	public void renderSelection(MonitoredFluidStack selection, int x, int y) {
 		StoredFluidStack fluidStack = selection.fluidStack.getObject();
 		if (fluidStack.fluid != null) {
-			//GL11.glPushMatrix();
+			// GL11.glPushMatrix();
 			GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-			ResourceLocation location = fluidStack.fluid.getFluid().getStill();
+			ResourceLocation location = fluidStack.fluid.getFluid().getStill(fluidStack.fluid);
 			this.drawTexturedModalRect(13 + (x * 18), 32 + (y * 18), mc.getTextureMapBlocks().getAtlasSprite(location.toString()), 16, 16);
-			//GL11.glPopMatrix();
+			// GL11.glPopMatrix();
 		}
 	}
 

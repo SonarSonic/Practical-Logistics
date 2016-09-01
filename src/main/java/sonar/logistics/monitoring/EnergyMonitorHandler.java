@@ -10,7 +10,6 @@ import sonar.core.api.energy.StoredEnergyStack;
 import sonar.core.api.utils.BlockCoords;
 import sonar.logistics.api.info.monitor.MonitorHandler;
 import sonar.logistics.connections.MonitoredList;
-import sonar.logistics.helpers.MonitorHelper;
 
 public class EnergyMonitorHandler extends MonitorHandler<MonitoredEnergyStack> {
 
@@ -39,20 +38,4 @@ public class EnergyMonitorHandler extends MonitorHandler<MonitoredEnergyStack> {
 		}
 		return null;
 	}
-	/*
-	@Override
-	public MonitoredEnergyStack readInfo(NBTTagCompound tag, SyncType type) {
-		return new MonitoredEnergyStack(StoredEnergyStack.readFromNBT(tag));
-	}
-
-	@Override
-	public NBTTagCompound writeInfo(MonitoredEnergyStack info, NBTTagCompound tag, SyncType type) {
-		return info.writeToNBT(tag, info);
-	}
-
-	@Override
-	public boolean validateInfo(IMonitorInfo info) {
-		return info instanceof MonitoredEnergyStack;
-	}
-	*/
 }

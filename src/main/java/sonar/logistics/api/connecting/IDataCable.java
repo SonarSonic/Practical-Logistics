@@ -7,7 +7,7 @@ import sonar.logistics.api.render.ICableRenderer;
 public interface IDataCable extends ICableRenderer, ILogicTile {
 	
 	/** when cables join together they create networks which are stored under IDs in the registry, this returns this id */
-	public int registryID();
+	//public int registryID();
 
 	/** DON'T CALL THIS OUTSIDE OF THE CABLE REGISTRY - Once this is called the Registry will assume the id was successfully changed*/
 	public void setRegistryID(int id);

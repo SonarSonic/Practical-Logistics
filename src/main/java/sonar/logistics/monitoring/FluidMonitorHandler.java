@@ -12,7 +12,6 @@ import sonar.core.api.fluids.StoredFluidStack;
 import sonar.core.api.utils.BlockCoords;
 import sonar.logistics.api.info.monitor.MonitorHandler;
 import sonar.logistics.connections.MonitoredList;
-import sonar.logistics.helpers.MonitorHelper;
 
 public class FluidMonitorHandler extends MonitorHandler<MonitoredFluidStack> {
 
@@ -30,6 +29,7 @@ public class FluidMonitorHandler extends MonitorHandler<MonitoredFluidStack> {
 			if (fluidTile != null && provider.canHandleFluids(fluidTile, side)) {
 				List<StoredFluidStack> info = new ArrayList();
 				StorageSize size = provider.getFluids(info, fluidTile, side);
+				list.sizing.add(size);
 				for (StoredFluidStack fluid : info) {
 					list.addInfoToList(new MonitoredFluidStack(fluid));
 				}
@@ -38,24 +38,5 @@ public class FluidMonitorHandler extends MonitorHandler<MonitoredFluidStack> {
 		}
 		return list;
 	}
-	/*
-	@Override
-	public MonitoredFluidStack readInfo(NBTTagCompound tag, SyncType type) {
-		return new MonitoredFluidStack(StoredFluidStack.readFromNBT(tag));
-	}
-
-	@Override
-	public NBTTagCompound writeInfo(MonitoredFluidStack info, NBTTagCompound tag, SyncType type) {
-		if (!validateInfo(info)) {
-			return tag;
-		}
-		return info.writeToNBT(tag, info);
-	}
-	
-	@Override
-	public boolean validateInfo(IMonitorInfo info) {
-		return info instanceof MonitoredFluidStack && ((MonitoredFluidStack) info).fluid != null;
-	}
-	*/
 
 }

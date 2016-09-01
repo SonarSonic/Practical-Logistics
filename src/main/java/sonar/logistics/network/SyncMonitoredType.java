@@ -5,20 +5,15 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.core.network.sync.SyncPart;
-import sonar.logistics.Logistics;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
-import sonar.logistics.api.info.monitor.MonitorHandler;
 import sonar.logistics.helpers.InfoHelper;
 
 public class SyncMonitoredType<T extends IMonitorInfo> extends SyncPart {
 
-	public String handlerID;
-	public MonitorHandler<T> handler;
 	public IMonitorInfo<T> info;
 
-	public SyncMonitoredType(String handlerID, int id) {
+	public SyncMonitoredType(int id) {
 		super(id);
-		this.handlerID = handlerID;
 	}
 
 	public void setInfo(IMonitorInfo<T> info) {
@@ -63,10 +58,9 @@ public class SyncMonitoredType<T extends IMonitorInfo> extends SyncPart {
 			info = InfoHelper.readInfoFromNBT(nbt.getCompoundTag(getTagName()));
 		}
 	}
-
+	/*
 	public MonitorHandler handler() {
 		return handler == null ? handler = Logistics.monitorHandlers.getRegisteredObject(handlerID) : handler;
-
 	}
-
+	*/
 }
