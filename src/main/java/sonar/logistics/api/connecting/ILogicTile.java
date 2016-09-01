@@ -14,5 +14,6 @@ public interface ILogicTile extends IWorldPosition {
 	 * @return the {@link BlockCoords} */
 	public BlockCoords getCoords();
 	
+	/**gets the network cache's ID*/
 	public int getNetworkID();
 }

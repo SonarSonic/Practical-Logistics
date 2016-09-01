@@ -1,5 +1,6 @@
 package sonar.logistics.api.readers;
 
+/**all the modes used by the Fluid Reader*/
 public class FluidReader {
 
 	public static enum Modes {

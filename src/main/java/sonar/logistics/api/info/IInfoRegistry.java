@@ -11,6 +11,7 @@ public abstract class IInfoRegistry {
 	/**register any IInventory fields which can be read here*/
 	public void registerAllFields(){}
 	
+	/**register any prefixes or suffixes to be used on any type of returns*/
 	public void registerAdjustments(){}
 	
 }

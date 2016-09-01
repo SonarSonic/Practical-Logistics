@@ -25,9 +25,9 @@ import sonar.logistics.api.display.ScreenLayout;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
 import sonar.logistics.helpers.InfoHelper;
 
+/** the typical implementation */
 public class InfoContainer implements IInfoContainer, INBTSyncable {
 
-	// public static TextureAtlasSprite progressSprite;
 	public static final ResourceLocation colour1 = new ResourceLocation(Logistics.MODID + ":textures/model/" + "progress1.png");
 	public static final ResourceLocation colour2 = new ResourceLocation(Logistics.MODID + ":textures/model/" + "progress2.png");
 	public static final ResourceLocation colour3 = new ResourceLocation(Logistics.MODID + ":textures/model/" + "progress3.png");

@@ -1,5 +1,6 @@
 package sonar.logistics.api.display;
 
+/**the various types of Display Screen*/
 public enum DisplayType {
 
 	SMALL(0.0625 * 6, 0.0625 * 14, 0.008), LARGE(0.0625 * 14, 0.0625 * 14, 0.008), CONNECTED(0.0625 * 14, 0.0625 * 14, 0.008);

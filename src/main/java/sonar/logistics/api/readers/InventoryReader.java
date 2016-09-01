@@ -1,5 +1,6 @@
 package sonar.logistics.api.readers;
 
+/**all the modes used by the Inventory Reader*/
 public class InventoryReader {
 	public static enum Modes {
 		STACK, SLOT, POS, INVENTORIES, STORAGE;
