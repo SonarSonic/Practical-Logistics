@@ -21,17 +21,18 @@ import sonar.logistics.api.info.monitor.ChannelType;
 import sonar.logistics.api.info.monitor.ILogicMonitor;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
 import sonar.logistics.api.info.monitor.IdentifiedCoordsList;
-import sonar.logistics.api.info.monitor.MonitorHandler;
+import sonar.logistics.api.info.monitor.LogicMonitorHandler;
 import sonar.logistics.api.info.monitor.MonitorViewer;
-import sonar.logistics.helpers.MonitorHelper;
+import sonar.logistics.helpers.InfoHelper;
+import sonar.logistics.helpers.LogisticsHelper;
 import sonar.logistics.monitoring.MonitoredBlockCoords;
 import sonar.logistics.network.PacketMonitoredCoords;
 import sonar.logistics.network.PacketMonitoredList;
 
 public abstract class MonitorCache implements IMonitorCache {
 
-	public final Map<MonitorHandler, Map<Pair<BlockCoords, EnumFacing>, MonitoredList<?>>> connectionInfo = new LinkedHashMap(); // block coords stored with the info gathered
-	public final Map<MonitorHandler, Map<ILogicMonitor, MonitoredList<?>>> monitorInfo = new LinkedHashMap();
+	public final Map<LogicMonitorHandler, Map<Pair<BlockCoords, EnumFacing>, MonitoredList<?>>> connectionInfo = new LinkedHashMap(); // block coords stored with the info gathered
+	public final Map<LogicMonitorHandler, Map<ILogicMonitor, MonitoredList<?>>> monitorInfo = new LinkedHashMap();
 	public final Map<IInfoDisplay, IInfoContainer> connectedDisplays = new LinkedHashMap();
 	public final ArrayList<ILogicMonitor> localMonitors = new ArrayList();
 
@@ -78,10 +79,10 @@ public abstract class MonitorCache implements IMonitorCache {
 	}
 
 	public void sendPacketsToViewer(ILogicMonitor monitor, List<MonitorViewer> viewers, boolean fullPacket, MonitoredList saveList, MonitoredList lastList) {
-		NBTTagCompound tag = MonitorHelper.writeMonitoredList(new NBTTagCompound(), lastList.isEmpty(), saveList, fullPacket ? SyncType.DEFAULT_SYNC : SyncType.SPECIAL);
+		NBTTagCompound tag = InfoHelper.writeMonitoredList(new NBTTagCompound(), lastList.isEmpty(), saveList, fullPacket ? SyncType.DEFAULT_SYNC : SyncType.SPECIAL);
 
 		MonitoredList<MonitoredBlockCoords> coords = fullPacket ? CacheRegistry.coordMap.get(getNetworkID()) : null;
-		NBTTagCompound coordTag = fullPacket ? MonitorHelper.writeMonitoredList(new NBTTagCompound(), coords.isEmpty(), coords.copyInfo(), SyncType.DEFAULT_SYNC) : null;
+		NBTTagCompound coordTag = fullPacket ? InfoHelper.writeMonitoredList(new NBTTagCompound(), coords.isEmpty(), coords.copyInfo(), SyncType.DEFAULT_SYNC) : null;
 		if (fullPacket || !tag.hasNoTags()) {
 			viewers.forEach(viewer -> {
 				switch (viewer.type) {
@@ -101,15 +102,16 @@ public abstract class MonitorCache implements IMonitorCache {
 
 	}
 
-	public <T extends IMonitorInfo> Map<Pair<BlockCoords, EnumFacing>, MonitoredList<?>> getMonitoredList(MonitorHandler<T> type) {
+	public <T extends IMonitorInfo> Map<Pair<BlockCoords, EnumFacing>, MonitoredList<?>> getMonitoredList(LogicMonitorHandler<T> type) {
 		Map<Pair<BlockCoords, EnumFacing>, MonitoredList<?>> infoList = connectionInfo.getOrDefault(type, new LinkedHashMap());
 		Map<Pair<BlockCoords, EnumFacing>, MonitoredList<?>> coordInfo = new LinkedHashMap();
 		for (Entry<Pair<BlockCoords, EnumFacing>, MonitoredList<?>> entry : infoList.entrySet()) {
-			MonitoredList<T> list = type.updateInfo((MonitoredList<T>) entry.getValue(), entry.getKey().a, entry.getKey().b);
+			MonitoredList<T> oldList = entry.getValue() == null ? MonitoredList.<T>newMonitoredList() : (MonitoredList<T>) entry.getValue();
+			MonitoredList<T> list = type.updateInfo(oldList, entry.getKey().a, entry.getKey().b);
 			coordInfo.put(entry.getKey(), list);
 		}
 		return coordInfo;
 	}
 
-	public abstract <T extends IMonitorInfo> void compileCoordsList(MonitorHandler<T> type);
+	public abstract <T extends IMonitorInfo> void compileCoordsList(LogicMonitorHandler<T> type);
 }

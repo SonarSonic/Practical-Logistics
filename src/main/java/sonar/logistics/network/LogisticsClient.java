@@ -3,6 +3,9 @@ package sonar.logistics.network;
 import mcmultipart.client.multipart.MultipartRegistryClient;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.client.event.DrawBlockHighlightEvent;
+import net.minecraftforge.client.event.GuiOpenEvent;
+import net.minecraftforge.client.event.GuiScreenEvent;
+import net.minecraftforge.client.event.MouseEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
@@ -34,7 +37,7 @@ public class LogisticsClient extends LogisticsCommon {
 	}
 
 	public void registerTextures() {
-		//Minecraft.getMinecraft().getTextureMapBlocks().registerSprite(InfoContainer.progressGreen);
+		// Minecraft.getMinecraft().getTextureMapBlocks().registerSprite(InfoContainer.progressGreen);
 	}
 
 	@SubscribeEvent
@@ -43,7 +46,16 @@ public class LogisticsClient extends LogisticsCommon {
 	}
 
 	@SubscribeEvent
-	public void renderHighlight(DrawBlockHighlightEvent evt){
+	public void renderHighlight(DrawBlockHighlightEvent evt) {
 		RenderOperatorOverlay.tick(evt);
 	}
+
+	public void setUsingOperator(boolean bool) {
+		RenderOperatorOverlay.isUsing = bool;
+	}
+
+	public boolean isUsingOperator(){
+		return RenderOperatorOverlay.isUsing;
+	}
+	
 }

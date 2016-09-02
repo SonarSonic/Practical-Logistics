@@ -34,7 +34,7 @@ public class PacketMonitorType implements IMessage {
 
 	@Override
 	public void toBytes(ByteBuf buf) {
-		buf.writeInt(monitor.getMonitorUUID().hashCode());
+		buf.writeInt(monitor.getIdentity().hashCode());
 		buf.writeInt(type.ordinal());
 	}
 

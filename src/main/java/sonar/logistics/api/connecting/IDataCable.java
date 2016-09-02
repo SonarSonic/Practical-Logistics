@@ -1,10 +1,13 @@
 package sonar.logistics.api.connecting;
 
+import net.minecraft.util.EnumFacing;
+import sonar.core.api.utils.BlockCoords;
+import sonar.core.utils.IWorldPosition;
 import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.render.ICableRenderer;
 
 /** implemented on Tile Entities and Forge Multipart parts which are cables */
-public interface IDataCable extends ICableRenderer, ILogicTile {
+public interface IDataCable extends ICableRenderer, IWorldPosition {
 	
 	/** when cables join together they create networks which are stored under IDs in the registry, this returns this id */
 	//public int registryID();
@@ -27,6 +30,15 @@ public interface IDataCable extends ICableRenderer, ILogicTile {
 	/**ensures all connections are connected to the same network*/
 	public void configureConnections(INetworkCache network);	
 	
-	/**if this cable has connected ILogicTiles within it's multipart*/
-	public boolean hasConnections();	
+	public boolean hasConnections();
+	
+	/** can the Tile connect to cables on the given direction */
+	public boolean canConnect(EnumFacing dir);
+
+	/** the {@link BlockCoords} this Block/FMP Part should be registered as on the Network
+	 * @return the {@link BlockCoords} */
+	public BlockCoords getCoords();
+	
+	/**gets the network cache's ID*/
+	public int getNetworkID();
 }

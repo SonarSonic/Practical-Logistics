@@ -2,14 +2,19 @@ package sonar.logistics.monitoring;
 
 import net.minecraft.util.EnumFacing;
 import sonar.core.api.utils.BlockCoords;
-import sonar.logistics.api.info.monitor.MonitorHandler;
+import sonar.logistics.Logistics;
+import sonar.logistics.api.asm.MonitorHandler;
+import sonar.logistics.api.info.monitor.LogicMonitorHandler;
 import sonar.logistics.connections.MonitoredList;
 
-public class ChannelMonitorHandler extends MonitorHandler<MonitoredBlockCoords> {
+@MonitorHandler(handlerID = ChannelMonitorHandler.id, modid = Logistics.MODID)
+public class ChannelMonitorHandler extends LogicMonitorHandler<MonitoredBlockCoords> {
 
+	public static final String id = "channels";
+	
 	@Override
-	public String getName() {
-		return MonitorHandler.CHANNEL;
+	public String id() {
+		return id;
 	}
 
 	@Override

@@ -10,16 +10,20 @@ import sonar.core.api.StorageSize;
 import sonar.core.api.fluids.FluidHandler;
 import sonar.core.api.fluids.StoredFluidStack;
 import sonar.core.api.utils.BlockCoords;
-import sonar.logistics.api.info.monitor.MonitorHandler;
+import sonar.logistics.Logistics;
+import sonar.logistics.api.asm.MonitorHandler;
+import sonar.logistics.api.info.monitor.LogicMonitorHandler;
 import sonar.logistics.connections.MonitoredList;
 
-public class FluidMonitorHandler extends MonitorHandler<MonitoredFluidStack> {
+@MonitorHandler(handlerID = FluidMonitorHandler.id, modid = Logistics.MODID)
+public class FluidMonitorHandler extends LogicMonitorHandler<MonitoredFluidStack> {
 
+	public static final String id = "fluid";
+	
 	@Override
-	public String getName() {
-		return MonitorHandler.FLUIDS;
+	public String id() {
+		return id;
 	}
-
 	@Override
 	public MonitoredList<MonitoredFluidStack> updateInfo(MonitoredList<MonitoredFluidStack> previousList, BlockCoords coords, EnumFacing side) {
 		MonitoredList<MonitoredFluidStack> list = MonitoredList.<MonitoredFluidStack>newMonitoredList();

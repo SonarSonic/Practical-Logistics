@@ -21,7 +21,7 @@ import sonar.logistics.api.asm.LogicInfoType;
 import sonar.logistics.api.display.DisplayType;
 import sonar.logistics.api.info.monitor.ILogicMonitor;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
-import sonar.logistics.api.info.monitor.MonitorHandler;
+import sonar.logistics.api.info.monitor.LogicMonitorHandler;
 import sonar.logistics.connections.LogicMonitorCache;
 import sonar.logistics.connections.MonitoredList;
 import sonar.logistics.monitoring.MonitoredItemStack;
@@ -65,7 +65,7 @@ public class LogicInfoList extends BaseInfo<LogicInfoList> implements INameableI
 	}
 
 	@Override
-	public MonitorHandler<LogicInfoList> getHandler() {
+	public LogicMonitorHandler<LogicInfoList> getHandler() {
 		return null;
 	}
 

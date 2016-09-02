@@ -1,5 +1,5 @@
 package sonar.logistics.registries;
-
+/*
 import sonar.core.helpers.NBTRegistryHelper;
 import sonar.logistics.api.utils.ItemFilter;
 import sonar.logistics.info.filters.items.ItemStackFilter;
@@ -23,3 +23,4 @@ public class ItemFilterRegistry extends NBTRegistryHelper.Buf<ItemFilter> {
 		return target.equalFilter(current);
 	}
 }
+*/

@@ -28,7 +28,6 @@ import sonar.logistics.connections.LogicMonitorCache;
 import sonar.logistics.network.LogisticsCommon;
 import sonar.logistics.registries.InfoLoaderRegistry;
 import sonar.logistics.registries.LogicRegistry;
-import sonar.logistics.registries.MonitorHandlerRegistry;
 import sonar.logistics.utils.SapphireOreGen;
 
 @Mod(modid = Logistics.MODID, name = Logistics.NAME, version = Logistics.VERSION, dependencies = "required-after:SonarCore")
@@ -43,12 +42,6 @@ public class Logistics {
 
 	public static SimpleNetworkWrapper network;
 	public static Logger logger = (Logger) LogManager.getLogger(MODID);
-
-	// public static InfoTypeRegistry infoTypes = new InfoTypeRegistry();
-	// public static InfoInteractionRegistry infoInteraction = new InfoInteractionRegistry();
-	// public static ItemFilterRegistry itemFilters = new ItemFilterRegistry();
-	// public static EntityProviderRegistry entityProviders = new EntityProviderRegistry();
-	public static MonitorHandlerRegistry monitorHandlers = new MonitorHandlerRegistry();
 
 	@Instance(MODID)
 	public static Logistics instance;
@@ -89,7 +82,6 @@ public class Logistics {
 
 		proxy.registerRenderThings();
 		logger.info("Registered Renderers");
-		/* MultipartRegistry.registerPart(NodePart.class, "practicallogistics:Node"); MultipartRegistry.registerPart(EntityNodePart.class, "practicallogistics:EntityNode"); MultipartRegistry.registerPart(InfoReaderPart.class, "practicallogistics:InfoReader");  MultipartRegistry.registerPart(RedstoneSignallerPart.class, "practicallogistics:RedstoneSignaller"); */
 		if (LogisticsConfig.sapphireOre) {
 			GameRegistry.registerWorldGenerator(new SapphireOreGen(), 1);
 			logger.info("Registered Sapphire World Generator");
@@ -98,6 +90,7 @@ public class Logistics {
 
 		ASMDataTable asmDataTable = event.getAsmData();
 		InfoLoaderRegistry.loadInfoTypes(asmDataTable);
+		InfoLoaderRegistry.loadMonitorHandlers(asmDataTable);
 		LogicRegistry.infoRegistries.addAll(InfoLoaderRegistry.getInfoRegistries(asmDataTable));
 		LogicRegistry.customTileHandlers.addAll(InfoLoaderRegistry.getCustomTileHandlers(asmDataTable));
 		LogicRegistry.customEntityHandlers.addAll(InfoLoaderRegistry.getCustomEntityHandlers(asmDataTable));
@@ -116,30 +109,17 @@ public class Logistics {
 		logger.info("Registered OreDict");
 
 		MinecraftForge.EVENT_BUS.register(new LogisticsEvents());
-		// FMLCommonHandler.instance().bus().register(new LogisticsEvents());
 		logger.info("Registered Events");
 		NetworkRegistry.INSTANCE.registerGuiHandler(this, new LogisticsCommon());
 		logger.info("Registered GUI Handler");
-
-		// infoTypes.register();
-		// infoInteraction.register();
-		// itemFilters.register();
-		// entityProviders.register();
-		monitorHandlers.register();
 		proxy.registerTextures();
 	}
 
 	@EventHandler
 	public void postLoad(FMLPostInitializationEvent evt) {
 		logger.info("Please Wait: We are saving Harambe with a time machine");
-		// logger.info("Registered " + infoTypes.getObjects().size() + " Info Types");
-		// logger.info("Registered " + infoInteraction.getObjects().size() + " Info Interactions");
-		// logger.info("Registered " + itemFilters.getObjects().size() + " Item Filters");
-		// logger.info("Registered " + entityProviders.getObjects().size() + " Entity Providers");
-		logger.info("Registered " + monitorHandlers.getObjects().size() + " " + monitorHandlers.registeryType());
 
 		if (Loader.isModLoaded("MineTweaker3")) {
-			// MineTweakerIntegration.integrate();
 			logger.info("'Mine Tweaker' integration was loaded");
 		}
 	}

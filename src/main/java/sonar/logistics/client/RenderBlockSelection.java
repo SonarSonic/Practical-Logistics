@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 
 import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import sonar.core.api.utils.BlockCoords;
@@ -24,15 +25,17 @@ public class RenderBlockSelection {
 			if (time > position.getValue().a + displayTime) {
 				positions.remove(position.getKey());
 			} else {
+				// if (position.getKey().getDimension() == Minecraft.getMinecraft().thePlayer.dimension) {
 				GlStateManager.pushMatrix();
 				GlStateManager.disableAlpha();
 				if (position.getValue().b) {
-					
+
 				} else {
 					RenderHelper.drawBoundingBox(Block.FULL_BLOCK_AABB, position.getKey().getBlockPos(), evt.getPartialTicks(), 120.0F, 100.0F, 20.0F, 0.5F);
 				}
 				GlStateManager.enableAlpha();
 				GlStateManager.popMatrix();
+				// }
 			}
 		}
 	}

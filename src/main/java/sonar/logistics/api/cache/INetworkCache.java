@@ -7,6 +7,7 @@ import java.util.Map.Entry;
 
 import net.minecraft.util.EnumFacing;
 import sonar.core.api.utils.BlockCoords;
+import sonar.core.utils.IWorldPosition;
 import sonar.logistics.api.connecting.ILogicTile;
 import sonar.logistics.api.info.monitor.ILogicMonitor;
 
@@ -30,13 +31,13 @@ public interface INetworkCache {
 	 * @param type the {@link CacheType} you wish to retrieve.
 	 * @param includeChannels normally true, false if you are retrieving blocks from multiple connected networks, which have already been logged
 	 * @return the {@link ArrayList}<{@link BlockCoords}> requested */
-	public <T extends ILogicTile> ArrayList<T> getConnections(Class<T> classType, boolean includeChannels);
+	public <T extends IWorldPosition> ArrayList<T> getConnections(Class<T> classType, boolean includeChannels);
 
 	/** convenience method for getting the BlockCoords of the first connection from the given {@link CacheType}
 	 * 
 	 * @param type the {@link CacheType} you wish to retrieve.
 	 * @return the {@link BlockCoords} requested, may be null */
-	public <T extends ILogicTile> T getFirstConnection(Class<T> classType);
+	public <T extends IWorldPosition> T getFirstConnection(Class<T> classType);
 
 	/** @return the networkID, related to the id of the Cable Network */
 	public int getNetworkID();
@@ -54,4 +55,5 @@ public interface INetworkCache {
 	
 	public ILogicMonitor getLocalMonitor();
 	
+	public void markDirty(RefreshType type);
 }

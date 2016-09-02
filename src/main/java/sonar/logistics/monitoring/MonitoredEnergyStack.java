@@ -8,13 +8,13 @@ import sonar.logistics.api.display.DisplayType;
 import sonar.logistics.api.info.BaseInfo;
 import sonar.logistics.api.info.monitor.IJoinableInfo;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
-import sonar.logistics.api.info.monitor.MonitorHandler;
+import sonar.logistics.api.info.monitor.LogicMonitorHandler;
 
 @LogicInfoType(id = MonitoredEnergyStack.id, modid = Logistics.MODID)
 public class MonitoredEnergyStack extends BaseInfo<MonitoredEnergyStack> implements IJoinableInfo<MonitoredEnergyStack> {
 
 	public static final String id = "energy";
-	public static final MonitorHandler<MonitoredEnergyStack> handler = Logistics.monitorHandlers.getRegisteredObject(MonitorHandler.ITEMS);
+	public static LogicMonitorHandler<MonitoredEnergyStack> handler = LogicMonitorHandler.instance(EnergyMonitorHandler.id);
 	public SyncNBTAbstract<StoredEnergyStack> energyStack = new SyncNBTAbstract<StoredEnergyStack>(StoredEnergyStack.class, 0);
 
 	{
@@ -44,7 +44,7 @@ public class MonitoredEnergyStack extends BaseInfo<MonitoredEnergyStack> impleme
 	}
 
 	@Override
-	public MonitorHandler<MonitoredEnergyStack> getHandler() {
+	public LogicMonitorHandler<MonitoredEnergyStack> getHandler() {
 		return handler;
 	}
 

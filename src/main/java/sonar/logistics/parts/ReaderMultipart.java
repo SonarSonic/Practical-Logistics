@@ -23,6 +23,7 @@ import sonar.logistics.api.info.monitor.IReader;
 import sonar.logistics.api.info.monitor.MonitorType;
 import sonar.logistics.api.info.monitor.MonitorViewer;
 import sonar.logistics.connections.LogicMonitorCache;
+import sonar.logistics.helpers.LogisticsHelper;
 
 public abstract class ReaderMultipart<T extends IMonitorInfo> extends MonitorMultipart<T> implements ISlottedPart, IReader<T>, IFlexibleGui {
 
@@ -36,18 +37,20 @@ public abstract class ReaderMultipart<T extends IMonitorInfo> extends MonitorMul
 
 	@Override
 	public boolean onActivated(EntityPlayer player, EnumHand hand, ItemStack heldItem, PartMOP hit) {
-		if (this instanceof IFlexibleGui) {
-			if (!getWorld().isRemote)
+		if (!LogisticsHelper.isPlayerUsingOperator(player)) {
+			if (!getWorld().isRemote) {
 				SonarCore.network.sendTo(new PacketMultipartSync(getPos(), writeData(new NBTTagCompound(), SyncType.SYNC_OVERRIDE), SyncType.SYNC_OVERRIDE, getUUID()), (EntityPlayerMP) player);
-			addViewer(new MonitorViewer(player, MonitorType.INFO));
-			openBasicGui(player, 0);
+				addViewer(new MonitorViewer(player, MonitorType.INFO));
+				openBasicGui(player, 0);
+			}
+			return true;
 		}
-		return true;
+		return false;
 	}
 
 	@Override
 	public IMonitorInfo getMonitorInfo(int pos) {
-		return LogicMonitorCache.info.get(new InfoUUID(getMonitorUUID().hashCode(), pos));
+		return LogicMonitorCache.info.get(new InfoUUID(getIdentity().hashCode(), pos));
 	}
 
 	@Override

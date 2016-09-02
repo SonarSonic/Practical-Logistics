@@ -52,7 +52,7 @@ public abstract class LogicReaderPart<T extends IMonitorInfo> extends ReaderMult
 		ArrayList<IMonitorInfo> cachedSelected = this.getSelectedInfo();
 		ArrayList<IMonitorInfo> cachedPaired = this.getPairedInfo();
 		for (int i = 0; i < this.getMaxInfo(); i++) {
-			InfoUUID id = new InfoUUID(getMonitorUUID().hashCode(), i);
+			InfoUUID id = new InfoUUID(getIdentity().hashCode(), i);
 			IMonitorInfo selectedInfo = cachedSelected.get(i);
 			IMonitorInfo lastInfo = LogicMonitorCache.info.get(id);
 			if (selectedInfo != null) {

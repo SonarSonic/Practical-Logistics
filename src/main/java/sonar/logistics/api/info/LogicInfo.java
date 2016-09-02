@@ -16,9 +16,10 @@ import sonar.logistics.Logistics;
 import sonar.logistics.api.asm.LogicInfoType;
 import sonar.logistics.api.display.DisplayType;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
-import sonar.logistics.api.info.monitor.MonitorHandler;
+import sonar.logistics.api.info.monitor.LogicMonitorHandler;
 import sonar.logistics.helpers.InfoHelper;
 import sonar.logistics.helpers.InfoRenderer;
+import sonar.logistics.monitoring.InfoMonitorHandler;
 import sonar.logistics.registries.LogicRegistry;
 import sonar.logistics.registries.LogicRegistry.RegistryType;
 
@@ -27,7 +28,7 @@ import sonar.logistics.registries.LogicRegistry.RegistryType;
 public class LogicInfo extends BaseInfo<LogicInfo> implements INameableInfo<LogicInfo>, IClickableInfo {
 
 	public static final String id = "logic";
-	public static final MonitorHandler<LogicInfo> handler = Logistics.monitorHandlers.getRegisteredObject(MonitorHandler.INFO);
+	public static final LogicMonitorHandler<LogicInfo> handler = LogicMonitorHandler.instance(InfoMonitorHandler.id);
 
 	private SyncTagType.STRING identifier = new SyncTagType.STRING(1);
 	private SyncEnum<RegistryType> registryType = new SyncEnum(RegistryType.values(), 2);
@@ -62,7 +63,7 @@ public class LogicInfo extends BaseInfo<LogicInfo> implements INameableInfo<Logi
 	}
 
 	@Override
-	public MonitorHandler<LogicInfo> getHandler() {
+	public LogicMonitorHandler<LogicInfo> getHandler() {
 		return handler;
 	}
 

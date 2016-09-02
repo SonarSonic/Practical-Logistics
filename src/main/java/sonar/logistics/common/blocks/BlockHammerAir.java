@@ -16,9 +16,9 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
+import sonar.core.utils.IGuiTile;
 import sonar.logistics.Logistics;
 import sonar.logistics.LogisticsBlocks;
-import sonar.logistics.network.LogisticsGui;
 
 public class BlockHammerAir extends Block {
 	public BlockHammerAir() {
@@ -65,10 +65,10 @@ public class BlockHammerAir extends Block {
 	@Override
     public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, @Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ){
 		if (world.getBlockState(pos.offset(EnumFacing.DOWN)).getBlock() == LogisticsBlocks.hammer) {
-			//player.openGui(Logistics.instance, LogisticsGui.hammer, world, pos.getX(), pos.getY() - 1, pos.getZ());
+			player.openGui(Logistics.instance, IGuiTile.ID, world, pos.getX(), pos.getY() - 1, pos.getZ());
 			return true;
 		} else if (world.getBlockState(pos.offset(EnumFacing.DOWN, 2)).getBlock() == LogisticsBlocks.hammer) {
-			//player.openGui(Logistics.instance, LogisticsGui.hammer, world, pos.getX(), pos.getY() - 2, pos.getZ());
+			player.openGui(Logistics.instance, IGuiTile.ID, world, pos.getX(), pos.getY() - 2, pos.getZ());
 			return true;
 		}
 		return false;

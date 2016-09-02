@@ -11,7 +11,7 @@ import sonar.logistics.Logistics;
 import sonar.logistics.api.asm.LogicInfoType;
 import sonar.logistics.api.display.DisplayType;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
-import sonar.logistics.api.info.monitor.MonitorHandler;
+import sonar.logistics.api.info.monitor.LogicMonitorHandler;
 import sonar.logistics.helpers.InfoHelper;
 import sonar.logistics.helpers.InfoRenderer;
 
@@ -96,7 +96,7 @@ public class ProgressInfo implements IMonitorInfo<ProgressInfo>, INBTSyncable, I
 	}
 
 	@Override
-	public MonitorHandler<ProgressInfo> getHandler() {
+	public LogicMonitorHandler<ProgressInfo> getHandler() {
 		return null;
 	}
 

@@ -1,5 +1,5 @@
 package sonar.logistics.client.gui;
-
+/*
 import java.io.IOException;
 
 import org.lwjgl.input.Keyboard;
@@ -104,3 +104,4 @@ public class GuiRenameEmitter extends GuiSonar {
 	}
 
 }
+*/

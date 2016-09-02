@@ -30,7 +30,7 @@ public class BlockHammer extends SonarMachineBlock {
 
 	@Override
 	public boolean operateBlock(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, BlockInteraction interact){
-		if (player != null) {
+		if (!world.isRemote && player != null) {
 			player.openGui(Logistics.instance, IGuiTile.ID, world, pos.getX(), pos.getY(), pos.getZ());
 			return true;
 		}

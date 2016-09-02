@@ -9,7 +9,8 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.logistics.connections.CacheRegistry;
 import sonar.logistics.connections.MonitoredList;
-import sonar.logistics.helpers.MonitorHelper;
+import sonar.logistics.helpers.InfoHelper;
+import sonar.logistics.helpers.LogisticsHelper;
 import sonar.logistics.monitoring.MonitoredBlockCoords;
 
 public class PacketMonitoredCoords implements IMessage {
@@ -31,7 +32,7 @@ public class PacketMonitoredCoords implements IMessage {
 		registryID = buf.readInt();
 		listTag = ByteBufUtils.readTag(buf);
 		if (listTag != null)
-			list = MonitorHelper.readMonitoredList(listTag, CacheRegistry.coordMap.getOrDefault(registryID, MonitoredList.newMonitoredList()).copyInfo(), SyncType.DEFAULT_SYNC);
+			list = InfoHelper.readMonitoredList(listTag, CacheRegistry.coordMap.getOrDefault(registryID, MonitoredList.newMonitoredList()).copyInfo(), SyncType.DEFAULT_SYNC);
 	}
 
 	@Override

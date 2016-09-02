@@ -6,6 +6,7 @@ import java.util.Map.Entry;
 
 import net.minecraft.util.EnumFacing;
 import sonar.core.api.utils.BlockCoords;
+import sonar.core.utils.IWorldPosition;
 import sonar.logistics.api.connecting.ILogicTile;
 import sonar.logistics.api.info.monitor.ILogicMonitor;
 
@@ -32,12 +33,12 @@ public class EmptyNetworkCache implements INetworkCache {
 	}
 
 	@Override
-	public <T extends ILogicTile> ArrayList<T> getConnections(Class<T> classType, boolean includeChannels){
+	public <T extends IWorldPosition> ArrayList<T> getConnections(Class<T> classType, boolean includeChannels){
 		return new ArrayList();
 	}
 
 	@Override
-	public <T extends ILogicTile> T getFirstConnection(Class<T> classType){
+	public <T extends IWorldPosition> T getFirstConnection(Class<T> classType){
 		return null;
 	}
 
@@ -64,5 +65,8 @@ public class EmptyNetworkCache implements INetworkCache {
 	public ILogicMonitor getLocalMonitor() {
 		return null;
 	}
+
+	@Override
+	public void markDirty(RefreshType type) {}
 
 }

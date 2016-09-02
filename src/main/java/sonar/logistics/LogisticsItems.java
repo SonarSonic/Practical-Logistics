@@ -12,6 +12,7 @@ import sonar.logistics.common.items.ItemFacingMultipart;
 import sonar.logistics.common.items.ItemOperator;
 import sonar.logistics.common.items.ItemScreenMultipart;
 import sonar.logistics.common.items.ItemSidedMultipart;
+import sonar.logistics.common.items.ItemWirelessMultipart;
 import sonar.logistics.common.items.WirelessTransceiver;
 import sonar.logistics.parts.ArrayPart;
 import sonar.logistics.parts.DataCablePart;
@@ -64,8 +65,8 @@ public class LogisticsItems extends Logistics {
 		infoReaderPart = register(new SonarRegistryItem(new ItemSidedMultipart(InfoReaderPart.class), "InfoReader"));
 		energyReaderPart = register(new SonarRegistryItem(new ItemSidedMultipart(EnergyReaderPart.class), "EnergyReader"));
 		transceiver = register(new SonarRegistryItem(new WirelessTransceiver().setMaxStackSize(1), "Transceiver"));
-		partEmitter = register(new SonarRegistryItem(new ItemFacingMultipart(DataEmitterPart.class), "DataEmitter"));
-		partReceiver = register(new SonarRegistryItem(new ItemFacingMultipart(DataReceiverPart.class), "DataReceiver"));
+		partEmitter = register(new SonarRegistryItem(new ItemWirelessMultipart(DataEmitterPart.class), "DataEmitter"));
+		partReceiver = register(new SonarRegistryItem(new ItemWirelessMultipart(DataReceiverPart.class), "DataReceiver"));
 
 		MultipartRegistry.registerPart(DataCablePart.class, "practicallogistics:DataCable");
 		MultipartRegistry.registerPart(NodePart.class, "practicallogistics:Node");

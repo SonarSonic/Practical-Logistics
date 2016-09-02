@@ -33,8 +33,10 @@ public abstract class LogisticsMultipart extends SonarMultipart implements ILogi
 	}
 
 	public void setLocalNetworkCache(INetworkCache network) {
-		this.network = network;
-		this.registryID.setObject(network.getNetworkID());
+		if (!this.wasRemoved) {
+			this.network = network;
+			this.registryID.setObject(network.getNetworkID());
+		}
 	}
 
 	public INetworkCache getNetwork() {
@@ -43,12 +45,13 @@ public abstract class LogisticsMultipart extends SonarMultipart implements ILogi
 
 	public void addInfo(List<String> info) {
 		ItemStack dropStack = getItemStack();
-		if (dropStack != null)info.add(TextFormatting.UNDERLINE + dropStack.getDisplayName());
+		if (dropStack != null)
+			info.add(TextFormatting.UNDERLINE + dropStack.getDisplayName());
 		info.add("Network ID: " + registryID.getObject());
 		info.add("Has channels: " + (this instanceof InfoReaderPart));
 	}
 
-	public int getNetworkID(){
+	public int getNetworkID() {
 		return registryID.getObject();
 	}
 }

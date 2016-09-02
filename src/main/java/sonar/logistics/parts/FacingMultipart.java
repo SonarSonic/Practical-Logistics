@@ -33,8 +33,7 @@ public abstract class FacingMultipart extends LogisticsMultipart implements INor
 
 	@Override
 	public void addOcclusionBoxes(List<AxisAlignedBB> list) {
-		addSelectionBoxes(list);
-		
+		addSelectionBoxes(list);		
 	}
 	
 	@Override

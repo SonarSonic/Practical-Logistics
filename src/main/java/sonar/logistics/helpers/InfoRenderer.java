@@ -137,7 +137,7 @@ public class InfoRenderer {
 			}
 		} else if (info instanceof MonitoredBlockCoords) {
 			MonitoredBlockCoords directInfo = (MonitoredBlockCoords) info;
-			FontHelper.text(directInfo.coords.toString(), identifierLeft, yPos, colour);
+			FontHelper.text(directInfo.syncCoords.toString(), identifierLeft, yPos, colour);
 		}
 	}
 }

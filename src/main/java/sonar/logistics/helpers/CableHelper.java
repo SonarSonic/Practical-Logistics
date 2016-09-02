@@ -14,16 +14,22 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import sonar.core.api.utils.BlockCoords;
 import sonar.core.utils.Pair;
+import sonar.core.utils.SonarValidation;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.cache.EmptyNetworkCache;
 import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.connecting.CableType;
 import sonar.logistics.api.connecting.IDataCable;
+import sonar.logistics.api.connecting.IDataEmitter;
+import sonar.logistics.api.connecting.IDataReceiver;
 import sonar.logistics.api.connecting.ILogicTile;
 import sonar.logistics.api.display.IInfoDisplay;
+import sonar.logistics.api.info.monitor.ILogicMonitor;
 import sonar.logistics.api.wrappers.CablingWrapper;
 import sonar.logistics.connections.CableRegistry;
 import sonar.logistics.connections.CacheRegistry;
+import sonar.logistics.parts.DataCablePart;
+import sonar.logistics.parts.LogisticsMultipart;
 
 public class CableHelper extends CablingWrapper {
 
@@ -68,6 +74,43 @@ public class CableHelper extends CablingWrapper {
 		}
 		return null;
 	}
+	
+	public static ArrayList<ILogicTile> getConnectedTiles(DataCablePart cable) {		
+		return getConnectedTiles(cable, new SonarValidation.CLASS(ILogicTile.class));
+	}
+
+	public static <T> ArrayList<T> getConnectedTiles(DataCablePart cable, Class<T> type) {		
+		return getConnectedTiles(cable, new SonarValidation.CLASS(type));
+	}
+
+	public static <T> ArrayList<T> getConnectedTiles(DataCablePart cable, SonarValidation validate) {
+		ArrayList<T> logicTiles = new ArrayList();
+		for (IMultipart part : cable.getContainer().getParts()) {
+			if (validate.isValid(part)) {
+				logicTiles.add((T) part);
+			}
+		}
+		for (EnumFacing face : EnumFacing.values()) {
+			BlockCoords offset = BlockCoords.translateCoords(cable.getCoords(), face.getOpposite());
+			ILogicTile tile = LogisticsAPI.getCableHelper().getMultipart(offset, face);
+			if (validate.isValid(tile) && tile.canConnect(face)) {
+				logicTiles.add((T) tile);
+			}
+		}
+		return logicTiles;
+	}
+
+	public static ArrayList<ILogicMonitor> getLocalMonitors(DataCablePart cable) {
+		ArrayList<ILogicMonitor> logicTiles = new ArrayList();
+		for (EnumFacing face : EnumFacing.values()) {
+			BlockCoords offset = BlockCoords.translateCoords(cable.getCoords(), face.getOpposite());
+			ILogicTile tile = LogisticsAPI.getCableHelper().getMultipart(offset, face);
+			if (tile instanceof ILogicMonitor) {
+				logicTiles.add((ILogicMonitor) tile);
+			}
+		}
+		return logicTiles;
+	}
 
 	public INetworkCache addCable(IDataCable cable) {
 		ArrayList<Pair<CableType, Integer>> connections = new ArrayList();
@@ -77,15 +120,13 @@ public class CableHelper extends CablingWrapper {
 		for (EnumFacing dir : EnumFacing.values()) {
 			if (cable.canConnect(dir)) {
 				Pair<CableType, Integer> connection = getConnectionType(coords.getWorld(), coords.getBlockPos(), dir, cable.getCableType());
-				if (connection.a != CableType.NONE) {
-					if (connection.b != -1) {
-						List<BlockCoords> cables = CableRegistry.getCables(connection.b);
-						if (cables.size() > lastSize) {
-							cableID = connection.b;
-							lastSize = cables.size();
-						}
-						connections.add(connection);
+				if (connection.a != CableType.NONE && connection.b != -1) {
+					List<BlockCoords> cables = CableRegistry.getCables(connection.b);
+					if (cables.size() > lastSize) {
+						cableID = connection.b;
+						lastSize = cables.size();
 					}
+					connections.add(connection);
 				}
 			}
 		}
@@ -105,7 +146,7 @@ public class CableHelper extends CablingWrapper {
 	public void refreshConnections(IDataCable cable) {
 		BlockCoords coords = cable.getCoords();
 		for (EnumFacing dir : EnumFacing.values()) {
-			Pair<CableType, Integer> connection = LogisticsAPI.getCableHelper().getConnectionType(coords.getWorld(), coords.getBlockPos(), dir, cable.getCableType());
+			Pair<CableType, Integer> connection = getConnectionType(coords.getWorld(), coords.getBlockPos(), dir, cable.getCableType());
 			boolean canConnect = cable.canConnect(dir);
 			if ((!canConnect && connection.a.canConnect(cable.getCableType()))) {
 				cable.removeCable();
@@ -160,7 +201,6 @@ public class CableHelper extends CablingWrapper {
 			if (centre != null && centre instanceof IDataCable) {
 				return getConnectionTypeFromObject(centre, dir, cableType);
 			}
-
 		}
 		return new Pair(CableType.NONE, -1);
 	}

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
+import sonar.core.helpers.FontHelper;
 import sonar.logistics.api.connecting.IChannelledTile;
 import sonar.logistics.api.connecting.IOperatorTool;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
@@ -18,20 +19,26 @@ import sonar.logistics.helpers.InfoRenderer;
 import sonar.logistics.monitoring.MonitoredBlockCoords;
 import sonar.logistics.parts.InfoReaderPart;
 
-public class GuiChannelSelection extends GuiNewSelectionList<MonitoredBlockCoords> {
+public class GuiChannelSelection extends GuiSelectionList<MonitoredBlockCoords> {
 	IChannelledTile tile;
 
-	public GuiChannelSelection(IOperatorTool tool, IChannelledTile tile) {
-		super(new ContainerChannelSelection(tool, tile), tile);
+	public GuiChannelSelection(IChannelledTile tile) {
+		super(new ContainerChannelSelection(tile), tile);
 		this.tile = tile;
+	}
+
+	@Override
+	public void drawGuiContainerForegroundLayer(int x, int y) {
+		super.drawGuiContainerForegroundLayer(x, y);
+		FontHelper.textCentre(FontHelper.translate("Channel Selection"), xSize, 6, LogisticsColours.white_text);
+		FontHelper.textCentre(String.format("Select the channels you wish to monitor"), xSize, 18, LogisticsColours.grey_text);
 	}
 
 	public void selectionPressed(GuiButton button, int buttonID, MonitoredBlockCoords info) {
 		if (buttonID == 0) {
-			part.lastSelected = ((MonitoredBlockCoords) info).coords.getCoords();
-			part.sendByteBufPacket(-3);
+			tile.modifyCoords(info);
 		} else {
-			RenderBlockSelection.addPosition(info.coords.getCoords(), false);
+			RenderBlockSelection.addPosition(info.syncCoords.getCoords(), false);
 		}
 	}
 
@@ -41,8 +48,8 @@ public class GuiChannelSelection extends GuiNewSelectionList<MonitoredBlockCoord
 
 	@Override
 	public boolean isCategoryHeader(MonitoredBlockCoords info) {
-		if (RenderBlockSelection.positions.isEmpty()) {
-			if (RenderBlockSelection.isPositionRenderered(info.coords.getCoords())) {
+		if (!RenderBlockSelection.positions.isEmpty()) {
+			if (RenderBlockSelection.isPositionRenderered(info.syncCoords.getCoords())) {
 				return true;
 			}
 		}
@@ -51,7 +58,7 @@ public class GuiChannelSelection extends GuiNewSelectionList<MonitoredBlockCoord
 
 	@Override
 	public boolean isSelectedInfo(MonitoredBlockCoords info) {
-		if (info.isValid() && tile.getChannels().contains(info.coords.getCoords())) {
+		if (info.isValid() && !info.isHeader() && tile.getChannels().contains(info.syncCoords.getCoords())) {
 			return true;
 		}
 		return false;

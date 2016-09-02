@@ -6,6 +6,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.world.World;
 import sonar.core.api.inventories.StoredItemStack;
 import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.core.inventory.SonarMultipartInventory;
@@ -23,7 +24,7 @@ import sonar.logistics.api.info.LogicInfoList;
 import sonar.logistics.api.info.ProgressInfo;
 import sonar.logistics.api.info.monitor.ChannelType;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
-import sonar.logistics.api.info.monitor.MonitorHandler;
+import sonar.logistics.api.info.monitor.LogicMonitorHandler;
 import sonar.logistics.api.readers.InventoryReader;
 import sonar.logistics.client.gui.GuiInfoReader;
 import sonar.logistics.client.gui.GuiInventoryReader;
@@ -32,27 +33,28 @@ import sonar.logistics.common.containers.ContainerInventoryReader;
 import sonar.logistics.connections.LogicMonitorCache;
 import sonar.logistics.connections.MonitoredList;
 import sonar.logistics.helpers.ItemHelper;
+import sonar.logistics.monitoring.ItemMonitorHandler;
 import sonar.logistics.monitoring.MonitoredItemStack;
 import sonar.logistics.registries.LogicRegistry.RegistryType;
 
 public class InventoryReaderPart extends ReaderMultipart<MonitoredItemStack> implements IByteBufTile {
 
 	public SonarMultipartInventory inventory = new SonarMultipartInventory(this, 1);
-	public SyncEnum<InventoryReader.Modes> setting = (SyncEnum) new SyncEnum(InventoryReader.Modes.values(), 1).addSyncType(SyncType.SPECIAL);
-	public SyncTagType.INT targetSlot = (INT) new SyncTagType.INT(2).addSyncType(SyncType.SPECIAL);
-	public SyncTagType.INT posSlot = (INT) new SyncTagType.INT(3).addSyncType(SyncType.SPECIAL);
-	public SyncEnum<SortingDirection> sortingOrder = (SyncEnum) new SyncEnum(SortingDirection.values(), 4).addSyncType(SyncType.SPECIAL);
-	public SyncEnum<InventoryReader.SortingType> sortingType = (SyncEnum) new SyncEnum(InventoryReader.SortingType.values(), 5).addSyncType(SyncType.SPECIAL);
+	public SyncEnum<InventoryReader.Modes> setting = (SyncEnum) new SyncEnum(InventoryReader.Modes.values(), 2).addSyncType(SyncType.SPECIAL);
+	public SyncTagType.INT targetSlot = (INT) new SyncTagType.INT(3).addSyncType(SyncType.SPECIAL);
+	public SyncTagType.INT posSlot = (INT) new SyncTagType.INT(4).addSyncType(SyncType.SPECIAL);
+	public SyncEnum<SortingDirection> sortingOrder = (SyncEnum) new SyncEnum(SortingDirection.values(), 5).addSyncType(SyncType.SPECIAL);
+	public SyncEnum<InventoryReader.SortingType> sortingType = (SyncEnum) new SyncEnum(InventoryReader.SortingType.values(), 6).addSyncType(SyncType.SPECIAL);
 	{
 		syncParts.addAll(Lists.newArrayList(inventory, setting, targetSlot, posSlot, sortingOrder, sortingType));
 	}
 
 	public InventoryReaderPart() {
-		super(MonitorHandler.ITEMS);
+		super(ItemMonitorHandler.id);
 	}
 
 	public InventoryReaderPart(EnumFacing face) {
-		super(MonitorHandler.ITEMS, face);
+		super(ItemMonitorHandler.id, face);
 	}
 
 	@Override
@@ -76,7 +78,7 @@ public class InventoryReaderPart extends ReaderMultipart<MonitoredItemStack> imp
 		IMonitorInfo info = null;
 		switch (setting.getObject()) {
 		case INVENTORIES:
-			info = new LogicInfoList(this.getMonitorUUID(), MonitoredItemStack.id);
+			info = new LogicInfoList(this.getIdentity(), MonitoredItemStack.id);
 			break;
 		case POS:
 			int pos = posSlot.getObject();
@@ -101,7 +103,7 @@ public class InventoryReaderPart extends ReaderMultipart<MonitoredItemStack> imp
 			break;
 		}
 		if (info != null) {
-			InfoUUID id = new InfoUUID(getMonitorUUID().hashCode(), 0);
+			InfoUUID id = new InfoUUID(getIdentity().hashCode(), 0);
 			IMonitorInfo oldInfo = LogicMonitorCache.info.get(id);
 			if (oldInfo == null || !oldInfo.isMatchingType(info) || !oldInfo.isIdenticalInfo(info)) {
 				LogicMonitorCache.changeInfo(id, info);
@@ -110,7 +112,7 @@ public class InventoryReaderPart extends ReaderMultipart<MonitoredItemStack> imp
 	}
 
 	@Override
-	public Object getServerElement(int id, EntityPlayer player, Object obj, NBTTagCompound tag) {
+	public Object getServerElement(Object obj, int id, World world, EntityPlayer player, NBTTagCompound tag) {
 		switch (id) {
 		case 0:
 			return new ContainerInventoryReader(this, player);
@@ -119,7 +121,7 @@ public class InventoryReaderPart extends ReaderMultipart<MonitoredItemStack> imp
 	}
 
 	@Override
-	public Object getClientElement(int id, EntityPlayer player, Object obj, NBTTagCompound tag) {
+	public Object getClientElement(Object obj, int id, World world, EntityPlayer player, NBTTagCompound tag) {
 		switch (id) {
 		case 0:
 			return new GuiInventoryReader(this, player);

@@ -11,7 +11,7 @@
         "transfer":{
             "push":{
                 "textures": {
-                    "0": "practicallogistics:model/transfer_node_blue"
+                    "0": "practicallogistics:model/transfer_node_push"
                  }
             },
             "pull":{            
@@ -21,7 +21,7 @@
             },
             "passive":{
                 "textures": {
-                    "0": "practicallogistics:model/transfer_node_orange"
+                    "0": "practicallogistics:model/transfer_node_passive"
                  }
             }            
         },

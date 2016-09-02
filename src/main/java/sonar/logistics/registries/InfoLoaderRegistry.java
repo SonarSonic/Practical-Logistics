@@ -8,22 +8,27 @@ import javax.annotation.Nonnull;
 import net.minecraftforge.fml.common.discovery.ASMDataTable;
 import sonar.core.helpers.ASMLoader;
 import sonar.core.utils.Pair;
+import sonar.logistics.Logistics;
 import sonar.logistics.api.asm.CustomEntityHandler;
 import sonar.logistics.api.asm.CustomTileHandler;
 import sonar.logistics.api.asm.InfoRegistry;
 import sonar.logistics.api.asm.LogicInfoType;
+import sonar.logistics.api.asm.MonitorHandler;
 import sonar.logistics.api.info.ICustomEntityHandler;
 import sonar.logistics.api.info.ICustomTileHandler;
 import sonar.logistics.api.info.IInfoRegistry;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
+import sonar.logistics.api.info.monitor.LogicMonitorHandler;
 
 public class InfoLoaderRegistry {
 
 	public static LinkedHashMap<Integer, String> infoNames = new LinkedHashMap();
 	public static LinkedHashMap<String, Integer> infoIds = new LinkedHashMap();
 	public static LinkedHashMap<String, Class<? extends IMonitorInfo>> infoClasses = new LinkedHashMap();
+	public static LinkedHashMap<String, LogicMonitorHandler> monitorHandlers = new LinkedHashMap();
 
-	private InfoLoaderRegistry() {}
+	private InfoLoaderRegistry() {
+	}
 
 	public static List<IInfoRegistry> getInfoRegistries(@Nonnull ASMDataTable asmDataTable) {
 		return ASMLoader.getInstances(asmDataTable, InfoRegistry.class, IInfoRegistry.class, true);
@@ -35,6 +40,19 @@ public class InfoLoaderRegistry {
 
 	public static List<ICustomEntityHandler> getCustomEntityHandlers(@Nonnull ASMDataTable asmDataTable) {
 		return ASMLoader.getInstances(asmDataTable, CustomEntityHandler.class, ICustomEntityHandler.class, true);
+	}
+
+	public static void loadMonitorHandlers(@Nonnull ASMDataTable asmDataTable) {
+		List<Pair<ASMDataTable.ASMData, Class<? extends LogicMonitorHandler>>> infoTypes = ASMLoader.getClasses(asmDataTable, MonitorHandler.class, LogicMonitorHandler.class, true);
+		for (Pair<ASMDataTable.ASMData, Class<? extends LogicMonitorHandler>> info : infoTypes) {
+			String name = (String) info.a.getAnnotationInfo().get("handlerID");
+			try {
+				monitorHandlers.put(name, info.b.newInstance());
+			} catch (InstantiationException | IllegalAccessException e) {
+				Logistics.logger.error("FAILED: To Load Monitor Handler - " + name);
+			}
+		}
+		Logistics.logger.info("Loaded: " + monitorHandlers.size() + " Monitor Handlers");
 	}
 
 	public static void loadInfoTypes(@Nonnull ASMDataTable asmDataTable) {

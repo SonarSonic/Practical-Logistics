@@ -3,6 +3,7 @@ package sonar.logistics.api.connecting;
 import net.minecraft.util.EnumFacing;
 import sonar.core.api.utils.BlockCoords;
 import sonar.core.utils.IWorldPosition;
+import sonar.logistics.api.cache.INetworkCache;
 
 /** implemented by Tile Entities which can connect to Data Cables */
 public interface ILogicTile extends IWorldPosition {
@@ -16,4 +17,6 @@ public interface ILogicTile extends IWorldPosition {
 	
 	/**gets the network cache's ID*/
 	public int getNetworkID();
+	
+	public void setLocalNetworkCache(INetworkCache network);
 }

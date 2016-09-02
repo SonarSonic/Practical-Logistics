@@ -33,22 +33,16 @@ public class LogicMonitorCache {
 
 	public static final int UPDATE_RADIUS = 64;
 
-	// chunk syncing - the player won't necessarily be inside the chunk itself but will be within the range.
-	// public static LinkedHashMap<Integer, ArrayList<StoredChunkPos>> monitoredChunks = new LinkedHashMap(); // The dimension id then the Chunk Pos which contain monitors...
-	// public static LinkedHashMap<EntityPlayer, ArrayList<StoredChunkPos>> activeChunks = new LinkedHashMap(); // these chunks will always be the same dimension as the player
-
 	// server side
 	public static final ArrayList<ILogicMonitor> monitors = new ArrayList();
-	public static final ArrayList<IInfoDisplay> displays = new ArrayList();
+	public static final ArrayList<IInfoDisplay> displays = new ArrayList();	
 	// client side
 	public static LinkedHashMap<ILogicMonitor, MonitoredList<?>> monitoredLists = new LinkedHashMap();
-
 	// both
 	public static ArrayList<InfoUUID> changedInfo = new ArrayList();
 
 	public static LinkedHashMap<InfoUUID, IMonitorInfo> lastInfo = new LinkedHashMap();
 	public static LinkedHashMap<InfoUUID, IMonitorInfo> info = new LinkedHashMap();
-	// public static LinkedHashMap<IInfoDisplay, IInfoContainer> displayLists = new LinkedHashMap();
 
 	public static void onServerClosed() {
 		monitors.clear();
@@ -126,7 +120,7 @@ public class LogicMonitorCache {
 	// server methods
 	public static ILogicMonitor getMonitorFromClient(int hashCode) {
 		for (ILogicMonitor monitor : monitors) {
-			if (monitor.getMonitorUUID().hashCode() == hashCode) {
+			if (monitor.getIdentity().hashCode() == hashCode) {
 				return monitor;
 			}
 		}
@@ -188,16 +182,11 @@ public class LogicMonitorCache {
 	public static TargetPoint getTargetPointFromPlayer(EntityPlayer player) {
 		return new TargetPoint(player.getEntityWorld().provider.getDimension(), player.posX, player.posY, player.posZ, UPDATE_RADIUS);
 	}
-
-	// public static void updateInfoFromServer(EntityPlayer player, InfoUUID infoID, ByteBuf updateBuf) {
-	// World world = player.getEntityWorld();
-	// getDisplaysInRadius(.forEach(display -> display.container().updateInfo(infoID, updateBuf));
-	// }
-
+	
 	// client methods
 	public static Pair<ILogicMonitor, MonitoredList<?>> getMonitorFromServer(int hashCode) {
 		for (Entry<ILogicMonitor, ?> entry : monitoredLists.entrySet()) {
-			if (entry.getKey().getMonitorUUID().hashCode() == hashCode) {
+			if (entry.getKey().getIdentity().hashCode() == hashCode) {
 				return new Pair(entry.getKey(), entry.getValue());
 			}
 		}
@@ -207,7 +196,7 @@ public class LogicMonitorCache {
 	public static <T extends IMonitorInfo> MonitoredList<T> getMonitoredList(ILogicMonitor monitor) {
 		monitoredLists.putIfAbsent(monitor, MonitoredList.<T>newMonitoredList());
 		for (Entry<ILogicMonitor, MonitoredList<?>> entry : monitoredLists.entrySet()) {
-			if (entry.getKey().getMonitorUUID().equals(monitor.getMonitorUUID())) {
+			if (entry.getKey().getIdentity().equals(monitor.getIdentity())) {
 				return (MonitoredList<T>) entry.getValue();
 			}
 		}

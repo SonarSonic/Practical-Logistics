@@ -10,17 +10,14 @@ import sonar.logistics.connections.MonitoredList;
 
 public interface ILogicMonitor<T extends IMonitorInfo> extends IChannelledTile {
 	
-	/**identifies this monitor, this will be synced across the server and client*/
-	public UUID getMonitorUUID();
-	
+	/**identifies this monitor, this will be synced across the server and client*/	
 	///**the coords selected by the player to be monitored*/
 	//public IdentifiedCoordsList getMonitoringCoords();
 	
 	/**the instance of the MonitorHandler this LogicMonitor uses*/
-	public MonitorHandler<T> getHandler();	
+	public LogicMonitorHandler<T> getHandler();	
 	
 	/**gets a list of all the players viewing*/
-	public ArrayList<MonitorViewer> getViewers(boolean sentFirstPacket);
 	
 	public void sentViewerPacket(MonitorViewer viewer, boolean sentFirstPacket);
 	

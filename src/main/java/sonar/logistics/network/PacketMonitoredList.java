@@ -12,7 +12,8 @@ import sonar.logistics.Logistics;
 import sonar.logistics.api.info.monitor.ILogicMonitor;
 import sonar.logistics.connections.LogicMonitorCache;
 import sonar.logistics.connections.MonitoredList;
-import sonar.logistics.helpers.MonitorHelper;
+import sonar.logistics.helpers.InfoHelper;
+import sonar.logistics.helpers.LogisticsHelper;
 
 public class PacketMonitoredList implements IMessage {
 
@@ -32,12 +33,13 @@ public class PacketMonitoredList implements IMessage {
 
 	@Override
 	public void fromBytes(ByteBuf buf) {
-		Pair<ILogicMonitor, MonitoredList<?>> pair = LogicMonitorCache.getMonitorFromServer(buf.readInt());
+		int hashCode = buf.readInt();
+		Pair<ILogicMonitor, MonitoredList<?>> pair = LogicMonitorCache.getMonitorFromServer(hashCode);
 		if (pair != null) {
 			list = pair.b == null ? MonitoredList.newMonitoredList() : pair.b.copyInfo();
 			monitor = pair.a;
 			type = SyncType.values()[buf.readInt()];
-			list = MonitorHelper.readMonitoredList(ByteBufUtils.readTag(buf), list, type);
+			list = InfoHelper.readMonitoredList(ByteBufUtils.readTag(buf), list, type);
 		} else {
 			Logistics.logger.error("Couldn't get monitor for hashcode");
 		}
@@ -45,7 +47,7 @@ public class PacketMonitoredList implements IMessage {
 
 	@Override
 	public void toBytes(ByteBuf buf) {
-		buf.writeInt(monitor.getMonitorUUID().hashCode());
+		buf.writeInt(monitor.getIdentity().hashCode());
 		buf.writeInt(type.ordinal());
 		ByteBufUtils.writeTag(buf, listTag);
 	}

@@ -65,7 +65,7 @@ public abstract class ScreenMultipart extends LogisticsMultipart implements INor
 			if (monitor != null) {
 				int max = Math.min(container().getMaxCapacity(), monitor.getMaxInfo());
 				for (int i = 0; i < max; i++) {
-					InfoUUID id = new InfoUUID(monitor.getMonitorUUID().hashCode(), i);
+					InfoUUID id = new InfoUUID(monitor.getIdentity().hashCode(), i);
 					container().setUUID(id, i);
 					LogicMonitorCache.changedInfo.add(id);
 				}

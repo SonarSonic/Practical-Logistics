@@ -28,9 +28,9 @@ public class IdentifiedCoordsList extends ArrayList<BlockCoords> implements ISyn
 		this.tagID = tagID;
 		this.identity = identity;
 	}
-	
-	public IdentifiedCoordsList setIdentity(UUID uuid){
-		identity=uuid;
+
+	public IdentifiedCoordsList setIdentity(UUID uuid) {
+		identity = uuid;
 		return this;
 	}
 
@@ -40,6 +40,23 @@ public class IdentifiedCoordsList extends ArrayList<BlockCoords> implements ISyn
 
 	public boolean equals(Object object) {
 		return object != null && (object instanceof IdentifiedCoordsList) ? ((IdentifiedCoordsList) object).identity.equals(identity) : super.equals(object);
+	}
+
+	public void modifyCoords(ChannelType type, BlockCoords coords) {
+		if (coords != null) {
+			if (!coords.contains(this)) {
+				if (type == ChannelType.SINGLE) {
+					clear();
+				}
+				add(coords);
+			} else {
+				((IdentifiedCoordsList) clone()).forEach(coord -> {
+					if (coord.equals(coords)) {
+						remove(coord);
+					}
+				});
+			}
+		}
 	}
 
 	public boolean add(BlockCoords coords) {
@@ -75,22 +92,29 @@ public class IdentifiedCoordsList extends ArrayList<BlockCoords> implements ISyn
 	@Override
 	public void writeToBuf(ByteBuf buf) {
 		ByteBufUtils.writeTag(buf, BlockCoords.writeBlockCoords(new NBTTagCompound(), this, getTagName()));
+		buf.writeLong(identity.getMostSignificantBits());
+		buf.writeLong(identity.getLeastSignificantBits());
 	}
 
 	@Override
 	public void readFromBuf(ByteBuf buf) {
 		clear();
 		addAll(BlockCoords.readBlockCoords(ByteBufUtils.readTag(buf), getTagName()));
+		long msb = buf.readLong();
+		long lsb = buf.readLong();
+		identity = new UUID(msb, lsb);
 	}
 
 	@Override
 	public NBTTagCompound writeData(NBTTagCompound nbt, SyncType type) {
+		nbt.setUniqueId("iden", identity);
 		return BlockCoords.writeBlockCoords(nbt, this, getTagName());
 	}
 
 	@Override
 	public void readData(NBTTagCompound nbt, SyncType type) {
-		//clear();
+		// clear();
+		identity = nbt.getUniqueId("iden");
 		addAll(BlockCoords.readBlockCoords(nbt, getTagName()));
 	}
 

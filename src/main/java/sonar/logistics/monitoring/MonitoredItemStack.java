@@ -18,14 +18,14 @@ import sonar.logistics.api.info.IClickableInfo;
 import sonar.logistics.api.info.RenderInfoProperties;
 import sonar.logistics.api.info.monitor.IJoinableInfo;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
-import sonar.logistics.api.info.monitor.MonitorHandler;
+import sonar.logistics.api.info.monitor.LogicMonitorHandler;
 import sonar.logistics.helpers.InfoHelper;
 
 @LogicInfoType(id = MonitoredItemStack.id, modid = Logistics.MODID)
 public class MonitoredItemStack extends BaseInfo<MonitoredItemStack> implements IJoinableInfo<MonitoredItemStack>, IClickableInfo {
 
 	public static final String id = "item";
-	public final MonitorHandler<MonitoredItemStack> handler = Logistics.monitorHandlers.getRegisteredObject(MonitorHandler.ITEMS);
+	public static LogicMonitorHandler<MonitoredItemStack> handler = LogicMonitorHandler.instance(ItemMonitorHandler.id);
 	public final SyncNBTAbstract<StoredItemStack> itemStack = new SyncNBTAbstract<StoredItemStack>(StoredItemStack.class, 0);
 
 	{
@@ -55,7 +55,7 @@ public class MonitoredItemStack extends BaseInfo<MonitoredItemStack> implements 
 	}
 
 	@Override
-	public MonitorHandler<MonitoredItemStack> getHandler() {
+	public LogicMonitorHandler<MonitoredItemStack> getHandler() {
 		return handler;
 	}
 

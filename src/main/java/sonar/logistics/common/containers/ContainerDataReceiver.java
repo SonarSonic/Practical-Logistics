@@ -4,6 +4,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import sonar.core.inventory.ContainerMultipartSync;
+import sonar.logistics.connections.EmitterRegistry;
 import sonar.logistics.parts.DataReceiverPart;
 
 public class ContainerDataReceiver extends ContainerMultipartSync {
@@ -21,5 +22,10 @@ public class ContainerDataReceiver extends ContainerMultipartSync {
 		ItemStack itemstack = null;
 		Slot slot = (Slot) this.inventorySlots.get(slotID);
 		return itemstack;
+	}
+
+	public void onContainerClosed(EntityPlayer player) {
+		super.onContainerClosed(player);
+		EmitterRegistry.removeViewer(player);
 	}
 }

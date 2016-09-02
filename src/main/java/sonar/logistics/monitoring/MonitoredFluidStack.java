@@ -21,14 +21,14 @@ import sonar.logistics.api.info.IClickableInfo;
 import sonar.logistics.api.info.RenderInfoProperties;
 import sonar.logistics.api.info.monitor.IJoinableInfo;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
-import sonar.logistics.api.info.monitor.MonitorHandler;
+import sonar.logistics.api.info.monitor.LogicMonitorHandler;
 import sonar.logistics.helpers.InfoRenderer;
 
 @LogicInfoType(id = MonitoredFluidStack.id, modid = Logistics.MODID)
 public class MonitoredFluidStack extends BaseInfo<MonitoredFluidStack> implements IJoinableInfo<MonitoredFluidStack>, IClickableInfo {
 
 	public static final String id = "fluid";
-	public final MonitorHandler<MonitoredFluidStack> handler = Logistics.monitorHandlers.getRegisteredObject(MonitorHandler.FLUIDS);
+	public static LogicMonitorHandler<MonitoredFluidStack> handler = LogicMonitorHandler.instance(FluidMonitorHandler.id);
 	public SyncNBTAbstract<StoredFluidStack> fluidStack = new SyncNBTAbstract<StoredFluidStack>(StoredFluidStack.class, 0);
 
 	{
@@ -58,7 +58,7 @@ public class MonitoredFluidStack extends BaseInfo<MonitoredFluidStack> implement
 	}
 
 	@Override
-	public MonitorHandler<MonitoredFluidStack> getHandler() {
+	public LogicMonitorHandler<MonitoredFluidStack> getHandler() {
 		return handler;
 	}
 

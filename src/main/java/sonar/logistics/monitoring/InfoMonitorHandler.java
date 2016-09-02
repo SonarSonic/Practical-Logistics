@@ -7,22 +7,22 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import sonar.core.api.utils.BlockCoords;
+import sonar.logistics.Logistics;
+import sonar.logistics.api.asm.MonitorHandler;
 import sonar.logistics.api.info.ICustomTileHandler;
 import sonar.logistics.api.info.LogicInfo;
-import sonar.logistics.api.info.monitor.MonitorHandler;
+import sonar.logistics.api.info.monitor.LogicMonitorHandler;
 import sonar.logistics.connections.MonitoredList;
 import sonar.logistics.registries.LogicRegistry;
 
-public class InfoMonitorHandler extends MonitorHandler<LogicInfo> {
+@MonitorHandler(handlerID = InfoMonitorHandler.id, modid = Logistics.MODID)
+public class InfoMonitorHandler extends LogicMonitorHandler<LogicInfo> {
 
+	public static final String id = "info";
+	
 	@Override
-	public boolean isLoadable() {
-		return true;
-	}
-
-	@Override
-	public String getName() {
-		return MonitorHandler.INFO;
+	public String id() {
+		return id;
 	}
 
 	@Override

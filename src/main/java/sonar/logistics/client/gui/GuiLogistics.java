@@ -20,8 +20,11 @@ public class GuiLogistics extends GuiSonar {
 		super(container, entity);
 	}
 
+
+	
 	@Override
 	public ResourceLocation getBackground() {
+		Minecraft.getMinecraft().mouseHelper.ungrabMouseCursor();
 		return null;
 	}
 

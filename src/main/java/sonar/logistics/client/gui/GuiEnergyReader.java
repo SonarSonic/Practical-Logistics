@@ -1,5 +1,5 @@
 package sonar.logistics.client.gui;
-
+/*
 import java.awt.Color;
 import java.util.List;
 
@@ -15,7 +15,7 @@ import sonar.logistics.client.renderers.RenderHandlers;
 import sonar.logistics.common.parts.EnergyReaderPart;
 import sonar.logistics.info.types.StoredEnergyInfo;
 
-public class GuiEnergyReader extends GuiSelectionList<DEADILogicInfo> {
+public class GuiEnergyReader extends GuiOLDSelectionList<DEADILogicInfo> {
 
 	public static final ResourceLocation bground = new ResourceLocation("PracticalLogistics:textures/gui/channelSelection.png");
 
@@ -70,7 +70,7 @@ public class GuiEnergyReader extends GuiSelectionList<DEADILogicInfo> {
 					GL11.glEnable(GL11.GL_DEPTH_TEST);
 					RenderItem.getInstance().renderItemAndEffectIntoGUI(fontRendererObj, this.mc.getTextureManager(), info.coords.block, 8, offsetTop + 1 + (getSelectionHeight() * pos));
 					RenderHelper.renderStoredItemStackOverlay(this.fontRendererObj, this.mc.getTextureManager(), info.coords.block, 0, 8, offsetTop + 1 + (getSelectionHeight() * pos), null);
-					*/
+					
 				}
 			}
 		}
@@ -104,3 +104,4 @@ public class GuiEnergyReader extends GuiSelectionList<DEADILogicInfo> {
 		return 18;
 	}
 }
+*/

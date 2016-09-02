@@ -63,10 +63,7 @@ public class ArrayPart extends SidedMultipart implements ISlottedPart, IConnecti
 			}
 		}
 		this.coordList = coordList;
-		if (network instanceof IRefreshCache) {
-			IRefreshCache toRefresh = (IRefreshCache) network;
-			toRefresh.refreshCache(network.getNetworkID(), RefreshType.FULL);
-		}
+		network.markDirty(RefreshType.FULL);
 	}
 
 	public boolean isItemValidForSlot(int slot, ItemStack stack) {
@@ -82,7 +79,7 @@ public class ArrayPart extends SidedMultipart implements ISlottedPart, IConnecti
 	public boolean onActivated(EntityPlayer player, EnumHand hand, ItemStack heldItem, PartMOP hit) {
 		if (!this.getWorld().isRemote) {
 			SonarCore.network.sendTo(new PacketMultipartSync(getPos(), this.writeData(new NBTTagCompound(), SyncType.SYNC_OVERRIDE), SyncType.SYNC_OVERRIDE, getUUID()), (EntityPlayerMP) player);
-			openBasicGui(player, int 0);
+			openGui(player, Logistics.instance);
 		}
 		return false;
 	}

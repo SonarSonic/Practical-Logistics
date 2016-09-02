@@ -13,7 +13,7 @@ import sonar.logistics.parts.InfoReaderPart;
 
 public class ContainerChannelSelection extends ContainerMultipartSync {
 
-	public ContainerChannelSelection(IOperatorTool tool, IChannelledTile handler) {
+	public ContainerChannelSelection(IChannelledTile handler) {
 		super((SonarMultipart) handler);
 	}
 

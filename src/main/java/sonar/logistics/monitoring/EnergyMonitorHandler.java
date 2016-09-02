@@ -8,19 +8,19 @@ import sonar.core.SonarCore;
 import sonar.core.api.energy.EnergyHandler;
 import sonar.core.api.energy.StoredEnergyStack;
 import sonar.core.api.utils.BlockCoords;
-import sonar.logistics.api.info.monitor.MonitorHandler;
+import sonar.logistics.Logistics;
+import sonar.logistics.api.asm.MonitorHandler;
+import sonar.logistics.api.info.monitor.LogicMonitorHandler;
 import sonar.logistics.connections.MonitoredList;
 
-public class EnergyMonitorHandler extends MonitorHandler<MonitoredEnergyStack> {
+@MonitorHandler(handlerID = EnergyMonitorHandler.id, modid = Logistics.MODID)
+public class EnergyMonitorHandler extends LogicMonitorHandler<MonitoredEnergyStack> {
 
+	public static final String id = "energy";
+	
 	@Override
-	public boolean isLoadable() {
-		return true;
-	}
-
-	@Override
-	public String getName() {
-		return MonitorHandler.ENERGY;
+	public String id() {
+		return id;
 	}
 
 	@Override

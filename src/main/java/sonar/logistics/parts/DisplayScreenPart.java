@@ -19,6 +19,26 @@ public class DisplayScreenPart extends ScreenMultipart  {
 		super(dir, rotation);
 	}
 
+	@Override
+	public ItemStack getItemStack() {
+		return new ItemStack(LogisticsItems.displayScreen);
+	}
+
+	@Override
+	public int maxInfo() {
+		return 2;
+	}
+
+	@Override
+	public boolean monitorsUUID(InfoUUID id) {
+		return true;// container().getStoredInfo();
+	}
+
+	@Override
+	public DisplayType getDisplayType() {
+		return DisplayType.SMALL;
+	}
+
 	public void addSelectionBoxes(List<AxisAlignedBB> list) {
 		double p = 0.0625;
 		double height = p * 16, width = 0, length = p * 1;
@@ -46,25 +66,5 @@ public class DisplayScreenPart extends ScreenMultipart  {
 			break;
 
 		}
-	}
-
-	@Override
-	public ItemStack getItemStack() {
-		return new ItemStack(LogisticsItems.displayScreen);
-	}
-
-	@Override
-	public int maxInfo() {
-		return 2;
-	}
-
-	@Override
-	public boolean monitorsUUID(InfoUUID id) {
-		return true;// container().getStoredInfo();
-	}
-
-	@Override
-	public DisplayType getDisplayType() {
-		return DisplayType.SMALL;
 	}
 }

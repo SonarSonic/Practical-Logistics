@@ -13,8 +13,8 @@
             "x": 180
         }],
         "active":{
-            "true":{"textures": {"0":"practicallogistics:model/redstoneEmitter_on_new"}},
-            "false":{"textures": {"0":"practicallogistics:model/redstoneEmitter_off_new"}}
+            "true":{"textures": {"0":"practicallogistics:model/redstoneEmitter_on"}},
+            "false":{"textures": {"0":"practicallogistics:model/redstoneEmitter_off"}}
         },        
         "facing":{  
             "north":{"x": 90, "y": 180},            

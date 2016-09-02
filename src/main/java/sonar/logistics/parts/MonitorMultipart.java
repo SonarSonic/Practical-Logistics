@@ -21,10 +21,11 @@ import sonar.logistics.api.info.monitor.ChannelType;
 import sonar.logistics.api.info.monitor.ILogicMonitor;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
 import sonar.logistics.api.info.monitor.IdentifiedCoordsList;
-import sonar.logistics.api.info.monitor.MonitorHandler;
+import sonar.logistics.api.info.monitor.LogicMonitorHandler;
 import sonar.logistics.api.info.monitor.MonitorViewer;
 import sonar.logistics.connections.LogicMonitorCache;
 import sonar.logistics.connections.MonitoredList;
+import sonar.logistics.monitoring.MonitoredBlockCoords;
 import sonar.logistics.network.SyncMonitoredType;
 
 public abstract class MonitorMultipart<T extends IMonitorInfo> extends SidedMultipart implements ILogicMonitor<T>, IByteBufTile, IChannelledTile {
@@ -32,7 +33,7 @@ public abstract class MonitorMultipart<T extends IMonitorInfo> extends SidedMult
 	protected IdentifiedCoordsList list = new IdentifiedCoordsList(-1);
 	protected HashMap<Boolean, ArrayList<MonitorViewer>> viewers = new HashMap<Boolean, ArrayList<MonitorViewer>>();
 	protected SyncUUID uuid = new SyncUUID(-2);
-	protected MonitorHandler handler = null;
+	protected LogicMonitorHandler handler = null;
 	protected String handlerID;
 	public SyncMonitoredType<T> selectedInfo;
 	public BlockCoords lastSelected = null;
@@ -86,13 +87,13 @@ public abstract class MonitorMultipart<T extends IMonitorInfo> extends SidedMult
 	}
 
 	@Override
-	public IdentifiedCoordsList getChannels(){
+	public IdentifiedCoordsList getChannels() {
 		return list;
-	}	
+	}
 
 	@Override
-	public MonitorHandler getHandler() {
-		return handler == null ? handler = Logistics.monitorHandlers.getRegisteredObject(handlerID) : handler;
+	public LogicMonitorHandler getHandler() {
+		return handler == null ? handler = LogicMonitorHandler.instance(handlerID) : handler;
 	}
 
 	@Override
@@ -125,7 +126,7 @@ public abstract class MonitorMultipart<T extends IMonitorInfo> extends SidedMult
 		toRemove.forEach(remove -> viewers.remove(remove));
 	}
 
-	public UUID getMonitorUUID() {
+	public UUID getIdentity() {
 		if (uuid.getUUID() == null) {
 			setUUID();
 		}
@@ -151,11 +152,17 @@ public abstract class MonitorMultipart<T extends IMonitorInfo> extends SidedMult
 	public void addInfo(List<String> info) {
 		super.addInfo(info);
 		info.add("Channels Configured: " + !list.isEmpty());
-		if (getMonitorUUID() != null)info.add("Monitor UUID: " + this.getMonitorUUID().hashCode());
+		if (getIdentity() != null)
+			info.add("Monitor UUID: " + this.getIdentity().hashCode());
 		info.add("Max Info: " + getMaxInfo());
 	}
 
 	public final int ADD = -9, PAIRED = -10, ALL = 100;
+
+	public void modifyCoords(MonitoredBlockCoords coords) {
+		lastSelected = coords.syncCoords.getCoords();
+		sendByteBufPacket(-3);
+	}
 
 	@Override
 	public void writePacket(ByteBuf buf, int id) {
@@ -174,17 +181,8 @@ public abstract class MonitorMultipart<T extends IMonitorInfo> extends SidedMult
 		switch (id) {
 		case -3:
 			BlockCoords coords = BlockCoords.readFromBuf(buf);
-			if (coords != null) {
-				if (!list.contains(coords)) {
-					if (channelType() == ChannelType.SINGLE) {
-						list.clear();
-					}
-					list.add(coords);
-				} else {
-					list.remove(coords);
-				}
-			}
-			this.sendByteBufPacket(-1);
+			list.modifyCoords(channelType(), coords);
+			sendByteBufPacket(list.tagID);
 			break;
 		case -2:
 			uuid.readFromBuf(buf);

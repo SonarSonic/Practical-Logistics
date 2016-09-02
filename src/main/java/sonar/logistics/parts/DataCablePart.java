@@ -35,6 +35,7 @@ import sonar.logistics.api.cache.EmptyNetworkCache;
 import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.cache.IRefreshCache;
 import sonar.logistics.api.cache.RefreshType;
+import sonar.logistics.api.connecting.CableConnection;
 import sonar.logistics.api.connecting.CableType;
 import sonar.logistics.api.connecting.IDataCable;
 import sonar.logistics.api.connecting.ILogicTile;
@@ -42,13 +43,9 @@ import sonar.logistics.api.connecting.IOperatorProvider;
 import sonar.logistics.api.connecting.IOperatorTile;
 import sonar.logistics.api.connecting.OperatorMode;
 import sonar.logistics.api.info.monitor.ILogicMonitor;
+import sonar.logistics.helpers.CableHelper;
 
 public class DataCablePart extends SonarMultipart implements ISlotOccludingPart, IDataCable, IOperatorTile, IOperatorProvider {
-
-	public int registryID = -1;
-	public boolean connection = false;
-	public boolean wasAdded = false;
-	public boolean[] isBlocked = new boolean[6];
 
 	public static final PropertyEnum<CableConnection> NORTH = PropertyEnum.<CableConnection>create("north", CableConnection.class);
 	public static final PropertyEnum<CableConnection> EAST = PropertyEnum.<CableConnection>create("east", CableConnection.class);
@@ -57,89 +54,13 @@ public class DataCablePart extends SonarMultipart implements ISlotOccludingPart,
 	public static final PropertyEnum<CableConnection> DOWN = PropertyEnum.<CableConnection>create("down", CableConnection.class);
 	public static final PropertyEnum<CableConnection> UP = PropertyEnum.<CableConnection>create("up", CableConnection.class);
 
-	public enum CableConnection implements IStringSerializable {
-		CABLE, INTERNAL, HALF, /* BLOCK, */ NONE;
-
-		public boolean canConnect() {
-			return this == CABLE || this == INTERNAL || this == HALF;
-		}
-
-		public double offsetBounds() {
-			return this == INTERNAL ? 0.0625 : this == HALF ? 0.0625 * 3 : 0;
-		}
-
-		public String getName() {
-			return this.toString().toLowerCase();
-		}
-	}
+	public int registryID = -1;
+	public boolean connection = false;
+	public boolean wasAdded = false;
+	public boolean[] isBlocked = new boolean[6];
 
 	public DataCablePart() {
 		super();
-	}
-
-	public void addSelectionBoxes(List<AxisAlignedBB> list) {
-		list.add(new LabelledAxisAlignedBB(6 * 0.0625, 6 * 0.0625, 6 * 0.0625, 1 - 6 * 0.0625, 1 - 6 * 0.0625, 1 - 6 * 0.0625).labelAxis("c"));
-		for (EnumFacing face : EnumFacing.values()) {
-			CableConnection connect = checkBlockInDirection(face);
-			if (connect.canConnect()) {
-				double p = 0.0625;
-				double w = (1 - 2 * 0.0625) / 2;
-				double heightMin = connect.offsetBounds();
-				double heightMax = 6 * 0.0625;
-				switch (face) {
-				case DOWN:
-					list.add(new LabelledAxisAlignedBB(w, heightMin, w, 1 - w, heightMax, 1 - w).labelAxis(face.toString()));
-					break;
-				case EAST:
-					list.add(new LabelledAxisAlignedBB(1 - heightMax, w, w, 1 - heightMin, 1 - w, 1 - w).labelAxis(face.toString()));
-					break;
-				case NORTH:
-					list.add(new LabelledAxisAlignedBB(w, w, heightMin, 1 - w, 1 - w, heightMax).labelAxis(face.toString()));
-					break;
-				case SOUTH:
-					list.add(new LabelledAxisAlignedBB(w, w, 1 - heightMax, 1 - w, 1 - w, 1 - heightMin).labelAxis(face.toString()));
-					break;
-				case UP:
-					list.add(new LabelledAxisAlignedBB(w, 1 - heightMax, w, 1 - w, 1 - heightMin, 1 - w).labelAxis(face.toString()));
-					break;
-				case WEST:
-					list.add(new LabelledAxisAlignedBB(heightMin, w, w, heightMax, 1 - w, 1 - w).labelAxis(face.toString()));
-					break;
-				default:
-					list.add(new AxisAlignedBB(w, heightMin, w, 1 - w, heightMax, 1 - w));
-					break;
-				}
-			}
-		}
-
-	}
-
-	@Override
-	public void addCollisionBoxes(AxisAlignedBB mask, List<AxisAlignedBB> list, Entity collidingEntity) {
-		ArrayList<AxisAlignedBB> boxes = new ArrayList();
-		addSelectionBoxes(boxes);
-		boxes.forEach(box -> {
-			if (box.intersectsWith(mask)) {
-				list.add(box);
-			}
-		});
-	}
-
-	@Override
-	public EnumSet<PartSlot> getSlotMask() {
-		return EnumSet.of(PartSlot.CENTER);
-	}
-
-	@Override
-	public EnumSet<PartSlot> getOccludedSlots() {
-		EnumSet set = EnumSet.noneOf(PartSlot.class);
-		for (PartSlot slot : PartSlot.FACES) {
-			EnumFacing face = slot.f1;
-			if (checkBlockInDirection(face).canConnect()) {
-				set.add(slot);
-			}
-		}
-		return set;
 	}
 
 	@Override
@@ -147,37 +68,25 @@ public class DataCablePart extends SonarMultipart implements ISlotOccludingPart,
 		if (!this.getWorld().isRemote) {
 			if (changedPart instanceof SonarMultipart) {
 				INetworkCache cache = LogisticsAPI.getCableHelper().getNetwork(registryID);
-				if (cache instanceof IRefreshCache) {
-					IRefreshCache toRefresh = (IRefreshCache) cache;
-					toRefresh.refreshCache(cache.getNetworkID(), RefreshType.FULL);
-				}
+				cache.markDirty(RefreshType.FULL);
 			}
 			refreshConnections();
 		}
+	}
 
+	@Override
+	public void onNeighborTileChange(EnumFacing facing) {
+		INetworkCache cache = LogisticsAPI.getCableHelper().getNetwork(registryID);
+		cache.markDirty(RefreshType.FULL);
+		refreshConnections();
 	}
 
 	public void configureConnections(INetworkCache network) {
-		boolean found = false;
-		for (IMultipart part : getContainer().getParts()) {
-			if (!(part instanceof IDataCable) && part instanceof ILogicTile) {
-				if (part instanceof LogisticsMultipart) {
-					LogisticsMultipart networkPart = (LogisticsMultipart) part;
-					if (!networkPart.wasRemoved) {
-						networkPart.setLocalNetworkCache(network);
-					}
-				}
-				found = true;
-			}
-		}
-		for (EnumFacing face : EnumFacing.values()) {
-			BlockCoords offset = BlockCoords.translateCoords(this.getCoords(), face.getOpposite());
-			ILogicTile tile = LogisticsAPI.getCableHelper().getMultipart(offset, face);
-			if (tile instanceof ILogicMonitor) {
-				network.addLocalMonitor((ILogicMonitor) tile);
-			}
-		}
-		connection = found;
+		ArrayList<ILogicTile> logicTiles = CableHelper.getConnectedTiles(this);
+		ArrayList<ILogicMonitor> logicMonitors = CableHelper.getLocalMonitors(this);
+		logicTiles.forEach(tile -> tile.setLocalNetworkCache(network));
+		logicMonitors.forEach(tile -> network.addLocalMonitor(tile));
+		connection = !logicTiles.isEmpty();
 		return;
 	}
 
@@ -227,7 +136,6 @@ public class DataCablePart extends SonarMultipart implements ISlotOccludingPart,
 	public void setRegistryID(int id) {
 		if (!this.getWorld().isRemote) {
 			registryID = id;
-			// configureConnections(LogisticsAPI.getCableHelper().getNetwork(registryID));
 		}
 	}
 
@@ -245,10 +153,7 @@ public class DataCablePart extends SonarMultipart implements ISlotOccludingPart,
 			LogisticsAPI.getCableHelper().removeCable(this);
 			configureConnections(EmptyNetworkCache.INSTANCE);
 			INetworkCache cache = LogisticsAPI.getCableHelper().getNetwork(registryID);
-			if (cache instanceof IRefreshCache) {
-				IRefreshCache toRefresh = (IRefreshCache) cache;
-				toRefresh.refreshCache(cache.getNetworkID(), RefreshType.FULL);
-			}
+			cache.markDirty(RefreshType.FULL);
 		}
 	}
 
@@ -307,29 +212,27 @@ public class DataCablePart extends SonarMultipart implements ISlotOccludingPart,
 			addSelectionBoxes(bounds);
 			for (AxisAlignedBB bound : bounds) {
 				if (bound instanceof LabelledAxisAlignedBB && bound.equals(rayTrace.bounds)) {
-					if (!this.getWorld().isRemote) {
-						String label = ((LabelledAxisAlignedBB) bound).label;
-						EnumFacing face = null;
-						if (!label.equals("c")) {
-							face = EnumFacing.valueOf(label.toUpperCase());
-						} else {
-							face = facing;
-						}
-						isBlocked[face.ordinal()] = !isBlocked[face.ordinal()];
-						IDataCable cable = LogisticsAPI.getCableHelper().getCableFromCoords(BlockCoords.translateCoords(getCoords(), face));
-						removeCable();
-						addCable();
-						if (cable != null && cable instanceof DataCablePart) {
-							DataCablePart part = (DataCablePart) cable;
-							part.isBlocked[face.getOpposite().ordinal()] = isBlocked[face.ordinal()];
-							part.sendUpdatePacket(true);
-							part.markDirty();
-							part.removeCable();
-							part.addCable();
-						}
-						sendUpdatePacket(true);
-						markDirty();
+					if (this.isClient()) {
+						return true;
 					}
+					String label = ((LabelledAxisAlignedBB) bound).label;
+					EnumFacing face = null;
+					face = !label.equals("c") ? EnumFacing.valueOf(label.toUpperCase()) : facing;
+					isBlocked[face.ordinal()] = !isBlocked[face.ordinal()];
+					IDataCable cable = LogisticsAPI.getCableHelper().getCableFromCoords(BlockCoords.translateCoords(getCoords(), face));
+					removeCable();
+					addCable();
+					if (cable != null && cable instanceof DataCablePart) {
+						DataCablePart part = (DataCablePart) cable;
+						part.isBlocked[face.getOpposite().ordinal()] = isBlocked[face.ordinal()];
+						part.sendUpdatePacket(true);
+						part.markDirty();
+						// it's messy, but there is no easier way to check if the cables are connected properly.
+						part.removeCable();
+						part.addCable();
+					}
+					sendUpdatePacket(true);
+					markDirty();
 					return true;
 				}
 			}
@@ -376,8 +279,74 @@ public class DataCablePart extends SonarMultipart implements ISlotOccludingPart,
 	@Override
 	public void addInfo(List<String> info) {
 		ItemStack dropStack = getItemStack();
-		if (dropStack != null)info.add(TextFormatting.UNDERLINE + dropStack.getDisplayName());
-		info.add("Network ID: " + registryID);	
+		if (dropStack != null)
+			info.add(TextFormatting.UNDERLINE + dropStack.getDisplayName());
+		info.add("Network ID: " + registryID);
+	}
+
+	@Override
+	public void addCollisionBoxes(AxisAlignedBB mask, List<AxisAlignedBB> list, Entity collidingEntity) {
+		ArrayList<AxisAlignedBB> boxes = new ArrayList();
+		addSelectionBoxes(boxes);
+		boxes.forEach(box -> {
+			if (box.intersectsWith(mask)) {
+				list.add(box);
+			}
+		});
+	}
+
+	@Override
+	public EnumSet<PartSlot> getSlotMask() {
+		return EnumSet.of(PartSlot.CENTER);
+	}
+
+	@Override
+	public EnumSet<PartSlot> getOccludedSlots() {
+		EnumSet set = EnumSet.noneOf(PartSlot.class);
+		for (PartSlot slot : PartSlot.FACES) {
+			EnumFacing face = slot.f1;
+			if (checkBlockInDirection(face).canConnect()) {
+				set.add(slot);
+			}
+		}
+		return set;
+	}
+
+	public void addSelectionBoxes(List<AxisAlignedBB> list) {
+		list.add(new LabelledAxisAlignedBB(6 * 0.0625, 6 * 0.0625, 6 * 0.0625, 1 - 6 * 0.0625, 1 - 6 * 0.0625, 1 - 6 * 0.0625).labelAxis("c"));
+		for (EnumFacing face : EnumFacing.values()) {
+			CableConnection connect = checkBlockInDirection(face);
+			if (connect.canConnect()) {
+				double p = 0.0625;
+				double w = (1 - 2 * 0.0625) / 2;
+				double heightMin = connect.offsetBounds();
+				double heightMax = 6 * 0.0625;
+				switch (face) {
+				case DOWN:
+					list.add(new LabelledAxisAlignedBB(w, heightMin, w, 1 - w, heightMax, 1 - w).labelAxis(face.toString()));
+					break;
+				case EAST:
+					list.add(new LabelledAxisAlignedBB(1 - heightMax, w, w, 1 - heightMin, 1 - w, 1 - w).labelAxis(face.toString()));
+					break;
+				case NORTH:
+					list.add(new LabelledAxisAlignedBB(w, w, heightMin, 1 - w, 1 - w, heightMax).labelAxis(face.toString()));
+					break;
+				case SOUTH:
+					list.add(new LabelledAxisAlignedBB(w, w, 1 - heightMax, 1 - w, 1 - w, 1 - heightMin).labelAxis(face.toString()));
+					break;
+				case UP:
+					list.add(new LabelledAxisAlignedBB(w, 1 - heightMax, w, 1 - w, 1 - heightMin, 1 - w).labelAxis(face.toString()));
+					break;
+				case WEST:
+					list.add(new LabelledAxisAlignedBB(heightMin, w, w, heightMax, 1 - w, 1 - w).labelAxis(face.toString()));
+					break;
+				default:
+					list.add(new AxisAlignedBB(w, heightMin, w, 1 - w, heightMax, 1 - w));
+					break;
+				}
+			}
+		}
+
 	}
 
 }

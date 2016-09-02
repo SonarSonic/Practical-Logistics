@@ -10,19 +10,19 @@ import sonar.core.api.StorageSize;
 import sonar.core.api.inventories.InventoryHandler;
 import sonar.core.api.inventories.StoredItemStack;
 import sonar.core.api.utils.BlockCoords;
-import sonar.logistics.api.info.monitor.MonitorHandler;
+import sonar.logistics.Logistics;
+import sonar.logistics.api.asm.MonitorHandler;
+import sonar.logistics.api.info.monitor.LogicMonitorHandler;
 import sonar.logistics.connections.MonitoredList;
 
-public class ItemMonitorHandler extends MonitorHandler<MonitoredItemStack> {
+@MonitorHandler(handlerID = ItemMonitorHandler.id, modid = Logistics.MODID)
+public class ItemMonitorHandler extends LogicMonitorHandler<MonitoredItemStack> {
 
+	public static final String id = "item";
+	
 	@Override
-	public boolean isLoadable() {
-		return true;
-	}
-
-	@Override
-	public String getName() {
-		return MonitorHandler.ITEMS;
+	public String id() {
+		return id;
 	}
 
 	@Override

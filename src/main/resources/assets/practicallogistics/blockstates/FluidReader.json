@@ -3,7 +3,7 @@
     "defaults": {
         "model":"practicallogistics:Reader",
         "textures": {
-            "0":"practicallogistics:model/fluidReader_new",
+            "0":"practicallogistics:model/fluid_reader",
             "particle":"practicallogistics:blocks/data_cable"
         }
      },

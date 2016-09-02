@@ -6,6 +6,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.world.World;
 import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.core.network.sync.SyncEnum;
 import sonar.core.network.sync.SyncTagType;
@@ -15,16 +16,16 @@ import sonar.core.utils.IGuiTile;
 import sonar.core.utils.SortingDirection;
 import sonar.logistics.LogisticsItems;
 import sonar.logistics.api.info.monitor.ChannelType;
-import sonar.logistics.api.info.monitor.MonitorHandler;
+import sonar.logistics.api.info.monitor.LogicMonitorHandler;
 import sonar.logistics.api.readers.FluidReader;
-import sonar.logistics.client.gui.GuiEnergyReader;
 import sonar.logistics.client.gui.GuiFluidReader;
 import sonar.logistics.common.containers.ContainerFluidReader;
 import sonar.logistics.connections.MonitoredList;
+import sonar.logistics.monitoring.EnergyMonitorHandler;
 import sonar.logistics.monitoring.MonitoredEnergyStack;
 import sonar.logistics.network.SyncMonitoredType;
 
-public class EnergyReaderPart extends ReaderMultipart<MonitoredEnergyStack> implements IByteBufTile, IGuiTile {
+public class EnergyReaderPart extends ReaderMultipart<MonitoredEnergyStack> implements IByteBufTile {
 
 	public SyncMonitoredType<MonitoredEnergyStack> selected = new SyncMonitoredType<MonitoredEnergyStack>(1);
 	public SyncEnum<FluidReader.Modes> setting = (SyncEnum) new SyncEnum(FluidReader.Modes.values(), 2).addSyncType(SyncType.SPECIAL);
@@ -36,11 +37,11 @@ public class EnergyReaderPart extends ReaderMultipart<MonitoredEnergyStack> impl
 		syncParts.addAll(Lists.newArrayList(setting, targetSlot, posSlot, sortingOrder, sortingType, selected));
 	}
 	public EnergyReaderPart() {
-		super(MonitorHandler.ENERGY);
+		super(EnergyMonitorHandler.id);
 	}
 
 	public EnergyReaderPart(EnumFacing face) {
-		super(MonitorHandler.ENERGY, face);
+		super(EnergyMonitorHandler.id, face);
 	}
 
 	@Override
@@ -90,21 +91,20 @@ public class EnergyReaderPart extends ReaderMultipart<MonitoredEnergyStack> impl
 		}
 		*/
 	}
-
 	@Override
-	public Object getServerElement(int id, EntityPlayer player, Object obj, NBTTagCompound tag) {
+	public Object getServerElement(Object obj, int id, World world, EntityPlayer player, NBTTagCompound tag) {
 		switch (id) {
 		case 0:
-			return new ContainerEnergyReader(this, player);
+			//return new ContainerEnergyReader(this, player);
 		}
 		return null;
 	}
 
 	@Override
-	public Object getClientElement(int id, EntityPlayer player, Object obj, NBTTagCompound tag) {
+	public Object getClientElement(Object obj, int id, World world, EntityPlayer player, NBTTagCompound tag) {
 		switch (id) {
 		case 0:
-			return new GuiEnergyReader(this, player);
+			//return new GuiEnergyReader(this, player);
 		}
 		return null;
 	}

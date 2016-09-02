@@ -7,7 +7,7 @@ import sonar.logistics.Logistics;
 import sonar.logistics.api.asm.LogicInfoType;
 import sonar.logistics.api.display.DisplayType;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
-import sonar.logistics.api.info.monitor.MonitorHandler;
+import sonar.logistics.api.info.monitor.LogicMonitorHandler;
 import sonar.logistics.helpers.InfoRenderer;
 
 @LogicInfoType(id = InfoError.id, modid = Logistics.MODID)
@@ -51,7 +51,7 @@ public class InfoError implements IMonitorInfo<InfoError> {
 	}
 
 	@Override
-	public MonitorHandler<InfoError> getHandler() {
+	public LogicMonitorHandler<InfoError> getHandler() {
 		return null;
 	}
 

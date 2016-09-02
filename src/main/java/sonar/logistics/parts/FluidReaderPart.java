@@ -6,6 +6,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.world.World;
 import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.core.network.sync.SyncEnum;
 import sonar.core.network.sync.SyncTagType;
@@ -18,7 +19,7 @@ import sonar.logistics.LogisticsItems;
 import sonar.logistics.api.info.InfoUUID;
 import sonar.logistics.api.info.monitor.ChannelType;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
-import sonar.logistics.api.info.monitor.MonitorHandler;
+import sonar.logistics.api.info.monitor.LogicMonitorHandler;
 import sonar.logistics.api.readers.FluidReader;
 import sonar.logistics.client.gui.GuiFluidReader;
 import sonar.logistics.client.gui.GuiInventoryReader;
@@ -27,6 +28,8 @@ import sonar.logistics.common.containers.ContainerInventoryReader;
 import sonar.logistics.connections.LogicMonitorCache;
 import sonar.logistics.connections.MonitoredList;
 import sonar.logistics.helpers.FluidHelper;
+import sonar.logistics.monitoring.FluidMonitorHandler;
+import sonar.logistics.monitoring.InfoMonitorHandler;
 import sonar.logistics.monitoring.MonitoredFluidStack;
 import sonar.logistics.network.SyncMonitoredType;
 
@@ -43,11 +46,11 @@ public class FluidReaderPart extends ReaderMultipart<MonitoredFluidStack> implem
 	}
 
 	public FluidReaderPart() {
-		super(MonitorHandler.FLUIDS);
+		super(FluidMonitorHandler.id);
 	}
 
 	public FluidReaderPart(EnumFacing face) {
-		super(MonitorHandler.FLUIDS, face);
+		super(FluidMonitorHandler.id, face);
 	}
 
 	@Override
@@ -88,7 +91,7 @@ public class FluidReaderPart extends ReaderMultipart<MonitoredFluidStack> implem
 			break;
 		}
 		if (info != null) {
-			InfoUUID id = new InfoUUID(getMonitorUUID().hashCode(), 0);
+			InfoUUID id = new InfoUUID(getIdentity().hashCode(), 0);
 			IMonitorInfo oldInfo = LogicMonitorCache.info.get(id);
 			if (oldInfo == null || !oldInfo.isIdenticalInfo(info)) {
 				LogicMonitorCache.changeInfo(id, info);
@@ -98,7 +101,7 @@ public class FluidReaderPart extends ReaderMultipart<MonitoredFluidStack> implem
 	}
 
 	@Override
-	public Object getServerElement(int id, EntityPlayer player, Object obj, NBTTagCompound tag) {
+	public Object getServerElement(Object obj, int id, World world, EntityPlayer player, NBTTagCompound tag) {
 		switch (id) {
 		case 0:
 			return new ContainerFluidReader(this, player);
@@ -107,7 +110,7 @@ public class FluidReaderPart extends ReaderMultipart<MonitoredFluidStack> implem
 	}
 
 	@Override
-	public Object getClientElement(int id, EntityPlayer player, Object obj, NBTTagCompound tag) {
+	public Object getClientElement(Object obj, int id, World world, EntityPlayer player, NBTTagCompound tag) {
 		switch (id) {
 		case 0:
 			return new GuiFluidReader(this, player);

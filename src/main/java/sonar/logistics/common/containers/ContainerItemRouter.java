@@ -1,5 +1,5 @@
 package sonar.logistics.common.containers;
-
+/*
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.ClickType;
@@ -147,3 +147,4 @@ public class ContainerItemRouter extends ContainerSync {
 		return new SyncType[] { SyncType.SPECIAL };
 	}
 }
+*/

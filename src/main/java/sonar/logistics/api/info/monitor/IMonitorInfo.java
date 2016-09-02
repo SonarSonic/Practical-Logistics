@@ -21,7 +21,7 @@ public interface IMonitorInfo<T extends IMonitorInfo> extends INBTSyncable{
 
 	public boolean isHeader();
 	
-	public MonitorHandler<T> getHandler();
+	public LogicMonitorHandler<T> getHandler();
 	
 	public boolean isValid();
 	

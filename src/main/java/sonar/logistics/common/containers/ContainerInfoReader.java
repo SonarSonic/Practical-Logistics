@@ -9,9 +9,11 @@ import sonar.core.inventory.ContainerMultipartSync;
 import sonar.logistics.parts.InfoReaderPart;
 
 public class ContainerInfoReader extends ContainerMultipartSync {
+	public InfoReaderPart part;
 
-	public ContainerInfoReader(EntityPlayer player, InfoReaderPart handler) {
-		super(handler);
+	public ContainerInfoReader(EntityPlayer player, InfoReaderPart part) {
+		super(part);
+		this.part = part;
 	}
 
 	@Override
@@ -35,7 +37,7 @@ public class ContainerInfoReader extends ContainerMultipartSync {
 	}
 
 	@Override
-    public ItemStack slotClick(int slotID, int drag, ClickType click, EntityPlayer player){
+	public ItemStack slotClick(int slotID, int drag, ClickType click, EntityPlayer player) {
 		if (slotID >= 0 && getSlot(slotID) != null && getSlot(slotID).getStack() == player.getHeldItemMainhand()) {
 			return null;
 		}
@@ -44,5 +46,10 @@ public class ContainerInfoReader extends ContainerMultipartSync {
 
 	public SyncType[] getSyncTypes() {
 		return new SyncType[] { SyncType.DEFAULT_SYNC };
+	}
+
+	public void onContainerClosed(EntityPlayer player) {
+		super.onContainerClosed(player);
+		part.removeViewer(player);
 	}
 }
