@@ -123,7 +123,7 @@ public abstract class MonitorMultipart<T extends IMonitorInfo> extends SidedMult
 				toRemove.add(viewer);
 			}
 		}
-		toRemove.forEach(remove -> viewers.remove(remove));
+		toRemove.forEach(viewers.get(true)::remove);
 	}
 
 	public UUID getIdentity() {
