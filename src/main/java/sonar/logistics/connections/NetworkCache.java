@@ -2,6 +2,7 @@ package sonar.logistics.connections;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -61,11 +62,12 @@ public class NetworkCache extends MonitorCache implements IRefreshCache {
 	@Override
 	@Deprecated
 	public Entry<BlockCoords, EnumFacing> getExternalBlock(boolean includeChannels) {
-		ArrayList<IWorldPosition> toRemove = new ArrayList();
-		for (IDataCable part : getConnections(IDataCable.class, includeChannels)) {
+		Iterator<IDataCable> connections = getConnections(IDataCable.class, includeChannels).iterator();
+		while (connections.hasNext()) {
+			IDataCable part = connections.next();
 			if (part == null || !(part instanceof IDataCable) || !((IDataCable) part).hasConnections()) {
-				toRemove.add(part);
-				continue;
+				// toRemove.add(part);
+				// continue;
 			} else {
 				DataCablePart cable = (DataCablePart) part;
 				HashMap<BlockCoords, EnumFacing> map = new HashMap();
@@ -86,15 +88,14 @@ public class NetworkCache extends MonitorCache implements IRefreshCache {
 		ArrayList<T> list = (ArrayList<T>) connections.getOrDefault(classType, (ArrayList<IWorldPosition>) new ArrayList<T>());
 		if (includeChannels) {
 			ArrayList<Integer> networks = getFinalNetworkList();
-			for (Integer id : networks) {
+			networks.iterator().forEachRemaining(id -> {
 				INetworkCache network = CacheRegistry.getCache(id);
-				ArrayList<T> connections = ((ArrayList<T>) network.getConnections(classType, false));
-				for (T connection : connections) {
-					if (!list.contains(connection)) {
+				ArrayList<T> connections = network.getConnections(classType, false);
+				connections.iterator().forEachRemaining(connection -> {
+					if (!list.contains(connection))
 						list.add(connection);
-					}
-				}
-			}
+				});
+			});
 		}
 		return list;
 	}
@@ -123,7 +124,10 @@ public class NetworkCache extends MonitorCache implements IRefreshCache {
 	public void refreshCables() {
 		localMonitors.clear();
 		HashMap<Class<?>, ArrayList<IWorldPosition>> newConnections = getFreshMap();
-		for (BlockCoords coord : CableRegistry.getCables(networkID)) {
+		ArrayList<BlockCoords> cables = CableRegistry.getCables(networkID);
+		Iterator<BlockCoords> iterator = cables.iterator();
+		while (iterator.hasNext()) {
+			BlockCoords coord = iterator.next();
 			DataCablePart cablePart = (DataCablePart) LogisticsAPI.getCableHelper().getCableFromCoords(coord);
 			if (cablePart == null) {
 				continue;
@@ -133,19 +137,20 @@ public class NetworkCache extends MonitorCache implements IRefreshCache {
 			tiles.forEach(tile -> getValidClasses(tile).forEach(classType -> newConnections.get(classType).add(tile)));
 			if (!tiles.isEmpty())
 				newConnections.get(IDataCable.class).add(cablePart);
+
 		}
 		this.connections = newConnections;
 	}
 
 	public void refreshNetworks() {
 		ArrayList<Integer> networks = new ArrayList();
-		for (IDataReceiver receiver : (List<IDataReceiver>) getConnections(IDataReceiver.class, true).clone()) {
-			receiver.getConnectedNetworks().forEach(network -> {
+		getConnections(IDataReceiver.class, true).iterator().forEachRemaining(receiver -> {
+			receiver.getConnectedNetworks().iterator().forEachRemaining(network -> {
 				if (!networks.contains(network)) {
 					networks.add(network);
 				}
 			});
-		}
+		});
 		this.connectedNetworks = networks;
 	}
 
@@ -158,7 +163,7 @@ public class NetworkCache extends MonitorCache implements IRefreshCache {
 				continue;
 			} else {
 				ArrayList<IConnectionNode> nodes = CableHelper.getConnectedTiles((DataCablePart) part, IConnectionNode.class);
-				nodes.forEach(node -> {
+				nodes.iterator().forEachRemaining(node -> {
 					if (!(node instanceof IRemovable) || !((IRemovable) node).wasRemoved()) {
 						node.addConnections(map);
 					}
@@ -188,7 +193,7 @@ public class NetworkCache extends MonitorCache implements IRefreshCache {
 		for (Entry<BlockCoords, EnumFacing> entry : networkedCache.entrySet()) {
 			list.add(new MonitoredBlockCoords(entry.getKey(), entry.getKey().getBlock().getUnlocalizedName()));
 		}
-		CacheRegistry.coordMap.put(networkID, list);
+		CacheRegistry.getCoordMap().put(networkID, list);
 	}
 
 	public <T extends IWorldPosition> T getFirstConnection(Class<T> type) {
@@ -213,12 +218,12 @@ public class NetworkCache extends MonitorCache implements IRefreshCache {
 
 	public ArrayList<Integer> getFinalNetworkList() {
 		ArrayList<Integer> networks = getConnectedNetworks(new ArrayList());
-		for (Integer id : (ArrayList<Integer>) networks.clone()) {
+		networks.iterator().forEachRemaining(id -> {
 			if (!networks.contains(id)) {
 				networks.add(id);
 			}
 			CacheRegistry.getCache(networkID).getConnectedNetworks(networks);
-		}
+		});
 		return networks;
 	}
 

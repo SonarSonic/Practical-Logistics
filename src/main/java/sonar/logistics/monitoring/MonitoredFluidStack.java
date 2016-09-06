@@ -11,6 +11,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHand;
 import net.minecraftforge.fluids.FluidStack;
 import sonar.core.api.fluids.StoredFluidStack;
+import sonar.core.api.utils.BlockInteractionType;
 import sonar.core.helpers.FontHelper;
 import sonar.core.network.sync.SyncNBTAbstract;
 import sonar.logistics.Logistics;
@@ -107,7 +108,7 @@ public class MonitoredFluidStack extends BaseInfo<MonitoredFluidStack> implement
 	}
 
 	@Override
-	public boolean onClicked(RenderInfoProperties renderInfo, EntityPlayer player, EnumHand hand, ItemStack stack, PartMOP hit) {
+	public boolean onClicked(BlockInteractionType type, boolean doubleClick, RenderInfoProperties renderInfo, EntityPlayer player, EnumHand hand, ItemStack stack, PartMOP hit) {
 		return false;
 	}
 

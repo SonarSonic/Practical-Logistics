@@ -54,10 +54,14 @@ public class ItemOperator extends SonarItem implements IOperatorTool, IFlexibleG
 			case ANALYSE:
 				break;
 			case DEFAULT:
-				if (part != null && part instanceof IOperatorTile) {
-					boolean operation = ((IOperatorTile) part).performOperation(result, mode, player, hand, facing, hitX, hitY, hitZ);
-					return operation ? EnumActionResult.SUCCESS : EnumActionResult.PASS;
+				if (!player.isSneaking()) {
+					if (part != null && part instanceof IOperatorTile) {
+						boolean operation = ((IOperatorTile) part).performOperation(result, mode, player, hand, facing, hitX, hitY, hitZ);
+						return operation ? EnumActionResult.SUCCESS : EnumActionResult.PASS;
+					}
+				} else {
 				}
+
 				break;
 			case CHANNELS:
 				if (part != null && part instanceof IChannelledTile) {
@@ -75,7 +79,7 @@ public class ItemOperator extends SonarItem implements IOperatorTool, IFlexibleG
 			case INFO:
 				break;
 			case ROTATE:
-				break;
+				return (part!=null && part.rotatePart(facing)) ? EnumActionResult.SUCCESS : EnumActionResult.PASS;
 			default:
 				break;
 
@@ -141,7 +145,7 @@ public class ItemOperator extends SonarItem implements IOperatorTool, IFlexibleG
 		case 0:
 			int hash = tag.getInteger("hash");
 			ILogicMonitor part = LogicMonitorCache.getMonitorFromClient(hash);
-			if (part!=null && part instanceof IChannelledTile) {
+			if (part != null && part instanceof IChannelledTile) {
 				return new GuiChannelSelection((IChannelledTile) part);
 			}
 		}

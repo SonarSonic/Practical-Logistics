@@ -32,7 +32,7 @@ public class PacketMonitoredCoords implements IMessage {
 		registryID = buf.readInt();
 		listTag = ByteBufUtils.readTag(buf);
 		if (listTag != null)
-			list = InfoHelper.readMonitoredList(listTag, CacheRegistry.coordMap.getOrDefault(registryID, MonitoredList.newMonitoredList()).copyInfo(), SyncType.DEFAULT_SYNC);
+			list = InfoHelper.readMonitoredList(listTag, CacheRegistry.getCoordMap().getOrDefault(registryID, MonitoredList.newMonitoredList()).copyInfo(), SyncType.DEFAULT_SYNC);
 	}
 
 	@Override

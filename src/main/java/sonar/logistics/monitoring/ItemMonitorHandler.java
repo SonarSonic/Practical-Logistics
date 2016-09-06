@@ -12,6 +12,7 @@ import sonar.core.api.inventories.StoredItemStack;
 import sonar.core.api.utils.BlockCoords;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.asm.MonitorHandler;
+import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.info.monitor.LogicMonitorHandler;
 import sonar.logistics.connections.MonitoredList;
 
@@ -26,7 +27,7 @@ public class ItemMonitorHandler extends LogicMonitorHandler<MonitoredItemStack> 
 	}
 
 	@Override
-	public MonitoredList<MonitoredItemStack> updateInfo(MonitoredList<MonitoredItemStack> previousList, BlockCoords coords, EnumFacing side) {
+	public MonitoredList<MonitoredItemStack> updateInfo(INetworkCache network, MonitoredList<MonitoredItemStack> previousList, BlockCoords coords, EnumFacing side) {
 		MonitoredList<MonitoredItemStack> list = MonitoredList.<MonitoredItemStack>newMonitoredList();
 		List<InventoryHandler> providers = SonarCore.inventoryProviders.getObjects();
 		TileEntity tile = coords.getTileEntity();

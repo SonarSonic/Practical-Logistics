@@ -81,7 +81,7 @@ public abstract class MonitorCache implements IMonitorCache {
 	public void sendPacketsToViewer(ILogicMonitor monitor, List<MonitorViewer> viewers, boolean fullPacket, MonitoredList saveList, MonitoredList lastList) {
 		NBTTagCompound tag = InfoHelper.writeMonitoredList(new NBTTagCompound(), lastList.isEmpty(), saveList, fullPacket ? SyncType.DEFAULT_SYNC : SyncType.SPECIAL);
 
-		MonitoredList<MonitoredBlockCoords> coords = fullPacket ? CacheRegistry.coordMap.get(getNetworkID()) : null;
+		MonitoredList<MonitoredBlockCoords> coords = fullPacket ? CacheRegistry.getCoordMap().get(getNetworkID()) : null;
 		NBTTagCompound coordTag = fullPacket ? InfoHelper.writeMonitoredList(new NBTTagCompound(), coords.isEmpty(), coords.copyInfo(), SyncType.DEFAULT_SYNC) : null;
 		if (fullPacket || !tag.hasNoTags()) {
 			viewers.forEach(viewer -> {
@@ -107,7 +107,7 @@ public abstract class MonitorCache implements IMonitorCache {
 		Map<Pair<BlockCoords, EnumFacing>, MonitoredList<?>> coordInfo = new LinkedHashMap();
 		for (Entry<Pair<BlockCoords, EnumFacing>, MonitoredList<?>> entry : infoList.entrySet()) {
 			MonitoredList<T> oldList = entry.getValue() == null ? MonitoredList.<T>newMonitoredList() : (MonitoredList<T>) entry.getValue();
-			MonitoredList<T> list = type.updateInfo(oldList, entry.getKey().a, entry.getKey().b);
+			MonitoredList<T> list = type.updateInfo(this, oldList, entry.getKey().a, entry.getKey().b);
 			coordInfo.put(entry.getKey(), list);
 		}
 		return coordInfo;

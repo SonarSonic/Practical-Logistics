@@ -1,107 +1,94 @@
 package sonar.logistics.client.gui;
-/*
-import java.awt.Color;
-import java.util.List;
 
-import org.lwjgl.opengl.GL11;
+import java.util.ArrayList;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.gui.GuiButton;
+import net.minecraft.entity.player.EntityPlayer;
 import sonar.core.helpers.FontHelper;
-import sonar.core.helpers.NBTHelper.SyncType;
-import sonar.core.inventory.ContainerMultipartSync;
-import sonar.logistics.api.info.DEADILogicInfo;
-import sonar.logistics.client.renderers.RenderHandlers;
-import sonar.logistics.common.parts.EnergyReaderPart;
-import sonar.logistics.info.types.StoredEnergyInfo;
+import sonar.logistics.api.info.monitor.IMonitorInfo;
+import sonar.logistics.client.LogisticsColours;
+import sonar.logistics.common.containers.ContainerEnergyReader;
+import sonar.logistics.common.containers.ContainerInfoReader;
+import sonar.logistics.helpers.InfoRenderer;
+import sonar.logistics.monitoring.MonitoredEnergyStack;
+import sonar.logistics.parts.EnergyReaderPart;
+import sonar.logistics.parts.InfoReaderPart;
 
-public class GuiEnergyReader extends GuiOLDSelectionList<DEADILogicInfo> {
-
-	public static final ResourceLocation bground = new ResourceLocation("PracticalLogistics:textures/gui/channelSelection.png");
+public class GuiEnergyReader extends GuiSelectionList<MonitoredEnergyStack> {
 
 	public EnergyReaderPart part;
-
-	public GuiEnergyReader(EnergyReaderPart part) {
-		super(new ContainerMultipartSync(part), part);
-		this.part = part;
+	
+	public GuiEnergyReader(EntityPlayer player, EnergyReaderPart tile) {
+		super(new ContainerEnergyReader(player, tile), tile);
+		this.part = tile;
 	}
 
 	@Override
-	public List<DEADILogicInfo> getSelectionList() {
-		return part.stacks;
+	public void drawGuiContainerForegroundLayer(int x, int y) {
+		super.drawGuiContainerForegroundLayer(x, y);
+		FontHelper.textCentre(FontHelper.translate("item.InfoReader.name"), xSize, 6, LogisticsColours.white_text);
+		FontHelper.textCentre(String.format("Select the data you wish to monitor"), xSize, 18, LogisticsColours.grey_text);
+	}
+
+	public void setInfo() {
+		infoList = part.getMonitoredList().cloneInfo();
 	}
 
 	@Override
-	public DEADILogicInfo getCurrentSelection() {
-		return part.primaryInfo.getObject();
-	}
-
-	@Override
-	public boolean isEqualSelection(DEADILogicInfo selection, DEADILogicInfo current) {
-		return selection.isIdenticalInfo(current) && !SyncType.isGivenType(selection.isMatchingData(current), SyncType.SAVE);
-	}
-
-	@Override
-	public void renderStrings(int x, int y) {
-		FontHelper.textCentre(FontHelper.translate("item.EnergyReader.name"), xSize, 6, 1);
-		FontHelper.textCentre("Select the Energy Info you wish to display", xSize, 18, 0);
-	}
-
-	@Override
-	public void renderSelection(DEADILogicInfo selection, boolean isSelected, int pos) {
-		Minecraft.getMinecraft().renderEngine.bindTexture(new ResourceLocation(RenderHandlers.modelFolder + "progressBar.png"));
-		if (selection instanceof StoredEnergyInfo) {
-			StoredEnergyInfo info = (StoredEnergyInfo) selection;
-			if (info.stack.capacity != 0) {
-				int l = (int) (info.stack.stored * 207 / info.stack.capacity);
-				GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-				drawTexturedModalRect(25, 32 + (getSelectionHeight() * pos), 176, 10, l, 16);
-			}
-			if (info.coords != null) {
-				String string = (info.coords.block != null ? (info.coords.block.getTooltip(this.mc.thePlayer, this.mc.gameSettings.advancedItemTooltips)).get(0).toString() : info.coords.coordString);
-
-				int offsetTop = 29;
-				if (getViewableSize() == 7) {
-					offsetTop = offsetTop + 2;
-				}
-				FontHelper.text(string + ": " + info.stack.stored + " " + info.stack.energyType.getStorageSuffix(), 28, offsetTop + 5 + (getSelectionHeight() * pos), Color.WHITE.getRGB());
-				if (info.coords.block != null) {
-					/*
-					GL11.glEnable(GL11.GL_DEPTH_TEST);
-					RenderItem.getInstance().renderItemAndEffectIntoGUI(fontRendererObj, this.mc.getTextureManager(), info.coords.block, 8, offsetTop + 1 + (getSelectionHeight() * pos));
-					RenderHelper.renderStoredItemStackOverlay(this.fontRendererObj, this.mc.getTextureManager(), info.coords.block, 0, 8, offsetTop + 1 + (getSelectionHeight() * pos), null);
-					
-				}
-			}
+	public void selectionPressed(GuiButton button, int buttonID, MonitoredEnergyStack info) {
+		if (info.isValid() && !info.isHeader()) {
+			part.selectedInfo.setInfo(info);
+			part.sendByteBufPacket(buttonID == 0 ? -9 : -10);
 		}
 	}
 
-	public void drawSelectionBackground(int offsetTop, int i, int pos) {
-		drawTexturedModalRect(this.guiLeft + 7, this.guiTop + offsetTop + (getSelectionHeight() * i), 0, i == pos ? 166 + getSelectionHeight() : 166, 154 + 72, getSelectionHeight()); // }else{
-		drawTexturedModalRect(this.guiLeft + 7, this.guiTop + offsetTop + (getSelectionHeight() * i), 0, 166, 154 + 72, getSelectionHeight());
-		if (i == pos)
-			drawTexturedModalRect(this.guiLeft + 7, this.guiTop + offsetTop + (getSelectionHeight() * i), 0, 166 + getSelectionHeight(), 18, getSelectionHeight());
-
-		// }
+	@Override
+	public boolean isCategoryHeader(MonitoredEnergyStack info) {
+		return info.isHeader();
 	}
 
 	@Override
-	public void sendPacket(DEADILogicInfo selection) {
-		part.primaryInfo.setObject(selection);
-		part.sendByteBufPacket(1);
+	public boolean isSelectedInfo(MonitoredEnergyStack info) {
+		if(!info.isValid() || info.isHeader()){
+			return false;
+		}
+		ArrayList<IMonitorInfo> selectedInfo = part.getSelectedInfo();
+		for (IMonitorInfo selected : selectedInfo) {
+			if (selected != null && !selected.isHeader() && info.isMatchingType(selected) && info.isMatchingInfo((LogicInfo) selected)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Override
-	public ResourceLocation getBackground() {
-		return bground;
+	public boolean isPairedInfo(MonitoredEnergyStack info) {
+		if(!info.isValid() || info.isHeader()){
+			return false;
+		}
+		return false;
 	}
 
-	public int getViewableSize() {
-		return 7;
+	@Override
+	public void renderInfo(MonitoredEnergyStack info, int yPos) {
+		InfoRenderer.renderMonitorInfoInGUI(info, yPos + 1, LogisticsColours.white_text.getRGB());
 	}
 
-	public int getSelectionHeight() {
-		return 18;
+	@Override
+	public int getColour(int i, int type) {
+		IMonitorInfo info = (IMonitorInfo) infoList.get(i + start);
+		if (info == null || info.isHeader()) {
+			return LogisticsColours.layers[1].getRGB();
+		}
+		ArrayList<IMonitorInfo> selectedInfo = type == 0 ? part.getSelectedInfo() : part.getPairedInfo();
+		int pos = 0;
+		for (IMonitorInfo selected : selectedInfo) {
+			if (selected != null && !selected.isHeader() && info.isMatchingType(selected) && info.isMatchingInfo(selected)) {
+				return LogisticsColours.infoColours[pos].getRGB();
+			}
+			pos++;
+		}
+		return LogisticsColours.layers[1].getRGB();
 	}
 }
-*/

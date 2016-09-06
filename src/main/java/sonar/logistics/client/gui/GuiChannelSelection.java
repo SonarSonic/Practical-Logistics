@@ -43,7 +43,7 @@ public class GuiChannelSelection extends GuiSelectionList<MonitoredBlockCoords> 
 	}
 
 	public void setInfo() {
-		infoList = (ArrayList<MonitoredBlockCoords>) CacheRegistry.coordMap.getOrDefault(tile.getNetworkID(), MonitoredList.<MonitoredBlockCoords>newMonitoredList()).clone();
+		infoList = (ArrayList<MonitoredBlockCoords>) CacheRegistry.getCoordMap().getOrDefault(tile.getNetworkID(), MonitoredList.<MonitoredBlockCoords>newMonitoredList()).clone();
 	}
 
 	@Override

@@ -9,6 +9,7 @@ import net.minecraft.world.World;
 import sonar.core.api.utils.BlockCoords;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.asm.MonitorHandler;
+import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.info.ICustomTileHandler;
 import sonar.logistics.api.info.LogicInfo;
 import sonar.logistics.api.info.monitor.LogicMonitorHandler;
@@ -26,7 +27,7 @@ public class InfoMonitorHandler extends LogicMonitorHandler<LogicInfo> {
 	}
 
 	@Override
-	public MonitoredList<LogicInfo> updateInfo(MonitoredList<LogicInfo> previousList, BlockCoords coords, EnumFacing dir) {
+	public MonitoredList<LogicInfo> updateInfo(INetworkCache network, MonitoredList<LogicInfo> previousList, BlockCoords coords, EnumFacing dir) {
 		MonitoredList<LogicInfo> list = MonitoredList.<LogicInfo>newMonitoredList();
 		World world =coords.getWorld(); IBlockState state = coords.getBlockState(world); BlockPos pos = coords.getBlockPos(); Block block = coords.getBlock(world); TileEntity tile = coords.getTileEntity(world);
 		LogicRegistry.getTileInfo(list, world, state, pos, dir, block, tile);		

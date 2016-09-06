@@ -83,7 +83,7 @@ public class MonitoredList<T extends IMonitorInfo> extends ArrayList<T> {
 	/** @param info the info type you wish to check
 	 * @return a boolean for if the info was changed and the new info */
 	public Pair<Boolean, IMonitorInfo> getLatestInfo(IMonitorInfo oldInfo) {
-		for (T newInfo : cloneInfo()) {
+		for (T newInfo : this) {
 			if (newInfo.isMatchingType(oldInfo) && newInfo.isMatchingInfo(oldInfo) && !newInfo.isIdenticalInfo(oldInfo)) {
 				return new Pair(true, newInfo);
 			}

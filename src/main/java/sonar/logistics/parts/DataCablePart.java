@@ -10,6 +10,7 @@ import mcmultipart.multipart.IMultipartContainer;
 import mcmultipart.multipart.ISlotOccludingPart;
 import mcmultipart.multipart.PartSlot;
 import mcmultipart.raytrace.RayTraceUtils.AdvancedRayTraceResultPart;
+import net.minecraft.block.Block;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockStateContainer;
@@ -76,6 +77,13 @@ public class DataCablePart extends SonarMultipart implements ISlotOccludingPart,
 
 	@Override
 	public void onNeighborTileChange(EnumFacing facing) {
+		super.onNeighborTileChange(facing);
+		INetworkCache cache = LogisticsAPI.getCableHelper().getNetwork(registryID);
+		cache.markDirty(RefreshType.FULL);
+		refreshConnections();
+	}
+	public void onNeighborBlockChange(Block block){
+		super.onNeighborBlockChange(block);
 		INetworkCache cache = LogisticsAPI.getCableHelper().getNetwork(registryID);
 		cache.markDirty(RefreshType.FULL);
 		refreshConnections();

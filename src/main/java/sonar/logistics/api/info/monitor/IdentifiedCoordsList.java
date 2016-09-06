@@ -2,6 +2,7 @@ package sonar.logistics.api.info.monitor;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.UUID;
 
 import io.netty.buffer.ByteBuf;
@@ -50,9 +51,10 @@ public class IdentifiedCoordsList extends ArrayList<BlockCoords> implements ISyn
 				}
 				add(coords);
 			} else {
-				((IdentifiedCoordsList) clone()).forEach(coord -> {
+				Iterator<BlockCoords> iterator = iterator();
+				iterator.forEachRemaining(coord -> {
 					if (coord.equals(coords)) {
-						remove(coord);
+						iterator.remove();
 					}
 				});
 			}

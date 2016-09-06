@@ -9,12 +9,13 @@ import sonar.core.integration.multipart.SonarMultipart;
 import sonar.core.inventory.ContainerMultipartSync;
 import sonar.logistics.api.connecting.IChannelledTile;
 import sonar.logistics.api.connecting.IOperatorTool;
+import sonar.logistics.api.display.IInfoDisplay;
 import sonar.logistics.parts.InfoReaderPart;
 
-public class ContainerChannelSelection extends ContainerMultipartSync {
+public class ContainerInfoDisplay extends ContainerMultipartSync {
 
-	public ContainerChannelSelection(IChannelledTile handler) {
-		super((SonarMultipart) handler);
+	public ContainerInfoDisplay(IInfoDisplay display) {
+		super((SonarMultipart) display);
 	}
 	
 	public boolean syncInventory() {

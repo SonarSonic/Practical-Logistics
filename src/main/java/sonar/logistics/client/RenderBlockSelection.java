@@ -1,6 +1,7 @@
 package sonar.logistics.client;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map.Entry;
 
 import net.minecraft.block.Block;
@@ -20,24 +21,22 @@ public class RenderBlockSelection {
 		if (positions.isEmpty()) {
 			return;
 		}
-		for (Entry<BlockCoords, Pair<Long, Boolean>> position : ((HashMap<BlockCoords, Pair<Long, Boolean>>) positions.clone()).entrySet()) {
+		Iterator<Entry<BlockCoords, Pair<Long, Boolean>>> iterator = positions.entrySet().iterator();
+		iterator.forEachRemaining(position -> {
 			long time = System.currentTimeMillis();
 			if (time > position.getValue().a + displayTime) {
-				positions.remove(position.getKey());
+				iterator.remove();
 			} else {
-				// if (position.getKey().getDimension() == Minecraft.getMinecraft().thePlayer.dimension) {
 				GlStateManager.pushMatrix();
 				GlStateManager.disableAlpha();
 				if (position.getValue().b) {
-
 				} else {
 					RenderHelper.drawBoundingBox(Block.FULL_BLOCK_AABB, position.getKey().getBlockPos(), evt.getPartialTicks(), 120.0F, 100.0F, 20.0F, 0.5F);
 				}
 				GlStateManager.enableAlpha();
 				GlStateManager.popMatrix();
-				// }
 			}
-		}
+		});
 	}
 
 	public static boolean isPositionRenderered(BlockCoords coords) {

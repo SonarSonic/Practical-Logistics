@@ -3,6 +3,7 @@ package sonar.logistics.helpers;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 
 import mcmultipart.raytrace.PartMOP;
 import net.minecraft.entity.player.EntityPlayer;
@@ -11,8 +12,11 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
+import sonar.core.api.utils.BlockInteractionType;
 import sonar.core.helpers.NBTHelper;
 import sonar.core.helpers.NBTHelper.SyncType;
+import sonar.core.utils.Pair;
+import sonar.core.utils.SortingDirection;
 import sonar.logistics.api.display.DisplayType;
 import sonar.logistics.api.display.IInfoDisplay;
 import sonar.logistics.api.display.ScreenLayout;
@@ -96,7 +100,10 @@ public class InfoHelper {
 			tags: for (int i = 0; i < list.tagCount(); i++) {
 				NBTTagCompound infoTag = list.getCompoundTagAt(i);
 				T stack = (T) InfoHelper.readInfoFromNBT(infoTag);
-				for (T stored : (ArrayList<T>) stacks.clone()) {
+				//.forEachRemaining(stored -> {});
+				Iterator<T> iterator = stacks.iterator();
+				while(iterator.hasNext()){
+					T stored = iterator.next();
 					if (stack.isMatchingInfo(stored)) {
 						if (infoTag.getBoolean(REMOVED)) {
 							stacks.remove(stored);
@@ -112,6 +119,22 @@ public class InfoHelper {
 		return stacks;
 	}
 
+	public static int compareWithDirection(long stored1, long stored2, SortingDirection dir){		
+		if (stored1 < stored2)
+			return dir == SortingDirection.DOWN ? 1 : -1;
+		if (stored1 == stored2)
+			return 0;
+		return dir == SortingDirection.DOWN ? -1 : 1;
+	}
+
+	public static int compareStringsWithDirection(String string1, String string2, SortingDirection dir){		
+		int res = String.CASE_INSENSITIVE_ORDER.compare(string1, string2);
+		if (res == 0) {
+			res = string1.compareTo(string2);
+		}
+		return dir == SortingDirection.DOWN ? res : -res;
+	}
+	
 	public static ArrayList<LogicInfo> sortInfoList(ArrayList<LogicInfo> oldInfo) {
 		ArrayList<LogicInfo> providerInfo = (ArrayList<LogicInfo>) oldInfo.clone();
 		Collections.sort(providerInfo, new Comparator<LogicInfo>() {
@@ -186,8 +209,21 @@ public class InfoHelper {
 		return false;
 	}
 
-	public void getInfoPosition() {
+	public enum ItemInteractionType {
+		ADD, REMOVE;
+	}
 
+	public static Pair<Integer, ItemInteractionType> getItemsToRemove(BlockInteractionType type) {
+		switch (type) {
+		case LEFT:
+			return new Pair(1, ItemInteractionType.REMOVE);
+		case RIGHT:
+			return new Pair(64, ItemInteractionType.ADD);
+		case SHIFT_LEFT:
+			return new Pair(64, ItemInteractionType.REMOVE);
+		default:
+			return new Pair(0, ItemInteractionType.ADD);
+		}
 	}
 
 	public boolean hasInfoChanged(IMonitorInfo info, IMonitorInfo newInfo) {

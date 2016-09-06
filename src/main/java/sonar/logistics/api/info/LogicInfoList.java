@@ -12,6 +12,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHand;
 import sonar.core.api.inventories.StoredItemStack;
+import sonar.core.api.utils.BlockInteractionType;
 import sonar.core.helpers.RenderHelper;
 import sonar.core.network.sync.SyncTagType;
 import sonar.core.network.sync.SyncUUID;
@@ -127,7 +128,7 @@ public class LogicInfoList extends BaseInfo<LogicInfoList> implements INameableI
 	}
 
 	@Override
-	public boolean onClicked(RenderInfoProperties renderInfo, EntityPlayer player, EnumHand hand, ItemStack stack, PartMOP hit) {
+	public boolean onClicked(BlockInteractionType type, boolean doubleClick, RenderInfoProperties renderInfo, EntityPlayer player, EnumHand hand, ItemStack stack, PartMOP hit) {
 		return false;
 	}
 

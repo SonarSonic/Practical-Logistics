@@ -1,13 +1,19 @@
 package sonar.logistics.connections;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import com.google.common.collect.Lists;
 
 import gnu.trove.map.hash.THashMap;
+import net.minecraftforge.fluids.capability.templates.FluidHandlerItemStack.Consumable;
 import sonar.core.api.utils.BlockCoords;
 import sonar.logistics.api.LogisticsAPI;
+import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.connecting.IDataCable;
 
 public class CableRegistry {
@@ -40,12 +46,13 @@ public class CableRegistry {
 	public static void addCable(int registryID, IDataCable cable, boolean refreshCache) {
 		if (registryID != -1 && cable != null) {
 			ArrayList<BlockCoords> network = cables.get(registryID) == null ? cables.put(registryID, new ArrayList()) : cables.get(registryID);
-
-			for (BlockCoords coords : cables.get(registryID)) {
+			
+			cables.get(registryID).iterator().forEachRemaining(coords -> {
 				if (BlockCoords.equalCoords(coords, cable.getCoords())) {
 					return;
 				}
-			}
+			});
+			
 			cables.get(registryID).add(cable.getCoords());
 			cable.setRegistryID(registryID);
 			if (refreshCache)
@@ -58,11 +65,11 @@ public class CableRegistry {
 			if (cables.get(registryID) == null) {
 				return;
 			}
-			for (BlockCoords coords : (ArrayList<BlockCoords>) cables.get(registryID).clone()) {
+			cables.get(registryID).iterator().forEachRemaining(coords -> {
 				if (BlockCoords.equalCoords(coords, cable.getCoords())) {
 					cables.get(registryID).remove(coords);
 				}
-			}
+			});
 
 			ArrayList<BlockCoords> oldCables = new ArrayList();
 			if (cables.get(registryID) != null) {
@@ -71,18 +78,17 @@ public class CableRegistry {
 			}
 
 			int newID = getNextAvailableID();
-			for (BlockCoords oldCable : oldCables) {
+			oldCables.forEach(oldCable -> {
 				IDataCable target = LogisticsAPI.getCableHelper().getCableFromCoords(oldCable);
-				if (target != null) {
+				if (target != null)
 					target.setRegistryID(-1);
-				}
-			}
-			for (BlockCoords oldCable : oldCables) {
+			});
+
+			oldCables.forEach(oldCable -> {
 				IDataCable target = LogisticsAPI.getCableHelper().getCableFromCoords(oldCable);
-				if (target != null) {
+				if (target != null)
 					target.addCable();
-				}
-			}
+			});
 		}
 	}
 

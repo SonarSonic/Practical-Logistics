@@ -6,6 +6,7 @@ import mcmultipart.raytrace.PartMOP;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHand;
+import sonar.core.api.utils.BlockInteractionType;
 import sonar.core.helpers.FontHelper;
 import sonar.core.network.sync.ObjectType;
 import sonar.core.network.sync.SyncEnum;
@@ -143,7 +144,7 @@ public class LogicInfo extends BaseInfo<LogicInfo> implements INameableInfo<Logi
 	}
 
 	@Override
-	public boolean onClicked(RenderInfoProperties renderInfo, EntityPlayer player, EnumHand hand, ItemStack stack, PartMOP hit) {
+	public boolean onClicked(BlockInteractionType type, boolean doubleClick, RenderInfoProperties renderInfo, EntityPlayer player, EnumHand hand, ItemStack stack, PartMOP hit) {
 		if (InfoHelper.canBeClickedStandard(renderInfo, player, hand, stack, hit)) {
 			FontHelper.sendMessage(getClientIdentifier() + ": " + obj.objectType + " - " + getClientObject(), player.getEntityWorld(), player);
 			return true;

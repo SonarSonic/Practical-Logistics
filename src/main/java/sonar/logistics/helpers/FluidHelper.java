@@ -210,7 +210,7 @@ public class FluidHelper extends FluidWrapper {
 			}
 		}
 	}
-	
+
 	public static void sortFluidList(ArrayList<MonitoredFluidStack> current, final SortingDirection dir, SortingType type) {
 		current.sort(new Comparator<MonitoredFluidStack>() {
 			public int compare(MonitoredFluidStack str1, MonitoredFluidStack str2) {
@@ -223,32 +223,21 @@ public class FluidHelper extends FluidWrapper {
 			}
 		});
 
-		switch (type) {
-		case STORED:
-			current.sort(new Comparator<MonitoredFluidStack>() {
-				public int compare(MonitoredFluidStack str1, MonitoredFluidStack str2) {
-					StoredFluidStack flu1 = str1.fluidStack.getObject(), flu2 = str2.fluidStack.getObject();
-					if (flu1.stored < flu2.stored)
-						return dir == SortingDirection.DOWN ? 1 : -1;
-					if (flu1.stored == flu2.stored)
-						return 0;
-					return dir == SortingDirection.DOWN ? -1 : 1;
+		current.sort(new Comparator<MonitoredFluidStack>() {
+			public int compare(MonitoredFluidStack str1, MonitoredFluidStack str2) {
+				StoredFluidStack flu1 = str1.fluidStack.getObject(), flu2 = str2.fluidStack.getObject();
+				switch (type) {
+				case MODID:
+					return InfoHelper.compareStringsWithDirection(flu1.getFullStack().getFluid().getBlock().getRegistryName().getResourceDomain(), flu2.getFullStack().getFluid().getBlock().getRegistryName().getResourceDomain(), dir);
+				case NAME:
+					break;
+				case STORED:
+					return InfoHelper.compareWithDirection(flu1.stored, flu2.stored, dir);
+				case TEMPERATURE:
+					return InfoHelper.compareWithDirection(flu1.getFullStack().getFluid().getTemperature(), flu2.getFullStack().getFluid().getTemperature(), dir);
 				}
-			});
-			break;
-		case MODID:
-			current.sort(new Comparator<MonitoredFluidStack>() {
-				public int compare(MonitoredFluidStack str1, MonitoredFluidStack str2) {
-					StoredFluidStack flu1 = str1.fluidStack.getObject(), flu2 = str2.fluidStack.getObject();
-					if (flu1.getFullStack().getFluid().getTemperature() < flu2.getFullStack().getFluid().getTemperature())
-						return dir == SortingDirection.DOWN ? 1 : -1;
-					if (flu1.getFullStack().getFluid().getTemperature() == flu2.getFullStack().getFluid().getTemperature())
-						return 0;
-					return dir == SortingDirection.DOWN ? -1 : 1;
-				}
-			});
-		default:
-			break;
-		}
+				return 0;
+			}
+		});
 	}
 }

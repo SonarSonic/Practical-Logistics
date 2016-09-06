@@ -5,18 +5,23 @@ import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import sonar.core.helpers.NBTHelper.SyncType;
-import sonar.core.integration.multipart.SonarMultipart;
 import sonar.core.inventory.ContainerMultipartSync;
-import sonar.logistics.api.connecting.IChannelledTile;
-import sonar.logistics.api.connecting.IOperatorTool;
+import sonar.logistics.parts.EnergyReaderPart;
 import sonar.logistics.parts.InfoReaderPart;
 
-public class ContainerChannelSelection extends ContainerMultipartSync {
+public class ContainerEnergyReader extends ContainerMultipartSync {
+	public EnergyReaderPart part;
 
-	public ContainerChannelSelection(IChannelledTile handler) {
-		super((SonarMultipart) handler);
+	public ContainerEnergyReader(EntityPlayer player, EnergyReaderPart part) {
+		super(part);
+		this.part = part;
 	}
-	
+
+	@Override
+	public void detectAndSendChanges() {
+		super.detectAndSendChanges();
+	}
+
 	public boolean syncInventory() {
 		return false;
 	}
@@ -32,7 +37,20 @@ public class ContainerChannelSelection extends ContainerMultipartSync {
 		return itemstack;
 	}
 
+	@Override
+	public ItemStack slotClick(int slotID, int drag, ClickType click, EntityPlayer player) {
+		if (slotID >= 0 && getSlot(slotID) != null && getSlot(slotID).getStack() == player.getHeldItemMainhand()) {
+			return null;
+		}
+		return super.slotClick(slotID, drag, click, player);
+	}
+
 	public SyncType[] getSyncTypes() {
 		return new SyncType[] { SyncType.DEFAULT_SYNC };
+	}
+
+	public void onContainerClosed(EntityPlayer player) {
+		super.onContainerClosed(player);
+		part.removeViewer(player);
 	}
 }

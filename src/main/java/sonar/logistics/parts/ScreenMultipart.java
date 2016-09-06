@@ -22,6 +22,7 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
+import sonar.core.api.IFlexibleGui;
 import sonar.core.api.utils.BlockInteractionType;
 import sonar.core.helpers.FontHelper;
 import sonar.core.helpers.NBTHelper.SyncType;
@@ -37,7 +38,7 @@ import sonar.logistics.api.info.InfoUUID;
 import sonar.logistics.api.info.monitor.ILogicMonitor;
 import sonar.logistics.connections.LogicMonitorCache;
 
-public abstract class ScreenMultipart extends LogisticsMultipart implements INormallyOccludingPart, IInfoDisplay, IOperatorTile {
+public abstract class ScreenMultipart extends LogisticsMultipart implements INormallyOccludingPart, IInfoDisplay, IOperatorTile, IFlexibleGui<ScreenMultipart> {
 
 	public SyncEnum<ScreenLayout> layout = new SyncEnum(ScreenLayout.values(), 0);
 	public DisplayState state = DisplayState.NONE;
@@ -83,13 +84,16 @@ public abstract class ScreenMultipart extends LogisticsMultipart implements INor
 		if (stack != null && stack.getItem() instanceof IOperatorTool) {
 			return false;
 		}
-		return container.onClicked(player.isSneaking() ? BlockInteractionType.SHIFT_RIGHT : BlockInteractionType.RIGHT, player, hand, stack, hit);
+		return container.onClicked(player.isSneaking() ? BlockInteractionType.SHIFT_RIGHT : BlockInteractionType.RIGHT, getWorld(), player, hand, stack, hit);
 	}
 
-	public void onClicked(EntityPlayer player, PartMOP hit) {
-		// super.onClicked(player, hit);
-		
-		//container.onClicked(player.isSneaking() ? BlockInteractionType.SHIFT_LEFT : BlockInteractionType.LEFT, player, player.getActiveHand(), player.getHeldItem(player.getActiveHand()), hit);
+	@Override
+	public void harvest(EntityPlayer player, PartMOP hit) {
+		if (hit.sideHit == face) {
+			container.onClicked(player.isSneaking() ? BlockInteractionType.SHIFT_LEFT : BlockInteractionType.LEFT, getWorld(), player, player.getActiveHand(), player.getActiveItemStack(), hit);
+			return;
+		}
+		super.harvest(player, hit);
 	}
 
 	public static enum DisplayState {
@@ -218,5 +222,16 @@ public abstract class ScreenMultipart extends LogisticsMultipart implements INor
 
 	public void addInfo(List<String> info) {
 		super.addInfo(info);
+	}
+
+	public Object getServerElement(ScreenMultipart obj, int id, World world, EntityPlayer player, NBTTagCompound tag) {
+		switch (id) {
+		case 0:
+		}
+		return null;
+	}
+
+	public Object getClientElement(ScreenMultipart obj, int id, World world, EntityPlayer player, NBTTagCompound tag) {
+		return null;
 	}
 }

@@ -1,6 +1,7 @@
 package sonar.logistics.api.info;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 import org.lwjgl.opengl.GL11;
 
@@ -10,6 +11,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.World;
 import sonar.core.api.nbt.INBTSyncable;
 import sonar.core.api.utils.BlockInteractionType;
 import sonar.core.helpers.NBTHelper;
@@ -35,7 +37,9 @@ public class InfoContainer implements IInfoContainer, INBTSyncable {
 	public final ArrayList<SyncNBTAbstract<DisplayInfo>> storedInfo = new ArrayList();
 	public final IInfoDisplay display;
 	public ArrayList<ISyncPart> syncParts = new ArrayList<ISyncPart>();
-
+	public long lastClickTime;
+	public UUID lastClickUUID;
+	
 	public InfoContainer(IInfoDisplay display) {
 		this.display = display;
 		for (int i = 0; i < display.maxInfo(); i++) {
@@ -101,12 +105,18 @@ public class InfoContainer implements IInfoContainer, INBTSyncable {
 	}
 
 	@Override
-	public boolean onClicked(BlockInteractionType type, EntityPlayer player, EnumHand hand, ItemStack stack, PartMOP hit) {
+	public boolean onClicked(BlockInteractionType type, World world, EntityPlayer player, EnumHand hand, ItemStack stack, PartMOP hit) {
+		boolean doubleClick = false;
+		if (world.getTotalWorldTime() - lastClickTime < 10 && player.getPersistentID().equals(lastClickUUID)) {
+			doubleClick = true;
+		}
+		lastClickTime = world.getTotalWorldTime();
+		lastClickUUID = player.getPersistentID();
 		for (int i = 0; i < display.maxInfo(); i++) {
 			IDisplayInfo info = storedInfo.get(i).getObject();
 			IMonitorInfo cachedInfo = info.getCachedInfo();
 			if (cachedInfo instanceof IClickableInfo) {
-				boolean clicked = ((IClickableInfo) cachedInfo).onClicked(info.getRenderProperties(), player, hand, stack, hit);
+				boolean clicked = ((IClickableInfo) cachedInfo).onClicked(type, doubleClick, info.getRenderProperties(), player, hand, stack, hit);
 				if (clicked) {
 					return true;
 				}

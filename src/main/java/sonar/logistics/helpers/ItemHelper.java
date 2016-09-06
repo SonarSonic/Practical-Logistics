@@ -83,7 +83,7 @@ public class ItemHelper extends ItemWrapper {
 					if (add == null) {
 						return null;
 					}
-					break; //make sure to only use one InventoryHandler!!
+					break; // make sure to only use one InventoryHandler!!
 				}
 			}
 		}
@@ -115,7 +115,7 @@ public class ItemHelper extends ItemWrapper {
 					if (remove == null) {
 						return null;
 					}
-					break; //make sure to only use one InventoryHandler!!
+					break; // make sure to only use one InventoryHandler!!
 				}
 			}
 		}
@@ -237,37 +237,27 @@ public class ItemHelper extends ItemWrapper {
 		}
 		IInventory inv = null;
 		int size = 0;
-		if (!enderChest) {
-			inv = player.inventory;
-			size = player.inventory.mainInventory.length;
-		} else {
-			inv = player.getInventoryEnderChest();
-			size = inv.getSizeInventory();
-		}
+		inv = !enderChest ? player.inventory : player.getInventoryEnderChest();
+		size = !enderChest ? player.inventory.mainInventory.length : inv.getSizeInventory();
 		if (inv == null || size == 0) {
 			return remove;
 		}
-		List<Integer> empty = new ArrayList();
 		for (int i = 0; i < size; i++) {
 			ItemStack stack = inv.getStackInSlot(i).copy();
-			if (stack != null) {
-				if (remove.equalStack(stack)) {
-					long used = (long) Math.min(remove.stored, Math.min(inv.getInventoryStackLimit(), stack.stackSize));
-					stack.stackSize -= used;
-					remove.stored -= used;
-					if (!action.shouldSimulate()) {
-						if (stack.stackSize == 0) {
-							stack = null;
-						}
-						inv.setInventorySlotContents(i, stack);
+			if (stack != null && remove.equalStack(stack)) {
+				long used = (long) Math.min(remove.stored, Math.min(inv.getInventoryStackLimit(), stack.stackSize));
+				stack.stackSize -= used;
+				remove.stored -= used;
+				if (!action.shouldSimulate()) {
+					if (stack.stackSize == 0) {
+						stack = null;
 					}
-					if (remove.stored == 0) {
-						return null;
-					}
+					inv.setInventorySlotContents(i, stack);
 				}
-
+				if (remove.stored == 0) {
+					return null;
+				}
 			}
-
 		}
 		return remove;
 	}
@@ -327,9 +317,8 @@ public class ItemHelper extends ItemWrapper {
 
 	public void insertItemFromPlayer(EntityPlayer player, INetworkCache cache, int slot) {
 		ItemStack add = player.inventory.getStackInSlot(slot);
-		if (add == null) {
+		if (add == null)
 			return;
-		}
 		StoredItemStack stack = LogisticsAPI.getItemHelper().addItems(new StoredItemStack(add), cache, ActionType.PERFORM);
 		if (stack == null || stack.stored == 0) {
 			add = null;
@@ -345,11 +334,7 @@ public class ItemHelper extends ItemWrapper {
 		info.sort(new Comparator<MonitoredItemStack>() {
 			public int compare(MonitoredItemStack str1, MonitoredItemStack str2) {
 				StoredItemStack item1 = str1.itemStack.getObject(), item2 = str2.itemStack.getObject();
-				int res = String.CASE_INSENSITIVE_ORDER.compare(item1.getItemStack().getDisplayName(), item2.getItemStack().getDisplayName());
-				if (res == 0) {
-					res = item1.getItemStack().getDisplayName().compareTo(item2.getItemStack().getDisplayName());
-				}
-				return dir == SortingDirection.DOWN ? res : -res;
+				return InfoHelper.compareStringsWithDirection(item1.getItemStack().getDisplayName(), item2.getItemStack().getDisplayName(), dir);
 			}
 		});
 
@@ -358,11 +343,7 @@ public class ItemHelper extends ItemWrapper {
 			info.sort(new Comparator<MonitoredItemStack>() {
 				public int compare(MonitoredItemStack str1, MonitoredItemStack str2) {
 					StoredItemStack item1 = str1.itemStack.getObject(), item2 = str2.itemStack.getObject();
-					if (item1.stored < item2.stored)
-						return dir == SortingDirection.DOWN ? 1 : -1;
-					if (item1.stored == item2.stored)
-						return 0;
-					return dir == SortingDirection.DOWN ? -1 : 1;
+					return InfoHelper.compareWithDirection(item1.stored, item2.stored, dir);
 				}
 			});
 			break;
@@ -372,11 +353,7 @@ public class ItemHelper extends ItemWrapper {
 					StoredItemStack item1 = str1.itemStack.getObject(), item2 = str2.itemStack.getObject();
 					String modid1 = item1.getItemStack().getItem().getRegistryName().getResourceDomain();
 					String modid2 = item2.getItemStack().getItem().getRegistryName().getResourceDomain();
-					int res = String.CASE_INSENSITIVE_ORDER.compare(modid1, modid2);
-					if (res == 0) {
-						res = modid1.compareTo(modid2);
-					}
-					return dir == SortingDirection.DOWN ? res : -res;
+					return InfoHelper.compareStringsWithDirection(modid1, modid2, dir);
 				}
 			});
 		default:

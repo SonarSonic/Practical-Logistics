@@ -42,6 +42,7 @@ public class Logistics {
 
 	public static SimpleNetworkWrapper network;
 	public static Logger logger = (Logger) LogManager.getLogger(MODID);
+	public CacheRegistry REGISTRY = new CacheRegistry();
 
 	@Instance(MODID)
 	public static Logistics instance;

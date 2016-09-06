@@ -23,6 +23,7 @@ import sonar.core.helpers.RenderHelper;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.readers.InventoryReader.Modes;
 import sonar.logistics.api.readers.InventoryReader.SortingType;
+import sonar.logistics.client.LogisticsColours;
 import sonar.logistics.common.containers.ContainerInventoryReader;
 import sonar.logistics.connections.MonitoredList;
 import sonar.logistics.monitoring.MonitoredItemStack;
@@ -256,7 +257,7 @@ public class GuiInventoryReader extends GuiSelectionGrid<MonitoredItemStack> {
 		super.drawGuiContainerBackgroundLayer(var1, var2, var3);
 		// RenderHelper.saveBlendState();
 		// StorageSize size = getGridList().sizing;
-		// drawRect(guiLeft+172, guiTop+ 150, guiLeft+180, guiTop+ 180, LogisticsColours.grey_base.getRGB());
+		
 		// RenderHelper.restoreBlendState();
 	}
 

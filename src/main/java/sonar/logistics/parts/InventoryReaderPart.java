@@ -91,8 +91,11 @@ public class InventoryReaderPart extends ReaderMultipart<MonitoredItemStack> imp
 		case STACK:
 			ItemStack stack = inventory.getStackInSlot(0);
 			if (stack != null) {
-				MonitoredItemStack dummyInfo = new MonitoredItemStack(new StoredItemStack(stack, 0));
+				MonitoredItemStack dummyInfo = new MonitoredItemStack(new StoredItemStack(stack, 0), network.getNetworkID());
 				Pair<Boolean, IMonitorInfo> latestInfo = updateInfo.getLatestInfo(dummyInfo);
+				if (latestInfo.b instanceof MonitoredItemStack) {
+					((MonitoredItemStack) latestInfo.b).networkID.setObject(network.getNetworkID());
+				}
 				info = latestInfo.a ? latestInfo.b : dummyInfo;
 			}
 			break;

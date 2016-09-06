@@ -9,7 +9,7 @@ import sonar.logistics.LogisticsItems;
 import sonar.logistics.api.display.DisplayType;
 import sonar.logistics.api.info.InfoUUID;
 
-public class DisplayScreenPart extends ScreenMultipart  {
+public class DisplayScreenPart extends ScreenMultipart {
 
 	public DisplayScreenPart() {
 		super();
@@ -31,7 +31,7 @@ public class DisplayScreenPart extends ScreenMultipart  {
 
 	@Override
 	public boolean monitorsUUID(InfoUUID id) {
-		return true;// container().getStoredInfo();
+		return true;
 	}
 
 	@Override
@@ -42,7 +42,6 @@ public class DisplayScreenPart extends ScreenMultipart  {
 	public void addSelectionBoxes(List<AxisAlignedBB> list) {
 		double p = 0.0625;
 		double height = p * 16, width = 0, length = p * 1;
-
 		switch (face) {
 		case EAST:
 			list.add(new AxisAlignedBB(1, p * 4, (width) / 2, 1 - length, 1 - p * 4, 1 - width / 2));
@@ -64,7 +63,6 @@ public class DisplayScreenPart extends ScreenMultipart  {
 			break;
 		default:
 			break;
-
 		}
 	}
 }

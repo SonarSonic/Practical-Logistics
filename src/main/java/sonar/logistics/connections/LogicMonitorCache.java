@@ -1,7 +1,9 @@
 package sonar.logistics.connections;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import net.minecraft.entity.player.EntityPlayer;
@@ -207,7 +209,6 @@ public class LogicMonitorCache {
 		if (!changedInfo.isEmpty() && !displays.isEmpty()) {
 			ArrayList<InfoUUID> infoToSync = (ArrayList<InfoUUID>) changedInfo.clone();
 			LinkedHashMap<World, LinkedHashMap<ChunkPos, ArrayList<InfoUUID>>> positions = new LinkedHashMap();
-			// get all the displays which are monitoring this info
 			for (InfoUUID id : changedInfo) {
 				boolean isSynced = false;
 				if (id.valid()) {
@@ -231,8 +232,8 @@ public class LogicMonitorCache {
 			if (infoToSync.isEmpty()) {
 				return;
 			}
-			LinkedHashMap<EntityPlayer, ArrayList<InfoUUID>> monitoring = new LinkedHashMap();
-
+			Map<EntityPlayer, ArrayList<InfoUUID>> monitoring = new HashMap();
+			//FIXME - THIS HAS LARGE OVERHEAD
 			for (Entry<World, LinkedHashMap<ChunkPos, ArrayList<InfoUUID>>> chunks : positions.entrySet()) {
 				World world = chunks.getKey();
 				PlayerChunkMap manager = ((WorldServer) world).getPlayerChunkMap();
@@ -276,7 +277,6 @@ public class LogicMonitorCache {
 			InfoUUID id = NBTHelper.instanceNBTSyncable(InfoUUID.class, infoTag);
 			if (!save) {
 				LogicMonitorCache.info.put(id, InfoHelper.readInfoFromNBT(infoTag));
-				/* IMonitorInfo info = LogicMonitorCache.info.get(id); if (info != null) { info.readData(infoTag, SyncType.DEFAULT_SYNC); } */
 			} else {
 				LogicMonitorCache.info.put(id, InfoHelper.readInfoFromNBT(infoTag));
 			}
