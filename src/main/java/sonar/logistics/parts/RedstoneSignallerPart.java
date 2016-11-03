@@ -3,7 +3,9 @@ package sonar.logistics.parts;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.netty.buffer.ByteBuf;
 import mcmultipart.MCMultiPartMod;
+import mcmultipart.multipart.IRedstonePart;
 import mcmultipart.raytrace.PartMOP;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyBool;
@@ -16,12 +18,15 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import sonar.core.network.sync.SyncUnidentifiedObject;
+import sonar.core.network.utils.IByteBufTile;
 import sonar.logistics.LogisticsItems;
 import sonar.logistics.api.connecting.IEntityNode;
 
-public class RedstoneSignallerPart extends SidedMultipart implements IEntityNode {
+public class RedstoneSignallerPart extends SidedMultipart implements IRedstonePart, IByteBufTile {
 
 	public static final PropertyBool ACTIVE = PropertyBool.create("active");
+	public SyncUnidentifiedObject object = new SyncUnidentifiedObject(1);
 
 	public RedstoneSignallerPart() {
 		super(3 * 0.0625, 0.0625 * 1, 0.0625 * 6);
@@ -30,10 +35,9 @@ public class RedstoneSignallerPart extends SidedMultipart implements IEntityNode
 	public RedstoneSignallerPart(EnumFacing face) {
 		super(face, 5 * 0.0625, 0.0625 * 1, 0.0625 * 6);
 	}
-
-	@Override
-	public List<Entity> getEntities() {
-		return new ArrayList();
+	
+	public void update(){
+		super.update();
 	}
 
 	@Override
@@ -47,7 +51,7 @@ public class RedstoneSignallerPart extends SidedMultipart implements IEntityNode
 	}
 
 	public boolean isActive() {
-		return false;
+		return true;
 	}
 
 	@Override
@@ -59,5 +63,38 @@ public class RedstoneSignallerPart extends SidedMultipart implements IEntityNode
 
 	public BlockStateContainer createBlockState() {
 		return new BlockStateContainer(MCMultiPartMod.multipart, new IProperty[] { ORIENTATION, ACTIVE });
+	}
+
+	@Override
+	public boolean canConnectRedstone(EnumFacing side) {
+		return side == face;
+	}
+
+	@Override
+	public int getWeakSignal(EnumFacing side) {
+		return side == face ? 15 : 0;
+	}
+
+	@Override
+	public int getStrongSignal(EnumFacing side) {
+		return side == face ? 15 : 0;
+	}
+
+	@Override
+	public void writePacket(ByteBuf buf, int id) {
+		switch (id) {
+		case 0:
+			object.writeToBuf(buf);
+			break;
+		}
+	}
+
+	@Override
+	public void readPacket(ByteBuf buf, int id) {
+		switch (id) {
+		case 0:
+			object.readFromBuf(buf);
+			break;
+		}
 	}
 }

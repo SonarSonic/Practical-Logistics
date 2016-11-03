@@ -16,13 +16,14 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import sonar.core.SonarCore;
 import sonar.core.api.inventories.StoredItemStack;
 import sonar.core.client.gui.SonarButtons.AnimatedButton;
 import sonar.core.helpers.FontHelper;
 import sonar.core.helpers.RenderHelper;
 import sonar.logistics.Logistics;
-import sonar.logistics.api.readers.InventoryReader.Modes;
-import sonar.logistics.api.readers.InventoryReader.SortingType;
+import sonar.logistics.api.settings.InventoryReader.Modes;
+import sonar.logistics.api.settings.InventoryReader.SortingType;
 import sonar.logistics.client.LogisticsColours;
 import sonar.logistics.common.containers.ContainerInventoryReader;
 import sonar.logistics.connections.MonitoredList;
@@ -40,13 +41,12 @@ public class GuiInventoryReader extends GuiSelectionGrid<MonitoredItemStack> {
 	private InventoryReaderPart part;
 	private GuiTextField slotField;
 	private GuiTextField searchField;
-
-	public InventoryPlayer inventoryPlayer;
+	public EntityPlayer player;
 
 	public GuiInventoryReader(InventoryReaderPart part, EntityPlayer player) {
 		super(new ContainerInventoryReader(part, player), part);
 		this.part = part;
-		this.inventoryPlayer = player.inventory;
+		this.player = player;
 	}
 
 	public Modes getSetting() {
@@ -97,14 +97,7 @@ public class GuiInventoryReader extends GuiSelectionGrid<MonitoredItemStack> {
 	}
 
 	public void switchState() {
-		/*
-		 * FIXME
-		Logistics.network.sendToServer(new PacketGuiChange(part.getPos(), getSetting() == STACK, LogisticsGui.inventoryReader));
-		if (this.mc.thePlayer.openContainer instanceof ContainerInventoryReader) {
-			((ContainerInventoryReader) this.mc.thePlayer.openContainer).addSlots(part, inventoryPlayer, getSetting() == STACK);
-		}
-		this.inventorySlots = this.mc.thePlayer.openContainer;
-		*/
+		SonarCore.refreshFlexibleContainer(player);
 	}
 
 	@Override
@@ -182,7 +175,7 @@ public class GuiInventoryReader extends GuiSelectionGrid<MonitoredItemStack> {
 	}
 
 	public String getSettingsString() {
-		return part.setting.getObject().name();
+		return part.setting.getObject().getClientName();
 	}
 
 	@Override
@@ -257,7 +250,7 @@ public class GuiInventoryReader extends GuiSelectionGrid<MonitoredItemStack> {
 		super.drawGuiContainerBackgroundLayer(var1, var2, var3);
 		// RenderHelper.saveBlendState();
 		// StorageSize size = getGridList().sizing;
-		
+
 		// RenderHelper.restoreBlendState();
 	}
 
@@ -278,7 +271,7 @@ public class GuiInventoryReader extends GuiSelectionGrid<MonitoredItemStack> {
 				text = ("Sorting Direction");
 				break;
 			case 1:
-				text = (part.sortingType.getObject() == SortingType.STORED ? "Items Stored" : part.sortingType.getObject() == SortingType.NAME ? "Item Name" : "Mod");
+				text = part.sortingType.getObject().getClientName();
 			}
 
 			drawCreativeTabHoveringText(text, x, y);

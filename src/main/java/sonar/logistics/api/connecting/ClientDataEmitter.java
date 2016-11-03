@@ -33,8 +33,7 @@ public class ClientDataEmitter implements IUUIDIdentity, INBTSyncable {
 		syncParts.addAll(Lists.newArrayList(uuid, coords, name));
 	}
 
-	public ClientDataEmitter() {
-	}
+	public ClientDataEmitter() {}
 
 	public ClientDataEmitter(IDataEmitter emitter) {
 		this.uuid.setObject(emitter.getIdentity());
@@ -60,7 +59,7 @@ public class ClientDataEmitter implements IUUIDIdentity, INBTSyncable {
 
 	public boolean equals(Object obj) {
 		if (obj != null && obj instanceof ClientDataEmitter) {
-			return getIdentity().equals(((IUUIDIdentity) obj).getIdentity());
+			return getIdentity().equals(((IUUIDIdentity) obj).getIdentity()) && coords.getCoords().equals(((ClientDataEmitter) obj).coords.getCoords());
 		}
 		return false;
 	}

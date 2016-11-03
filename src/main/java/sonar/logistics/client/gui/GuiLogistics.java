@@ -20,8 +20,6 @@ public class GuiLogistics extends GuiSonar {
 		super(container, entity);
 	}
 
-
-	
 	@Override
 	public ResourceLocation getBackground() {
 		Minecraft.getMinecraft().mouseHelper.ungrabMouseCursor();
@@ -40,7 +38,6 @@ public class GuiLogistics extends GuiSonar {
 			drawRect(scroller.left, scrollYPos, scroller.left + 8, scrollYPos + 15, LogisticsColours.layers[2].getRGB());
 			drawRect(scroller.left, scrollYPos, scroller.left + 8, scrollYPos + 15, LogisticsColours.layers[2].getRGB());
 		}
-
 		// RenderHelper.restoreBlendState();
 	}
 

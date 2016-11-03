@@ -29,7 +29,7 @@ import sonar.logistics.api.connecting.IOperatorTile;
 import sonar.logistics.api.connecting.OperatorMode;
 import sonar.logistics.api.connecting.TransferMode;
 
-public class TransferNodePart extends SidedMultipart implements IConnectionNode, ISlottedPart, IOperatorTile {
+public class TransferNodePart extends SidedMultipart implements IConnectionNode, IOperatorTile {
 
 	public static final PropertyEnum<TransferMode> TRANSFER = PropertyEnum.<TransferMode>create("transfer", TransferMode.class);
 	public SyncEnum<TransferMode> transferMode = new SyncEnum(TransferMode.values(), 1).setDefault(TransferMode.PULL);
@@ -48,7 +48,7 @@ public class TransferNodePart extends SidedMultipart implements IConnectionNode,
 
 	public void update() {
 		super.update();
-		if(this.isClient()){
+		if (this.isClient()) {
 			return;
 		}
 		if (!transferMode.getObject().isPassive()) {
@@ -63,7 +63,7 @@ public class TransferNodePart extends SidedMultipart implements IConnectionNode,
 							EnumFacing dirFrom = transferMode.getObject().shouldPull() ? face : entry.getValue();
 							EnumFacing dirTo = !transferMode.getObject().shouldPull() ? face : entry.getValue();
 							TileEntity from = transferMode.getObject().shouldPull() ? localTile : netTile;
-							TileEntity to = !transferMode.getObject().shouldPull() ? localTile : netTile;							
+							TileEntity to = !transferMode.getObject().shouldPull() ? localTile : netTile;
 							SonarAPI.getItemHelper().transferItems(from, to, dirFrom.getOpposite(), dirTo.getOpposite(), null);
 						}
 					}
@@ -101,7 +101,7 @@ public class TransferNodePart extends SidedMultipart implements IConnectionNode,
 	@Override
 	public boolean performOperation(AdvancedRayTraceResultPart rayTrace, OperatorMode mode, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
 		if (!getWorld().isRemote) {
-			transferMode.incrementEnum();			
+			transferMode.incrementEnum();
 			sendSyncPacket();
 			sendUpdatePacket(true);
 			FontHelper.sendMessage("Transfer Mode: " + transferMode.getObject(), getWorld(), player);

@@ -17,7 +17,7 @@ import sonar.core.utils.SortingDirection;
 import sonar.logistics.LogisticsItems;
 import sonar.logistics.api.info.monitor.ChannelType;
 import sonar.logistics.api.info.monitor.LogicMonitorHandler;
-import sonar.logistics.api.readers.FluidReader;
+import sonar.logistics.api.settings.FluidReader;
 import sonar.logistics.client.gui.GuiFluidReader;
 import sonar.logistics.common.containers.ContainerFluidReader;
 import sonar.logistics.connections.MonitoredList;

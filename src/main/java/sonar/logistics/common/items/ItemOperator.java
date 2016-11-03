@@ -75,6 +75,7 @@ public class ItemOperator extends SonarItem implements IOperatorTool, IFlexibleG
 					}
 					return EnumActionResult.SUCCESS;
 				}
+				//FIXME - Need a version for Logic Monitors
 				break;
 			case INFO:
 				break;

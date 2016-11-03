@@ -31,7 +31,7 @@ public class LogisticsCrafting extends Logistics {
 		//addShapedOre(new ItemStack(BlockRegistry.channelSelector, 1), new Object[] { "CDC", "PCD", "CDC", 'P', ItemRegistry.stone_plate, 'D', "dustSapphire", 'C', BlockRegistry.channelledCable });
 		addShapedOre(new ItemStack(LogisticsBlocks.clock, 1), new Object[] { "   ", "DCR", "PPP", 'P', LogisticsItems.stone_plate, 'D', "dustSapphire", 'C', Items.CLOCK, 'R', "dustRedstone" });
 		//addShapedOre(new ItemStack(BlockRegistry.transceiverArray, 1), new Object[] { "PPP", "RCE", "   ", 'P', ItemRegistry.stone_plate, 'C', BlockRegistry.channelledCable, 'E', BlockRegistry.dataEmitter, 'R', BlockRegistry.dataReceiver });
-		addShapedOre(new ItemStack(LogisticsItems.transceiver, 1), new Object[] { "SPD", "RBE", "SPD", 'P', LogisticsItems.stone_plate, 'B', Items.ENDER_PEARL, 'S', "dustSapphire", 'D', "dustRedstone", 'E', LogisticsBlocks.dataEmitter, 'R', LogisticsBlocks.dataReceiver });
+		addShapedOre(new ItemStack(LogisticsItems.transceiver, 1), new Object[] { "SPD", "RBE", "SPD", 'P', LogisticsItems.stone_plate, 'B', Items.ENDER_PEARL, 'S', "dustSapphire", 'D', "dustRedstone", 'E', LogisticsItems.partEmitter, 'R', LogisticsItems.partReceiver });
 
 	}
 

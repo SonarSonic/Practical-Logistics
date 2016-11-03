@@ -48,9 +48,8 @@ public class CacheRegistry {
 		Iterator<Entry<Integer, INetworkCache>> iterator = entrySet.iterator();
 		iterator.forEachRemaining(entry -> {
 			INetworkCache entryValueCache = entry.getValue();			
-			
 			if (entryValueCache instanceof IRefreshCache)
-				((IRefreshCache) entryValueCache).updateNetwork(entryValueCache.getNetworkID());
+				((IRefreshCache) entryValueCache).updateNetwork(entryValueCache.getNetworkID());	
 			
 			if (CableRegistry.getCables(entryValueCache.getNetworkID()).size() == 0)
 				iterator.remove();

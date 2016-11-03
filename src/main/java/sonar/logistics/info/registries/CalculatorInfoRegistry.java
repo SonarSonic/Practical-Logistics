@@ -13,7 +13,7 @@ import sonar.logistics.api.info.IInfoRegistry;
 import sonar.logistics.registries.LogicRegistry;
 import sonar.logistics.registries.LogicRegistry.RegistryType;
 
-@InfoRegistry(modid = "Calculator")
+@InfoRegistry(modid = "calculator")
 public class CalculatorInfoRegistry extends IInfoRegistry {
 
 	@Override

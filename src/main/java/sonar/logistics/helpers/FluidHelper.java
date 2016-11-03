@@ -21,7 +21,7 @@ import sonar.core.api.utils.BlockCoords;
 import sonar.core.utils.SortingDirection;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.cache.INetworkCache;
-import sonar.logistics.api.readers.FluidReader.SortingType;
+import sonar.logistics.api.settings.FluidReader.SortingType;
 import sonar.logistics.api.wrappers.FluidWrapper;
 import sonar.logistics.monitoring.MonitoredFluidStack;
 

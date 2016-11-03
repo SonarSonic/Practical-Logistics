@@ -18,9 +18,9 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import sonar.core.api.fluids.StoredFluidStack;
 import sonar.core.client.gui.SonarButtons.AnimatedButton;
 import sonar.core.helpers.FontHelper;
-import sonar.logistics.api.readers.FluidReader;
-import sonar.logistics.api.readers.FluidReader.Modes;
-import sonar.logistics.api.readers.FluidReader.SortingType;
+import sonar.logistics.api.settings.FluidReader;
+import sonar.logistics.api.settings.FluidReader.Modes;
+import sonar.logistics.api.settings.FluidReader.SortingType;
 import sonar.logistics.common.containers.ContainerFluidReader;
 import sonar.logistics.connections.MonitoredList;
 import sonar.logistics.monitoring.MonitoredFluidStack;
@@ -50,7 +50,7 @@ public class GuiFluidReader extends GuiSelectionGrid<MonitoredFluidStack> {
 
 	public void initGui() {
 		super.initGui();
-		this.buttonList.add(new GuiButton(-1, guiLeft + 120 - (18 * 6), guiTop + 7, 65 + 3, 20, getSetting().getName()) {
+		this.buttonList.add(new GuiButton(-1, guiLeft + 120 - (18 * 6), guiTop + 7, 65 + 3, 20, getSetting().getClientName()) {
 			public void drawButtonForegroundLayer(int x, int y) {
 				drawCreativeTabHoveringText(getSetting().getDescription(), x, y);
 			}
@@ -100,7 +100,7 @@ public class GuiFluidReader extends GuiSelectionGrid<MonitoredFluidStack> {
 		if (getSetting() == Modes.POS) {
 			slotField.drawTextBox();
 		}
-		if (getSetting() == Modes.FLUID) {
+		if (getSetting() == Modes.SELECTED) {
 			if (x - guiLeft >= 103 && x - guiLeft <= 103 + 16 && y - guiTop >= 9 && y - guiTop <= 9 + 16) {
 				/* if (!part.getSelectedInfo().isEmpty()) { MonitoredFluidStack stack = ((MonitoredFluidStack) part.getSelectedInfo().get(0)); if (stack != null) { GL11.glDisable(GL11.GL_DEPTH_TEST); GL11.glDisable(GL11.GL_LIGHTING); List list = new ArrayList(); list.add(stack.fluidStack.getObject().fluid.getLocalizedName()); drawHoveringText(list, x - guiLeft, y - guiTop, fontRendererObj); GL11.glEnable(GL11.GL_LIGHTING); GL11.glEnable(GL11.GL_DEPTH_TEST); net.minecraft.client.renderer.RenderHelper.enableGUIStandardItemLighting(); } } */
 			}
@@ -181,7 +181,7 @@ public class GuiFluidReader extends GuiSelectionGrid<MonitoredFluidStack> {
 		if (empty) {
 			return;
 		}
-		if (getSetting() == Modes.FLUID) {
+		if (getSetting() == Modes.SELECTED) {
 			part.selected.setInfo(selection);
 			part.sendByteBufPacket(1);
 		}
@@ -265,7 +265,7 @@ public class GuiFluidReader extends GuiSelectionGrid<MonitoredFluidStack> {
 
 	@Override
 	public ResourceLocation getBackground() {
-		if (getSetting() == Modes.FLUID) {
+		if (getSetting() == Modes.SELECTED) {
 			return stackBGround;
 		}
 		return clearBGround;
@@ -287,7 +287,7 @@ public class GuiFluidReader extends GuiSelectionGrid<MonitoredFluidStack> {
 				text = ("Sorting Direction");
 				break;
 			case 1:
-				text = (part.sortingType.getObject().getTypeName());
+				text = (part.sortingType.getObject().getClientName());
 			}
 
 			drawCreativeTabHoveringText(text, x, y);

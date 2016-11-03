@@ -1,26 +1,22 @@
 package sonar.logistics.client.gui;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.inventory.Container;
 import sonar.core.helpers.FontHelper;
 import sonar.core.helpers.RenderHelper;
+import sonar.core.utils.IWorldPosition;
 import sonar.logistics.client.LogisticsColours;
-import sonar.logistics.common.containers.ContainerArray;
-import sonar.logistics.parts.ArrayPart;
 
-public class GuiArray extends GuiLogistics {
-	public ArrayPart part;
+public class GuiTransferNode extends GuiLogistics {
 
-	public GuiArray(EntityPlayer player, ArrayPart part) {
-		super(new ContainerArray(player, part), part);
-		this.part = part;
-		this.ySize = 132;
+	public GuiTransferNode(Container container, IWorldPosition entity) {
+		super(container, entity);
 	}
-
+	
 	@Override
 	public void drawGuiContainerForegroundLayer(int par1, int par2) {
 		super.drawGuiContainerForegroundLayer(par1, par2);
-		FontHelper.textCentre(FontHelper.translate("item.Array.name"), xSize, 6, LogisticsColours.white_text.getRGB());
+		FontHelper.textCentre(FontHelper.translate("item.TransferNode.name"), xSize, 6, LogisticsColours.white_text.getRGB());
+		
 	}
 
 	@Override

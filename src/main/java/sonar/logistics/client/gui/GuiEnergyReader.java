@@ -1,5 +1,5 @@
 package sonar.logistics.client.gui;
-
+/*
 import java.util.ArrayList;
 
 import net.minecraft.client.Minecraft;
@@ -92,3 +92,4 @@ public class GuiEnergyReader extends GuiSelectionList<MonitoredEnergyStack> {
 		return LogisticsColours.layers[1].getRGB();
 	}
 }
+*/

@@ -1,47 +1,54 @@
 package sonar.logistics.common.containers;
 
+import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
+import sonar.core.api.IFlexibleContainer;
 import sonar.core.api.inventories.StoredItemStack;
 import sonar.core.api.utils.ActionType;
 import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.core.inventory.ContainerMultipartSync;
 import sonar.core.inventory.slots.SlotList;
 import sonar.logistics.api.LogisticsAPI;
-import sonar.logistics.api.readers.InventoryReader.Modes;
+import sonar.logistics.api.settings.InventoryReader;
+import sonar.logistics.api.settings.InventoryReader.Modes;
 import sonar.logistics.parts.InventoryReaderPart;
 
-public class ContainerInventoryReader extends ContainerMultipartSync {
+public class ContainerInventoryReader extends ContainerMultipartSync implements IFlexibleContainer<InventoryReader.Modes> {
 
 	private static final int INV_START = 1, INV_END = INV_START + 26, HOTBAR_START = INV_END + 1, HOTBAR_END = HOTBAR_START + 8;
 	public boolean stackMode = false;
 	public ItemStack lastStack = null;
-	InventoryReaderPart part;
+	public InventoryReaderPart part;
+	public EntityPlayer player;
 
 	public ContainerInventoryReader(InventoryReaderPart part, EntityPlayer player) {
 		super(part);
-		addSlots(part, player.inventory, part.setting.getObject() == Modes.STACK);
 		this.part = part;
+		this.player = player;
+		refreshState();
 	}
 
-	public void addSlots(InventoryReaderPart handler, InventoryPlayer inventoryPlayer, boolean hasStack) {
-		stackMode = hasStack;
+	@Override
+	public void refreshState() {
+		InventoryReader.Modes state = getCurrentState();
+		stackMode = state == Modes.STACK;
 		this.inventoryItemStacks.clear();
 		this.inventorySlots.clear();
 		for (int i = 0; i < 3; ++i) {
 			for (int j = 0; j < 9; ++j) {
-				this.addSlotToContainer(new Slot(inventoryPlayer, j + i * 9 + 9, 41 + j * 18, 174 + i * 18));
+				this.addSlotToContainer(new Slot(player.inventory, j + i * 9 + 9, 41 + j * 18, 174 + i * 18));
 			}
 		}
 
 		for (int i = 0; i < 9; ++i) {
-			this.addSlotToContainer(new Slot(inventoryPlayer, i, 41 + i * 18, 232));
-		}		
-		if (hasStack)
-			addSlotToContainer(new SlotList(handler.inventory, 0, 103, 9));		
+			this.addSlotToContainer(new Slot(player.inventory, i, 41 + i * 18, 232));
+		}
+		if (stackMode)
+			addSlotToContainer(new SlotList(part.inventory, 0, 103, 9));
 	}
 
 	@Override
@@ -62,8 +69,8 @@ public class ContainerInventoryReader extends ContainerMultipartSync {
 						LogisticsAPI.getItemHelper().addItemsFromPlayer(stack, player, part.network, ActionType.PERFORM);
 					} else {
 						StoredItemStack perform = LogisticsAPI.getItemHelper().addItems(stack, part.network, ActionType.PERFORM);
-						lastStack = itemstack1;		
-						
+						lastStack = itemstack1;
+
 						itemstack1.stackSize = (int) (perform == null || perform.stored == 0 ? 0 : (perform.getStackSize()));
 						player.inventory.markDirty();
 					}
@@ -115,5 +122,10 @@ public class ContainerInventoryReader extends ContainerMultipartSync {
 	public void onContainerClosed(EntityPlayer player) {
 		super.onContainerClosed(player);
 		part.removeViewer(player);
+	}
+
+	@Override
+	public InventoryReader.Modes getCurrentState() {
+		return part.setting.getObject();
 	}
 }

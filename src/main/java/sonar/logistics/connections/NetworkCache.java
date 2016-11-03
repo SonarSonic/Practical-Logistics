@@ -182,6 +182,11 @@ public class NetworkCache extends MonitorCache implements IRefreshCache {
 					map.put(set.getKey(), set.getValue());
 				}
 			}
+			for (ILogicMonitor monitor : network.getLocalMonitors()) {
+				if (!localMonitors.contains(monitor)) {
+					localMonitors.add(monitor);
+				}
+			}
 		}
 		this.networkedCache = (HashMap<BlockCoords, EnumFacing>) map.clone();
 
@@ -194,6 +199,7 @@ public class NetworkCache extends MonitorCache implements IRefreshCache {
 			list.add(new MonitoredBlockCoords(entry.getKey(), entry.getKey().getBlock().getUnlocalizedName()));
 		}
 		CacheRegistry.getCoordMap().put(networkID, list);
+
 	}
 
 	public <T extends IWorldPosition> T getFirstConnection(Class<T> type) {
@@ -291,5 +297,10 @@ public class NetworkCache extends MonitorCache implements IRefreshCache {
 		if (type.ordinal() < toRefresh.ordinal()) {
 			toRefresh = type;
 		}
+	}
+
+	@Override
+	public ArrayList<ILogicMonitor> getLocalMonitors() {
+		return localMonitors;
 	}
 }

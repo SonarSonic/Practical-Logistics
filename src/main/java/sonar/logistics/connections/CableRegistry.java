@@ -46,13 +46,13 @@ public class CableRegistry {
 	public static void addCable(int registryID, IDataCable cable, boolean refreshCache) {
 		if (registryID != -1 && cable != null) {
 			ArrayList<BlockCoords> network = cables.get(registryID) == null ? cables.put(registryID, new ArrayList()) : cables.get(registryID);
-			
+
 			cables.get(registryID).iterator().forEachRemaining(coords -> {
 				if (BlockCoords.equalCoords(coords, cable.getCoords())) {
 					return;
 				}
 			});
-			
+
 			cables.get(registryID).add(cable.getCoords());
 			cable.setRegistryID(registryID);
 			if (refreshCache)
@@ -65,11 +65,13 @@ public class CableRegistry {
 			if (cables.get(registryID) == null) {
 				return;
 			}
-			cables.get(registryID).iterator().forEachRemaining(coords -> {
+			Iterator<BlockCoords> iterator = cables.get(registryID).iterator();
+			while (iterator.hasNext()) {
+				BlockCoords coords = iterator.next();
 				if (BlockCoords.equalCoords(coords, cable.getCoords())) {
-					cables.get(registryID).remove(coords);
+					iterator.remove();
 				}
-			});
+			}
 
 			ArrayList<BlockCoords> oldCables = new ArrayList();
 			if (cables.get(registryID) != null) {

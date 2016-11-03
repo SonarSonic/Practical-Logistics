@@ -44,6 +44,7 @@ import sonar.logistics.api.connecting.IOperatorProvider;
 import sonar.logistics.api.connecting.IOperatorTile;
 import sonar.logistics.api.connecting.OperatorMode;
 import sonar.logistics.api.info.monitor.ILogicMonitor;
+import sonar.logistics.api.wrappers.CablingWrapper;
 import sonar.logistics.helpers.CableHelper;
 
 public class DataCablePart extends SonarMultipart implements ISlotOccludingPart, IDataCable, IOperatorTile, IOperatorProvider {
@@ -193,6 +194,8 @@ public class DataCablePart extends SonarMultipart implements ISlotOccludingPart,
 					return CableConnection.INTERNAL;
 				}
 			}
+			
+			CablingWrapper helper = LogisticsAPI.getCableHelper();
 			Pair<CableType, Integer> connection = LogisticsAPI.getCableHelper().getConnectionType(getContainer().getWorldIn(), getContainer().getPosIn(), dir, getCableType());
 			return !canConnect(dir) || !connection.a.canConnect(getCableType()) ? CableConnection.NONE : CableConnection.CABLE;
 		}

@@ -3,7 +3,7 @@
     "defaults": {
         "model":"practicallogistics:RedstoneSignaller",
         "textures": {
-            "0":"practicallogistics:model/redstoneEmitter_off_new",
+            "0":"practicallogistics:model/redstoneEmitter_off",
             "particle":"practicallogistics:blocks/data_cable"
         }
      },

@@ -2,6 +2,7 @@ package sonar.logistics.parts;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.Iterator;
 import java.util.List;
 
 import com.google.common.collect.Lists;
@@ -68,10 +69,7 @@ public class DataReceiverPart extends FacingMultipart implements IDataReceiver, 
 		if (isClient()) {
 			return;
 		}
-		if (EmitterRegistry.dirty) {
-			networks = getNetworks();
-			network.markDirty(RefreshType.CONNECTED_NETWORKS);
-		}
+		/* if (EmitterRegistry.dirty) { networks = getNetworks(); network.markDirty(RefreshType.CONNECTED_NETWORKS); } */
 	}
 
 	public ArrayList<Integer> getNetworks() {
@@ -161,7 +159,23 @@ public class DataReceiverPart extends FacingMultipart implements IDataReceiver, 
 		switch (id) {
 		case 0:
 			selectedEmitter.readFromBuf(buf);
-			clientEmitters.addObject(selectedEmitter.getObject());
+			ClientDataEmitter emitter = selectedEmitter.getObject();
+			ArrayList<ClientDataEmitter> emitters = (ArrayList<ClientDataEmitter>) clientEmitters.getObjects().clone();
+			Iterator<ClientDataEmitter> iterator = emitters.iterator();
+			boolean found = false;
+			while (iterator.hasNext()) {
+				ClientDataEmitter entry = iterator.next();
+				if (entry.equals(emitter)) {// FIXME what's going on here then					
+					iterator.remove();
+					found = true;
+					break;
+				}
+			}
+			if (!found)
+				emitters.add(emitter);
+
+			clientEmitters.setObjects(emitters);
+			// SyncNBTAbstractList<ClientDataEmitter> deademitters = clientEmitters;
 			networks = getNetworks();
 			network.markDirty(RefreshType.CONNECTED_NETWORKS);
 			sendSyncPacket();

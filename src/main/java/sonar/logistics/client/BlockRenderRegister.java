@@ -27,7 +27,11 @@ public class BlockRenderRegister {
 				registerSpecial(renderer);
 			} else {
 				Item item = Item.getItemFromBlock(block.getBlock());
-				if (item.getHasSubtypes()) {
+				if (item == null) {
+					SonarCore.logger.error("Enable to register renderer for " + block.getBlock());
+					return;
+				}
+				if (item != null && item.getHasSubtypes()) {
 					List<ItemStack> stacks = new ArrayList();
 					item.getSubItems(item, Logistics.creativeTab, stacks);
 					for (ItemStack stack : stacks) {
@@ -48,6 +52,10 @@ public class BlockRenderRegister {
 	public static void registerBlock(Block block) {
 		if (block != null) {
 			Item item = Item.getItemFromBlock(block);
+			if (item == null) {
+				SonarCore.logger.error("Enable to register renderer for " + block);
+				return;
+			}
 			ModelLoader.setCustomModelResourceLocation(item, 0, new ModelResourceLocation(Logistics.MODID + ":" + item.getUnlocalizedName().substring(5), "inventory"));
 		}
 	}

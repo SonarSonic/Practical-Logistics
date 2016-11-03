@@ -95,7 +95,7 @@ public class LogicRegistry {
 		infoRegistries.forEach(registry -> registry.registerAdjustments());
 	}
 
-	/* public static void registerInfoHandlers() { infoRegistries.add(new VanillaInfoRegistry()); registerInfoRegistry("Calculator", new CalculatorInfoRegistry()); } */
+	/* public static void registerInfoHandlers() { infoRegistries.add(new VanillaInfoRegistry()); registerInfoRegistry("calculator", new CalculatorInfoRegistry()); } */
 	public static void registerInfoRegistry(String modid, IInfoRegistry handler) {
 		if (Loader.isModLoaded(modid)) {
 			infoRegistries.add(handler);

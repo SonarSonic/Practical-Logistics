@@ -30,13 +30,13 @@ import sonar.logistics.registries.InfoLoaderRegistry;
 import sonar.logistics.registries.LogicRegistry;
 import sonar.logistics.utils.SapphireOreGen;
 
-@Mod(modid = Logistics.MODID, name = Logistics.NAME, version = Logistics.VERSION, dependencies = "required-after:SonarCore")
+@Mod(modid = Logistics.MODID, name = Logistics.NAME, version = Logistics.VERSION, dependencies = "required-after:sonarcore")
 public class Logistics {
 
 	@SidedProxy(clientSide = "sonar.logistics.network.LogisticsClient", serverSide = "sonar.logistics.network.LogisticsCommon")
 	public static LogisticsCommon proxy;
 
-	public static final String MODID = "PracticalLogistics";
+	public static final String MODID = "practicallogistics";
 	public static final String NAME = "Practical Logistics";
 	public static final String VERSION = "2.0.0";
 
@@ -57,7 +57,7 @@ public class Logistics {
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		logger.info("Releasing the Kraken");
-		if (!Loader.isModLoaded("SonarCore")) {
+		if (!(Loader.isModLoaded("SonarCore")|| Loader.isModLoaded("sonarcore"))) {
 			logger.fatal("Sonar Core is not loaded");
 		} else {
 			logger.info("Successfully loaded with Sonar Core");

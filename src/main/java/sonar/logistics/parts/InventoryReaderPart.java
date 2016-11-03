@@ -25,7 +25,7 @@ import sonar.logistics.api.info.ProgressInfo;
 import sonar.logistics.api.info.monitor.ChannelType;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
 import sonar.logistics.api.info.monitor.LogicMonitorHandler;
-import sonar.logistics.api.readers.InventoryReader;
+import sonar.logistics.api.settings.InventoryReader;
 import sonar.logistics.client.gui.GuiInfoReader;
 import sonar.logistics.client.gui.GuiInventoryReader;
 import sonar.logistics.common.containers.ContainerInfoReader;

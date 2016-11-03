@@ -10,7 +10,7 @@ import net.minecraftforge.fluids.IFluidContainerItem;
 import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.core.inventory.ContainerMultipartSync;
 import sonar.core.inventory.slots.SlotList;
-import sonar.logistics.api.readers.FluidReader.Modes;
+import sonar.logistics.api.settings.FluidReader.Modes;
 import sonar.logistics.parts.FluidReaderPart;
 
 public class ContainerFluidReader extends ContainerMultipartSync {
@@ -22,7 +22,7 @@ public class ContainerFluidReader extends ContainerMultipartSync {
 	public ContainerFluidReader(FluidReaderPart part, EntityPlayer player) {
 		super(part);
 		this.part = part;
-		addSlots(part, player, part.setting.getObject() == Modes.FLUID);
+		addSlots(part, player, part.setting.getObject() == Modes.SELECTED);
 	}
 
 	public void addSlots(FluidReaderPart handler, EntityPlayer player, boolean hasStack) {

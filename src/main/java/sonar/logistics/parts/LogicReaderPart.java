@@ -58,23 +58,26 @@ public abstract class LogicReaderPart<T extends IMonitorInfo> extends ReaderMult
 			if (selectedInfo != null) {
 				IMonitorInfo latestInfo = selectedInfo;
 				Pair<Boolean, IMonitorInfo> newInfo = updateInfo.getLatestInfo(selectedInfo);
+				boolean isPair = false;
 				if (cachedPaired != null) {
 					IMonitorInfo paired = cachedPaired.get(i);
 					if (paired != null) {
 						Pair<Boolean, IMonitorInfo> newPaired = updateInfo.getLatestInfo(paired);
-						if (newInfo.b instanceof LogicInfo && newPaired.b instanceof LogicInfo)
+						if (newInfo.b instanceof LogicInfo && newPaired.b instanceof LogicInfo) {
 							latestInfo = new ProgressInfo((LogicInfo) newInfo.b, (LogicInfo) newPaired.b);
+							isPair = true;
+						}
 					}
 				}
 				if (!newInfo.a && lastInfo != null && lastInfo.isMatchingType(newInfo.b) && !lastInfo.isIdenticalInfo(newInfo.b)) {
 					continue;
-				} else {
-					//latestInfo = newInfo.b;
+				} else if (!isPair) {
+					latestInfo = newInfo.b; // FIXME: why was this commented out then?
 				}
 
 				LogicMonitorCache.changeInfo(id, latestInfo);
-			}else if(lastInfo!=null){
-				//set to empty info type
+			} else if (lastInfo != null) {
+				// set to empty info type
 				LogicMonitorCache.changeInfo(id, null);
 			}
 		}
@@ -105,7 +108,7 @@ public abstract class LogicReaderPart<T extends IMonitorInfo> extends ReaderMult
 		}
 		syncInfo.get(newPos == -1 ? 0 : newPos).setInfo(info);
 		sendSyncPacket();
-		//sendByteBufPacket(100);
+		// sendByteBufPacket(100);
 	}
 
 	@Override

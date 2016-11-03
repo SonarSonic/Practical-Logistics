@@ -39,6 +39,39 @@ item.Transceiver.name=Transceiver
 //messages
 dataBlock.denied=Access Denied
 
+//inventory reader
+pl.inv.mode.stack=Stack
+pl.inv.mode.slot=Slot
+pl.inv.mode.pos=Position
+pl.inv.mode.inventories=Inventories
+pl.inv.mode.storage=Storage
+
+pl.inv.sort.stored=Items Stored
+pl.inv.sort.name=Item Name
+pl.inv.sort.modid=Mod Name
+
+//fluid reader
+pl.fluid.mode.selected=Fluid
+pl.fluid.mode.pos=Pos
+pl.fluid.mode.tanks=Tanks
+pl.fluid.mode.storage=Storage
+
+pl.fluid.desc.selected=Selected Fluid
+pl.fluid.desc.pos=Fluid at the given position
+pl.fluid.desc.tanks=List of all Fluids
+pl.fluid.desc.storage=Current Tank Usage
+
+pl.fluid.sort.stored=Fluids Stored
+pl.fluid.sort.name=Fluid Name
+pl.fluid.sort.modid=Mod Name
+pl.fluid.sort.temperature=Temperature
+
+//redstone signaller
+pl.signaller.default=Default
+pl.signaller.override=Override
+pl.signaller.all=Match All
+pl.signaller.one=Match One
+
 //info
 pl.Vec3i.getX=X Coord
 pl.Vec3i.getY=Y Coord

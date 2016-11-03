@@ -25,7 +25,7 @@ import sonar.core.utils.SortingDirection;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.connecting.IEntityNode;
-import sonar.logistics.api.readers.InventoryReader.SortingType;
+import sonar.logistics.api.settings.InventoryReader.SortingType;
 import sonar.logistics.api.wrappers.ItemWrapper;
 import sonar.logistics.monitoring.MonitoredItemStack;
 
@@ -77,6 +77,9 @@ public class ItemHelper extends ItemWrapper {
 		Map<BlockCoords, EnumFacing> connections = network.getExternalBlocks(true);
 		for (Map.Entry<BlockCoords, EnumFacing> entry : connections.entrySet()) {
 			TileEntity tile = entry.getKey().getTileEntity();
+			if (tile == null) {
+				continue;
+			}
 			for (InventoryHandler provider : SonarCore.inventoryProviders.getObjects()) {
 				if (provider.canHandleItems(tile, entry.getValue())) {
 					add = provider.addStack(add, tile, entry.getValue(), action);
@@ -109,6 +112,9 @@ public class ItemHelper extends ItemWrapper {
 		Map<BlockCoords, EnumFacing> connections = network.getExternalBlocks(true);
 		for (Map.Entry<BlockCoords, EnumFacing> entry : connections.entrySet()) {
 			TileEntity tile = entry.getKey().getTileEntity();
+			if (tile == null) {
+				continue;
+			}
 			for (InventoryHandler provider : SonarCore.inventoryProviders.getObjects()) {
 				if (provider.canHandleItems(tile, entry.getValue())) {
 					remove = provider.removeStack(remove, tile, entry.getValue(), action);

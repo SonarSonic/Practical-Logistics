@@ -20,7 +20,7 @@ import sonar.logistics.api.info.InfoUUID;
 import sonar.logistics.api.info.monitor.ChannelType;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
 import sonar.logistics.api.info.monitor.LogicMonitorHandler;
-import sonar.logistics.api.readers.FluidReader;
+import sonar.logistics.api.settings.FluidReader;
 import sonar.logistics.client.gui.GuiFluidReader;
 import sonar.logistics.client.gui.GuiInventoryReader;
 import sonar.logistics.common.containers.ContainerFluidReader;
@@ -73,7 +73,7 @@ public class FluidReaderPart extends ReaderMultipart<MonitoredFluidStack> implem
 	public void setMonitoredInfo(MonitoredList<MonitoredFluidStack> updateInfo) {
 		IMonitorInfo info = null;
 		switch (setting.getObject()) {
-		case FLUID:
+		case SELECTED:
 			MonitoredFluidStack stack = selected.getMonitoredInfo();
 			if (stack != null) {
 				MonitoredFluidStack dummyInfo = stack.copy();

@@ -9,8 +9,8 @@ import sonar.logistics.api.wrappers.ItemWrapper;
 /** Use this for all your interaction with the mod. This will be initilized by Practical Logistics if it is loaded. Make sure you only register stuff once Practical Logistics is loaded therefore in the FMLPostInitializationEvent */
 public final class LogisticsAPI {
 
-	public static final String MODID = "PracticalLogistics";
-	public static final String NAME = "PracticalLogisticsAPI";
+	public static final String MODID = "practicallogistics";
+	public static final String NAME = "practicallogisticsapi";
 	public static final String VERSION = "1.4";
 
 	private static CablingWrapper cables = new CablingWrapper();
@@ -18,9 +18,8 @@ public final class LogisticsAPI {
 	private static FluidWrapper fluids = new FluidWrapper();
 	private static ItemWrapper items = new ItemWrapper();
 
-    
 	public static void init() {
-		if (Loader.isModLoaded("PracticalLogistics")) {
+		if (Loader.isModLoaded("practicallogistics") || Loader.isModLoaded("PracticalLogistics")) {
 			try {
 				cables = (CablingWrapper) Class.forName("sonar.logistics.helpers.CableHelper").newInstance();
 				energy = (EnergyWrapper) Class.forName("sonar.logistics.helpers.EnergyHelper").newInstance();

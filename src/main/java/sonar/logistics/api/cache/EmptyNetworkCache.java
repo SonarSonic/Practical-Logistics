@@ -69,4 +69,9 @@ public class EmptyNetworkCache implements INetworkCache {
 	@Override
 	public void markDirty(RefreshType type) {}
 
+	@Override
+	public ArrayList<ILogicMonitor> getLocalMonitors() {
+		return new ArrayList();
+	}
+
 }

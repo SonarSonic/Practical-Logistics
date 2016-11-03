@@ -8,6 +8,7 @@ import sonar.logistics.api.connecting.IChannelledTile;
 import sonar.logistics.api.connecting.ILogicTile;
 import sonar.logistics.connections.MonitoredList;
 
+/***/
 public interface ILogicMonitor<T extends IMonitorInfo> extends IChannelledTile {
 	
 	/**identifies this monitor, this will be synced across the server and client*/	

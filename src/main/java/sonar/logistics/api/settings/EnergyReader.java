@@ -1,4 +1,4 @@
-package sonar.logistics.api.readers;
+package sonar.logistics.api.settings;
 
 /**all the modes used by the Fluid Reader*/
 public class EnergyReader {

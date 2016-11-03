@@ -18,6 +18,7 @@ import sonar.core.network.sync.ISyncPart;
 import sonar.core.utils.IGuiTile;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.info.InfoUUID;
+import sonar.logistics.api.info.monitor.ILogicMonitor;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
 import sonar.logistics.api.info.monitor.IReader;
 import sonar.logistics.api.info.monitor.MonitorType;
@@ -35,6 +36,12 @@ public abstract class ReaderMultipart<T extends IMonitorInfo> extends MonitorMul
 		super(handlerID, face, 6 * 0.0625, 0.0625 * 1, 0.0625 * 6);
 	}
 
+	public void update(){
+		super.update();
+		ILogicMonitor monitor = network.getLocalMonitor();
+		
+	}
+	
 	@Override
 	public boolean onActivated(EntityPlayer player, EnumHand hand, ItemStack heldItem, PartMOP hit) {
 		if (!LogisticsHelper.isPlayerUsingOperator(player)) {

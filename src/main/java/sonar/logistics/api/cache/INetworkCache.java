@@ -55,5 +55,7 @@ public interface INetworkCache {
 	
 	public ILogicMonitor getLocalMonitor();
 	
+	public ArrayList<ILogicMonitor> getLocalMonitors();
+	
 	public void markDirty(RefreshType type);
 }
