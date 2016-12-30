@@ -36,13 +36,13 @@ import sonar.logistics.api.info.monitor.MonitorType;
 import sonar.logistics.client.LogisticsColours;
 import sonar.logistics.client.RenderBlockSelection;
 import sonar.logistics.common.containers.ContainerInfoReader;
-import sonar.logistics.connections.CacheRegistry;
-import sonar.logistics.connections.MonitoredList;
+import sonar.logistics.common.multiparts.InfoReaderPart;
+import sonar.logistics.common.multiparts.LogisticsReader;
+import sonar.logistics.connections.managers.NetworkManager;
+import sonar.logistics.connections.monitoring.MonitoredBlockCoords;
+import sonar.logistics.connections.monitoring.MonitoredList;
 import sonar.logistics.helpers.InfoRenderer;
-import sonar.logistics.monitoring.MonitoredBlockCoords;
 import sonar.logistics.network.PacketMonitorType;
-import sonar.logistics.parts.InfoReaderPart;
-import sonar.logistics.parts.LogicReaderPart;
 
 public abstract class GuiSelectionList<T> extends GuiLogistics {
 

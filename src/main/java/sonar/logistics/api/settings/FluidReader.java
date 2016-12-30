@@ -9,11 +9,11 @@ public class FluidReader {
 		SELECTED, POS, TANKS, STORAGE;
 
 		public String getDescription() {
-			return FontHelper.translate("pl.fluid.desc. " + name().toLowerCase());
+			return FontHelper.translate("pl.fluid.desc." + name().toLowerCase());
 		}
 
 		public String getClientName() {
-			return FontHelper.translate("pl.fluid.mode. " + name().toLowerCase());
+			return FontHelper.translate("pl.fluid.mode." + name().toLowerCase());
 		}
 	}
 
@@ -21,7 +21,7 @@ public class FluidReader {
 		STORED, NAME, MODID, TEMPERATURE;
 
 		public String getClientName() {
-			return FontHelper.translate("pl.fluid.sort. " + name().toLowerCase());
+			return FontHelper.translate("pl.fluid.sort." + name().toLowerCase());
 		}
 	}
 }

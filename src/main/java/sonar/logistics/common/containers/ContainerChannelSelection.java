@@ -9,7 +9,7 @@ import sonar.core.integration.multipart.SonarMultipart;
 import sonar.core.inventory.ContainerMultipartSync;
 import sonar.logistics.api.connecting.IChannelledTile;
 import sonar.logistics.api.connecting.IOperatorTool;
-import sonar.logistics.parts.InfoReaderPart;
+import sonar.logistics.common.multiparts.InfoReaderPart;
 
 public class ContainerChannelSelection extends ContainerMultipartSync {
 

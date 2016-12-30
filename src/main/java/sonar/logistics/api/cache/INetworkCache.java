@@ -23,7 +23,6 @@ public interface INetworkCache {
 
 	/** @param includeChannels normally true, false if you are retrieving blocks from multiple connected networks, which have already been logged
 	 * @return the {@link LinkedHashMap} of {@link BlockCoords} paired with {@link EnumFacing} */
-	@Deprecated
 	public HashMap<BlockCoords, EnumFacing> getExternalBlocks(boolean includeChannels);
 
 	/** gets the full list of Cached Coordinates for a given {@link CacheType}.

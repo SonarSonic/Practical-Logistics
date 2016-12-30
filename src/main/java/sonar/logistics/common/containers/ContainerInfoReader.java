@@ -6,7 +6,7 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.core.inventory.ContainerMultipartSync;
-import sonar.logistics.parts.InfoReaderPart;
+import sonar.logistics.common.multiparts.InfoReaderPart;
 
 public class ContainerInfoReader extends ContainerMultipartSync {
 	public InfoReaderPart part;

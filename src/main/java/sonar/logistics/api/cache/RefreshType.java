@@ -4,10 +4,11 @@ package sonar.logistics.api.cache;
 public enum RefreshType {
 	/** when a cable is changed */
 	FULL,
+	/** when an emitter is changed */
+	CONNECTED_NETWORKS,
+	ALERT,
 	/** when a node is changed */
 	CONNECTED_BLOCKS,
-	/** when an emitter is changed */
-	CONNECTED_NETWORKS, 	
 	NONE;
 
 	public boolean shouldRefreshCables() {
@@ -15,10 +16,14 @@ public enum RefreshType {
 	}
 
 	public boolean shouldRefreshNetworks() {
-		return this == FULL || this == CONNECTED_NETWORKS;
+		return this == FULL || this == CONNECTED_NETWORKS || this == ALERT;
 	}
 
 	public boolean shouldRefreshConnections() {
-		return this == FULL || this == CONNECTED_BLOCKS || this == CONNECTED_NETWORKS;
+		return this == FULL || this == CONNECTED_BLOCKS || this == CONNECTED_NETWORKS || this == ALERT;
+	}
+
+	public boolean shouldAlertWatchingNetworks() {
+		return this != ALERT && this != NONE;
 	}
 }

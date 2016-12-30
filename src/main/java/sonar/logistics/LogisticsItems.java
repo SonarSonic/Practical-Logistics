@@ -14,19 +14,19 @@ import sonar.logistics.common.items.ItemScreenMultipart;
 import sonar.logistics.common.items.ItemSidedMultipart;
 import sonar.logistics.common.items.ItemWirelessMultipart;
 import sonar.logistics.common.items.WirelessTransceiver;
-import sonar.logistics.parts.ArrayPart;
-import sonar.logistics.parts.DataCablePart;
-import sonar.logistics.parts.DataEmitterPart;
-import sonar.logistics.parts.DataReceiverPart;
-import sonar.logistics.parts.DisplayScreenPart;
-import sonar.logistics.parts.EnergyReaderPart;
-import sonar.logistics.parts.FluidReaderPart;
-import sonar.logistics.parts.InfoReaderPart;
-import sonar.logistics.parts.InventoryReaderPart;
-import sonar.logistics.parts.LargeDisplayScreenPart;
-import sonar.logistics.parts.NodePart;
-import sonar.logistics.parts.RedstoneSignallerPart;
-import sonar.logistics.parts.TransferNodePart;
+import sonar.logistics.common.multiparts.ArrayPart;
+import sonar.logistics.common.multiparts.DataCablePart;
+import sonar.logistics.common.multiparts.DataEmitterPart;
+import sonar.logistics.common.multiparts.DataReceiverPart;
+import sonar.logistics.common.multiparts.DisplayScreenPart;
+import sonar.logistics.common.multiparts.EnergyReaderPart;
+import sonar.logistics.common.multiparts.FluidReaderPart;
+import sonar.logistics.common.multiparts.InfoReaderPart;
+import sonar.logistics.common.multiparts.InventoryReaderPart;
+import sonar.logistics.common.multiparts.LargeDisplayScreenPart;
+import sonar.logistics.common.multiparts.NodePart;
+import sonar.logistics.common.multiparts.RedstoneSignallerPart;
+import sonar.logistics.common.multiparts.TransferNodePart;
 
 public class LogisticsItems extends Logistics {
 

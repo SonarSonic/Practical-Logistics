@@ -53,7 +53,7 @@ public class ProgressInfo implements IMonitorInfo<ProgressInfo>, INBTSyncable, I
 		if (!isValid()) {
 			return "ERROR";
 		}
-		return (compare == 1 ? second : first).getClientObject();
+		return (compare == 1 ? second : first).getClientObject(); // + "/"  + (compare != 1 ? second : first).getClientObject();
 	}
 
 	@Override

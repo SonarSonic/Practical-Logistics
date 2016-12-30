@@ -27,6 +27,8 @@ item.Array.name=Array
 item.DataCable.name=Data Cable
 item.EntityNode.name=Entity Node
 item.RedstoneSignaller.name=Redstone Signaller
+item.DataReceiver.name=Data Receiver
+item.DataEmitter.name=Data Emitter
 
 //items
 item.EnergyScreenItem.name=Energy Screen
@@ -35,6 +37,9 @@ item.Sapphire.name=Sapphire
 item.SapphireDust.name=Sapphire Dust
 item.StonePlate.name=Stone Plate
 item.Transceiver.name=Transceiver
+item.Operator.name=Operator Tool
+item.DisplayScreen.name=Display Screen
+item.LargeDisplayScreen.name=Large Display Screen
 
 //messages
 dataBlock.denied=Access Denied

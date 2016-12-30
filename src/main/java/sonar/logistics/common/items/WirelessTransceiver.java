@@ -2,6 +2,8 @@ package sonar.logistics.common.items;
 
 import java.util.List;
 
+import mcmultipart.multipart.IMultipartContainer;
+import mcmultipart.multipart.MultipartHelper;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
@@ -26,8 +28,9 @@ public class WirelessTransceiver extends SonarItem implements ITransceiver {
 	public EnumActionResult onItemUse(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
 		IBlockState state = world.getBlockState(pos);
 		Block target = state.getBlock();
-		if (target != null) {
-			if (!world.isRemote) {
+		if (target != null && !world.isRemote) {
+			IMultipartContainer container = MultipartHelper.getPartContainer(world, pos);
+			if (container == null) { // ADD COMPATIBILITY FOR MULTIPARTS HERE
 				NBTTagCompound tag = stack.getTagCompound();
 				if (tag == null)
 					tag = new NBTTagCompound();
@@ -38,7 +41,9 @@ public class WirelessTransceiver extends SonarItem implements ITransceiver {
 				stack.setTagCompound(tag);
 			}
 		}
+
 		return EnumActionResult.SUCCESS;
+
 	}
 
 	@Override

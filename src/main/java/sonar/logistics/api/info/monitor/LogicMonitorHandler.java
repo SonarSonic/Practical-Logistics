@@ -5,9 +5,9 @@ import java.util.Objects;
 import net.minecraft.util.EnumFacing;
 import sonar.core.api.IRegistryObject;
 import sonar.core.api.utils.BlockCoords;
+import sonar.logistics.LogisticsASMLoader;
 import sonar.logistics.api.cache.INetworkCache;
-import sonar.logistics.connections.MonitoredList;
-import sonar.logistics.registries.InfoLoaderRegistry;
+import sonar.logistics.connections.monitoring.MonitoredList;
 
 public abstract class LogicMonitorHandler<I extends IMonitorInfo> {
 
@@ -21,7 +21,7 @@ public abstract class LogicMonitorHandler<I extends IMonitorInfo> {
 	public abstract MonitoredList<I> updateInfo(INetworkCache network, MonitoredList<I> info, BlockCoords coords, EnumFacing side);
 
 	public static LogicMonitorHandler instance(String id){
-		return InfoLoaderRegistry.monitorHandlers.get(id);
+		return LogisticsASMLoader.monitorHandlers.get(id);
 	}
 	
 	/** @param tag the save to read from

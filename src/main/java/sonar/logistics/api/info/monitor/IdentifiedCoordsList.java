@@ -52,11 +52,7 @@ public class IdentifiedCoordsList extends ArrayList<BlockCoords> implements ISyn
 				add(coords);
 			} else {
 				Iterator<BlockCoords> iterator = iterator();
-				iterator.forEachRemaining(coord -> {
-					if (coord.equals(coords)) {
-						iterator.remove();
-					}
-				});
+				this.removeIf(coord -> coord.equals(coords));
 			}
 		}
 	}

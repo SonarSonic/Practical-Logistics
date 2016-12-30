@@ -7,6 +7,7 @@ import com.google.common.collect.Lists;
 
 import net.minecraft.nbt.NBTTagCompound;
 import sonar.core.api.nbt.INBTSyncable;
+import sonar.core.api.utils.BlockCoords;
 import sonar.core.helpers.NBTHelper;
 import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.core.network.sync.ISyncPart;
@@ -20,7 +21,7 @@ import sonar.logistics.api.display.DisplayType;
 import sonar.logistics.api.info.BaseInfo;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
 import sonar.logistics.api.info.monitor.LogicMonitorHandler;
-import sonar.logistics.monitoring.MonitoredBlockCoords;
+import sonar.logistics.connections.monitoring.MonitoredBlockCoords;
 import sonar.logistics.network.SyncMonitoredType;
 
 public class ClientDataEmitter implements IUUIDIdentity, INBTSyncable {
@@ -41,6 +42,16 @@ public class ClientDataEmitter implements IUUIDIdentity, INBTSyncable {
 		this.name.setObject(emitter.getEmitterName());
 	}
 
+	public ClientDataEmitter(UUID uuid, BlockCoords coords, String name) {
+		this.uuid.setObject(uuid);
+		this.coords.setCoords(coords);
+		this.name.setObject(name);
+	}
+	
+	public ClientDataEmitter copy(){
+		return new ClientDataEmitter(uuid.getUUID(), coords.getCoords(), name.getObject());
+	}
+	
 	@Override
 	public UUID getIdentity() {
 		return uuid.getUUID();

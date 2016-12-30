@@ -1,22 +1,25 @@
 {
     "forge_marker": 1,
     "defaults": {
+        "model":"practicallogistics:DataReceiver",
         "textures": {
-	        "0":"practicallogistics:model/data_receiver_base",
-	        "1":"practicallogistics:model/data_receiver_connection",
-	        "2":"practicallogistics:model/data_receiver_receiver",
+            "node":"practicallogistics:model/receiver",
+            "0":"practicallogistics:model/receiver",
             "particle":"practicallogistics:blocks/data_cable"
-	    },
-        "model":"practicallogistics:DataEmitter",        
-        "transform":"forge:default-block"
-    },
-    "variants": {  
-        "inventory": [{}],  
-        "facing": {
-            "north":{},
-            "south":{"y": 180}, 
-            "west":{"y": 270},
-            "east":{"y": 90}
         }
+     },
+    "variants": {
+        "normal":[],
+        "inventory": [{    
+            "model":"practicallogistics:DataReceiver"
+        }],
+        "facing":{  
+            "north":{"x": 90, "y": 180},            
+            "south":{"x": 90, "y": 0},      
+            "west":{"x": 90, "y": 90}, 
+            "east":{"x": 90, "y": 270},
+            "up":{"x": 180},
+            "down":{}
+        }         
     }
 }

@@ -9,7 +9,7 @@ import sonar.core.registries.SonarRegistryBlock;
 import sonar.logistics.common.blocks.BlockHammer;
 import sonar.logistics.common.blocks.BlockHammerAir;
 import sonar.logistics.common.blocks.BlockSapphireOre;
-import sonar.logistics.common.blocks.tileentity.TileEntityHammer;
+import sonar.logistics.common.tileentity.TileEntityHammer;
 
 public class LogisticsBlocks extends Logistics {
 

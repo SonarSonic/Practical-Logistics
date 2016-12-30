@@ -11,7 +11,7 @@ import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.core.inventory.ContainerMultipartSync;
 import sonar.core.inventory.slots.SlotList;
 import sonar.logistics.api.settings.FluidReader.Modes;
-import sonar.logistics.parts.FluidReaderPart;
+import sonar.logistics.common.multiparts.FluidReaderPart;
 
 public class ContainerFluidReader extends ContainerMultipartSync {
 

@@ -40,6 +40,7 @@ public class RenderOperatorOverlay {
 			return;
 		}
 		ItemStack stack = evt.getPlayer().getHeldItemMainhand();
+		
 		if(stack==null || !(stack.getItem() instanceof IOperatorTool)){
 			//isUsing=false;
 			return;
@@ -48,25 +49,24 @@ public class RenderOperatorOverlay {
 		if (pos == null) {
 			return;
 		}
-		if (!pos.equals(lastPos)) {
-			// gotFirstPacket=false;
-			// tell server to send, packets, once received it will display..
-			// return;
-		}
+		boolean requestPacket = !pos.equals(lastPos);
 		lastPos = pos;
 		IMultipartContainer container = (IMultipartContainer) MultipartHelper.getPartContainer(Minecraft.getMinecraft().theWorld, pos);
+		
 		if (container != null) {
 			EntityPlayer player = Minecraft.getMinecraft().thePlayer;
 			Vec3d start = RayTraceUtils.getStart(player);
 			Vec3d end = RayTraceUtils.getEnd(player);
 			AdvancedRayTraceResultPart result = SonarMultipartHelper.collisionRayTrace(container, start, end);
-			if (result != null) {
+			
+			if (result != null) {				
 				RenderHelper.offsetRendering(pos, evt.getPartialTicks());
 				Entity view = Minecraft.getMinecraft().getRenderViewEntity();
 				IMultipart part = result.hit.partHit;
-				if (part != null && part instanceof IOperatorProvider) {
-					/// get operator info here
-					IOperatorProvider provider = (IOperatorProvider) part;
+				
+				if (part != null && part instanceof IOperatorProvider) {					
+					IOperatorProvider provider = (IOperatorProvider) part;					
+					if(requestPacket)provider.updateOperatorInfo();					
 					ArrayList<String> infoList = new ArrayList();
 					provider.addInfo(infoList);
 					if (infoList.isEmpty()) {
@@ -87,6 +87,7 @@ public class RenderOperatorOverlay {
 					GlStateManager.disableDepth();
 					GlStateManager.scale(0.016, 0.016, 1);
 					GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+					
 					GuiSonar.drawTransparentRect(-maxWidth / 2, -maxHeight / 2, maxWidth / 2, maxHeight / 2, LogisticsColours.layers[1].getRGB());
 					GuiSonar.drawTransparentRect(-maxWidth / 2 + 1, -maxHeight / 2 + 1, maxWidth / 2 - 1, maxHeight / 2 - 1, LogisticsColours.layers[2].getRGB());
 					GuiSonar.drawTransparentRect(-maxWidth / 2 + 1, -maxHeight / 2 + 1, maxWidth / 2 - 1, maxHeight / 2 - 1, LogisticsColours.layers[2].getRGB());
@@ -97,6 +98,7 @@ public class RenderOperatorOverlay {
 					double yCentre = 0;
 					double centre = ((double) (infoList.size()) / 2) - yCentre;
 					float offset = 12F;
+					
 					for (int i = 0; i < infoList.size(); i++) {
 						String info = infoList.get(i);
 						FontHelper.textCentre(info, 0, (int) (i == centre ? yCentre : i < centre ? yCentre - offset * -(i - centre) : yCentre + offset * (i - centre)), -1);

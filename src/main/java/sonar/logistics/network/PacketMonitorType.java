@@ -11,7 +11,7 @@ import sonar.core.SonarCore;
 import sonar.logistics.api.info.monitor.ILogicMonitor;
 import sonar.logistics.api.info.monitor.MonitorType;
 import sonar.logistics.api.info.monitor.MonitorViewer;
-import sonar.logistics.connections.LogicMonitorCache;
+import sonar.logistics.connections.managers.LogicMonitorManager;
 
 public class PacketMonitorType implements IMessage {
 
@@ -28,7 +28,7 @@ public class PacketMonitorType implements IMessage {
 
 	@Override
 	public void fromBytes(ByteBuf buf) {
-		monitor = LogicMonitorCache.getMonitorFromClient(buf.readInt());
+		monitor = LogicMonitorManager.getMonitorFromClient(buf.readInt());
 		type = MonitorType.values()[buf.readInt()];
 	}
 

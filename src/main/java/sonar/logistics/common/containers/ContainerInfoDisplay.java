@@ -10,7 +10,7 @@ import sonar.core.inventory.ContainerMultipartSync;
 import sonar.logistics.api.connecting.IChannelledTile;
 import sonar.logistics.api.connecting.IOperatorTool;
 import sonar.logistics.api.display.IInfoDisplay;
-import sonar.logistics.parts.InfoReaderPart;
+import sonar.logistics.common.multiparts.InfoReaderPart;
 
 public class ContainerInfoDisplay extends ContainerMultipartSync {
 

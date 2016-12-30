@@ -10,12 +10,14 @@ import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.core.utils.Pair;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.info.monitor.ILogicMonitor;
-import sonar.logistics.connections.LogicMonitorCache;
-import sonar.logistics.connections.MonitoredList;
+import sonar.logistics.connections.managers.LogicMonitorManager;
+import sonar.logistics.connections.monitoring.MonitoredList;
 import sonar.logistics.helpers.InfoHelper;
 import sonar.logistics.helpers.LogisticsHelper;
 
 public class PacketMonitoredList implements IMessage {
+
+	public int networkID;
 
 	public MonitoredList list;
 	public ILogicMonitor monitor;
@@ -23,10 +25,12 @@ public class PacketMonitoredList implements IMessage {
 	public NBTTagCompound listTag;
 	public SyncType type;
 
-	public PacketMonitoredList() {}
-	
-	public PacketMonitoredList(ILogicMonitor monitor, NBTTagCompound listTag, SyncType type) {
+	public PacketMonitoredList() {
+	}
+
+	public PacketMonitoredList(ILogicMonitor monitor, int networkID, NBTTagCompound listTag, SyncType type) {
 		this.monitor = monitor;
+		this.networkID = networkID;
 		this.listTag = listTag;
 		this.type = type;
 	}
@@ -34,12 +38,19 @@ public class PacketMonitoredList implements IMessage {
 	@Override
 	public void fromBytes(ByteBuf buf) {
 		int hashCode = buf.readInt();
-		Pair<ILogicMonitor, MonitoredList<?>> pair = LogicMonitorCache.getMonitorFromServer(hashCode);
+		networkID = buf.readInt();
+		Pair<ILogicMonitor, MonitoredList<?>> pair = LogicMonitorManager.getMonitorFromServer(hashCode);
 		if (pair != null) {
-			list = pair.b == null ? MonitoredList.newMonitoredList() : pair.b.copyInfo();
 			monitor = pair.a;
-			type = SyncType.values()[buf.readInt()];
-			list = InfoHelper.readMonitoredList(ByteBufUtils.readTag(buf), list, type);
+			if (monitor.getNetworkID() == networkID) {
+
+				list = pair.b == null ? MonitoredList.newMonitoredList(networkID) : pair.b.copyInfo();
+				list.networkID = networkID;
+				type = SyncType.values()[buf.readInt()];
+				list = InfoHelper.readMonitoredList(ByteBufUtils.readTag(buf), list, type);
+			}else{
+				list = MonitoredList.newMonitoredList(monitor.getNetworkID());
+			}
 		} else {
 			Logistics.logger.error("Couldn't get monitor for hashcode");
 		}
@@ -48,6 +59,7 @@ public class PacketMonitoredList implements IMessage {
 	@Override
 	public void toBytes(ByteBuf buf) {
 		buf.writeInt(monitor.getIdentity().hashCode());
+		buf.writeInt(networkID);
 		buf.writeInt(type.ordinal());
 		ByteBufUtils.writeTag(buf, listTag);
 	}
@@ -57,7 +69,7 @@ public class PacketMonitoredList implements IMessage {
 		@Override
 		public IMessage onMessage(PacketMonitoredList message, MessageContext ctx) {
 			if (message.list != null) {
-				LogicMonitorCache.monitoredLists.put(message.monitor, message.monitor.sortMonitoredList(message.list));
+				LogicMonitorManager.monitoredLists.put(message.monitor, message.monitor.sortMonitoredList(message.list));
 			}
 			return null;
 		}

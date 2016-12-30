@@ -4,7 +4,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import sonar.core.inventory.ContainerMultipartSync;
-import sonar.logistics.parts.ArrayPart;
+import sonar.logistics.common.multiparts.ArrayPart;
 
 public class ContainerArray extends ContainerMultipartSync {
 

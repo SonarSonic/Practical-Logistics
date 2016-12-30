@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.inventory.Container;
 import net.minecraft.util.ResourceLocation;
 import sonar.core.client.gui.widgets.SonarScroller;
@@ -12,7 +13,7 @@ import sonar.core.helpers.RenderHelper;
 import sonar.core.utils.IWorldPosition;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
 import sonar.logistics.client.LogisticsColours;
-import sonar.logistics.connections.MonitoredList;
+import sonar.logistics.connections.monitoring.MonitoredList;
 
 public abstract class GuiSelectionGrid<T extends IMonitorInfo> extends GuiLogistics {
 
@@ -79,9 +80,10 @@ public abstract class GuiSelectionGrid<T extends IMonitorInfo> extends GuiLogist
 	@Override
 	public void drawGuiContainerForegroundLayer(int x, int y) {
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
-		super.drawGuiContainerForegroundLayer(x, y);
 		net.minecraft.client.renderer.RenderHelper.enableGUIStandardItemLighting();
 		renderStrings(x, y);
+		   
+
 		preRender();
 		MonitoredList<T> list = getGridList().copyInfo();
 		if (list != null && !list.isEmpty()) {
@@ -101,6 +103,8 @@ public abstract class GuiSelectionGrid<T extends IMonitorInfo> extends GuiLogist
 			}
 		}
 		postRender();
+		
+		
 		if (x - guiLeft >= 13 && x - guiLeft <= 13 + (12 * 18) && y - guiTop >= 32 && y - guiTop <= 32 + (7 * 18)) {
 			int start = (int) (getGridSize(list) / 12 * scroller.getCurrentScroll());
 			int X = (x - guiLeft - 13) / 18;
@@ -123,6 +127,7 @@ public abstract class GuiSelectionGrid<T extends IMonitorInfo> extends GuiLogist
 				}
 			}
 		}
+		super.drawGuiContainerForegroundLayer(x, y);
 		//GlStateManager.disableCull();
 	}
 

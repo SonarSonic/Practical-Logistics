@@ -17,14 +17,14 @@ import sonar.core.helpers.NBTHelper;
 import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.core.utils.Pair;
 import sonar.core.utils.SortingDirection;
+import sonar.logistics.LogisticsASMLoader;
 import sonar.logistics.api.display.DisplayType;
 import sonar.logistics.api.display.IInfoDisplay;
 import sonar.logistics.api.display.ScreenLayout;
 import sonar.logistics.api.info.LogicInfo;
 import sonar.logistics.api.info.RenderInfoProperties;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
-import sonar.logistics.connections.MonitoredList;
-import sonar.logistics.registries.InfoLoaderRegistry;
+import sonar.logistics.connections.monitoring.MonitoredList;
 
 public class InfoHelper {
 
@@ -236,15 +236,15 @@ public class InfoHelper {
 	}
 
 	public static int getName(String name) {
-		return InfoLoaderRegistry.infoIds.get(name);
+		return LogisticsASMLoader.infoIds.get(name);
 	}
 
 	public static Class<? extends IMonitorInfo> getInfoType(int id) {
-		return InfoLoaderRegistry.infoClasses.get(InfoLoaderRegistry.infoNames.get(id));
+		return LogisticsASMLoader.infoClasses.get(LogisticsASMLoader.infoNames.get(id));
 	}
 
 	public static NBTTagCompound writeInfoToNBT(NBTTagCompound tag, IMonitorInfo info, SyncType type) {
-		tag.setInteger("iiD", InfoLoaderRegistry.infoIds.get(info.getID()));
+		tag.setInteger("iiD", LogisticsASMLoader.infoIds.get(info.getID()));
 		info.writeData(tag, type);
 		return tag;
 	}

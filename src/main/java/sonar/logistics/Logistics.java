@@ -15,25 +15,25 @@ import net.minecraftforge.fml.common.discovery.ASMDataTable;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.event.FMLServerStoppingEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.OreDictionary;
 import sonar.logistics.api.LogisticsAPI;
-import sonar.logistics.connections.CableRegistry;
-import sonar.logistics.connections.CacheRegistry;
-import sonar.logistics.connections.EmitterRegistry;
-import sonar.logistics.connections.LogicMonitorCache;
-import sonar.logistics.network.LogisticsCommon;
-import sonar.logistics.registries.InfoLoaderRegistry;
-import sonar.logistics.registries.LogicRegistry;
+import sonar.logistics.commands.CommandResetInfoRegistry;
+import sonar.logistics.connections.managers.CableManager;
+import sonar.logistics.connections.managers.EmitterManager;
+import sonar.logistics.connections.managers.LogicMonitorManager;
+import sonar.logistics.connections.managers.NetworkManager;
+import sonar.logistics.info.LogicInfoRegistry;
 import sonar.logistics.utils.SapphireOreGen;
 
 @Mod(modid = Logistics.MODID, name = Logistics.NAME, version = Logistics.VERSION, dependencies = "required-after:sonarcore")
 public class Logistics {
 
-	@SidedProxy(clientSide = "sonar.logistics.network.LogisticsClient", serverSide = "sonar.logistics.network.LogisticsCommon")
+	@SidedProxy(clientSide = "sonar.logistics.LogisticsClient", serverSide = "sonar.logistics.LogisticsCommon")
 	public static LogisticsCommon proxy;
 
 	public static final String MODID = "practicallogistics";
@@ -42,7 +42,7 @@ public class Logistics {
 
 	public static SimpleNetworkWrapper network;
 	public static Logger logger = (Logger) LogManager.getLogger(MODID);
-	public CacheRegistry REGISTRY = new CacheRegistry();
+	public NetworkManager REGISTRY = new NetworkManager();
 
 	@Instance(MODID)
 	public static Logistics instance;
@@ -57,7 +57,7 @@ public class Logistics {
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		logger.info("Releasing the Kraken");
-		if (!(Loader.isModLoaded("SonarCore")|| Loader.isModLoaded("sonarcore"))) {
+		if (!(Loader.isModLoaded("SonarCore") || Loader.isModLoaded("sonarcore"))) {
 			logger.fatal("Sonar Core is not loaded");
 		} else {
 			logger.info("Successfully loaded with Sonar Core");
@@ -90,12 +90,12 @@ public class Logistics {
 			logger.info("Sapphire Ore Generation is disabled in the config");
 
 		ASMDataTable asmDataTable = event.getAsmData();
-		InfoLoaderRegistry.loadInfoTypes(asmDataTable);
-		InfoLoaderRegistry.loadMonitorHandlers(asmDataTable);
-		LogicRegistry.infoRegistries.addAll(InfoLoaderRegistry.getInfoRegistries(asmDataTable));
-		LogicRegistry.customTileHandlers.addAll(InfoLoaderRegistry.getCustomTileHandlers(asmDataTable));
-		LogicRegistry.customEntityHandlers.addAll(InfoLoaderRegistry.getCustomEntityHandlers(asmDataTable));
-		LogicRegistry.init();
+		LogisticsASMLoader.loadInfoTypes(asmDataTable);
+		LogisticsASMLoader.loadMonitorHandlers(asmDataTable);
+		LogicInfoRegistry.infoRegistries.addAll(LogisticsASMLoader.getInfoRegistries(asmDataTable));
+		LogicInfoRegistry.customTileHandlers.addAll(LogisticsASMLoader.getCustomTileHandlers(asmDataTable));
+		LogicInfoRegistry.customEntityHandlers.addAll(LogisticsASMLoader.getCustomEntityHandlers(asmDataTable));
+		LogicInfoRegistry.init();
 	}
 
 	@EventHandler
@@ -119,17 +119,22 @@ public class Logistics {
 	@EventHandler
 	public void postLoad(FMLPostInitializationEvent evt) {
 		logger.info("Please Wait: We are saving Harambe with a time machine");
-
-		if (Loader.isModLoaded("MineTweaker3")) {
+		if (Loader.isModLoaded("MineTweaker3") || Loader.isModLoaded("MineTweaker3".toLowerCase())) {
+			MineTweakerIntegration.init();
 			logger.info("'Mine Tweaker' integration was loaded");
 		}
 	}
 
 	@EventHandler
-	public void onClose(FMLServerStoppingEvent event) {
-		EmitterRegistry.removeAll();
-		CableRegistry.removeAll();
-		CacheRegistry.removeAll();
-		LogicMonitorCache.onServerClosed();
+	public void serverLoad(FMLServerStartingEvent event) {
+		event.registerServerCommand(new CommandResetInfoRegistry());
+	}
+
+	@EventHandler
+	public void serverClose(FMLServerStoppingEvent event) {
+		EmitterManager.removeAll();
+		CableManager.removeAll();
+		NetworkManager.removeAll();
+		LogicMonitorManager.onServerClosed();
 	}
 }

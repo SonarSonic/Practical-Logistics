@@ -15,7 +15,7 @@ import sonar.core.common.block.SonarMaterials;
 import sonar.core.utils.IGuiTile;
 import sonar.logistics.Logistics;
 import sonar.logistics.LogisticsBlocks;
-import sonar.logistics.common.blocks.tileentity.TileEntityHammer;
+import sonar.logistics.common.tileentity.TileEntityHammer;
 
 public class BlockHammer extends SonarMachineBlock {
 

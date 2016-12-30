@@ -9,6 +9,7 @@ import org.lwjgl.input.Keyboard;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
@@ -26,10 +27,10 @@ import sonar.logistics.api.settings.InventoryReader.Modes;
 import sonar.logistics.api.settings.InventoryReader.SortingType;
 import sonar.logistics.client.LogisticsColours;
 import sonar.logistics.common.containers.ContainerInventoryReader;
-import sonar.logistics.connections.MonitoredList;
-import sonar.logistics.monitoring.MonitoredItemStack;
+import sonar.logistics.common.multiparts.InventoryReaderPart;
+import sonar.logistics.connections.monitoring.MonitoredItemStack;
+import sonar.logistics.connections.monitoring.MonitoredList;
 import sonar.logistics.network.PacketInventoryReader;
-import sonar.logistics.parts.InventoryReaderPart;
 
 public class GuiInventoryReader extends GuiSelectionGrid<MonitoredItemStack> {
 
@@ -81,7 +82,7 @@ public class GuiInventoryReader extends GuiSelectionGrid<MonitoredItemStack> {
 		if (button != null) {
 			if (button.id == -1) {
 				part.setting.incrementEnum();
-				part.sendByteBufPacket(1);
+				part.sendByteBufPacket(2);
 				switchState();
 				reset();
 			}
@@ -184,7 +185,7 @@ public class GuiInventoryReader extends GuiSelectionGrid<MonitoredItemStack> {
 		if (search == null || search.isEmpty() || search.equals(" "))
 			return part.getMonitoredList();
 		else {
-			MonitoredList<MonitoredItemStack> searchList = MonitoredList.newMonitoredList();
+			MonitoredList<MonitoredItemStack> searchList = MonitoredList.newMonitoredList(part.getNetworkID());
 			for (MonitoredItemStack stack : (ArrayList<MonitoredItemStack>) part.getMonitoredList().clone()) {
 				StoredItemStack item = stack.itemStack.getObject();
 				if (stack != null && item != null && item.item.getDisplayName().toLowerCase().contains(search.toLowerCase())) {
@@ -219,9 +220,10 @@ public class GuiInventoryReader extends GuiSelectionGrid<MonitoredItemStack> {
 			return;
 		}
 		ItemStack stack = storedStack.item;
+		//GlStateManager.disableDepth();
 		RenderHelper.renderItem(this, 13 + (x * 18), 32 + (y * 18), stack);
 		// this.itemRender.renderItemOverlayIntoGUI(this.fontRendererObj, stack, 13 + (x * 18), 32 + (y * 18), "" + storedStack.stored);
-		RenderHelper.renderStoredItemStackOverlay(stack, storedStack.stored, 13 + (x * 18), 32 + (y * 18), null);
+		RenderHelper.renderStoredItemStackOverlay(stack, storedStack.stored, 13 + (x * 18), 32 + (y * 18), null, true);
 	}
 
 	@Override

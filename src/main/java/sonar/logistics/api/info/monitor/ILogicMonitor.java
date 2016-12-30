@@ -6,7 +6,7 @@ import java.util.UUID;
 import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.connecting.IChannelledTile;
 import sonar.logistics.api.connecting.ILogicTile;
-import sonar.logistics.connections.MonitoredList;
+import sonar.logistics.connections.monitoring.MonitoredList;
 
 /***/
 public interface ILogicMonitor<T extends IMonitorInfo> extends IChannelledTile {

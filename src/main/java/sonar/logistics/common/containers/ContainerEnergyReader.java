@@ -6,8 +6,8 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.core.inventory.ContainerMultipartSync;
-import sonar.logistics.parts.EnergyReaderPart;
-import sonar.logistics.parts.InfoReaderPart;
+import sonar.logistics.common.multiparts.EnergyReaderPart;
+import sonar.logistics.common.multiparts.InfoReaderPart;
 
 public class ContainerEnergyReader extends ContainerMultipartSync {
 	public EnergyReaderPart part;

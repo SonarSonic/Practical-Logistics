@@ -8,7 +8,7 @@ import net.minecraft.nbt.NBTTagList;
 import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.logistics.api.connecting.IOperatorTool;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
-import sonar.logistics.connections.MonitoredList;
+import sonar.logistics.connections.monitoring.MonitoredList;
 
 public class LogisticsHelper {
 

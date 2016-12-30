@@ -38,7 +38,7 @@ import sonar.logistics.api.connecting.OperatorMode;
 import sonar.logistics.api.info.monitor.ILogicMonitor;
 import sonar.logistics.client.gui.GuiChannelSelection;
 import sonar.logistics.common.containers.ContainerChannelSelection;
-import sonar.logistics.connections.LogicMonitorCache;
+import sonar.logistics.connections.managers.LogicMonitorManager;
 
 public class ItemOperator extends SonarItem implements IOperatorTool, IFlexibleGui<ItemStack> {
 
@@ -132,7 +132,7 @@ public class ItemOperator extends SonarItem implements IOperatorTool, IFlexibleG
 		switch (id) {
 		case 0:
 			int hash = tag.getInteger("hash");
-			ILogicMonitor part = LogicMonitorCache.getMonitorFromClient(hash);
+			ILogicMonitor part = LogicMonitorManager.getMonitorFromClient(hash);
 			if (part != null && part instanceof IChannelledTile) {
 				return new ContainerChannelSelection((IChannelledTile) part);
 			}
@@ -145,7 +145,7 @@ public class ItemOperator extends SonarItem implements IOperatorTool, IFlexibleG
 		switch (id) {
 		case 0:
 			int hash = tag.getInteger("hash");
-			ILogicMonitor part = LogicMonitorCache.getMonitorFromClient(hash);
+			ILogicMonitor part = LogicMonitorManager.getMonitorFromClient(hash);
 			if (part != null && part instanceof IChannelledTile) {
 				return new GuiChannelSelection((IChannelledTile) part);
 			}

@@ -7,7 +7,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import sonar.core.helpers.NBTHelper.SyncType;
-import sonar.logistics.connections.LogicMonitorCache;
+import sonar.logistics.connections.managers.LogicMonitorManager;
 
 public class PacketInfoList implements IMessage {
 
@@ -38,7 +38,7 @@ public class PacketInfoList implements IMessage {
 
 		@Override
 		public IMessage onMessage(PacketInfoList message, MessageContext ctx) {
-			LogicMonitorCache.onInfoPacket(message.tag, message.type);
+			LogicMonitorManager.onInfoPacket(message.tag, message.type);
 			return null;
 		}
 

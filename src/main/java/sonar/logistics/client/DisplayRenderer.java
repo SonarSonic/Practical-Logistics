@@ -3,8 +3,8 @@ package sonar.logistics.client;
 import mcmultipart.client.multipart.MultipartSpecialRenderer;
 import net.minecraft.client.renderer.GlStateManager;
 import sonar.core.helpers.RenderHelper;
+import sonar.logistics.common.multiparts.ScreenMultipart;
 import sonar.logistics.helpers.InfoRenderer;
-import sonar.logistics.parts.ScreenMultipart;
 
 //TWEAKED FAST MSR
 public class DisplayRenderer extends MultipartSpecialRenderer<ScreenMultipart> {

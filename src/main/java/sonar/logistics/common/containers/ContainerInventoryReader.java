@@ -15,7 +15,7 @@ import sonar.core.inventory.slots.SlotList;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.settings.InventoryReader;
 import sonar.logistics.api.settings.InventoryReader.Modes;
-import sonar.logistics.parts.InventoryReaderPart;
+import sonar.logistics.common.multiparts.InventoryReaderPart;
 
 public class ContainerInventoryReader extends ContainerMultipartSync implements IFlexibleContainer<InventoryReader.Modes> {
 

@@ -8,8 +8,8 @@ import net.minecraft.client.renderer.block.model.ItemCameraTransforms.TransformT
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import sonar.core.helpers.RenderHelper;
+import sonar.logistics.common.multiparts.ArrayPart;
 import sonar.logistics.helpers.InfoRenderer;
-import sonar.logistics.parts.ArrayPart;
 
 public class RenderArray extends MultipartSpecialRenderer<ArrayPart> {
 

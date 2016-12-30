@@ -23,7 +23,7 @@ import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.settings.FluidReader.SortingType;
 import sonar.logistics.api.wrappers.FluidWrapper;
-import sonar.logistics.monitoring.MonitoredFluidStack;
+import sonar.logistics.connections.monitoring.MonitoredFluidStack;
 
 public class FluidHelper extends FluidWrapper {
 

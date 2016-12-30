@@ -26,10 +26,10 @@ import sonar.logistics.api.connecting.ILogicTile;
 import sonar.logistics.api.display.IInfoDisplay;
 import sonar.logistics.api.info.monitor.ILogicMonitor;
 import sonar.logistics.api.wrappers.CablingWrapper;
-import sonar.logistics.connections.CableRegistry;
-import sonar.logistics.connections.CacheRegistry;
-import sonar.logistics.parts.DataCablePart;
-import sonar.logistics.parts.LogisticsMultipart;
+import sonar.logistics.common.multiparts.DataCablePart;
+import sonar.logistics.common.multiparts.LogisticsMultipart;
+import sonar.logistics.connections.managers.CableManager;
+import sonar.logistics.connections.managers.NetworkManager;
 
 public class CableHelper extends CablingWrapper {
 
@@ -121,7 +121,7 @@ public class CableHelper extends CablingWrapper {
 			if (cable.canConnect(dir)) {
 				Pair<CableType, Integer> connection = getConnectionType(coords.getWorld(), coords.getBlockPos(), dir, cable.getCableType());
 				if (connection.a != CableType.NONE && connection.b != -1) {
-					List<BlockCoords> cables = CableRegistry.getCables(connection.b);
+					List<IDataCable> cables = CableManager.getCables(connection.b);
 					if (cables.size() > lastSize) {
 						cableID = connection.b;
 						lastSize = cables.size();
@@ -130,17 +130,17 @@ public class CableHelper extends CablingWrapper {
 				}
 			}
 		}
-		CableRegistry.addCable(cableID == -1 ? cableID = CableRegistry.getNextAvailableID() : cableID, cable, true);
+		CableManager.addCable(cableID == -1 ? cableID = CableManager.getNextAvailableID() : cableID, cable, true);
 		for (Pair<CableType, Integer> connection : connections) {
 			if (connection.b != cableID) {
-				CableRegistry.connectNetworks(cableID, connection.b);
+				CableManager.connectNetworks(cableID, connection.b);
 			}
 		}
-		return CacheRegistry.getCache(cableID);
+		return NetworkManager.getOrCreateNetwork(cableID);
 	}
 
 	public void removeCable(IDataCable cable) {
-		CableRegistry.removeCable(cable.getNetworkID(), cable);
+		CableManager.removeCable(cable.getNetworkID(), cable);
 	}
 
 	public void refreshConnections(IDataCable cable) {
@@ -152,7 +152,7 @@ public class CableHelper extends CablingWrapper {
 				cable.removeCable();
 				cable.addCable();
 			} else if ((canConnect && connection.a.canConnect(cable.getCableType()) && connection.b != cable.getNetworkID())) {
-				CableRegistry.connectNetworks(cable.getNetworkID(), connection.b);
+				CableManager.connectNetworks(cable.getNetworkID(), connection.b);
 			}
 		}
 	}
@@ -160,7 +160,7 @@ public class CableHelper extends CablingWrapper {
 	public INetworkCache getNetwork(TileEntity tile, EnumFacing dir) {
 		Pair<CableType, Integer> connection = getConnectionType(tile.getWorld(), tile.getPos(), dir, CableType.DATA_CABLE);
 		if (connection.a != CableType.NONE && connection.b != -1) {
-			INetworkCache cache = CacheRegistry.getCache(connection.b);
+			INetworkCache cache = NetworkManager.getNetwork(connection.b);
 			if (cache != null) {
 				return cache;
 			}
@@ -169,8 +169,7 @@ public class CableHelper extends CablingWrapper {
 	}
 
 	public INetworkCache getNetwork(int registryID) {
-		INetworkCache cache = CacheRegistry.getCache(registryID);
-		return cache != null ? cache : EmptyNetworkCache.INSTANCE;
+		return NetworkManager.getNetwork(registryID);
 	}
 
 	/* public Map<BlockCoords, EnumFacing> getTileConnections(List<BlockCoords> network) { if (network == null) { return Collections.EMPTY_MAP; } Map<BlockCoords, EnumFacing> connections = new LinkedHashMap(); for (BlockCoords connect : network) { TileEntity tile = connect.getTileEntity(); if (tile != null && tile instanceof IConnectionNode) { ((IConnectionNode) tile).addConnections(connections); } else { IMultipartContainer container = MultipartHelper.getPartContainer(connect.getWorld(), connect.getBlockPos()); if (container != null) { ISlottedPart part = container.getPartInSlot(PartSlot.CENTER); if (part == null) { continue; } else if (part instanceof IDataCable && ((IDataCable) part).hasConnections()) { container.getParts().forEach(multipart -> { if (multipart instanceof IConnectionNode) { ((IConnectionNode) multipart).addConnections(connections); } }); } } } } return connections;

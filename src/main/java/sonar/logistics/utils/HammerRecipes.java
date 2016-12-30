@@ -2,9 +2,10 @@ package sonar.logistics.utils;
 
 import net.minecraft.item.ItemStack;
 import sonar.core.helpers.RecipeHelper;
+import sonar.core.recipes.DefinedRecipeHelper;
 import sonar.logistics.LogisticsItems;
 
-public class HammerRecipes extends RecipeHelper {
+public class HammerRecipes extends DefinedRecipeHelper {
 
 	private static final HammerRecipes instance = new HammerRecipes();
 
@@ -12,7 +13,7 @@ public class HammerRecipes extends RecipeHelper {
 		super(1, 1, false);
 	}
 
-	public static final RecipeHelper instance() {
+	public static final HammerRecipes instance() {
 		return instance;
 	}
 

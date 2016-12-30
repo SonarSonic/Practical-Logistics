@@ -4,8 +4,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
 import sonar.core.client.gui.GuiSonar;
 import sonar.core.helpers.FontHelper;
-import sonar.logistics.common.blocks.tileentity.TileEntityHammer;
 import sonar.logistics.common.containers.ContainerHammer;
+import sonar.logistics.common.tileentity.TileEntityHammer;
 
 public class GuiHammer extends GuiSonar {
 	public TileEntityHammer entity;

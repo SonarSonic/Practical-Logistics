@@ -13,8 +13,7 @@ public class InfoUUID implements INBTSyncable {
 	public int hashCode;
 	public int pos;
 
-	public InfoUUID() {
-	}
+	public InfoUUID() {}
 
 	public InfoUUID(int hashCode, int pos) {
 		this.hashCode = hashCode;
@@ -58,15 +57,15 @@ public class InfoUUID implements INBTSyncable {
 	}
 
 	@Override
-	public void readData(NBTTagCompound nbt, SyncType type) {
-		String[] ids = nbt.getString("uuid").split(":");
-		hashCode = Integer.valueOf(ids[0]);
-		pos = Integer.valueOf(ids[1]);
+	public void readData(NBTTagCompound nbt, SyncType type) {		
+		hashCode = nbt.getInteger("hash");
+		pos = nbt.getInteger("pos");
 	}
 
 	@Override
 	public NBTTagCompound writeData(NBTTagCompound nbt, SyncType type) {
-		nbt.setString("uuid", toString());
+		nbt.setInteger("hash", hashCode);
+		nbt.setInteger("pos", pos);		
 		return nbt;
 	}
 }

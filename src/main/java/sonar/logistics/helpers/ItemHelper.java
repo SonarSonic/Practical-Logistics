@@ -27,7 +27,7 @@ import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.connecting.IEntityNode;
 import sonar.logistics.api.settings.InventoryReader.SortingType;
 import sonar.logistics.api.wrappers.ItemWrapper;
-import sonar.logistics.monitoring.MonitoredItemStack;
+import sonar.logistics.connections.monitoring.MonitoredItemStack;
 
 public class ItemHelper extends ItemWrapper {
 

@@ -6,7 +6,7 @@ import sonar.core.helpers.RenderHelper;
 import sonar.logistics.api.display.IInfoDisplay;
 import sonar.logistics.client.LogisticsColours;
 import sonar.logistics.common.containers.ContainerInfoDisplay;
-import sonar.logistics.parts.ArrayPart;
+import sonar.logistics.common.multiparts.ArrayPart;
 
 public class GuiInfoDisplay extends GuiLogistics {
 	public static final ResourceLocation bground = new ResourceLocation("PracticalLogistics:textures/gui/transceiverArray.png");

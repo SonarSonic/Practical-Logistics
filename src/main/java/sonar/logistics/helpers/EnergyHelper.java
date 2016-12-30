@@ -12,7 +12,7 @@ import sonar.core.api.inventories.StoredItemStack;
 import sonar.core.utils.SortingDirection;
 import sonar.logistics.api.settings.EnergyReader.SortingType;
 import sonar.logistics.api.wrappers.EnergyWrapper;
-import sonar.logistics.monitoring.MonitoredEnergyStack;
+import sonar.logistics.connections.monitoring.MonitoredEnergyStack;
 
 public class EnergyHelper extends EnergyWrapper {
 

@@ -18,11 +18,11 @@ import sonar.logistics.api.asm.LogicInfoType;
 import sonar.logistics.api.display.DisplayType;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
 import sonar.logistics.api.info.monitor.LogicMonitorHandler;
+import sonar.logistics.connections.monitoring.InfoMonitorHandler;
 import sonar.logistics.helpers.InfoHelper;
 import sonar.logistics.helpers.InfoRenderer;
-import sonar.logistics.monitoring.InfoMonitorHandler;
-import sonar.logistics.registries.LogicRegistry;
-import sonar.logistics.registries.LogicRegistry.RegistryType;
+import sonar.logistics.info.LogicInfoRegistry;
+import sonar.logistics.info.LogicInfoRegistry.RegistryType;
 
 /** default info type, created by the LogicRegistry */
 @LogicInfoType(id = LogicInfo.id, modid = Logistics.MODID)
@@ -88,7 +88,7 @@ public class LogicInfo extends BaseInfo<LogicInfo> implements INameableInfo<Logi
 
 	public String getClientObject() {
 		String prefix = "", suffix = "";
-		Pair<String, String> adjustment = LogicRegistry.infoAdjustments.get(identifier.getObject());
+		Pair<String, String> adjustment = LogicInfoRegistry.infoAdjustments.get(identifier.getObject());
 		if (identifier.getObject().equals("Block.getUnlocalizedName")) {
 			return FontHelper.translate(obj.get().toString() + ".name");
 		}

@@ -15,13 +15,13 @@ import sonar.logistics.client.RenderBlockSelection;
 import sonar.logistics.common.containers.ContainerChannelSelection;
 import sonar.logistics.common.containers.ContainerDataReceiver;
 import sonar.logistics.common.containers.ContainerInfoReader;
-import sonar.logistics.connections.CacheRegistry;
-import sonar.logistics.connections.EmitterRegistry;
-import sonar.logistics.connections.MonitoredList;
+import sonar.logistics.common.multiparts.DataReceiverPart;
+import sonar.logistics.common.multiparts.InfoReaderPart;
+import sonar.logistics.connections.managers.EmitterManager;
+import sonar.logistics.connections.managers.NetworkManager;
+import sonar.logistics.connections.monitoring.MonitoredBlockCoords;
+import sonar.logistics.connections.monitoring.MonitoredList;
 import sonar.logistics.helpers.InfoRenderer;
-import sonar.logistics.monitoring.MonitoredBlockCoords;
-import sonar.logistics.parts.DataReceiverPart;
-import sonar.logistics.parts.InfoReaderPart;
 
 public class GuiDataReceiver extends GuiSelectionList<ClientDataEmitter> {
 	public DataReceiverPart tile;
@@ -48,7 +48,7 @@ public class GuiDataReceiver extends GuiSelectionList<ClientDataEmitter> {
 	}
 
 	public void setInfo() {
-		infoList = (ArrayList<ClientDataEmitter>) EmitterRegistry.clientEmitters.clone();
+		infoList = (ArrayList<ClientDataEmitter>) EmitterManager.clientEmitters.clone();
 	}
 
 	@Override
