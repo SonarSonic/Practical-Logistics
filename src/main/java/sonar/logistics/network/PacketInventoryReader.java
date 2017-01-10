@@ -74,13 +74,12 @@ public class PacketInventoryReader extends PacketMultipart {
 				}
 				LogisticsAPI.getItemHelper().removeToPlayerInventory(new StoredItemStack(message.selected), (long) 64, network, player, ActionType.PERFORM);
 			} else if (player.inventory.getItemStack() != null) {
-				StoredItemStack add = new StoredItemStack(player.inventory.getItemStack().copy());
-				int stackSize = Math.min(message.button == 1 ? 1 : 64, add.getValidStackSize());
-				StoredItemStack stack = LogisticsAPI.getItemHelper().addItems(add.copy().setStackSize(stackSize), network, ActionType.PERFORM);
-				// stack = SonarAPI.getItemHelper().getStackToAdd(stackSize, add, stack);
-
-				ItemStack actualStack = StoredItemStack.getActualStack(stack);
-				if (actualStack == null || (actualStack.stackSize != stackSize && !(actualStack.stackSize <= 0)) && !ItemStack.areItemStacksEqual(StoredItemStack.getActualStack(stack), player.inventory.getItemStack())) {
+				StoredItemStack add = new StoredItemStack(player.inventory.getItemStack().copy());				
+				int stackSize = Math.min(message.button == 1 ? 1 : 64, add.getValidStackSize());				
+				StoredItemStack stack = LogisticsAPI.getItemHelper().addItems(add.copy().setStackSize(stackSize), network, ActionType.PERFORM);		
+				StoredItemStack remove = SonarAPI.getItemHelper().getStackToAdd(stackSize, add, stack);
+				ItemStack actualStack = add.copy().setStackSize(add.stored - SonarAPI.getItemHelper().getStackToAdd(stackSize, add, stack).stored).getActualStack();				
+				if (actualStack == null || (actualStack.stackSize != add.stored && !(actualStack.stackSize <= 0)) && !ItemStack.areItemStacksEqual(StoredItemStack.getActualStack(stack), player.inventory.getItemStack())) {
 					player.inventory.setItemStack(actualStack);
 					SonarCore.network.sendTo(new PacketStackUpdate(actualStack), (EntityPlayerMP) player);
 				}
@@ -90,9 +89,8 @@ public class PacketInventoryReader extends PacketMultipart {
 				}
 
 				ItemStack stack = message.selected;
-				StoredItemStack toAdd = new StoredItemStack(stack.copy()).setStackSize(Math.min(stack.getMaxStackSize(), 64));
-				StoredItemStack removed = LogisticsAPI.getItemHelper().removeItems(toAdd.copy(), network, ActionType.SIMULATE);
-
+				StoredItemStack toAdd = new StoredItemStack(stack.copy()).setStackSize(Math.min(stack.getMaxStackSize(), 64));							
+				StoredItemStack removed = LogisticsAPI.getItemHelper().removeItems(toAdd.copy(), network, ActionType.SIMULATE);				
 				StoredItemStack simulate = SonarAPI.getItemHelper().getStackToAdd(toAdd.stored, toAdd, removed);
 				if (simulate != null && simulate.stored != 0) {
 					if (message.button == 1 && simulate.stored != 1) {

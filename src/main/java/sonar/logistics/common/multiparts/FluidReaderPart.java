@@ -89,7 +89,7 @@ public class FluidReaderPart extends ReaderMultipart<MonitoredFluidStack> implem
 		case STORAGE:
 			break;
 		case TANKS:
-			info = new LogicInfoList(getIdentity(), MonitoredFluidStack.id);
+			info = new LogicInfoList(getIdentity(), MonitoredFluidStack.id, this.getNetworkID());
 			break;
 		default:
 			break;

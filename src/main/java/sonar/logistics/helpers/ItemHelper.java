@@ -16,10 +16,12 @@ import net.minecraft.util.EnumFacing;
 import sonar.core.SonarCore;
 import sonar.core.api.SonarAPI;
 import sonar.core.api.StorageSize;
-import sonar.core.api.inventories.InventoryHandler;
+import sonar.core.api.asm.InventoryHandler;
+import sonar.core.api.inventories.ISonarInventoryHandler;
 import sonar.core.api.inventories.StoredItemStack;
 import sonar.core.api.utils.ActionType;
 import sonar.core.api.utils.BlockCoords;
+import sonar.core.handlers.inventories.IInventoryProvider;
 import sonar.core.network.PacketInvUpdate;
 import sonar.core.utils.SortingDirection;
 import sonar.logistics.api.LogisticsAPI;
@@ -44,7 +46,7 @@ public class ItemHelper extends ItemWrapper {
 			return storage;
 		}
 		boolean specialProvider = false;
-		for (InventoryHandler provider : SonarCore.inventoryProviders.getObjects()) {
+		for (ISonarInventoryHandler provider : SonarCore.inventoryHandlers) {
 			if (provider.canHandleItems(tile, entry.getValue())) {
 				if (!specialProvider) {
 					StorageSize size = provider.getItems(storedStacks, tile, entry.getValue());
@@ -80,7 +82,7 @@ public class ItemHelper extends ItemWrapper {
 			if (tile == null) {
 				continue;
 			}
-			for (InventoryHandler provider : SonarCore.inventoryProviders.getObjects()) {
+			for (ISonarInventoryHandler provider : SonarCore.inventoryHandlers) {
 				if (provider.canHandleItems(tile, entry.getValue())) {
 					add = provider.addStack(add, tile, entry.getValue(), action);
 					if (add == null) {
@@ -115,7 +117,10 @@ public class ItemHelper extends ItemWrapper {
 			if (tile == null) {
 				continue;
 			}
-			for (InventoryHandler provider : SonarCore.inventoryProviders.getObjects()) {
+			for (ISonarInventoryHandler provider : SonarCore.inventoryHandlers) {
+				if(provider instanceof IInventoryProvider){
+					continue;
+				}
 				if (provider.canHandleItems(tile, entry.getValue())) {
 					remove = provider.removeStack(remove, tile, entry.getValue(), action);
 					if (remove == null) {
@@ -166,13 +171,12 @@ public class ItemHelper extends ItemWrapper {
 	public StoredItemStack getTileStack(INetworkCache network, int slot) {
 		Map<BlockCoords, EnumFacing> connections = network.getExternalBlocks(true);
 		for (Map.Entry<BlockCoords, EnumFacing> entry : connections.entrySet()) {
-			for (InventoryHandler provider : SonarCore.inventoryProviders.getObjects()) {
+			for (ISonarInventoryHandler provider : SonarCore.inventoryHandlers) {
 				TileEntity tile = entry.getKey().getTileEntity();
 				if (tile != null && provider.canHandleItems(tile, entry.getValue())) {
 					return provider.getStack(slot, tile, entry.getValue());
 				}
 			}
-
 		}
 		return null;
 	}

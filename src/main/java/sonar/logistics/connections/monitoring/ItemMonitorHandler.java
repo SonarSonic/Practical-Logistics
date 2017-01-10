@@ -7,7 +7,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import sonar.core.SonarCore;
 import sonar.core.api.StorageSize;
-import sonar.core.api.inventories.InventoryHandler;
+import sonar.core.api.inventories.ISonarInventoryHandler;
 import sonar.core.api.inventories.StoredItemStack;
 import sonar.core.api.utils.BlockCoords;
 import sonar.logistics.Logistics;
@@ -19,7 +19,7 @@ import sonar.logistics.api.info.monitor.LogicMonitorHandler;
 public class ItemMonitorHandler extends LogicMonitorHandler<MonitoredItemStack> {
 
 	public static final String id = "item";
-	
+
 	@Override
 	public String id() {
 		return id;
@@ -28,10 +28,10 @@ public class ItemMonitorHandler extends LogicMonitorHandler<MonitoredItemStack> 
 	@Override
 	public MonitoredList<MonitoredItemStack> updateInfo(INetworkCache network, MonitoredList<MonitoredItemStack> previousList, BlockCoords coords, EnumFacing side) {
 		MonitoredList<MonitoredItemStack> list = MonitoredList.<MonitoredItemStack>newMonitoredList(network.getNetworkID());
-		List<InventoryHandler> providers = SonarCore.inventoryProviders.getObjects();
+		List<ISonarInventoryHandler> providers = SonarCore.inventoryHandlers;
 		TileEntity tile = coords.getTileEntity();
 		if (tile != null) {
-			for (InventoryHandler provider : providers) {
+			for (ISonarInventoryHandler provider : providers) {
 				if (provider.canHandleItems(tile, side)) {
 					List<StoredItemStack> info = new ArrayList();
 					StorageSize size = provider.getItems(info, tile, side);

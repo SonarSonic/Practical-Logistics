@@ -93,7 +93,7 @@ public class CableHelper extends CablingWrapper {
 		for (EnumFacing face : EnumFacing.values()) {
 			BlockCoords offset = BlockCoords.translateCoords(cable.getCoords(), face.getOpposite());
 			ILogicTile tile = LogisticsAPI.getCableHelper().getMultipart(offset, face);
-			if (validate.isValid(tile) && tile.canConnect(face)) {
+			if (validate.isValid(tile) && tile.canConnect(face).canConnect()) {
 				logicTiles.add((T) tile);
 			}
 		}
@@ -211,7 +211,7 @@ public class CableHelper extends CablingWrapper {
 				return cable.canConnect(dir.getOpposite()) ? new Pair(cable.getCableType(), cable.getNetworkID()) : new Pair(CableType.NONE, -1);
 			}
 		} else if (connection instanceof ILogicTile) {
-			return ((ILogicTile) connection).canConnect(dir.getOpposite()) ? new Pair(CableType.BLOCK_CONNECTION, -1) : new Pair(CableType.NONE, -1);
+			return ((ILogicTile) connection).canConnect(dir.getOpposite()).canShowConnection() ? new Pair(CableType.BLOCK_CONNECTION, -1) : new Pair(CableType.NONE, -1);
 		}
 		return new Pair(CableType.NONE, -1);
 	}

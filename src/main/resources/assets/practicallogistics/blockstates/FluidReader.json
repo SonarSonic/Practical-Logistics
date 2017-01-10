@@ -12,6 +12,14 @@
         "inventory": [{    
             "model":"practicallogistics:Reader"
         }],
+        "display":{
+            "true":{            
+                "model":"practicallogistics:ReaderWithDisplay"
+            },
+            "false":{            
+                "model":"practicallogistics:Reader"
+            }        
+        },  
         "facing":{  
             "north":{"x": 90, "y": 180},            
             "south":{"x": 90, "y": 0},      

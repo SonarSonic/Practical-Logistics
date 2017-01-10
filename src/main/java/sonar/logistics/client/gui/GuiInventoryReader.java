@@ -88,11 +88,11 @@ public class GuiInventoryReader extends GuiSelectionGrid<MonitoredItemStack> {
 			}
 			if (button.id == 0) {
 				part.sortingOrder.incrementEnum();
-				part.sendByteBufPacket(4);
+				part.sendByteBufPacket(5);
 			}
 			if (button.id == 1) {
 				part.sortingType.incrementEnum();
-				part.sendByteBufPacket(5);
+				part.sendByteBufPacket(6);
 			}
 		}
 	}

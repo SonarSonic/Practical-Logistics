@@ -20,6 +20,7 @@ import sonar.core.utils.IGuiTile;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.connecting.IDataCable;
+import sonar.logistics.api.connecting.ILogicTile.ConnectionType;
 import sonar.logistics.api.info.InfoUUID;
 import sonar.logistics.api.info.monitor.ILogicMonitor;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
@@ -64,8 +65,8 @@ public abstract class ReaderMultipart<T extends IMonitorInfo> extends MonitorMul
 	}
 
 	@Override
-	public boolean canConnect(EnumFacing dir) {
-		return true;// dir != face;
+	public ConnectionType canConnect(EnumFacing dir) {
+		return dir != face ? ConnectionType.NETWORK : ConnectionType.VISUAL;
 	}
 
 	@Override

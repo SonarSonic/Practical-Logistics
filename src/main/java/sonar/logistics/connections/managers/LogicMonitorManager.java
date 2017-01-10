@@ -39,6 +39,8 @@ public class LogicMonitorManager {
 	// server side
 	public static final ArrayList<ILogicMonitor> monitors = new ArrayList();
 	public static final ArrayList<IInfoDisplay> displays = new ArrayList();
+	public static boolean markDisplaysDirty = true;
+	
 	// client side
 	public static LinkedHashMap<ILogicMonitor, MonitoredList<?>> monitoredLists = new LinkedHashMap();
 	// both

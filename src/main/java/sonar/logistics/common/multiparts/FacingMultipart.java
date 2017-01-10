@@ -21,6 +21,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.core.utils.Pair;
+import sonar.logistics.api.connecting.ILogicTile.ConnectionType;
 
 public abstract class FacingMultipart extends LogisticsMultipart implements INormallyOccludingPart {
 
@@ -103,8 +104,8 @@ public abstract class FacingMultipart extends LogisticsMultipart implements INor
 	}
 
 	@Override
-	public boolean canConnect(EnumFacing dir) {
-		return true;
+	public ConnectionType canConnect(EnumFacing dir) {
+		return ConnectionType.NETWORK;
 	}
 
 	@Override

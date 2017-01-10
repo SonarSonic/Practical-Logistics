@@ -5,8 +5,8 @@ import java.util.Comparator;
 import java.util.List;
 
 import sonar.core.SonarCore;
-import sonar.core.api.energy.EnergyHandler;
 import sonar.core.api.energy.EnergyType;
+import sonar.core.api.energy.ISonarEnergyHandler;
 import sonar.core.api.energy.StoredEnergyStack;
 import sonar.core.api.inventories.StoredItemStack;
 import sonar.core.utils.SortingDirection;
@@ -16,10 +16,10 @@ import sonar.logistics.connections.monitoring.MonitoredEnergyStack;
 
 public class EnergyHelper extends EnergyWrapper {
 
-	public ArrayList<EnergyHandler> getProviders(EnergyType type) {
-		ArrayList<EnergyHandler> providers = new ArrayList();
-		List<EnergyHandler> handlers = SonarCore.energyProviders.getObjects();
-		for (EnergyHandler provider : handlers) {
+	public ArrayList<ISonarEnergyHandler> getProviders(EnergyType type) {
+		ArrayList<ISonarEnergyHandler> providers = new ArrayList();
+		List<ISonarEnergyHandler> handlers = SonarCore.energyHandlers;
+		for (ISonarEnergyHandler provider : handlers) {
 			if (provider.getProvidedType().getName().equals(type.getName())) {
 				providers.add(provider);
 			}

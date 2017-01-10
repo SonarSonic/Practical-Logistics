@@ -149,7 +149,7 @@ public abstract class SidedMultipart extends LogisticsMultipart implements ISlot
 	}
 
 	@Override
-	public boolean canConnect(EnumFacing dir) {
-		return dir != face;
+	public ConnectionType canConnect(EnumFacing dir) {
+		return dir != face ? ConnectionType.NETWORK : ConnectionType.NONE;
 	}
 }

@@ -102,9 +102,12 @@ public abstract class AbstractNetwork implements ILogisticsNetwork {
 				}
 			});
 		}
-
 	}
-
+	
+	public MonitoredList<?> getListForMonitor(ILogicMonitor monitor){
+		return null;		
+	}
+	
 	public <T extends IMonitorInfo> Map<Pair<BlockCoords, EnumFacing>, MonitoredList<?>> getMonitoredList(LogicMonitorHandler<T> type) {
 		Map<Pair<BlockCoords, EnumFacing>, MonitoredList<?>> infoList = connectionInfo.getOrDefault(type, new LinkedHashMap());
 		Map<Pair<BlockCoords, EnumFacing>, MonitoredList<?>> coordInfo = new LinkedHashMap();

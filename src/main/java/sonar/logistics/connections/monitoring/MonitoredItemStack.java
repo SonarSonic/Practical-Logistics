@@ -145,35 +145,7 @@ public class MonitoredItemStack extends BaseInfo<MonitoredItemStack> implements 
 	public boolean onClicked(BlockInteractionType type, boolean doubleClick, RenderInfoProperties renderInfo, EntityPlayer player, EnumHand hand, ItemStack stack, PartMOP hit) {
 		if (InfoHelper.canBeClickedStandard(renderInfo, player, hand, stack, hit)) {
 			if (!player.getEntityWorld().isRemote) {
-				Pair<Integer, ItemInteractionType> toRemove = InfoHelper.getItemsToRemove(type);
-				if (toRemove.a != 0 && networkID.getObject() != -1) {
-					INetworkCache cache = NetworkManager.getNetwork(networkID.getObject());
-					switch (toRemove.b) {
-					case ADD:
-						if (stack != null) {
-							if (!doubleClick) {
-								LogisticsAPI.getItemHelper().insertItemFromPlayer(player, cache, player.inventory.currentItem);
-							} else {
-								LogisticsAPI.getItemHelper().insertInventoryFromPlayer(player, cache, player.inventory.currentItem);
-							}
-						}
-						break;
-					case REMOVE:
-						IMultipart part = hit.partHit;
-						if (part != null && part instanceof LogisticsMultipart) {
-							BlockPos pos = part.getPos();
-							StoredItemStack extract = LogisticsAPI.getItemHelper().extractItem(cache, itemStack.getObject().copy().setStackSize(toRemove.a));
-							if (extract != null) {
-								pos = pos.offset(hit.sideHit);
-								SonarAPI.getItemHelper().spawnStoredItemStack(extract, part.getWorld(), pos.getX(), pos.getY(), pos.getZ(), hit.sideHit);
-							}
-						}
-						break;
-					default:
-						break;
-
-					}
-				}
+				InfoHelper.screenItemStackClicked(itemStack.getObject(), networkID.getObject(), type, doubleClick, renderInfo, player, hand, stack, hit);
 			}
 			return true;
 		}

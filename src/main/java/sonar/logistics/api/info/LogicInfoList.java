@@ -18,6 +18,7 @@ import sonar.core.api.utils.BlockInteractionType;
 import sonar.core.helpers.RenderHelper;
 import sonar.core.network.sync.SyncTagType;
 import sonar.core.network.sync.SyncUUID;
+import sonar.core.network.sync.SyncTagType.INT;
 import sonar.core.utils.Pair;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.asm.LogicInfoType;
@@ -32,6 +33,7 @@ import sonar.logistics.connections.managers.LogicMonitorManager;
 import sonar.logistics.connections.monitoring.MonitoredFluidStack;
 import sonar.logistics.connections.monitoring.MonitoredItemStack;
 import sonar.logistics.connections.monitoring.MonitoredList;
+import sonar.logistics.helpers.InfoHelper;
 
 @LogicInfoType(id = LogicInfoList.id, modid = Logistics.MODID)
 public class LogicInfoList extends BaseInfo<LogicInfoList> implements INameableInfo<LogicInfoList>, IClickableInfo {
@@ -39,17 +41,19 @@ public class LogicInfoList extends BaseInfo<LogicInfoList> implements INameableI
 	public static final String id = "logiclist";
 	public SyncUUID monitorUUID = new SyncUUID(0);
 	public SyncTagType.STRING infoID = new SyncTagType.STRING(1);
+	public final SyncTagType.INT networkID = (INT) new SyncTagType.INT(2).setDefault(-1);
 
 	{
-		syncParts.addAll(Lists.newArrayList(monitorUUID, infoID));
+		syncParts.addAll(Lists.newArrayList(monitorUUID, infoID, networkID));
 	}
 
 	public LogicInfoList() {
 	}
 
-	public LogicInfoList(UUID monitorUUID, String infoID) {
+	public LogicInfoList(UUID monitorUUID, String infoID, int networkID) {
 		this.monitorUUID.setObject(monitorUUID);
 		this.infoID.setObject(infoID);
+		this.networkID.setObject(networkID);
 	}
 
 	@Override
@@ -84,7 +88,7 @@ public class LogicInfoList extends BaseInfo<LogicInfoList> implements INameableI
 
 	@Override
 	public LogicInfoList copy() {
-		return new LogicInfoList(monitorUUID.getUUID(), infoID.getObject());
+		return new LogicInfoList(monitorUUID.getUUID(), infoID.getObject(), networkID.getObject());
 	}
 
 	@Override
@@ -149,59 +153,106 @@ public class LogicInfoList extends BaseInfo<LogicInfoList> implements INameableI
 			DisplayType displayType = part.getDisplayType();
 
 			BlockPos pos = part.getPos();// handler pos...
-			BlockPos secondPos = pos;
+			// BlockPos secondPos = pos;
 			int slot = -1;
 
 			int maxH = 1;
 			int minH = 0;
 			int maxY = 1;
 			int minY = 0;
+			int hSlots = (Math.round(maxH - minH) * 2);
+			int yPos = (int) ((maxY - (hit.hitVec.yCoord - pos.getY())) * 2), hPos = 0;
 			switch (part.face) {
 			case DOWN:
+				System.out.println(part.rotation);
+				switch (part.rotation) {
+				case EAST:
+					hPos = (int) ((maxH - minH - (hit.hitVec.zCoord - pos.getZ())) * 2);
+					yPos = (int)((maxH - minH - (hit.hitVec.xCoord - pos.getX())) * 2);		
+					slot = ((yPos * hSlots) + hPos);
+					break;
+				case NORTH:
+					hPos = (int) ((maxH - minH - (hit.hitVec.xCoord - pos.getX())) * 2);	
+					yPos = (int)((minH + (hit.hitVec.zCoord - pos.getZ())) * 2);
+					System.out.println(yPos);
+					slot = ((yPos * hSlots) + hPos);				
+					break;
+				case SOUTH:
+					hPos = (int) ((minH + (hit.hitVec.xCoord - pos.getX())) * 2);	
+					yPos = (int)((maxH - minH - (hit.hitVec.zCoord - pos.getZ())) * 2);
+					slot = ((yPos * hSlots) + hPos);
+					break;
+				case WEST:
+					hPos = (int) ((minH + (hit.hitVec.zCoord - pos.getZ())) * 2);
+					yPos = (int)((minH + (hit.hitVec.xCoord - pos.getX())) * 2);
+					slot = ((yPos * hSlots) + hPos);
+					break;
+				default:
+					break;
+				}
 				break;
 			case EAST:
-				int hSlots = (Math.round(maxH - minH) * 2);
-				int yPos = (maxY - (secondPos.getY() - pos.getY())) * 2;
-				int hPos = (maxH - (secondPos.getZ() - pos.getZ())) * 2;
-				int hSlot = hit.hitVec.zCoord < 0.5 ? hPos + 1 : hPos;
-				int ySlot = hit.hitVec.yCoord < 0.5 ? yPos + 1 : yPos;
-				slot = ((ySlot * hSlots) + hSlot) + (ySlot * 2);
+				hPos = (int) ((maxH - minH - (hit.hitVec.zCoord - pos.getZ())) * 2);
+				slot = ((yPos * hSlots) + hPos);
 				break;
 			case NORTH:
-				hSlots = (Math.round(maxH - minH) * 2);
-				yPos = (maxY - (secondPos.getY() - pos.getY())) * 2;
-				hPos = (maxH - (secondPos.getX() - pos.getX())) * 2;
-				hSlot = hit.hitVec.xCoord < 0.5 ? hPos + 1 : hPos;
-				ySlot = hit.hitVec.yCoord < 0.5 ? yPos + 1 : yPos;
-				slot = ((ySlot * hSlots) + hSlot) + (ySlot * 2);
+				hPos = (int) ((maxH - minH - (hit.hitVec.xCoord - pos.getX())) * 2);
+				slot = ((yPos * hSlots) + hPos);
 				break;
 			case SOUTH:
-				hSlots = (Math.round(maxH - minH) * 2);
-				yPos = (maxY - (secondPos.getY() - pos.getY())) * 2;
-				hPos = (maxH - minH + (secondPos.getX() - pos.getX())) * 2;
-				hSlot = hit.hitVec.xCoord < 0.5 ? hPos : hPos + 1;
-				ySlot = hit.hitVec.yCoord < 0.5 ? yPos + 1 : yPos;
-				slot = ((ySlot * hSlots) + hSlot) + (ySlot * 2) - maxH * 2;
+				hPos = (int) ((maxH - minH + (hit.hitVec.xCoord - pos.getX())) * 2);
+				slot = ((yPos * hSlots) + hPos) - maxH * 2;
 				break;
 			case UP:
+				switch (part.rotation) {
+				case EAST:
+					hPos = (int) ((maxH - minH - (hit.hitVec.zCoord - pos.getZ())) * 2);
+					yPos = (int)((minH + (hit.hitVec.xCoord - pos.getX())) * 2);
+					slot = ((yPos * hSlots) + hPos);
+					break;
+				case NORTH:
+					hPos = (int) ((maxH - minH - (hit.hitVec.xCoord - pos.getX())) * 2);	
+					yPos = (int)((maxH - (hit.hitVec.zCoord - pos.getZ())) * 2);
+					slot = ((yPos * hSlots) + hPos);					
+					break;
+				case SOUTH:
+					hPos = (int) ((maxH - minH + (hit.hitVec.xCoord - pos.getX())) * 2);	
+					yPos = (int)((minH + (hit.hitVec.zCoord - pos.getZ())) * 2);
+					slot = ((yPos * hSlots) + hPos) - maxH * 2;
+					break;
+				case WEST:
+					hPos = (int) ((maxH - minH + (hit.hitVec.zCoord - pos.getZ())) * 2);
+					yPos = (int)((minH - (hit.hitVec.xCoord - pos.getX())) * 2);
+					slot = ((yPos * hSlots) + hPos);
+					break;
+				default:
+					break;
+				}
+
 				break;
 			case WEST:
-				hSlots = (Math.round(maxH - minH) * 2);
-				yPos = (maxY - (secondPos.getY() - pos.getY())) * 2;
-				hPos = (maxH - minH + (secondPos.getZ() - pos.getZ())) * 2;
-				hSlot = hit.hitVec.zCoord < 0.5 ? hPos : hPos + 1;
-				ySlot = hit.hitVec.yCoord < 0.5 ? yPos + 1 : yPos;
-				slot = ((ySlot * hSlots) + hSlot) + (ySlot * 2) - maxH * 2;
+				hPos = (int) ((maxH - minH + (hit.hitVec.zCoord - pos.getZ())) * 2);
+				slot = ((yPos * hSlots) + hPos) - maxH * 2;
 				break;
 			default:
 				break;
-
 			}
 
 			System.out.println(slot);
-
+			Pair<ILogicMonitor, MonitoredList<?>> monitor = LogicMonitorManager.getMonitorFromServer(monitorUUID.getUUID().hashCode());
+			boolean isRemote = player.getEntityWorld().isRemote;
+			if (monitor.b != null && slot >= 0 && slot < monitor.b.size()) {
+				if (!player.getEntityWorld().isRemote) {
+					MonitoredItemStack itemStack = (MonitoredItemStack) monitor.b.get(slot);
+					if (itemStack != null) {
+						InfoHelper.screenItemStackClicked(itemStack.itemStack.getObject(), networkID.getObject(), type, doubleClick, renderInfo, player, hand, stack, hit);
+					}
+				}
+				return true;
+			}
 		}
 		return false;
+
 	}
 
 	@Override

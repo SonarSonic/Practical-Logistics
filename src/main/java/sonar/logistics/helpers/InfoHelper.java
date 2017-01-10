@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 
+import mcmultipart.multipart.IMultipart;
 import mcmultipart.raytrace.PartMOP;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -12,19 +13,26 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
+import sonar.core.api.SonarAPI;
+import sonar.core.api.inventories.StoredItemStack;
 import sonar.core.api.utils.BlockInteractionType;
 import sonar.core.helpers.NBTHelper;
 import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.core.utils.Pair;
 import sonar.core.utils.SortingDirection;
 import sonar.logistics.LogisticsASMLoader;
+import sonar.logistics.api.LogisticsAPI;
+import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.display.DisplayType;
 import sonar.logistics.api.display.IInfoDisplay;
 import sonar.logistics.api.display.ScreenLayout;
 import sonar.logistics.api.info.LogicInfo;
 import sonar.logistics.api.info.RenderInfoProperties;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
+import sonar.logistics.common.multiparts.LogisticsMultipart;
+import sonar.logistics.connections.managers.NetworkManager;
 import sonar.logistics.connections.monitoring.MonitoredList;
+import sonar.logistics.helpers.InfoHelper.ItemInteractionType;
 
 public class InfoHelper {
 
@@ -32,6 +40,37 @@ public class InfoHelper {
 	public static final String SYNC = "syn";
 	public static final String REMOVED = "r";
 	public static final String SPECIAL = "spe";
+
+	public static void screenItemStackClicked(StoredItemStack itemstack, int networkID, BlockInteractionType type, boolean doubleClick, RenderInfoProperties renderInfo, EntityPlayer player, EnumHand hand, ItemStack stack, PartMOP hit) {
+		Pair<Integer, ItemInteractionType> toRemove = InfoHelper.getItemsToRemove(type);
+		if (toRemove.a != 0 && networkID != -1) {
+			INetworkCache cache = NetworkManager.getNetwork(networkID);
+			switch (toRemove.b) {
+			case ADD:
+				if (stack != null) {
+					if (!doubleClick) {
+						LogisticsAPI.getItemHelper().insertItemFromPlayer(player, cache, player.inventory.currentItem);
+					} else {
+						LogisticsAPI.getItemHelper().insertInventoryFromPlayer(player, cache, player.inventory.currentItem);
+					}
+				}
+				break;
+			case REMOVE:
+				IMultipart part = hit.partHit;
+				if (part != null && part instanceof LogisticsMultipart) {
+					BlockPos pos = part.getPos();
+					StoredItemStack extract = LogisticsAPI.getItemHelper().extractItem(cache, itemstack.copy().setStackSize(toRemove.a));
+					if (extract != null) {
+						pos = pos.offset(hit.sideHit);
+						SonarAPI.getItemHelper().spawnStoredItemStack(extract, part.getWorld(), pos.getX(), pos.getY(), pos.getZ(), hit.sideHit);
+					}
+				}
+				break;
+			default:
+				break;
+			}
+		}
+	}
 
 	// FIXME - to use updateWriting for some of the tags, like ILogicInfo
 	public static <T extends IMonitorInfo> NBTTagCompound writeMonitoredList(NBTTagCompound tag, boolean lastWasNull, MonitoredList<T> stacks, SyncType type) {
@@ -67,7 +106,7 @@ public class InfoHelper {
 						NBTTagCompound compound = new NBTTagCompound();
 						if (listType == 1)
 							compound.setBoolean(REMOVED, true);
-						// list.appendTag(InfoHelper.writeInfoToNBT(compound, info, listType == 1 ? SyncType.SAVE : SyncType.SAVE));
+						list.appendTag(InfoHelper.writeInfoToNBT(compound, info, listType == 1 ? SyncType.SAVE : SyncType.SAVE));
 					}
 				}
 			}
@@ -100,9 +139,9 @@ public class InfoHelper {
 			tags: for (int i = 0; i < list.tagCount(); i++) {
 				NBTTagCompound infoTag = list.getCompoundTagAt(i);
 				T stack = (T) InfoHelper.readInfoFromNBT(infoTag);
-				//.forEachRemaining(stored -> {});
+				// .forEachRemaining(stored -> {});
 				Iterator<T> iterator = stacks.iterator();
-				while(iterator.hasNext()){
+				while (iterator.hasNext()) {
 					T stored = iterator.next();
 					if (stack.isMatchingInfo(stored)) {
 						if (infoTag.getBoolean(REMOVED)) {
@@ -119,7 +158,7 @@ public class InfoHelper {
 		return stacks;
 	}
 
-	public static int compareWithDirection(long stored1, long stored2, SortingDirection dir){		
+	public static int compareWithDirection(long stored1, long stored2, SortingDirection dir) {
 		if (stored1 < stored2)
 			return dir == SortingDirection.DOWN ? 1 : -1;
 		if (stored1 == stored2)
@@ -127,14 +166,14 @@ public class InfoHelper {
 		return dir == SortingDirection.DOWN ? -1 : 1;
 	}
 
-	public static int compareStringsWithDirection(String string1, String string2, SortingDirection dir){		
+	public static int compareStringsWithDirection(String string1, String string2, SortingDirection dir) {
 		int res = String.CASE_INSENSITIVE_ORDER.compare(string1, string2);
 		if (res == 0) {
 			res = string1.compareTo(string2);
 		}
 		return dir == SortingDirection.DOWN ? res : -res;
 	}
-	
+
 	public static ArrayList<LogicInfo> sortInfoList(ArrayList<LogicInfo> oldInfo) {
 		ArrayList<LogicInfo> providerInfo = (ArrayList<LogicInfo>) oldInfo.clone();
 		Collections.sort(providerInfo, new Comparator<LogicInfo>() {

@@ -260,13 +260,9 @@ public class DefaultNetwork extends AbstractNetwork implements IRefreshCache {
 
 	public ArrayList<Integer> getFinalNetworkList() {
 		ArrayList<Integer> networks = getConnectedNetworks(new ArrayList());
-		networks.iterator().forEachRemaining(id -> {
-			if (!networks.contains(id)) {
-				networks.add(id);
-			}
-			NetworkManager.getNetwork(id).getConnectedNetworks(networks);
-		});
-		return networks;
+		ArrayList<Integer> fullNetworks = (ArrayList<Integer>) networks.clone();
+		networks.iterator().forEachRemaining(id -> NetworkManager.getNetwork(id).getConnectedNetworks(fullNetworks));
+		return fullNetworks;
 	}
 
 	@Override

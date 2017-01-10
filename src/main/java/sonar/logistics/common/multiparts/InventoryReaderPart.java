@@ -78,7 +78,7 @@ public class InventoryReaderPart extends ReaderMultipart<MonitoredItemStack> imp
 		IMonitorInfo info = null;
 		switch (setting.getObject()) {
 		case INVENTORIES:
-			info = new LogicInfoList(getIdentity(), MonitoredItemStack.id);
+			info = new LogicInfoList(getIdentity(), MonitoredItemStack.id, this.getNetworkID());
 			break;
 		case POS:
 			int pos = posSlot.getObject();

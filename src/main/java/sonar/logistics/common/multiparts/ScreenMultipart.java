@@ -34,6 +34,7 @@ import sonar.core.network.sync.SyncEnum;
 import sonar.logistics.api.connecting.IOperatorTile;
 import sonar.logistics.api.connecting.IOperatorTool;
 import sonar.logistics.api.connecting.OperatorMode;
+import sonar.logistics.api.connecting.ILogicTile.ConnectionType;
 import sonar.logistics.api.display.IInfoDisplay;
 import sonar.logistics.api.display.ScreenLayout;
 import sonar.logistics.api.info.IInfoContainer;
@@ -197,8 +198,8 @@ public abstract class ScreenMultipart extends LogisticsMultipart implements INor
 	}
 
 	@Override
-	public boolean canConnect(EnumFacing dir) {
-		return dir != face;
+	public ConnectionType canConnect(EnumFacing dir) {
+		return dir != face ? ConnectionType.NETWORK : ConnectionType.NONE;
 	}
 
 	@Override

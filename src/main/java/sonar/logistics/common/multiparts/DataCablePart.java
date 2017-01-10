@@ -194,7 +194,7 @@ public class DataCablePart extends SonarMultipart implements ISlotOccludingPart,
 					}
 				}
 				ILogicTile tile = (ILogicTile) part;
-				if (tile.canConnect(dir.getOpposite())) {
+				if (tile.canConnect(dir.getOpposite()).canShowConnection()) {
 					return CableConnection.INTERNAL;
 				}
 			}

@@ -13,7 +13,8 @@ import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidContainerItem;
 import sonar.core.SonarCore;
-import sonar.core.api.fluids.FluidHandler;
+import sonar.core.api.asm.FluidHandler;
+import sonar.core.api.fluids.ISonarFluidHandler;
 import sonar.core.api.fluids.StoredFluidStack;
 import sonar.core.api.inventories.StoredItemStack;
 import sonar.core.api.utils.ActionType;
@@ -34,7 +35,7 @@ public class FluidHelper extends FluidWrapper {
 		Map<BlockCoords, EnumFacing> connections = network.getExternalBlocks(true);
 		for (Map.Entry<BlockCoords, EnumFacing> entry : connections.entrySet()) {
 			TileEntity tile = entry.getKey().getTileEntity();
-			for (FluidHandler provider : SonarCore.fluidProviders.getObjects()) {
+			for (ISonarFluidHandler provider : SonarCore.fluidHandlers) {
 				if (provider.canHandleFluids(tile, entry.getValue())) {
 					add = provider.addStack(add, tile, entry.getValue(), action);
 					if (add == null) {
@@ -53,7 +54,7 @@ public class FluidHelper extends FluidWrapper {
 		Map<BlockCoords, EnumFacing> connections = network.getExternalBlocks(true);
 		for (Map.Entry<BlockCoords, EnumFacing> entry : connections.entrySet()) {
 			TileEntity tile = entry.getKey().getTileEntity();
-			for (FluidHandler provider : SonarCore.fluidProviders.getObjects()) {
+			for (ISonarFluidHandler provider : SonarCore.fluidHandlers) {
 				if (provider.canHandleFluids(tile, entry.getValue())) {
 					remove = provider.removeStack(remove, tile, entry.getValue(), action);
 					if (remove == null) {

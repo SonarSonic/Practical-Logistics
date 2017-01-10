@@ -5,7 +5,7 @@ import java.util.List;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import sonar.core.SonarCore;
-import sonar.core.api.energy.EnergyHandler;
+import sonar.core.api.energy.ISonarEnergyHandler;
 import sonar.core.api.energy.StoredEnergyStack;
 import sonar.core.api.utils.BlockCoords;
 import sonar.logistics.Logistics;
@@ -26,8 +26,8 @@ public class EnergyMonitorHandler extends LogicMonitorHandler<MonitoredEnergySta
 	@Override
 	public MonitoredList<MonitoredEnergyStack> updateInfo(INetworkCache network, MonitoredList<MonitoredEnergyStack> previousList, BlockCoords coords, EnumFacing side) {
 		MonitoredList<MonitoredEnergyStack> list = MonitoredList.<MonitoredEnergyStack>newMonitoredList(network.getNetworkID());
-		List<EnergyHandler> providers = SonarCore.energyProviders.getObjects();
-		for (EnergyHandler provider : providers) {
+		List<ISonarEnergyHandler> providers = SonarCore.energyHandlers;
+		for (ISonarEnergyHandler provider : providers) {
 			TileEntity tile = coords.getTileEntity();
 			if (tile != null && provider.canProvideEnergy(tile, side)) {
 				StoredEnergyStack info = provider.getEnergy(new StoredEnergyStack(provider.getProvidedType()), tile, side);

@@ -8,8 +8,22 @@ import sonar.logistics.api.cache.INetworkCache;
 /** implemented by Tile Entities which can connect to Data Cables */
 public interface ILogicTile extends IWorldPosition {
 
+	public static enum ConnectionType{
+		VISUAL,
+		NETWORK,
+		NONE;
+		
+		public boolean canConnect(){
+			return this==NETWORK;
+		}
+		
+		public boolean canShowConnection(){
+			return this==VISUAL || canConnect();
+		}
+	}
+	
 	/** can the Tile connect to cables on the given direction */
-	public boolean canConnect(EnumFacing dir);
+	public ConnectionType canConnect(EnumFacing dir);
 
 	/** the {@link BlockCoords} this Block/FMP Part should be registered as on the Network
 	 * @return the {@link BlockCoords} */

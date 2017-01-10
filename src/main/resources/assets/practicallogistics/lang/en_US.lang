@@ -29,6 +29,7 @@ item.EntityNode.name=Entity Node
 item.RedstoneSignaller.name=Redstone Signaller
 item.DataReceiver.name=Data Receiver
 item.DataEmitter.name=Data Emitter
+item.TransferNode.name=Transfer Node
 
 //items
 item.EnergyScreenItem.name=Energy Screen
