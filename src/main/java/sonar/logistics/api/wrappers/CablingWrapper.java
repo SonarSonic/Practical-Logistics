@@ -1,18 +1,14 @@
 package sonar.logistics.api.wrappers;
 
-import mcmultipart.multipart.IMultipartContainer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 import sonar.core.api.utils.BlockCoords;
-import sonar.core.utils.Pair;
 import sonar.logistics.api.cache.EmptyNetworkCache;
 import sonar.logistics.api.cache.INetworkCache;
-import sonar.logistics.api.connecting.CableType;
 import sonar.logistics.api.connecting.IDataCable;
 import sonar.logistics.api.connecting.ILogicTile;
 import sonar.logistics.api.display.IInfoDisplay;
+import sonar.logistics.api.display.ILargeDisplay;
 
 public class CablingWrapper {
 
@@ -27,26 +23,30 @@ public class CablingWrapper {
 	public IInfoDisplay getDisplayScreen(BlockCoords coords, EnumFacing face) {
 		return null;
 	}
+	
+	public ILargeDisplay getDisplayScreen(BlockCoords coords, int registryID) {
+		return null;
+	}
 
 	/** should be called on the {@code validate()} method in your TileEntity class: for adding a {@link IDataCable} to a network
 	 * 
 	 * @param cable {@link IDataCable} to be added
 	 * @return */
-	public INetworkCache addCable(IDataCable cable) {
-		return EmptyNetworkCache.INSTANCE;
-	}
+	//public INetworkCache addCable(IDataCable cable) {
+	///	return EmptyNetworkCache.INSTANCE;
+	//}
 
 	/** should be called on the {@code invalidate()} method in your TileEntity class: for removing a {@link IDataCable} from a network
 	 * 
 	 * @param cable {@link IDataCable} to be removed */
-	public void removeCable(IDataCable cable) {
-	}
+	//public void removeCable(IDataCable cable) {
+	//}
 
 	/** checks all the adjacent IInfoEmitters and refreshes their connections
 	 * 
 	 * @param cable the {@link IDataCable} */
-	public void refreshConnections(IDataCable cable) {
-	}
+	//public void refreshConnections(IDataCable cable) {
+	//}
 
 	/** returns the {@link INetworkCache} on a given side of a tile
 	 * 
@@ -60,12 +60,12 @@ public class CablingWrapper {
 	public INetworkCache getNetwork(int registryID) {
 		return EmptyNetworkCache.INSTANCE;
 	}
-
-	public Pair<CableType, Integer> getConnectionType(TileEntity tile, EnumFacing dir, CableType cableType) {
+	/*
+	public Pair<ConnectableType, Integer> getConnectionType(TileEntity tile, EnumFacing dir, ConnectableType cableType) {
 		return this.getConnectionType(tile.getWorld(), tile.getPos(), dir, cableType);
 	}
 
-	public Pair<CableType, Integer> getConnectionType(BlockCoords coords, EnumFacing dir, CableType cableType) {
+	public Pair<ConnectableType, Integer> getConnectionType(BlockCoords coords, EnumFacing dir, ConnectableType cableType) {
 		return this.getConnectionType(coords.getWorld(), coords.getBlockPos(), dir, cableType);
 	}
 
@@ -76,8 +76,9 @@ public class CablingWrapper {
 	 * @param dir {@link EnumFacing} to check in
 	 * @param cableType the default CableType
 	 * @return the CableType */
-	public Pair<CableType, Integer> getConnectionType(World world, BlockPos pos, EnumFacing dir, CableType cableType) {
-		return new Pair(CableType.NONE, -1);
+	/*
+	public Pair<ConnectableType, Integer> getConnectionType(World world, BlockPos pos, EnumFacing dir, ConnectableType cableType) {
+		return new Pair(ConnectableType.NONE, -1);
 	}
 
 	/** checks the given IMultipartContainer for cable connections in a given direction
@@ -86,8 +87,9 @@ public class CablingWrapper {
 	 * @param dir {@link EnumFacing} to check in
 	 * @param cableType the default CableType
 	 * @return the CableType */
-	public Pair<CableType, Integer> getConnectionType(IMultipartContainer container, EnumFacing dir, CableType cableType) {
-		return new Pair(CableType.NONE, -1);
+	/*
+	public Pair<ConnectableType, Integer> getConnectionType(IMultipartContainer container, EnumFacing dir, ConnectableType cableType) {
+		return new Pair(ConnectableType.NONE, -1);
 	}
 
 	/** checks the given TileEntity for cable connections in a given direction
@@ -96,7 +98,9 @@ public class CablingWrapper {
 	 * @param dir {@link EnumFacing} to check in
 	 * @param cableType the default CableType
 	 * @return the CableType */
-	public Pair<CableType, Integer> getConnectionTypeFromObject(Object connection, EnumFacing dir, CableType cableType) {
-		return new Pair(CableType.NONE, -1);
+	/*
+	public Pair<ConnectableType, Integer> getConnectionTypeFromObject(Object connection, EnumFacing dir, ConnectableType cableType) {
+		return new Pair(ConnectableType.NONE, -1);
 	}
+	*/
 }

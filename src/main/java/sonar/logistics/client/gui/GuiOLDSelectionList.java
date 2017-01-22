@@ -1,7 +1,6 @@
 package sonar.logistics.client.gui;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.lwjgl.input.Keyboard;
@@ -17,7 +16,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import sonar.core.client.gui.GuiSonar;
 import sonar.core.client.gui.SonarButtons.ImageButton;
 import sonar.core.utils.IWorldPosition;
-import sonar.logistics.api.info.monitor.IMonitorInfo;
 
 public abstract class GuiOLDSelectionList<T> extends GuiSonar {
 

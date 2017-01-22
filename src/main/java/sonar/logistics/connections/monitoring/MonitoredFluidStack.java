@@ -10,7 +10,6 @@ import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHand;
-import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 import sonar.core.api.fluids.StoredFluidStack;
 import sonar.core.api.utils.BlockInteractionType;
@@ -18,28 +17,28 @@ import sonar.core.helpers.FontHelper;
 import sonar.core.network.sync.SyncNBTAbstract;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.asm.LogicInfoType;
-import sonar.logistics.api.display.DisplayType;
+import sonar.logistics.api.display.IDisplayInfo;
 import sonar.logistics.api.info.BaseInfo;
 import sonar.logistics.api.info.IClickableInfo;
-import sonar.logistics.api.info.RenderInfoProperties;
+import sonar.logistics.api.info.INameableInfo;
+import sonar.logistics.api.info.InfoContainer;
 import sonar.logistics.api.info.monitor.IJoinableInfo;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
 import sonar.logistics.api.info.monitor.LogicMonitorHandler;
 import sonar.logistics.helpers.InfoRenderer;
 
 @LogicInfoType(id = MonitoredFluidStack.id, modid = Logistics.MODID)
-public class MonitoredFluidStack extends BaseInfo<MonitoredFluidStack> implements IJoinableInfo<MonitoredFluidStack>, IClickableInfo {
+public class MonitoredFluidStack extends BaseInfo<MonitoredFluidStack> implements IJoinableInfo<MonitoredFluidStack>, IClickableInfo, INameableInfo<MonitoredFluidStack> {
 
 	public static final String id = "fluid";
 	public static LogicMonitorHandler<MonitoredFluidStack> handler = LogicMonitorHandler.instance(FluidMonitorHandler.id);
 	public SyncNBTAbstract<StoredFluidStack> fluidStack = new SyncNBTAbstract<StoredFluidStack>(StoredFluidStack.class, 0);
 
 	{
-		syncParts.add(fluidStack);
+		syncParts.addParts(fluidStack);
 	}
 
-	public MonitoredFluidStack() {
-	}
+	public MonitoredFluidStack() {}
 
 	public MonitoredFluidStack(StoredFluidStack stack) {
 		this.fluidStack.setObject(stack);
@@ -92,7 +91,7 @@ public class MonitoredFluidStack extends BaseInfo<MonitoredFluidStack> implement
 	}
 
 	@Override
-	public void renderInfo(DisplayType displayType, double width, double height, double scale, int infoPos) {
+	public void renderInfo(InfoContainer container, IDisplayInfo displayInfo, double width, double height, double scale, int infoPos) {
 		FluidStack stack = fluidStack.getObject().fluid;
 		if (stack != null) {
 			GL11.glPushMatrix();
@@ -105,17 +104,30 @@ public class MonitoredFluidStack extends BaseInfo<MonitoredFluidStack> implement
 			GlStateManager.enableLighting();
 			GL11.glTranslated(0, 0, -0.001);
 			GL11.glPopMatrix();
-			InfoRenderer.renderNormalInfo(displayType, width, height, scale, stack.getLocalizedName(), FontHelper.formatFluidSize(fluidStack.getObject().stored));
+			InfoRenderer.renderNormalInfo(container.display.getDisplayType(), width, height, scale, displayInfo.getFormattedStrings());
 			GL11.glPopMatrix();
 		}
 	}
 
 	@Override
-	public boolean onClicked(BlockInteractionType type, boolean doubleClick, RenderInfoProperties renderInfo, EntityPlayer player, EnumHand hand, ItemStack stack, PartMOP hit) {
-		//FluidHelper.
-		
-		
+	public boolean onClicked(BlockInteractionType type, boolean doubleClick, IDisplayInfo renderInfo, EntityPlayer player, EnumHand hand, ItemStack stack, PartMOP hit, InfoContainer container) {
+		//FluidHelper.		
 		return false;
+	}
+
+	@Override
+	public String getClientIdentifier() {
+		return  (fluidStack.getObject() != null && fluidStack.getObject().fluid != null ? fluidStack.getObject().fluid.getLocalizedName() : "FLUIDSTACK");
+	}
+
+	@Override
+	public String getClientObject() {
+		return fluidStack.getObject() != null ? "" + FontHelper.formatFluidSize(fluidStack.getObject().stored) : "ERROR";
+	}
+
+	@Override
+	public String getClientType() {
+		return "fluid";
 	}
 
 }

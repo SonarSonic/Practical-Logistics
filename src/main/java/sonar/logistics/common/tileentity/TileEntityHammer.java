@@ -1,7 +1,5 @@
 package sonar.logistics.common.tileentity;
 
-import com.google.common.collect.Lists;
-
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ISidedInventory;
@@ -25,7 +23,7 @@ public class TileEntityHammer extends TileEntityInventory implements ISidedInven
 	public static int speed = 100;
 
 	public TileEntityHammer() {
-		syncParts.addAll(Lists.newArrayList(progress, coolDown));
+		syncList.addParts(progress, coolDown);
 		super.inv = new SonarInventory(this, 2);
 	}
 

@@ -1,9 +1,9 @@
 package sonar.logistics.helpers;
 
+import java.util.List;
+
 import org.lwjgl.opengl.GL11;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.VertexBuffer;
@@ -12,6 +12,7 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.EnumFacing;
 import sonar.core.helpers.FontHelper;
 import sonar.core.helpers.RenderHelper;
+import sonar.core.helpers.SonarHelper;
 import sonar.logistics.api.display.DisplayType;
 import sonar.logistics.api.info.INameableInfo;
 import sonar.logistics.api.info.LogicInfo;
@@ -32,21 +33,29 @@ public class InfoRenderer {
 	}
 
 	public static void renderNormalInfo(DisplayType type, String... toDisplay) {
+		renderNormalInfo(type, type.width, type.height, type.scale, SonarHelper.convertArray(toDisplay));
+	}
+
+	public static void renderNormalInfo(DisplayType type, List<String> toDisplay) {
 		renderNormalInfo(type, type.width, type.height, type.scale, toDisplay);
 	}
 
 	public static double getYCentre(DisplayType type, double height) {
-		return ((0.1205 * height) * (0.1205 * height)) + (0.4089 * height) - 0.56; // quadratic equation to solve the scale
+		return ((0.12 * height) * (0.12 * height)) + (0.41 * height) - 0.58; // quadratic equation to solve the scale
 	}
 
 	public static void renderNormalInfo(DisplayType displayType, double width, double height, double scale, String... toDisplay) {
+		renderNormalInfo(displayType, width, height, scale, SonarHelper.convertArray(toDisplay));
+	}
+
+	public static void renderNormalInfo(DisplayType displayType, double width, double height, double scale, List<String> toDisplay) {
 		GlStateManager.disableLighting();
 		GlStateManager.enableCull();
-		double yCentre = getYCentre(displayType, height);
-		float offset = (float) ((float) (0.09F + scale * 2));
-		double centre = ((double) (toDisplay.length) / 2) - yCentre;
-		for (int i = 0; i < toDisplay.length; i++) {
-			renderCenteredString(toDisplay[i], -1, (float) (i == centre ? yCentre : i < centre ? yCentre - offset * -(i - centre) : yCentre + offset * (i - centre)), (float) (width + 0.0625*2), (float) scale, -1);
+		float offset = (float) ((float) (0.09F + scale * 6));
+		double yCentre = getYCentre(displayType, height + offset);
+		double centre = ((double) (toDisplay.size()) / 2) - yCentre;
+		for (int i = 0; i < toDisplay.size(); i++) {
+			renderCenteredString(toDisplay.get(i), -1, (float) (i == centre ? yCentre : i < centre ? yCentre - offset * -(i - centre) : yCentre + offset * (i - centre)), (float) (width + 0.0625 * 2), (float) scale, -1);
 		}
 		GlStateManager.disableCull();
 		GlStateManager.enableLighting();
@@ -80,8 +89,8 @@ public class InfoRenderer {
 		double barWidth = ((double) progress * (maxX - minX)) / maxProgress;
 		double divide = Math.max((maxX - minX), (maxY - minY));
 
-		double widthnew = (sprite.getMinU() + (barWidth * (sprite.getMaxU() - sprite.getMinU()) / 1));
-		double heightnew = (sprite.getMinV() + ((maxY - minY) * (sprite.getMaxV() - sprite.getMinV()) / 1));
+		double widthnew = (sprite.getMinU() + (barWidth * (sprite.getMaxU() - sprite.getMinU() )/ (maxX - minX)));
+		double heightnew = (sprite.getMinV() + ((maxY - minY) * (sprite.getMaxV() - sprite.getMinV())/ (maxX - minX)));
 		vertexbuffer.pos((double) (minX + 0), maxY, zLevel).tex((double) sprite.getMinU(), heightnew).endVertex();
 		vertexbuffer.pos((double) (minX + barWidth), maxY, zLevel).tex(widthnew, heightnew).endVertex();
 		vertexbuffer.pos((double) (minX + barWidth), (double) (minY + 0), zLevel).tex(widthnew, (double) sprite.getMinV()).endVertex();

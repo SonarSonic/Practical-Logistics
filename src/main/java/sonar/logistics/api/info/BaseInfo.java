@@ -5,13 +5,17 @@ import java.util.ArrayList;
 import net.minecraft.nbt.NBTTagCompound;
 import sonar.core.helpers.NBTHelper;
 import sonar.core.helpers.NBTHelper.SyncType;
+import sonar.core.network.sync.ICheckableSyncPart;
+import sonar.core.network.sync.IDirtyPart;
 import sonar.core.network.sync.ISyncPart;
+import sonar.core.network.sync.ISyncableListener;
+import sonar.core.network.sync.SyncableList;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
 
 /** typical implementation of IMonitorInfo which has a sync parts list for all the Info things it also has the required constructor which required empty constructor */
-public abstract class BaseInfo<T extends IMonitorInfo> implements IMonitorInfo<T> {
+public abstract class BaseInfo<T extends IMonitorInfo> implements IMonitorInfo<T>, ISyncableListener {
 
-	protected ArrayList<ISyncPart> syncParts = new ArrayList<ISyncPart>();
+	protected SyncableList syncParts = new SyncableList(this);
 
 	public BaseInfo() {}
 
@@ -37,5 +41,26 @@ public abstract class BaseInfo<T extends IMonitorInfo> implements IMonitorInfo<T
 			return (info.isHeader() && isHeader()) || (this.isMatchingType(info) && isIdenticalInfo((T) info));
 		}
 		return false;
+	}
+
+	public void markChanged(IDirtyPart part){
+		syncParts.markSyncPartChanged(part);
+	}
+	
+	@Override
+	public void identifyChanges(T newInfo) {
+		ArrayList<ISyncPart> parts = syncParts.getStandardSyncParts();
+		ArrayList<ISyncPart> infoParts = syncParts.getStandardSyncParts();	
+		
+		for(int i=0;i<parts.size();i++){
+			ISyncPart toCheck = infoParts.get(i);
+			if(toCheck instanceof ICheckableSyncPart){
+				if(!((ICheckableSyncPart) parts.get(i)).equalPart(toCheck)){
+					toCheck.getListener().markChanged(toCheck);
+				}
+			}else{
+				toCheck.getListener().markChanged(toCheck);
+			}
+		}
 	}
 }

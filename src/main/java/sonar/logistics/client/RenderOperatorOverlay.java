@@ -1,6 +1,5 @@
 package sonar.logistics.client;
 
-import java.awt.Color;
 import java.util.ArrayList;
 
 import org.lwjgl.opengl.GL11;
@@ -12,11 +11,9 @@ import mcmultipart.raytrace.RayTraceUtils;
 import mcmultipart.raytrace.RayTraceUtils.AdvancedRayTraceResultPart;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.client.event.DrawBlockHighlightEvent;
@@ -24,11 +21,8 @@ import sonar.core.client.gui.GuiSonar;
 import sonar.core.helpers.FontHelper;
 import sonar.core.helpers.RenderHelper;
 import sonar.core.integration.multipart.SonarMultipartHelper;
-import sonar.logistics.api.connecting.IOperatorTile;
-import sonar.logistics.api.connecting.IOperatorTool;
 import sonar.logistics.api.connecting.IOperatorProvider;
-import sonar.logistics.api.display.DisplayType;
-import sonar.logistics.helpers.InfoRenderer;
+import sonar.logistics.api.connecting.IOperatorTool;
 
 public class RenderOperatorOverlay {
 

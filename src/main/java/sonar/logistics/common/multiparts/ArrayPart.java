@@ -9,18 +9,14 @@ import mcmultipart.raytrace.PartMOP;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
-import sonar.core.SonarCore;
 import sonar.core.api.utils.BlockCoords;
-import sonar.core.helpers.NBTHelper.SyncType;
+import sonar.core.integration.multipart.SonarMultipartHelper;
 import sonar.core.inventory.SonarMultipartInventory;
-import sonar.core.network.PacketMultipartSync;
 import sonar.core.utils.IGuiTile;
 import sonar.logistics.Logistics;
 import sonar.logistics.LogisticsItems;
-import sonar.logistics.api.cache.IRefreshCache;
 import sonar.logistics.api.cache.RefreshType;
 import sonar.logistics.api.connecting.IConnectionNode;
 import sonar.logistics.api.connecting.ITransceiver;
@@ -32,8 +28,8 @@ public class ArrayPart extends SidedMultipart implements ISlottedPart, IConnecti
 	public Map<BlockCoords, EnumFacing> coordList = Collections.EMPTY_MAP;
 	public SonarMultipartInventory inventory = new SonarMultipartInventory(this, 8) {
 		@Override
-		public void setChanged(boolean set) {
-			super.setChanged(set);
+		public void markDirty() {
+			super.markDirty();
 			updateCoordsList();
 		}
 
@@ -44,12 +40,12 @@ public class ArrayPart extends SidedMultipart implements ISlottedPart, IConnecti
 
 	public ArrayPart() {
 		super(0.625, 0.0625 * 1, 0.0625 * 4);
-		syncParts.add(inventory);
+		syncList.addPart(inventory);
 	}
 
 	public ArrayPart(EnumFacing face) {
 		super(face, 0.625, 0.0625 * 1, 0.0625 * 4);
-		syncParts.add(inventory);
+		syncList.addPart(inventory);
 	}
 
 	/* @Override public <T> T getCapability(Capability<T> capability, EnumFacing facing) { if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) { return (T) inventory; } return super.getCapability(capability, facing); } */
@@ -78,7 +74,7 @@ public class ArrayPart extends SidedMultipart implements ISlottedPart, IConnecti
 	@Override
 	public boolean onActivated(EntityPlayer player, EnumHand hand, ItemStack heldItem, PartMOP hit) {
 		if (!this.getWorld().isRemote) {
-			SonarCore.network.sendTo(new PacketMultipartSync(getPos(), this.writeData(new NBTTagCompound(), SyncType.SYNC_OVERRIDE), SyncType.SYNC_OVERRIDE, getUUID()), (EntityPlayerMP) player);
+			SonarMultipartHelper.sendMultipartSyncToPlayer(this, (EntityPlayerMP) player);
 			openGui(player, Logistics.instance);
 		}
 		return false;

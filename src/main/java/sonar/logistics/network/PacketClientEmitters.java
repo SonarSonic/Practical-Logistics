@@ -12,13 +12,8 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import sonar.core.helpers.NBTHelper;
 import sonar.core.helpers.NBTHelper.SyncType;
+import sonar.logistics.Logistics;
 import sonar.logistics.api.connecting.ClientDataEmitter;
-import sonar.logistics.connections.managers.EmitterManager;
-import sonar.logistics.connections.managers.NetworkManager;
-import sonar.logistics.connections.monitoring.MonitoredBlockCoords;
-import sonar.logistics.connections.monitoring.MonitoredList;
-import sonar.logistics.helpers.InfoHelper;
-import sonar.logistics.helpers.LogisticsHelper;
 
 public class PacketClientEmitters implements IMessage {
 
@@ -57,7 +52,7 @@ public class PacketClientEmitters implements IMessage {
 	public static class Handler implements IMessageHandler<PacketClientEmitters, IMessage> {
 		@Override
 		public IMessage onMessage(PacketClientEmitters message, MessageContext ctx) {
-			EmitterManager.clientEmitters = message.emitters;
+			Logistics.getClientManager().clientEmitters = message.emitters;
 			return null;
 		}
 	}

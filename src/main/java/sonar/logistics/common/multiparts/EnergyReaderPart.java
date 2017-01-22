@@ -1,25 +1,20 @@
 package sonar.logistics.common.multiparts;
 
-import com.google.common.collect.Lists;
-
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
+import sonar.core.helpers.FontHelper;
 import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.core.network.sync.SyncEnum;
 import sonar.core.network.sync.SyncTagType;
 import sonar.core.network.sync.SyncTagType.INT;
 import sonar.core.network.utils.IByteBufTile;
-import sonar.core.utils.IGuiTile;
 import sonar.core.utils.SortingDirection;
 import sonar.logistics.LogisticsItems;
 import sonar.logistics.api.info.monitor.ChannelType;
-import sonar.logistics.api.info.monitor.LogicMonitorHandler;
 import sonar.logistics.api.settings.FluidReader;
-import sonar.logistics.client.gui.GuiFluidReader;
-import sonar.logistics.common.containers.ContainerFluidReader;
 import sonar.logistics.connections.monitoring.EnergyMonitorHandler;
 import sonar.logistics.connections.monitoring.MonitoredEnergyStack;
 import sonar.logistics.connections.monitoring.MonitoredList;
@@ -34,7 +29,7 @@ public class EnergyReaderPart extends ReaderMultipart<MonitoredEnergyStack> impl
 	public SyncEnum<SortingDirection> sortingOrder = (SyncEnum) new SyncEnum(SortingDirection.values(), 5).addSyncType(SyncType.SPECIAL);
 	public SyncEnum<FluidReader.SortingType> sortingType = (SyncEnum) new SyncEnum(FluidReader.SortingType.values(), 6).addSyncType(SyncType.SPECIAL);
 	{
-		syncParts.addAll(Lists.newArrayList(setting, targetSlot, posSlot, sortingOrder, sortingType, selected));
+		syncList.addParts(setting, targetSlot, posSlot, sortingOrder, sortingType, selected);
 	}
 	public EnergyReaderPart() {
 		super(EnergyMonitorHandler.id);
@@ -50,7 +45,7 @@ public class EnergyReaderPart extends ReaderMultipart<MonitoredEnergyStack> impl
 	}
 	
 	@Override
-	public MonitoredList<MonitoredEnergyStack> sortMonitoredList(MonitoredList<MonitoredEnergyStack> updateInfo) {
+	public MonitoredList<MonitoredEnergyStack> sortMonitoredList(MonitoredList<MonitoredEnergyStack> updateInfo, int channelID) {
 		//FluidHelper.sortFluidList(updateInfo, sortingOrder.getObject(), sortingType.getObject());
 		return updateInfo;
 	}
@@ -61,7 +56,7 @@ public class EnergyReaderPart extends ReaderMultipart<MonitoredEnergyStack> impl
 	}
 
 	@Override
-	public void setMonitoredInfo(MonitoredList<MonitoredEnergyStack> updateInfo) {
+	public void setMonitoredInfo(MonitoredList<MonitoredEnergyStack> updateInfo, int channelID) {
 		/*
 		IMonitorInfo info = null;
 		switch (setting.getObject()) {
@@ -107,5 +102,10 @@ public class EnergyReaderPart extends ReaderMultipart<MonitoredEnergyStack> impl
 			//return new GuiEnergyReader(this, player);
 		}
 		return null;
+	}
+
+	@Override
+	public String getDisplayName() {
+		return FontHelper.translate("item.EnergyReader.name");
 	}
 }

@@ -28,11 +28,11 @@ public class InfoMonitorHandler extends LogicMonitorHandler<LogicInfo> {
 	@Override
 	public MonitoredList<LogicInfo> updateInfo(INetworkCache network, MonitoredList<LogicInfo> previousList, BlockCoords coords, EnumFacing dir) {
 		MonitoredList<LogicInfo> list = MonitoredList.<LogicInfo>newMonitoredList(network.getNetworkID());
-		World world =coords.getWorld(); IBlockState state = coords.getBlockState(world); BlockPos pos = coords.getBlockPos(); Block block = coords.getBlock(world); TileEntity tile = coords.getTileEntity(world);
-		LogicInfoRegistry.getTileInfo(list, world, state, pos, dir, block, tile);		
+		EnumFacing face = dir.getOpposite();World world =coords.getWorld(); IBlockState state = coords.getBlockState(world); BlockPos pos = coords.getBlockPos(); Block block = coords.getBlock(world); TileEntity tile = coords.getTileEntity(world);
+		LogicInfoRegistry.getTileInfo(list,face, world, state, pos, face, block, tile);		
 		for(ICustomTileHandler handler : LogicInfoRegistry.customTileHandlers){
-			if(handler.canProvideInfo(world, state, pos, dir, tile, block)){
-				handler.addInfo(list, world, state, pos, dir, tile, block);
+			if(handler.canProvideInfo(world, state, pos, face, tile, block)){
+				handler.addInfo(list, world, state, pos, face, tile, block);
 			}
 		}		
 		return list;

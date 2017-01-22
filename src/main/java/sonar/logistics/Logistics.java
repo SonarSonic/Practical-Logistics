@@ -5,7 +5,9 @@ import org.apache.logging.log4j.Logger;
 
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
+import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -24,9 +26,12 @@ import net.minecraftforge.oredict.OreDictionary;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.commands.CommandResetInfoRegistry;
 import sonar.logistics.connections.managers.CableManager;
+import sonar.logistics.connections.managers.ClientInfoManager;
+import sonar.logistics.connections.managers.DisplayManager;
 import sonar.logistics.connections.managers.EmitterManager;
-import sonar.logistics.connections.managers.LogicMonitorManager;
+import sonar.logistics.connections.managers.IInfoManager;
 import sonar.logistics.connections.managers.NetworkManager;
+import sonar.logistics.connections.managers.ServerInfoManager;
 import sonar.logistics.info.LogicInfoRegistry;
 import sonar.logistics.utils.SapphireOreGen;
 
@@ -42,11 +47,21 @@ public class Logistics {
 
 	public static SimpleNetworkWrapper network;
 	public static Logger logger = (Logger) LogManager.getLogger(MODID);
-	public NetworkManager REGISTRY = new NetworkManager();
-
+	
 	@Instance(MODID)
 	public static Logistics instance;
 
+	//@SideOnly(Side.SERVER)
+	public NetworkManager networkManager = new NetworkManager();
+	//@SideOnly(Side.SERVER)
+	public CableManager cableManager = new CableManager();
+	//@SideOnly(Side.SERVER)
+	public DisplayManager displayManager = new DisplayManager();
+	//@SideOnly(Side.SERVER)
+	public ServerInfoManager serverManager = new ServerInfoManager();	
+	//@SideOnly(Side.CLIENT)
+	public ClientInfoManager clientManager = new ClientInfoManager();
+	
 	public static CreativeTabs creativeTab = new CreativeTabs("Practical Logistics") {
 		@Override
 		public Item getTabIconItem() {
@@ -133,8 +148,52 @@ public class Logistics {
 	@EventHandler
 	public void serverClose(FMLServerStoppingEvent event) {
 		EmitterManager.removeAll();
-		CableManager.removeAll();
-		NetworkManager.removeAll();
-		LogicMonitorManager.onServerClosed();
+		
+	}
+
+	//@SideOnly(Side.SERVER)
+	public static NetworkManager getNetworkManager(){
+		if(Thread.currentThread().getName()!="Server thread"){
+			return null;
+		}
+		return Logistics.instance.networkManager;
+	}
+
+	//@SideOnly(Side.SERVER)
+	public static CableManager getCableManager(){
+		if(Thread.currentThread().getName()!="Server thread"){
+			return null;
+		}
+		return Logistics.instance.cableManager;
+	}
+
+	//@SideOnly(Side.SERVER)
+	public static DisplayManager getDisplayManager(){
+		if(Thread.currentThread().getName()!="Server thread"){
+			return null;
+		}
+		return Logistics.instance.displayManager;
+	}
+
+	//@SideOnly(Side.CLIENT)
+	public static ServerInfoManager getServerManager(){
+		if(Thread.currentThread().getName()!="Server thread"){
+			return null;
+		}
+		return Logistics.instance.serverManager;
+	}
+
+	//@SideOnly(Side.CLIENT)
+	public static ClientInfoManager getClientManager(){
+		if(Thread.currentThread().getName()=="Server thread"){
+			return null;
+		}
+		return Logistics.instance.clientManager;
+	}
+	
+	public static IInfoManager getInfoManager(boolean isRemote){
+		
+		
+		return !isRemote ? getServerManager() : getClientManager();		
 	}
 }

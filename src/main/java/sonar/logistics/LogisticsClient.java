@@ -1,16 +1,11 @@
 package sonar.logistics;
 
 import mcmultipart.client.multipart.MultipartRegistryClient;
-import net.minecraft.client.Minecraft;
 import net.minecraftforge.client.event.DrawBlockHighlightEvent;
-import net.minecraftforge.client.event.GuiOpenEvent;
-import net.minecraftforge.client.event.GuiScreenEvent;
-import net.minecraftforge.client.event.MouseEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import sonar.logistics.api.info.InfoContainer;
 import sonar.logistics.client.BlockRenderRegister;
 import sonar.logistics.client.DisplayRenderer;
 import sonar.logistics.client.ItemRenderRegister;
@@ -24,7 +19,7 @@ import sonar.logistics.common.multiparts.LargeDisplayScreenPart;
 import sonar.logistics.common.tileentity.TileEntityHammer;
 
 public class LogisticsClient extends LogisticsCommon {
-
+	
 	public void registerRenderThings() {
 		ItemRenderRegister.register();
 		BlockRenderRegister.register();
@@ -54,8 +49,7 @@ public class LogisticsClient extends LogisticsCommon {
 		RenderOperatorOverlay.isUsing = bool;
 	}
 
-	public boolean isUsingOperator(){
+	public boolean isUsingOperator() {
 		return RenderOperatorOverlay.isUsing;
 	}
-	
 }

@@ -32,7 +32,7 @@ public class GuiLogistics extends GuiSonar {
 		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 		drawTransparentRect(this.guiLeft, this.guiTop, this.guiLeft + this.xSize, this.guiTop + this.ySize, LogisticsColours.layers[1].getRGB());
 		drawTransparentRect(this.guiLeft + 1, this.guiTop + 1, this.guiLeft + this.xSize - 1, this.guiTop + this.ySize - 1, LogisticsColours.layers[2].getRGB());
-		if (scroller != null) {
+		if (scroller != null && scroller.renderScroller) {
 			int scrollYPos = scroller.start + (int) ((float) (scroller.end - scroller.start - 17) * scroller.getCurrentScroll());
 			drawRect(scroller.left, scroller.start, scroller.left + 8, scroller.end - 2, LogisticsColours.layers[1].getRGB());
 			drawRect(scroller.left, scrollYPos, scroller.left + 8, scrollYPos + 15, LogisticsColours.layers[2].getRGB());

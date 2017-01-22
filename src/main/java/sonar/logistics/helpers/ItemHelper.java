@@ -16,7 +16,6 @@ import net.minecraft.util.EnumFacing;
 import sonar.core.SonarCore;
 import sonar.core.api.SonarAPI;
 import sonar.core.api.StorageSize;
-import sonar.core.api.asm.InventoryHandler;
 import sonar.core.api.inventories.ISonarInventoryHandler;
 import sonar.core.api.inventories.StoredItemStack;
 import sonar.core.api.utils.ActionType;
@@ -253,8 +252,9 @@ public class ItemHelper extends ItemWrapper {
 			return remove;
 		}
 		for (int i = 0; i < size; i++) {
-			ItemStack stack = inv.getStackInSlot(i).copy();
+			ItemStack stack = inv.getStackInSlot(i);
 			if (stack != null && remove.equalStack(stack)) {
+				stack = stack.copy();
 				long used = (long) Math.min(remove.stored, Math.min(inv.getInventoryStackLimit(), stack.stackSize));
 				stack.stackSize -= used;
 				remove.stored -= used;

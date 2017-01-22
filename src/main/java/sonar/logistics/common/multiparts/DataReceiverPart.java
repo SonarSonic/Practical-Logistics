@@ -1,15 +1,10 @@
 package sonar.logistics.common.multiparts;
 
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
 
-import com.google.common.collect.Lists;
-
 import io.netty.buffer.ByteBuf;
-import mcmultipart.multipart.ISlotOccludingPart;
-import mcmultipart.multipart.PartSlot;
 import mcmultipart.raytrace.PartMOP;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -19,32 +14,23 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.world.World;
-import sonar.core.SonarCore;
 import sonar.core.api.IFlexibleGui;
-import sonar.core.helpers.NBTHelper.SyncType;
-import sonar.core.network.PacketMultipartSync;
+import sonar.core.integration.multipart.SonarMultipartHelper;
 import sonar.core.network.sync.SyncNBTAbstract;
 import sonar.core.network.sync.SyncNBTAbstractList;
 import sonar.core.network.sync.SyncUUID;
 import sonar.core.network.utils.IByteBufTile;
+import sonar.logistics.Logistics;
 import sonar.logistics.LogisticsItems;
 import sonar.logistics.api.cache.INetworkCache;
-import sonar.logistics.api.cache.IRefreshCache;
 import sonar.logistics.api.cache.RefreshType;
 import sonar.logistics.api.connecting.ClientDataEmitter;
 import sonar.logistics.api.connecting.IDataEmitter;
 import sonar.logistics.api.connecting.IDataReceiver;
-import sonar.logistics.api.info.monitor.ChannelType;
-import sonar.logistics.api.info.monitor.IMonitorInfo;
-import sonar.logistics.api.info.monitor.MonitorType;
-import sonar.logistics.api.info.monitor.MonitorViewer;
 import sonar.logistics.client.gui.GuiDataReceiver;
 import sonar.logistics.common.containers.ContainerDataReceiver;
 import sonar.logistics.connections.managers.EmitterManager;
-import sonar.logistics.connections.managers.NetworkManager;
-import sonar.logistics.connections.monitoring.MonitoredList;
 import sonar.logistics.helpers.LogisticsHelper;
-import sonar.logistics.network.SyncMonitoredType;
 
 public class DataReceiverPart extends SidedMultipart implements IDataReceiver, IFlexibleGui, IByteBufTile {
 
@@ -54,7 +40,7 @@ public class DataReceiverPart extends SidedMultipart implements IDataReceiver, I
 	// public ArrayList<IDataEmitter> emitters = new ArrayList();
 	public ArrayList<Integer> networks = new ArrayList();
 	{
-		syncParts.addAll(Lists.newArrayList(clientEmitters, playerUUID, selectedEmitter));
+		syncList.addParts(clientEmitters, playerUUID, selectedEmitter);
 	}
 
 	public DataReceiverPart() {
@@ -104,9 +90,9 @@ public class DataReceiverPart extends SidedMultipart implements IDataReceiver, I
 	public boolean onActivated(EntityPlayer player, EnumHand hand, ItemStack heldItem, PartMOP hit) {
 		if (!LogisticsHelper.isPlayerUsingOperator(player)) {
 			if (!getWorld().isRemote) {
-				SonarCore.network.sendTo(new PacketMultipartSync(getPos(), writeData(new NBTTagCompound(), SyncType.SYNC_OVERRIDE), SyncType.SYNC_OVERRIDE, getUUID()), (EntityPlayerMP) player);
+				SonarMultipartHelper.sendMultipartSyncToPlayer(this, (EntityPlayerMP) player);
 				EmitterManager.addViewer(player);
-				openBasicGui(player, 0);
+				openFlexibleGui(player, 0);
 			}
 			return true;
 		}
@@ -146,7 +132,9 @@ public class DataReceiverPart extends SidedMultipart implements IDataReceiver, I
 	@Override
 	public void onFirstTick() {
 		super.onFirstTick();
-		NetworkManager.updateEmitters = true;
+		if (this.isServer()) {
+			Logistics.getNetworkManager().updateEmitters = true;
+		}
 	}
 
 	public void onRemoved() {

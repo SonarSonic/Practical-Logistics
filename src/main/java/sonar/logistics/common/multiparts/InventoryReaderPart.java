@@ -1,22 +1,21 @@
 package sonar.logistics.common.multiparts;
 
-import com.google.common.collect.Lists;
-
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 import sonar.core.api.inventories.StoredItemStack;
+import sonar.core.helpers.FontHelper;
 import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.core.inventory.SonarMultipartInventory;
 import sonar.core.network.sync.SyncEnum;
 import sonar.core.network.sync.SyncTagType;
 import sonar.core.network.sync.SyncTagType.INT;
 import sonar.core.network.utils.IByteBufTile;
-import sonar.core.utils.IGuiTile;
 import sonar.core.utils.Pair;
 import sonar.core.utils.SortingDirection;
+import sonar.logistics.Logistics;
 import sonar.logistics.LogisticsItems;
 import sonar.logistics.api.info.InfoUUID;
 import sonar.logistics.api.info.LogicInfo;
@@ -24,13 +23,9 @@ import sonar.logistics.api.info.LogicInfoList;
 import sonar.logistics.api.info.ProgressInfo;
 import sonar.logistics.api.info.monitor.ChannelType;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
-import sonar.logistics.api.info.monitor.LogicMonitorHandler;
 import sonar.logistics.api.settings.InventoryReader;
-import sonar.logistics.client.gui.GuiInfoReader;
 import sonar.logistics.client.gui.GuiInventoryReader;
-import sonar.logistics.common.containers.ContainerInfoReader;
 import sonar.logistics.common.containers.ContainerInventoryReader;
-import sonar.logistics.connections.managers.LogicMonitorManager;
 import sonar.logistics.connections.monitoring.ItemMonitorHandler;
 import sonar.logistics.connections.monitoring.MonitoredItemStack;
 import sonar.logistics.connections.monitoring.MonitoredList;
@@ -46,7 +41,7 @@ public class InventoryReaderPart extends ReaderMultipart<MonitoredItemStack> imp
 	public SyncEnum<SortingDirection> sortingOrder = (SyncEnum) new SyncEnum(SortingDirection.values(), 5).addSyncType(SyncType.SPECIAL);
 	public SyncEnum<InventoryReader.SortingType> sortingType = (SyncEnum) new SyncEnum(InventoryReader.SortingType.values(), 6).addSyncType(SyncType.SPECIAL);
 	{
-		syncParts.addAll(Lists.newArrayList(inventory, setting, targetSlot, posSlot, sortingOrder, sortingType));
+		syncList.addParts(inventory, setting, targetSlot, posSlot, sortingOrder, sortingType);
 	}
 
 	public InventoryReaderPart() {
@@ -63,7 +58,7 @@ public class InventoryReaderPart extends ReaderMultipart<MonitoredItemStack> imp
 	}
 
 	@Override
-	public MonitoredList<MonitoredItemStack> sortMonitoredList(MonitoredList<MonitoredItemStack> updateInfo) {
+	public MonitoredList<MonitoredItemStack> sortMonitoredList(MonitoredList<MonitoredItemStack> updateInfo, int channelID) {
 		ItemHelper.sortItemList(updateInfo, sortingOrder.getObject(), sortingType.getObject());
 		return updateInfo;
 	}
@@ -74,7 +69,7 @@ public class InventoryReaderPart extends ReaderMultipart<MonitoredItemStack> imp
 	}
 
 	@Override
-	public void setMonitoredInfo(MonitoredList<MonitoredItemStack> updateInfo) {
+	public void setMonitoredInfo(MonitoredList<MonitoredItemStack> updateInfo, int channelID) {
 		IMonitorInfo info = null;
 		switch (setting.getObject()) {
 		case INVENTORIES:
@@ -92,7 +87,7 @@ public class InventoryReaderPart extends ReaderMultipart<MonitoredItemStack> imp
 			ItemStack stack = inventory.getStackInSlot(0);
 			if (stack != null) {
 				MonitoredItemStack dummyInfo = new MonitoredItemStack(new StoredItemStack(stack.copy(), 0), network.getNetworkID());
-				Pair<Boolean, IMonitorInfo> latestInfo = updateInfo.getLatestInfo(dummyInfo);
+				Pair<Boolean, IMonitorInfo> latestInfo = updateInfo.getLatestInfo(dummyInfo);				
 				if (latestInfo.b instanceof MonitoredItemStack) {
 					((MonitoredItemStack) latestInfo.b).networkID.setObject(network.getNetworkID());
 				}
@@ -107,9 +102,9 @@ public class InventoryReaderPart extends ReaderMultipart<MonitoredItemStack> imp
 		}
 		if (info != null) {
 			InfoUUID id = new InfoUUID(getIdentity().hashCode(), 0);
-			IMonitorInfo oldInfo = LogicMonitorManager.info.get(id);
+			IMonitorInfo oldInfo = Logistics.getServerManager().info.get(id);
 			if (oldInfo == null || !oldInfo.isMatchingType(info) || !oldInfo.isIdenticalInfo(info)) {
-				LogicMonitorManager.changeInfo(id, info);
+				Logistics.getServerManager().changeInfo(id, info);
 			}
 		}
 	}
@@ -130,6 +125,11 @@ public class InventoryReaderPart extends ReaderMultipart<MonitoredItemStack> imp
 			return new GuiInventoryReader(this, player);
 		}
 		return null;
+	}
+
+	@Override
+	public String getDisplayName() {
+		return FontHelper.translate("item.InventoryReader.name");
 	}
 
 }

@@ -22,7 +22,6 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.text.TextFormatting;
 import sonar.core.api.utils.BlockCoords;
@@ -30,24 +29,20 @@ import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.core.integration.multipart.SonarMultipart;
 import sonar.core.utils.LabelledAxisAlignedBB;
 import sonar.core.utils.Pair;
+import sonar.logistics.Logistics;
 import sonar.logistics.LogisticsItems;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.cache.EmptyNetworkCache;
 import sonar.logistics.api.cache.INetworkCache;
-import sonar.logistics.api.cache.IRefreshCache;
 import sonar.logistics.api.cache.RefreshType;
 import sonar.logistics.api.connecting.CableConnection;
-import sonar.logistics.api.connecting.CableType;
+import sonar.logistics.api.connecting.ConnectableType;
 import sonar.logistics.api.connecting.IDataCable;
-import sonar.logistics.api.connecting.IDataEmitter;
-import sonar.logistics.api.connecting.IDataReceiver;
 import sonar.logistics.api.connecting.ILogicTile;
 import sonar.logistics.api.connecting.IOperatorProvider;
 import sonar.logistics.api.connecting.IOperatorTile;
 import sonar.logistics.api.connecting.OperatorMode;
 import sonar.logistics.api.info.monitor.ILogicMonitor;
-import sonar.logistics.api.wrappers.CablingWrapper;
-import sonar.logistics.connections.managers.NetworkManager;
 import sonar.logistics.helpers.CableHelper;
 
 public class DataCablePart extends SonarMultipart implements ISlotOccludingPart, IDataCable, IOperatorTile, IOperatorProvider {
@@ -73,7 +68,7 @@ public class DataCablePart extends SonarMultipart implements ISlotOccludingPart,
 		if (!this.getWorld().isRemote) {
 			refreshConnections();
 			if (changedPart instanceof LogisticsMultipart) {
-				INetworkCache cache = LogisticsAPI.getCableHelper().getNetwork(registryID);				
+				INetworkCache cache = LogisticsAPI.getCableHelper().getNetwork(registryID);
 				cache.markDirty(RefreshType.FULL);
 			}
 		}
@@ -82,16 +77,17 @@ public class DataCablePart extends SonarMultipart implements ISlotOccludingPart,
 	@Override
 	public void onNeighborTileChange(EnumFacing facing) {
 		super.onNeighborTileChange(facing);
-		//INetworkCache cache = LogisticsAPI.getCableHelper().getNetwork(registryID);
-		//cache.markDirty(RefreshType.CONNECTED_BLOCKS);
-		refreshConnections();
+		// INetworkCache cache = LogisticsAPI.getCableHelper().getNetwork(registryID);
+		// cache.markDirty(RefreshType.CONNECTED_BLOCKS);
+		/// refreshConnections(); //should always been done by the cable being added, preventing constant loops
+
 	}
 
 	public void onNeighborBlockChange(Block block) {
 		super.onNeighborBlockChange(block);
-		//INetworkCache cache = LogisticsAPI.getCableHelper().getNetwork(registryID);
-		//cache.markDirty(RefreshType.FULL);
-		//refreshConnections();
+		// INetworkCache cache = LogisticsAPI.getCableHelper().getNetwork(registryID);
+		// cache.markDirty(RefreshType.FULL);
+		// refreshConnections();
 	}
 
 	public void configureConnections(INetworkCache network) {
@@ -111,7 +107,7 @@ public class DataCablePart extends SonarMultipart implements ISlotOccludingPart,
 	@Override
 	public void onFirstTick() {
 		if (!this.getWorld().isRemote && !wasAdded) {
-			addCable();
+			addToNetwork();
 			wasAdded = true;
 		}
 	}
@@ -125,23 +121,23 @@ public class DataCablePart extends SonarMultipart implements ISlotOccludingPart,
 	@Override
 	public void onUnloaded() {
 		if (!this.getWorld().isRemote) {
-			this.removeCable();
+			this.removeFromNetwork();
 			wasAdded = false;
 		}
 	}
 
 	@Override
-	public CableType canRenderConnection(EnumFacing dir) {
-		return LogisticsAPI.getCableHelper().getConnectionType(getContainer().getWorldIn(), getContainer().getPosIn(), dir, getCableType()).a;
+	public ConnectableType canRenderConnection(EnumFacing dir) {
+		return CableHelper.getConnectionType(this, getContainer().getWorldIn(), getContainer().getPosIn(), dir, getCableType()).a;
 	}
 
 	@Override
-	public boolean canConnect(EnumFacing dir) {
+	public boolean canConnectOnSide(EnumFacing dir) {
 		return isBlocked[dir.ordinal()] ? false : getContainer().getPartInSlot(PartSlot.getFaceSlot(dir)) == null;
 	}
 
 	@Override
-	public int getNetworkID() {
+	public int getRegistryID() {
 		return registryID;
 	}
 
@@ -153,26 +149,28 @@ public class DataCablePart extends SonarMultipart implements ISlotOccludingPart,
 	}
 
 	@Override
-	public CableType getCableType() {
-		return CableType.DATA_CABLE;
+	public ConnectableType getCableType() {
+		return ConnectableType.CONNECTION;
 	}
 
-	public void addCable() {
-		LogisticsAPI.getCableHelper().addCable(this);
+	public void addToNetwork() {
+		if (isServer()) {
+			Logistics.getCableManager().addCable(this);
+		}
 	}
 
-	public void removeCable() {
-		if (!this.getWorld().isRemote) {
-			LogisticsAPI.getCableHelper().removeCable(this);
+	public void removeFromNetwork() {
+		if (isServer()) {
+			Logistics.getCableManager().removeConnection(this.getRegistryID(), this);
 			configureConnections(EmptyNetworkCache.INSTANCE);
-			//INetworkCache cache = LogisticsAPI.getCableHelper().getNetwork(registryID);
-			//cache.markDirty(RefreshType.FULL);
 		}
 	}
 
 	@Override
 	public void refreshConnections() {
-		LogisticsAPI.getCableHelper().refreshConnections(this);
+		if (isServer()) {
+			Logistics.getCableManager().refreshConnections(this);
+		}
 	}
 
 	public CableConnection checkBlockInDirection(EnumFacing dir) {
@@ -199,9 +197,8 @@ public class DataCablePart extends SonarMultipart implements ISlotOccludingPart,
 				}
 			}
 
-			CablingWrapper helper = LogisticsAPI.getCableHelper();
-			Pair<CableType, Integer> connection = LogisticsAPI.getCableHelper().getConnectionType(getContainer().getWorldIn(), getContainer().getPosIn(), dir, getCableType());
-			return !canConnect(dir) || !connection.a.canConnect(getCableType()) ? CableConnection.NONE : CableConnection.CABLE;
+			Pair<ConnectableType, Integer> connection = CableHelper.getConnectionType(this, getContainer().getWorldIn(), getContainer().getPosIn(), dir, getCableType());
+			return !canConnectOnSide(dir) || !connection.a.canConnect(getCableType()) ? CableConnection.NONE : CableConnection.CABLE;
 		}
 		return CableConnection.NONE;
 	}
@@ -235,20 +232,20 @@ public class DataCablePart extends SonarMultipart implements ISlotOccludingPart,
 					face = !label.equals("c") ? EnumFacing.valueOf(label.toUpperCase()) : facing;
 					isBlocked[face.ordinal()] = !isBlocked[face.ordinal()];
 					IDataCable cable = LogisticsAPI.getCableHelper().getCableFromCoords(BlockCoords.translateCoords(getCoords(), face));
-					removeCable();
-					addCable();
+					removeFromNetwork();
+					addToNetwork();
 					if (cable != null && cable instanceof DataCablePart) {
 						DataCablePart part = (DataCablePart) cable;
 						part.isBlocked[face.getOpposite().ordinal()] = isBlocked[face.ordinal()];
 						part.sendUpdatePacket(true);
 						part.markDirty();
 						// it's messy, but there is no easier way to check if the cables are connected properly.
-						part.removeCable();
-						part.addCable();
+						part.removeFromNetwork();
+						part.addToNetwork();
 					}
 					sendUpdatePacket(true);
 					markDirty();
-					NetworkManager.updateEmitters = true;
+					Logistics.getNetworkManager().updateEmitters = true;
 					return true;
 				}
 			}
@@ -295,7 +292,6 @@ public class DataCablePart extends SonarMultipart implements ISlotOccludingPart,
 		if (type.isType(SyncType.DEFAULT_SYNC)) {
 			nbt.setInteger("id", registryID);
 		}
-
 		return super.writeData(nbt, type);
 	}
 

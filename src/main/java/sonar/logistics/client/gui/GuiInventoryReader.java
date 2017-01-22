@@ -11,7 +11,6 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
@@ -24,8 +23,6 @@ import sonar.core.helpers.FontHelper;
 import sonar.core.helpers.RenderHelper;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.settings.InventoryReader.Modes;
-import sonar.logistics.api.settings.InventoryReader.SortingType;
-import sonar.logistics.client.LogisticsColours;
 import sonar.logistics.common.containers.ContainerInventoryReader;
 import sonar.logistics.common.multiparts.InventoryReaderPart;
 import sonar.logistics.connections.monitoring.MonitoredItemStack;
@@ -220,7 +217,7 @@ public class GuiInventoryReader extends GuiSelectionGrid<MonitoredItemStack> {
 			return;
 		}
 		ItemStack stack = storedStack.item;
-		//GlStateManager.disableDepth();
+		GlStateManager.disableDepth();
 		RenderHelper.renderItem(this, 13 + (x * 18), 32 + (y * 18), stack);
 		// this.itemRender.renderItemOverlayIntoGUI(this.fontRendererObj, stack, 13 + (x * 18), 32 + (y * 18), "" + storedStack.stored);
 		RenderHelper.renderStoredItemStackOverlay(stack, storedStack.stored, 13 + (x * 18), 32 + (y * 18), null, true);
@@ -280,8 +277,7 @@ public class GuiInventoryReader extends GuiSelectionGrid<MonitoredItemStack> {
 		}
 
 		@Override
-		public void onClicked() {
-		}
+		public void onClicked() {}
 
 		@Override
 		public int getTextureX() {

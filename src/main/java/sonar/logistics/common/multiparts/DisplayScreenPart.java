@@ -3,14 +3,21 @@ package sonar.logistics.common.multiparts;
 import java.util.List;
 
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraftforge.fml.common.network.ByteBufUtils;
+import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.logistics.LogisticsItems;
 import sonar.logistics.api.display.DisplayType;
-import sonar.logistics.api.info.InfoUUID;
+import sonar.logistics.api.info.IInfoContainer;
+import sonar.logistics.api.info.InfoContainer;
 
 public class DisplayScreenPart extends ScreenMultipart {
 
+	public InfoContainer container = new InfoContainer(this);
+	
 	public DisplayScreenPart() {
 		super();
 	}
@@ -27,11 +34,6 @@ public class DisplayScreenPart extends ScreenMultipart {
 	@Override
 	public int maxInfo() {
 		return 2;
-	}
-
-	@Override
-	public boolean monitorsUUID(InfoUUID id) {
-		return true;
 	}
 
 	@Override
@@ -65,4 +67,34 @@ public class DisplayScreenPart extends ScreenMultipart {
 			break;
 		}
 	}
+
+	@Override
+	public IInfoContainer container() {
+		return container;
+	}
+	
+	@Override
+	public NBTTagCompound writeData(NBTTagCompound tag, SyncType type) {
+		super.writeData(tag, type);
+		container().writeData(tag, type);
+		return tag;
+	}
+
+	@Override
+	public void readData(NBTTagCompound tag, SyncType type) {
+		super.readData(tag, type);
+		container().readData(tag, type);
+	}
+	@Override
+	public void writeUpdatePacket(PacketBuffer buf) {
+		super.writeUpdatePacket(buf);
+		ByteBufUtils.writeTag(buf, container().writeData(new NBTTagCompound(), SyncType.SAVE));
+	}
+
+	@Override
+	public void readUpdatePacket(PacketBuffer buf) {
+		super.readUpdatePacket(buf);
+		container().readData(ByteBufUtils.readTag(buf), SyncType.SAVE);
+	}
+
 }

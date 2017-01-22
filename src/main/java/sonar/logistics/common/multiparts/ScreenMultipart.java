@@ -1,12 +1,14 @@
 package sonar.logistics.common.multiparts;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
+import com.google.common.collect.Lists;
+
+import io.netty.buffer.ByteBuf;
 import mcmultipart.MCMultiPartMod;
-import mcmultipart.multipart.IMultipart;
 import mcmultipart.multipart.INormallyOccludingPart;
-import mcmultipart.multipart.ISlottedPart;
-import mcmultipart.multipart.PartSlot;
 import mcmultipart.raytrace.PartMOP;
 import mcmultipart.raytrace.RayTraceUtils.AdvancedRayTraceResultPart;
 import net.minecraft.block.properties.IProperty;
@@ -22,95 +24,41 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.network.ByteBufUtils;
-import sonar.core.SonarCore;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import sonar.core.api.IFlexibleGui;
+import sonar.core.api.utils.BlockCoords;
 import sonar.core.api.utils.BlockInteractionType;
 import sonar.core.helpers.FontHelper;
 import sonar.core.helpers.NBTHelper.SyncType;
+import sonar.core.integration.multipart.SonarMultipartHelper;
 import sonar.core.inventory.ContainerMultipartSync;
-import sonar.core.network.PacketMultipartSync;
+import sonar.core.network.sync.IDirtyPart;
 import sonar.core.network.sync.SyncEnum;
+import sonar.core.network.sync.SyncTagType;
+import sonar.core.network.utils.IByteBufTile;
+import sonar.logistics.Logistics;
 import sonar.logistics.api.connecting.IOperatorTile;
 import sonar.logistics.api.connecting.IOperatorTool;
 import sonar.logistics.api.connecting.OperatorMode;
-import sonar.logistics.api.connecting.ILogicTile.ConnectionType;
 import sonar.logistics.api.display.IInfoDisplay;
 import sonar.logistics.api.display.ScreenLayout;
-import sonar.logistics.api.info.IInfoContainer;
-import sonar.logistics.api.info.InfoContainer;
 import sonar.logistics.api.info.InfoUUID;
 import sonar.logistics.api.info.monitor.ILogicMonitor;
+import sonar.logistics.api.info.monitor.MonitorType;
 import sonar.logistics.client.gui.GuiDisplayScreen;
-import sonar.logistics.connections.managers.LogicMonitorManager;
+import sonar.logistics.connections.monitoring.ViewersList;
 
-public abstract class ScreenMultipart extends LogisticsMultipart implements INormallyOccludingPart, IInfoDisplay, IOperatorTile, IFlexibleGui<ScreenMultipart> {
+public abstract class ScreenMultipart extends LogisticsMultipart implements IByteBufTile, INormallyOccludingPart, IInfoDisplay, IOperatorTile, IFlexibleGui<ScreenMultipart> {
 
-	public SyncEnum<ScreenLayout> layout = new SyncEnum(ScreenLayout.values(), 0);
-	public DisplayState state = DisplayState.NONE;
+	public ViewersList viewers = new ViewersList(this, Lists.newArrayList(MonitorType.INFO));
+	public SyncEnum<ScreenLayout> layout = new SyncEnum(ScreenLayout.values(), 1);
+	public SyncTagType.BOOLEAN defaultData = new SyncTagType.BOOLEAN(2); // set default info
 	public ILogicMonitor monitor = null;
 	public EnumFacing rotation, face;
-	public InfoContainer container = new InfoContainer(this);
+	public BlockCoords lastSelected = null;
+	public int currentSelected = -1;
 	{
-		syncParts.add(layout);
-	}
-
-	public void update() {
-		super.update();
-		if (this.isClient()) {
-			return;
-		}
-		switch (state) {
-		case SET:
-			if (monitor == null || monitor.getNetwork().getNetworkID() != network.getNetworkID()) {
-				state = DisplayState.NONE;
-			}
-			break;
-		case NONE:
-			ISlottedPart part = getContainer().getPartInSlot(PartSlot.getFaceSlot(face));
-			monitor = (part != null && part instanceof ILogicMonitor) ? (ILogicMonitor) part : this.getNetwork().getLocalMonitor();
-			if (monitor != null) {
-				int max = Math.min(container().getMaxCapacity(), monitor.getMaxInfo());
-				for (int i = 0; i < max; i++) {
-					InfoUUID id = new InfoUUID(monitor.getIdentity().hashCode(), i);
-					container().setUUID(id, i);
-					LogicMonitorManager.changedInfo.add(id);
-				}
-				state = DisplayState.SET;
-				this.sendUpdatePacket();
-			}
-			break;
-		default:
-			break;
-
-		}
-	}
-
-	public boolean onActivated(EntityPlayer player, EnumHand hand, ItemStack stack, PartMOP hit) {
-		if (stack != null && stack.getItem() instanceof IOperatorTool) {
-			return false;
-		}
-		if (hit.sideHit != face) {
-			if (isServer()) {
-				SonarCore.network.sendTo(new PacketMultipartSync(getPos(), writeData(new NBTTagCompound(), SyncType.SYNC_OVERRIDE), SyncType.SYNC_OVERRIDE, getUUID()), (EntityPlayerMP) player);
-				openBasicGui(player, 0);
-			}
-			return true;
-		}
-		return container.onClicked(player.isSneaking() ? BlockInteractionType.SHIFT_RIGHT : BlockInteractionType.RIGHT, getWorld(), player, hand, stack, hit);
-	}
-
-	@Override
-	public void harvest(EntityPlayer player, PartMOP hit) {
-		if (hit.sideHit == face) {
-			container.onClicked(player.isSneaking() ? BlockInteractionType.SHIFT_LEFT : BlockInteractionType.LEFT, getWorld(), player, player.getActiveHand(), player.getActiveItemStack(), hit);
-			return;
-		}
-		super.harvest(player, hit);
-	}
-
-	public static enum DisplayState {
-		NONE, SET;
+		syncList.addPart(defaultData);
 	}
 
 	public ScreenMultipart() {
@@ -123,25 +71,88 @@ public abstract class ScreenMultipart extends LogisticsMultipart implements INor
 		this.face = face;
 	}
 
+	public void update() {
+		super.update();
+		updateDefaultInfo();
+	}
+
+	public void updateDefaultInfo() {
+		if (isServer() && !defaultData.getObject()) {
+			ArrayList<ILogicMonitor> monitors = Logistics.getServerManager().getLocalMonitors(new ArrayList(), this);
+			if (!monitors.isEmpty()) {
+				ILogicMonitor monitor = monitors.get(0);
+				if (container() != null && monitor != null && monitor.getIdentity() != null) {
+					for (int i = 0; i < Math.min(monitor.getMaxInfo(), maxInfo()); i++) {
+						container().setUUID(new InfoUUID(monitor.getIdentity().hashCode(), i), i);
+					}
+					defaultData.setObject(true);
+					sendSyncPacket();
+				}
+			}
+		}
+	}
+
+	public boolean onActivated(EntityPlayer player, EnumHand hand, ItemStack stack, PartMOP hit) {
+		if (stack != null && stack.getItem() instanceof IOperatorTool) {
+			return false;
+		}
+		if (hit.sideHit != face) {
+			if (isServer()) {
+				Logistics.getServerManager().sendLocalMonitorsToClient(this, player);
+				SonarMultipartHelper.sendMultipartSyncToPlayer(this, (EntityPlayerMP) player);
+				openFlexibleGui(player, 0);
+			}
+			return true;
+		}
+		return container().onClicked(player.isSneaking() ? BlockInteractionType.SHIFT_RIGHT : BlockInteractionType.RIGHT, getWorld(), player, hand, stack, hit);
+	}
+
+	@Override
+	public void harvest(EntityPlayer player, PartMOP hit) {
+		if (hit.sideHit == face) {
+			container().onClicked(player.isSneaking() ? BlockInteractionType.SHIFT_LEFT : BlockInteractionType.LEFT, getWorld(), player, player.getActiveHand(), player.getActiveItemStack(), hit);
+			return;
+		}
+		super.harvest(player, hit);
+	}
+
+	public void markChanged(IDirtyPart part) {
+		super.markChanged(part);
+		ArrayList<EntityPlayer> viewers = this.getViewersList().getViewers(false, MonitorType.INFO);
+		for (EntityPlayer player : viewers) {
+			SonarMultipartHelper.sendMultipartSyncToPlayer(this, (EntityPlayerMP) player);
+		}
+	}
+
+	public void onSyncPacketRequested(EntityPlayer player) {
+		super.onSyncPacketRequested(player);
+		viewers.addViewer(player, MonitorType.INFO);
+	}
+
 	public void onFirstTick() {
 		super.onFirstTick();
-		LogicMonitorManager.addDisplay(this);
+		if (!this.getWorld().isRemote)
+			Logistics.getServerManager().addDisplay(this);
+		if (this.isClient())
+			this.requestSyncPacket();
 	}
 
 	public void onLoaded() {
 		super.onLoaded();
-		LogicMonitorManager.addDisplay(this);
-
+		if (!this.getWorld().isRemote)
+			Logistics.getServerManager().addDisplay(this);
 	}
 
 	public void onRemoved() {
 		super.onRemoved();
-		LogicMonitorManager.removeDisplay(this);
+		if (!this.getWorld().isRemote)
+			Logistics.getServerManager().removeDisplay(this);
 	}
 
 	public void onUnloaded() {
 		super.onUnloaded();
-		LogicMonitorManager.removeDisplay(this);
+		if (!this.getWorld().isRemote)
+			Logistics.getServerManager().removeDisplay(this);
 	}
 
 	@Override
@@ -150,18 +161,40 @@ public abstract class ScreenMultipart extends LogisticsMultipart implements INor
 	}
 
 	@Override
-	public IInfoContainer container() {
-		return container;
-	}
-
-	@Override
 	public ScreenLayout getLayout() {
 		return layout.getObject();
 	}
 
-	public void onPartChanged(IMultipart changedPart) {
-		super.onPartChanged(changedPart);
-		state = DisplayState.NONE;
+	@Override
+	public void writePacket(ByteBuf buf, int id) {
+		switch (id) {
+		case 0:
+			buf.writeInt(currentSelected);
+			container().getInfoUUID(currentSelected).writeToBuf(buf);
+			break;
+		case 1:
+			buf.writeInt(currentSelected);
+			container().getDisplayInfo(currentSelected).formatList.writeToBuf(buf);
+			break;
+		}
+	}
+
+	@Override
+	public void readPacket(ByteBuf buf, int id) {
+		switch (id) {
+		case 0:
+			currentSelected = buf.readInt();
+			container().setUUID(InfoUUID.getUUID(buf), currentSelected);
+			if (FMLCommonHandler.instance().getEffectiveSide().isServer())
+				Logistics.getServerManager().updateViewingMonitors = true;
+			this.sendSyncPacket();
+			break;
+		case 1:
+			currentSelected = buf.readInt();
+			container().getDisplayInfo(currentSelected).formatList.readFromBuf(buf);
+			this.sendSyncPacket();
+			break;
+		}
 	}
 
 	@Override
@@ -169,7 +202,8 @@ public abstract class ScreenMultipart extends LogisticsMultipart implements INor
 		super.writeData(tag, type);
 		tag.setByte("rotation", (byte) rotation.ordinal());
 		tag.setByte("face", (byte) face.ordinal());
-		container.writeData(tag, type);
+		layout.writeData(tag, type);
+		// container().writeData(tag, type);
 		return tag;
 	}
 
@@ -178,7 +212,8 @@ public abstract class ScreenMultipart extends LogisticsMultipart implements INor
 		super.readData(tag, type);
 		rotation = EnumFacing.VALUES[tag.getByte("rotation")];
 		face = EnumFacing.VALUES[tag.getByte("face")];
-		container.readData(tag, type);
+		layout.readData(tag, type);
+		// container().readData(tag, type);
 	}
 
 	@Override
@@ -186,7 +221,8 @@ public abstract class ScreenMultipart extends LogisticsMultipart implements INor
 		super.writeUpdatePacket(buf);
 		buf.writeByte((byte) rotation.ordinal());
 		buf.writeByte((byte) face.ordinal());
-		ByteBufUtils.writeTag(buf, container.writeData(new NBTTagCompound(), SyncType.SAVE));
+		layout.writeToBuf(buf);
+		// ByteBufUtils.writeTag(buf, container().writeData(new NBTTagCompound(), SyncType.SAVE));
 	}
 
 	@Override
@@ -194,7 +230,8 @@ public abstract class ScreenMultipart extends LogisticsMultipart implements INor
 		super.readUpdatePacket(buf);
 		rotation = EnumFacing.VALUES[buf.readByte()];
 		face = EnumFacing.VALUES[buf.readByte()];
-		container.readData(ByteBufUtils.readTag(buf), SyncType.SAVE);
+		layout.readFromBuf(buf);
+		// container().readData(ByteBufUtils.readTag(buf), SyncType.SAVE);
 	}
 
 	@Override
@@ -227,7 +264,6 @@ public abstract class ScreenMultipart extends LogisticsMultipart implements INor
 			}
 			sendSyncPacket();
 			sendUpdatePacket(true);
-			state = DisplayState.NONE;
 			FontHelper.sendMessage("Screen Layout: " + layout.getObject(), getWorld(), player);
 		}
 
@@ -238,19 +274,28 @@ public abstract class ScreenMultipart extends LogisticsMultipart implements INor
 		super.addInfo(info);
 	}
 
+	@Override
+	public void onViewerAdded(EntityPlayer player, List<MonitorType> type) {
+	}
+
+	@Override
+	public void onViewerRemoved(EntityPlayer player, List<MonitorType> type) {
+	}
+
 	public Object getServerElement(ScreenMultipart obj, int id, World world, EntityPlayer player, NBTTagCompound tag) {
-		switch (id) {
-		case 0:
-			return new ContainerMultipartSync(obj);
-		}
-		return null;
+		return id == 0 ? new ContainerMultipartSync(obj) : null;
 	}
 
 	public Object getClientElement(ScreenMultipart obj, int id, World world, EntityPlayer player, NBTTagCompound tag) {
-		switch (id) {
-		case 0:
-			return new GuiDisplayScreen(obj);
-		}
-		return null;
+		return id == 0 ? new GuiDisplayScreen(obj) : null;
+	}
+
+	public UUID getIdentity() {
+		return getUUID();
+	}
+
+	@Override
+	public ViewersList getViewersList() {
+		return viewers;
 	}
 }

@@ -1,7 +1,5 @@
 package sonar.logistics.network;
 
-import java.util.ArrayList;
-
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
@@ -10,8 +8,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import sonar.core.SonarCore;
 import sonar.logistics.api.info.monitor.ILogicMonitor;
 import sonar.logistics.api.info.monitor.MonitorType;
-import sonar.logistics.api.info.monitor.MonitorViewer;
-import sonar.logistics.connections.managers.LogicMonitorManager;
+import sonar.logistics.helpers.CableHelper;
 
 public class PacketMonitorType implements IMessage {
 
@@ -28,7 +25,7 @@ public class PacketMonitorType implements IMessage {
 
 	@Override
 	public void fromBytes(ByteBuf buf) {
-		monitor = LogicMonitorManager.getMonitorFromClient(buf.readInt());
+		monitor = CableHelper.getMonitorFromHashCode(buf.readInt(), false);
 		type = MonitorType.values()[buf.readInt()];
 	}
 
@@ -44,12 +41,7 @@ public class PacketMonitorType implements IMessage {
 		public IMessage onMessage(PacketMonitorType message, MessageContext ctx) {
 			EntityPlayer player = SonarCore.proxy.getPlayerEntity(ctx);
 			if (message.monitor != null && player != null) {
-				for (MonitorViewer viewer : (ArrayList<MonitorViewer>) message.monitor.getViewers(true)) {
-					if (viewer.player.getGameProfile().getId().equals(player.getGameProfile().getId())) {
-						viewer.setMonitorType(message.type);
-						break;
-					}
-				}
+				message.monitor.getViewersList().addViewer(player, message.type);
 			}
 			return null;
 		}

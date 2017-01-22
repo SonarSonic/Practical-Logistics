@@ -37,7 +37,7 @@ public class ItemMonitorHandler extends LogicMonitorHandler<MonitoredItemStack> 
 					StorageSize size = provider.getItems(info, tile, side);
 					list.sizing.add(size);
 					for (StoredItemStack item : info) {
-						list.addInfoToList(new MonitoredItemStack(item));
+						list.addInfoToList(new MonitoredItemStack(item), previousList);
 					}
 					break;
 				}

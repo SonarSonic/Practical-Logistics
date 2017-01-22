@@ -10,7 +10,7 @@ import sonar.core.integration.fmp.OLDMultipartHelper;
 import sonar.core.integration.fmp.handlers.TileHandler;
 import sonar.logistics.api.connecting.ILargeDisplay;
 import sonar.logistics.api.render.LargeScreenSizing;
-import sonar.logistics.connections.DisplayRegistry;
+import sonar.logistics.connections.managers.DisplayRegistry;
 
 public class DisplayHelper {
 

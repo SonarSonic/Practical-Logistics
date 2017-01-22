@@ -2,7 +2,6 @@ package sonar.logistics.client.gui;
 
 import java.util.ArrayList;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.entity.player.EntityPlayer;
 import sonar.core.helpers.FontHelper;

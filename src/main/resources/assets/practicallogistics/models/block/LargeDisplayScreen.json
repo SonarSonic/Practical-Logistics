@@ -1,7 +1,8 @@
 {
     "textures": {
+        "front": "practicallogistics:model/large_display_screen_front",
         "0": "practicallogistics:model/large_display_screen_front",
-        "1": "practicallogistics:model/large_display_screen_back"
+        "back": "practicallogistics:model/large_display_screen_back"
     },
     "elements": [
         {
@@ -13,8 +14,8 @@
                 "east": { "texture": "#0", "uv": [ 0.0, 14.0, 16.0, 15.0 ] },
                 "south": { "texture": "#0", "uv": [ 0.0, 12.0, 16.0, 13.0 ] },
                 "west": { "texture": "#0", "uv": [ 0.0, 16.0, 16.0, 15.0 ] },
-                "up": { "texture": "#1", "uv": [ 0.0, 0.0, 12.0, 12.0 ] },
-                "down": { "texture": "#0", "uv": [ 0.0, 0.0, 12.0, 12.0 ] }
+                "up": { "texture": "#back", "uv": [ 0.0, 0.0, 16.0, 16.0 ] },
+                "down": { "texture": "#front", "uv": [ 0.0, 0.0, 16.0, 16.0 ] }
             }
         }
     ]

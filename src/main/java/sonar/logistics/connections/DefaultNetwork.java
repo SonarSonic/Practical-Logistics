@@ -9,7 +9,6 @@ import java.util.Map.Entry;
 
 import com.google.common.collect.Lists;
 
-import mcmultipart.multipart.IMultipart;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import sonar.core.api.utils.BlockCoords;
@@ -29,10 +28,7 @@ import sonar.logistics.api.connecting.ILogicTile;
 import sonar.logistics.api.info.monitor.ILogicMonitor;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
 import sonar.logistics.api.info.monitor.LogicMonitorHandler;
-import sonar.logistics.api.info.monitor.MonitorViewer;
 import sonar.logistics.common.multiparts.DataCablePart;
-import sonar.logistics.connections.managers.CableManager;
-import sonar.logistics.connections.managers.NetworkManager;
 import sonar.logistics.connections.monitoring.MonitoredBlockCoords;
 import sonar.logistics.connections.monitoring.MonitoredList;
 import sonar.logistics.helpers.CableHelper;
@@ -74,10 +70,7 @@ public class DefaultNetwork extends AbstractNetwork implements IRefreshCache {
 		Iterator<IDataCable> connections = getConnections(IDataCable.class, includeChannels).iterator();
 		while (connections.hasNext()) {
 			IDataCable part = connections.next();
-			if (part == null || !(part instanceof IDataCable) || !((IDataCable) part).hasConnections()) {
-				// toRemove.add(part);
-				// continue;
-			} else {
+			if (part instanceof DataCablePart) {
 				DataCablePart cable = (DataCablePart) part;
 				HashMap<BlockCoords, EnumFacing> map = new HashMap();
 				cable.getContainer().getParts().forEach(multipart -> {
@@ -98,11 +91,12 @@ public class DefaultNetwork extends AbstractNetwork implements IRefreshCache {
 		if (includeChannels) {
 			ArrayList<Integer> networks = getFinalNetworkList();
 			networks.iterator().forEachRemaining(id -> {
-				INetworkCache network = NetworkManager.getNetwork(id);
+				INetworkCache network = Logistics.getNetworkManager().getNetwork(id);
 				ArrayList<T> connections = network.getConnections(classType, false);
 				connections.iterator().forEachRemaining(connection -> {
-					if (!list.contains(connection))
+					if (!list.contains(connection)) {
 						list.add(connection);
+					}
 				});
 			});
 		}
@@ -117,7 +111,7 @@ public class DefaultNetwork extends AbstractNetwork implements IRefreshCache {
 	@Override
 	public void refreshCache(int networkID, RefreshType refresh) {
 		this.networkID = networkID;
-		if (NetworkManager.updateEmitters) {
+		if (Logistics.getNetworkManager().updateEmitters) {
 			for (IDataReceiver receiver : getConnections(IDataReceiver.class, true)) {
 				receiver.refreshConnectedNetworks();
 			}
@@ -142,14 +136,14 @@ public class DefaultNetwork extends AbstractNetwork implements IRefreshCache {
 	public void alertWatchingNetworks() {
 		ArrayList<Integer> networks = this.getWatchingNetworkList();
 		for (Integer id : networks) {
-			NetworkManager.markNetworkDirty(id, RefreshType.ALERT);
+			Logistics.getNetworkManager().markNetworkDirty(id, RefreshType.ALERT);
 		}
 	}
 
 	public void refreshCables() {
 		localMonitors.clear();
 		HashMap<Class<?>, ArrayList<IWorldPosition>> newConnections = getFreshMap();
-		ArrayList<IDataCable> cables = CableManager.getCables(networkID);
+		ArrayList<IDataCable> cables = Logistics.getCableManager().getConnections(networkID);
 		Iterator<IDataCable> iterator = cables.iterator();
 		while (iterator.hasNext()) {
 			BlockCoords coord = iterator.next().getCoords();
@@ -198,7 +192,7 @@ public class DefaultNetwork extends AbstractNetwork implements IRefreshCache {
 
 		ArrayList<Integer> networks = getFinalNetworkList();
 		for (Integer id : networks) {
-			INetworkCache network = NetworkManager.getNetwork(id);
+			INetworkCache network = Logistics.getNetworkManager().getNetwork(id);
 			HashMap<BlockCoords, EnumFacing> blocks = (HashMap<BlockCoords, EnumFacing>) network.getExternalBlocks(false).clone();
 			for (Entry<BlockCoords, EnumFacing> set : blocks.entrySet()) {
 				if (!map.containsKey(set.getKey())) {
@@ -220,9 +214,9 @@ public class DefaultNetwork extends AbstractNetwork implements IRefreshCache {
 		MonitoredList<MonitoredBlockCoords> list = MonitoredList.<MonitoredBlockCoords>newMonitoredList(getNetworkID());
 		for (Entry<BlockCoords, EnumFacing> entry : networkedCache.entrySet()) {
 			TileEntity tile = entry.getKey().getTileEntity();
-			list.add(new MonitoredBlockCoords(entry.getKey(), tile != null && tile.getDisplayName() != null ? "sdsd" + tile.getDisplayName().getFormattedText() : entry.getKey().getBlock().getLocalizedName()));
+			list.add(new MonitoredBlockCoords(entry.getKey(), tile != null && tile.getDisplayName() != null ? tile.getDisplayName().getFormattedText() : entry.getKey().getBlock().getLocalizedName()));
 		}
-		NetworkManager.getCoordMap().put(networkID, list);
+		Logistics.getNetworkManager().getCoordMap().put(networkID, list);
 
 	}
 
@@ -261,21 +255,21 @@ public class DefaultNetwork extends AbstractNetwork implements IRefreshCache {
 	public ArrayList<Integer> getFinalNetworkList() {
 		ArrayList<Integer> networks = getConnectedNetworks(new ArrayList());
 		ArrayList<Integer> fullNetworks = (ArrayList<Integer>) networks.clone();
-		networks.iterator().forEachRemaining(id -> NetworkManager.getNetwork(id).getConnectedNetworks(fullNetworks));
+		networks.iterator().forEachRemaining(id -> Logistics.getNetworkManager().getNetwork(id).getConnectedNetworks(fullNetworks));
 		return fullNetworks;
 	}
 
 	@Override
 	public void updateNetwork(int networkID) {
 		resendAllLists = networkID != this.getNetworkID();
-		if (resendAllLists || NetworkManager.updateEmitters) {
+		if (resendAllLists || Logistics.getNetworkManager().updateEmitters) {
 			refreshCache(networkID, RefreshType.FULL);
 		} else if (toRefresh != RefreshType.NONE) {
 			refreshCache(networkID, toRefresh);
 		} else {
 			lastRefresh = RefreshType.NONE;
 		}
-
+		
 		toRefresh = RefreshType.NONE;
 		for (Entry<LogicMonitorHandler, Map<ILogicMonitor, MonitoredList<?>>> monitorMap : monitorInfo.entrySet()) {
 			if (!monitorMap.getValue().isEmpty() && monitorMap.getKey() != null) {
@@ -285,13 +279,9 @@ public class DefaultNetwork extends AbstractNetwork implements IRefreshCache {
 					ILogicMonitor monitor = monitors.getKey();
 					if (monitor != null && monitor.getHandler().id().equals(monitorMap.getKey().id())) {
 						MonitoredList<IMonitorInfo> updateList = updateMonitoredList(monitors.getKey(), newConnections).updateList(monitors.getValue());
-						monitor.sortMonitoredList(updateList);
-						monitor.setMonitoredInfo(updateList);
-						for (Boolean bool : new Boolean[] { true, false }) {
-							List<MonitorViewer> viewers = (List<MonitorViewer>) monitor.getViewers(bool).clone();
-							if (!viewers.isEmpty() && (resendAllLists || bool == true || updateList.hasChanged))
-								sendPacketsToViewer(monitor, viewers, !bool, updateList.copyInfo(), monitors.getValue().copyInfo());
-						}
+						monitor.sortMonitoredList(updateList, 0);// TODO
+						monitor.setMonitoredInfo(updateList, 0);// TODO
+						sendPacketsToViewers(monitor, updateList.copyInfo(), monitors.getValue().copyInfo());
 						monitors.setValue(updateList);
 					} else if (!monitor.getHandler().id().equals(monitorMap.getKey().id())) {
 						Logistics.logger.info("WRONG MONITOR HANDLER FOR MONITOR: " + monitorMap.getKey().id());

@@ -17,11 +17,11 @@ import sonar.logistics.api.connecting.IOperatorProvider;
 public abstract class LogisticsMultipart extends SonarMultipart implements ILogicTile, IOperatorProvider {
 
 	public INetworkCache network = EmptyNetworkCache.INSTANCE;
-	public SyncTagType.INT registryID = (INT) new SyncTagType.INT(0).setDefault(-1);
+	public SyncTagType.INT networkID = (INT) new SyncTagType.INT(0).setDefault(-1);
 	public static final PropertyDirection ORIENTATION = PropertyDirection.create("facing");
 	public static final PropertyDirection ROTATION = PropertyDirection.create("rotation");
 	{
-		syncParts.add(registryID);
+		syncList.addPart(networkID);
 	}
 
 	public LogisticsMultipart() {
@@ -35,7 +35,7 @@ public abstract class LogisticsMultipart extends SonarMultipart implements ILogi
 	public void setLocalNetworkCache(INetworkCache network) {
 		if (!this.wasRemoved) {
 			this.network = network;
-			this.registryID.setObject(network.getNetworkID());
+			this.networkID.setObject(network.getNetworkID());
 		}
 	}
 
@@ -47,12 +47,12 @@ public abstract class LogisticsMultipart extends SonarMultipart implements ILogi
 		ItemStack dropStack = getItemStack();
 		if (dropStack != null)
 			info.add(TextFormatting.UNDERLINE + dropStack.getDisplayName());
-		info.add("Network ID: " + registryID.getObject());
+		info.add("Network ID: " + networkID.getObject());
 		info.add("Has channels: " + (this instanceof InfoReaderPart));
 	}
 
 	public int getNetworkID() {
-		return registryID.getObject();
+		return networkID.getObject();
 	}	
 
 	public void updateOperatorInfo(){

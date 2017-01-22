@@ -8,7 +8,6 @@ import sonar.core.SonarCore;
 import sonar.core.api.energy.EnergyType;
 import sonar.core.api.energy.ISonarEnergyHandler;
 import sonar.core.api.energy.StoredEnergyStack;
-import sonar.core.api.inventories.StoredItemStack;
 import sonar.core.utils.SortingDirection;
 import sonar.logistics.api.settings.EnergyReader.SortingType;
 import sonar.logistics.api.wrappers.EnergyWrapper;

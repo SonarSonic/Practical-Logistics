@@ -11,28 +11,32 @@ import sonar.core.helpers.NBTHelper.SyncType;
 public class InfoUUID implements INBTSyncable {
 
 	public int hashCode;
-	public int pos;
+	public int channelID;
 
 	public InfoUUID() {}
 
 	public InfoUUID(int hashCode, int pos) {
 		this.hashCode = hashCode;
-		this.pos = pos;
+		this.channelID = pos;
+	}
+	
+	public int getChannelID(){
+		return channelID;
 	}
 
 	public boolean equals(Object obj) {
 		if (obj != null && obj instanceof InfoUUID) {
-			return this.hashCode == ((InfoUUID) obj).hashCode && this.pos == ((InfoUUID) obj).pos;
+			return this.hashCode == ((InfoUUID) obj).hashCode && this.channelID == ((InfoUUID) obj).channelID;
 		}
 		return false;
 	}
 
 	public int hashCode() {
-		return Objects.hashCode(hashCode, pos);
+		return Objects.hashCode(hashCode, channelID);
 	}
 
 	public boolean valid() {
-		if (hashCode == -1 && pos == -1) {
+		if (hashCode == -1 && channelID == -1) {
 			return false;
 		}
 		return true;
@@ -44,11 +48,11 @@ public class InfoUUID implements INBTSyncable {
 
 	public void writeToBuf(ByteBuf buf) {
 		buf.writeInt(hashCode);
-		buf.writeInt(pos);
+		buf.writeInt(channelID);
 	}
 
 	public String toString() {
-		return hashCode + ":" + pos;
+		return hashCode + ":" + channelID;
 	}
 
 	public static InfoUUID fromString(String string) {
@@ -59,13 +63,13 @@ public class InfoUUID implements INBTSyncable {
 	@Override
 	public void readData(NBTTagCompound nbt, SyncType type) {		
 		hashCode = nbt.getInteger("hash");
-		pos = nbt.getInteger("pos");
+		channelID = nbt.getInteger("pos");
 	}
 
 	@Override
 	public NBTTagCompound writeData(NBTTagCompound nbt, SyncType type) {
 		nbt.setInteger("hash", hashCode);
-		nbt.setInteger("pos", pos);		
+		nbt.setInteger("pos", channelID);		
 		return nbt;
 	}
 }

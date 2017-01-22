@@ -7,7 +7,6 @@ import java.util.Map.Entry;
 import net.minecraft.util.EnumFacing;
 import sonar.core.api.utils.BlockCoords;
 import sonar.core.utils.IWorldPosition;
-import sonar.logistics.api.connecting.ILogicTile;
 import sonar.logistics.api.info.monitor.ILogicMonitor;
 
 /** an implementation of {@link INetworkCache} that acts as an Empty Network, when working with networks the INSTANCE of this should be returned instead of null */
@@ -15,8 +14,7 @@ public class EmptyNetworkCache implements INetworkCache {
 
 	public static final EmptyNetworkCache INSTANCE = EmptyNetworkCache.createEmptyCache();
 
-	private EmptyNetworkCache() {
-	}
+	private EmptyNetworkCache() {}
 
 	public static EmptyNetworkCache createEmptyCache() {
 		return new EmptyNetworkCache();
@@ -58,8 +56,7 @@ public class EmptyNetworkCache implements INetworkCache {
 	}
 
 	@Override
-	public void addLocalMonitor(ILogicMonitor monitor) {		
-	}
+	public void addLocalMonitor(ILogicMonitor monitor) {}
 
 	@Override
 	public ILogicMonitor getLocalMonitor() {

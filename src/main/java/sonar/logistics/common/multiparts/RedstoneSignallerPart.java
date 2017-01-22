@@ -1,8 +1,5 @@
 package sonar.logistics.common.multiparts;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import io.netty.buffer.ByteBuf;
 import mcmultipart.MCMultiPartMod;
 import mcmultipart.multipart.IRedstonePart;
@@ -11,7 +8,6 @@ import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
@@ -21,7 +17,6 @@ import net.minecraft.world.World;
 import sonar.core.network.sync.SyncUnidentifiedObject;
 import sonar.core.network.utils.IByteBufTile;
 import sonar.logistics.LogisticsItems;
-import sonar.logistics.api.connecting.IEntityNode;
 
 public class RedstoneSignallerPart extends SidedMultipart implements IRedstonePart, IByteBufTile {
 

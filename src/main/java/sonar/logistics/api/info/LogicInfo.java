@@ -1,5 +1,8 @@
 package sonar.logistics.api.info;
 
+import java.util.ArrayList;
+import java.util.Map;
+
 import com.google.common.collect.Lists;
 
 import mcmultipart.raytrace.PartMOP;
@@ -8,6 +11,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHand;
 import sonar.core.api.utils.BlockInteractionType;
 import sonar.core.helpers.FontHelper;
+import sonar.core.network.sync.ISyncPart;
 import sonar.core.network.sync.ObjectType;
 import sonar.core.network.sync.SyncEnum;
 import sonar.core.network.sync.SyncTagType;
@@ -15,7 +19,8 @@ import sonar.core.network.sync.SyncUnidentifiedObject;
 import sonar.core.utils.Pair;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.asm.LogicInfoType;
-import sonar.logistics.api.display.DisplayType;
+import sonar.logistics.api.display.IDisplayInfo;
+import sonar.logistics.api.display.ISuffixable;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
 import sonar.logistics.api.info.monitor.LogicMonitorHandler;
 import sonar.logistics.connections.monitoring.InfoMonitorHandler;
@@ -26,18 +31,18 @@ import sonar.logistics.info.LogicInfoRegistry.RegistryType;
 
 /** default info type, created by the LogicRegistry */
 @LogicInfoType(id = LogicInfo.id, modid = Logistics.MODID)
-public class LogicInfo extends BaseInfo<LogicInfo> implements INameableInfo<LogicInfo>, IClickableInfo {
+public class LogicInfo extends BaseInfo<LogicInfo> implements INameableInfo<LogicInfo>, IClickableInfo, ISuffixable, IComparableInfo<LogicInfo> {
 
 	public static final String id = "logic";
 	public static final LogicMonitorHandler<LogicInfo> handler = LogicMonitorHandler.instance(InfoMonitorHandler.id);
-
+	private String suffix, prefix;
 	private SyncTagType.STRING identifier = new SyncTagType.STRING(1);
 	private SyncEnum<RegistryType> registryType = new SyncEnum(RegistryType.values(), 2);
 	private SyncUnidentifiedObject obj = new SyncUnidentifiedObject(3);
 	private boolean isCategory = false;
 
 	{
-		syncParts.addAll(Lists.newArrayList(identifier, registryType, obj));
+		syncParts.addParts(identifier, registryType, obj);
 	}
 
 	public LogicInfo() {
@@ -86,18 +91,29 @@ public class LogicInfo extends BaseInfo<LogicInfo> implements INameableInfo<Logi
 		return FontHelper.translate("pl." + identifier);
 	}
 
+	public Pair<String, String> updateAdjustments(boolean forceUpdate) {
+		if (forceUpdate || (prefix == null || suffix == null)) {
+			prefix = "";
+			suffix = "";
+			Pair<String, String> adjustment = LogicInfoRegistry.infoAdjustments.get(identifier.getObject());
+			/// if (identifier.getObject().equals("Block.getUnlocalizedName")) {
+			// return FontHelper.translate(obj.get().toString() + ".name");
+			// }
+			if (adjustment != null) {
+				if (!adjustment.a.isEmpty())
+					prefix = adjustment.a + " ";
+				if (!adjustment.b.isEmpty())
+					suffix = " " + adjustment.b;
+			}
+		}
+		return new Pair(prefix, suffix);
+	}
+
 	public String getClientObject() {
-		String prefix = "", suffix = "";
-		Pair<String, String> adjustment = LogicInfoRegistry.infoAdjustments.get(identifier.getObject());
 		if (identifier.getObject().equals("Block.getUnlocalizedName")) {
 			return FontHelper.translate(obj.get().toString() + ".name");
 		}
-		if (adjustment != null) {
-			if (!adjustment.a.isEmpty())
-				prefix = adjustment.a + " ";
-			if (!adjustment.b.isEmpty())
-				suffix = " " + adjustment.b;
-		}
+		updateAdjustments(false);
 		return prefix + obj.get().toString() + suffix;
 	}
 
@@ -125,7 +141,7 @@ public class LogicInfo extends BaseInfo<LogicInfo> implements INameableInfo<Logi
 
 	@Override
 	public boolean isValid() {
-		return obj.get() != null;
+		return obj.get() != null && obj.objectType != null;
 	}
 
 	@Override
@@ -139,17 +155,45 @@ public class LogicInfo extends BaseInfo<LogicInfo> implements INameableInfo<Logi
 	}
 
 	@Override
-	public void renderInfo(DisplayType displayType, double width, double height, double scale, int infoPos) {
-		InfoRenderer.renderNormalInfo(displayType, width, height, scale, getClientIdentifier(), getClientObject());
+	public void renderInfo(InfoContainer container, IDisplayInfo displayInfo, double width, double height, double scale, int infoPos) {
+		// InfoRenderer.renderNormalInfo(displayType, width, height, scale, getClientIdentifier(), getClientObject());
+		InfoRenderer.renderNormalInfo(container.display.getDisplayType(), width, height, scale, displayInfo.getFormattedStrings());
 	}
 
 	@Override
-	public boolean onClicked(BlockInteractionType type, boolean doubleClick, RenderInfoProperties renderInfo, EntityPlayer player, EnumHand hand, ItemStack stack, PartMOP hit) {
-		if (InfoHelper.canBeClickedStandard(renderInfo, player, hand, stack, hit)) {
+	public boolean onClicked(BlockInteractionType type, boolean doubleClick, IDisplayInfo renderInfo, EntityPlayer player, EnumHand hand, ItemStack stack, PartMOP hit, InfoContainer container) {
+		if (InfoHelper.canBeClickedStandard(renderInfo.getRenderProperties(), player, hand, stack, hit)) {
 			FontHelper.sendMessage(getClientIdentifier() + ": " + obj.objectType + " - " + getClientObject(), player.getEntityWorld(), player);
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	public String getSuffix() {
+		updateAdjustments(false);
+		return suffix;
+	}
+
+	@Override
+	public String getPrefix() {
+		updateAdjustments(false);
+		return prefix;
+	}
+
+	@Override
+	public String getRawData() {
+		if (identifier.getObject().equals("Block.getUnlocalizedName")) {
+			return FontHelper.translate(obj.get().toString() + ".name");
+		}
+		return obj.get().toString();
+	}
+
+	@Override
+	public void getComparableObjects(Map<String, Object> objects) {
+		objects.put("raw info", obj.get());
+		objects.put("object type", obj.objectType);
+		objects.put("identifier", identifier.getObject());
 	}
 
 }

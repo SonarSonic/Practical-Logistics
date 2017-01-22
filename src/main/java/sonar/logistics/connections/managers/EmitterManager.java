@@ -9,8 +9,6 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.connecting.ClientDataEmitter;
 import sonar.logistics.api.connecting.IDataEmitter;
-import sonar.logistics.api.info.monitor.MonitorViewer;
-import sonar.logistics.connections.monitoring.MonitoredBlockCoords;
 import sonar.logistics.network.PacketClientEmitters;
 
 public class EmitterManager {
@@ -18,7 +16,6 @@ public class EmitterManager {
 	public static ArrayList<IDataEmitter> emitters = new ArrayList<IDataEmitter>();
 	public static ArrayList<EntityPlayer> viewers = new ArrayList<EntityPlayer>();
 	// client
-	public static ArrayList<ClientDataEmitter> clientEmitters = new ArrayList<ClientDataEmitter>();
 
 	private static boolean dirty;
 
@@ -27,7 +24,7 @@ public class EmitterManager {
 	}
 
 	public static void emitterChanged(IDataEmitter emitter) {
-		NetworkManager.updateEmitters = true;
+		Logistics.getNetworkManager().updateEmitters = true;
 		dirty = true;
 	}
 

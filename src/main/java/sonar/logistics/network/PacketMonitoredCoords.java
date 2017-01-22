@@ -7,11 +7,10 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import sonar.core.helpers.NBTHelper.SyncType;
-import sonar.logistics.connections.managers.NetworkManager;
+import sonar.logistics.Logistics;
 import sonar.logistics.connections.monitoring.MonitoredBlockCoords;
 import sonar.logistics.connections.monitoring.MonitoredList;
 import sonar.logistics.helpers.InfoHelper;
-import sonar.logistics.helpers.LogisticsHelper;
 
 public class PacketMonitoredCoords implements IMessage {
 
@@ -19,8 +18,7 @@ public class PacketMonitoredCoords implements IMessage {
 	public NBTTagCompound listTag;
 	public int registryID;
 
-	public PacketMonitoredCoords() {
-	}
+	public PacketMonitoredCoords() {}
 
 	public PacketMonitoredCoords(int registryID, NBTTagCompound listTag) {
 		this.listTag = listTag;
@@ -32,7 +30,7 @@ public class PacketMonitoredCoords implements IMessage {
 		registryID = buf.readInt();
 		listTag = ByteBufUtils.readTag(buf);
 		if (listTag != null)
-			list = InfoHelper.readMonitoredList(listTag, NetworkManager.getCoordMap().getOrDefault(registryID, MonitoredList.newMonitoredList(registryID)).copyInfo(), SyncType.DEFAULT_SYNC);
+			list = InfoHelper.readMonitoredList(listTag, Logistics.getClientManager().coordMap.getOrDefault(registryID, MonitoredList.newMonitoredList(registryID)).copyInfo(), SyncType.DEFAULT_SYNC);
 	}
 
 	@Override
@@ -45,7 +43,7 @@ public class PacketMonitoredCoords implements IMessage {
 		@Override
 		public IMessage onMessage(PacketMonitoredCoords message, MessageContext ctx) {
 			//if (message.list != null)
-				//CacheRegistry.coordMap.put(message.registryID, message.list);
+				//Logistics.getClientManager().coordMap.put(message.registryID, message.list);
 			return null;
 		}
 	}

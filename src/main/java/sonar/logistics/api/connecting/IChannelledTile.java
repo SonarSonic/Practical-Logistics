@@ -1,6 +1,5 @@
 package sonar.logistics.api.connecting;
 
-import net.minecraft.entity.player.EntityPlayer;
 import sonar.logistics.api.info.monitor.ILogicViewable;
 import sonar.logistics.api.info.monitor.IdentifiedCoordsList;
 import sonar.logistics.connections.monitoring.MonitoredBlockCoords;
@@ -9,8 +8,9 @@ import sonar.logistics.connections.monitoring.MonitoredBlockCoords;
 public interface IChannelledTile extends ILogicViewable {
 
 	/**the currently selected channels*/
-	public IdentifiedCoordsList getChannels();
+	public IdentifiedCoordsList getChannels(int channelID);
 	
-	/**call this client side only, sends the selected coords to the server*/
-	public void modifyCoords(MonitoredBlockCoords coords);
+	/**call this client side only, sends the selected coords to the server
+	 * @param channelID TODO*/
+	public void modifyCoords(MonitoredBlockCoords coords, int channelID);
 }

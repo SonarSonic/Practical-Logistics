@@ -16,10 +16,13 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.fml.common.Loader;
 import sonar.core.utils.Pair;
 import sonar.logistics.Logistics;
@@ -28,34 +31,35 @@ import sonar.logistics.api.info.ICustomTileHandler;
 import sonar.logistics.api.info.IInfoRegistry;
 import sonar.logistics.api.info.LogicInfo;
 
-/**where all the registering for LogicInfo happens*/
+/** where all the registering for LogicInfo happens */
 public class LogicInfoRegistry {
 
-	/** the cache of methods/fields applicable to a given tile.*/
+	/** the cache of methods/fields applicable to a given tile. */
 	public static LinkedHashMap<Class<?>, ArrayList<Method>> cachedMethods = new LinkedHashMap();
 	public static LinkedHashMap<Class<?>, ArrayList<Field>> cachedFields = new LinkedHashMap();
 
-	/** all the registries which can provide valid returns, methods and fields*/
+	/** all the registries which can provide valid returns, methods and fields */
 	public static ArrayList<IInfoRegistry> infoRegistries = new ArrayList();
 
-	/** all custom handlers which can provide custom info on blocks for tricky situations*/
+	/** all custom handlers which can provide custom info on blocks for tricky situations */
 	public static ArrayList<ICustomTileHandler> customTileHandlers = new ArrayList();
 	public static ArrayList<ICustomEntityHandler> customEntityHandlers = new ArrayList();
 
-	/** all the register validated returns, methods and fields from the registries*/
+	/** all the register validated returns, methods and fields from the registries */
 	public static ArrayList<Class<?>> registeredReturnTypes = Lists.newArrayList();
+	public static ArrayList<Capability> registeredCapabilities = Lists.newArrayList();
 	public static LinkedHashMap<RegistryType, LinkedHashMap<Class<?>, ArrayList<Method>>> infoMethods = new LinkedHashMap();
 	public static LinkedHashMap<RegistryType, LinkedHashMap<Class<?>, ArrayList<Field>>> infoFields = new LinkedHashMap();
 	public static LinkedHashMap<Class<?>, Map<String, Integer>> invFields = new LinkedHashMap();
 	public static LinkedHashMap<String, Pair<String, String>> infoAdjustments = new LinkedHashMap();
 
-	/** the default accepted returns*/
+	/** the default accepted returns */
 	public static ArrayList<Class<?>> acceptedTypes = RegistryType.buildArrayList();
 	public static ArrayList<Class<?>> defaultReturnTypes = Lists.newArrayList(String.class);
 
 	/** used to define the type of class the method/return is applicable for this is to speed up identification but you can use NONE for any type of class if you wish */
 	public static enum RegistryType {
-		WORLD(World.class, 0), TILE(TileEntity.class, 5), BLOCK(Block.class, 3), ENTITY(Entity.class, 6), ITEM(Item.class, 7), STATE(IBlockState.class, 4), POS(BlockPos.class, 1), FACE(EnumFacing.class, 2), NONE(null, 8);
+		WORLD(World.class, 0), TILE(TileEntity.class, 5), BLOCK(Block.class, 3), ENTITY(Entity.class, 6), ITEM(Item.class, 7), STATE(IBlockState.class, 4), POS(BlockPos.class, 1), FACE(EnumFacing.class, 2), ITEMSTACK(ItemStack.class, 8), CAPABILITY(Capability.class, 9), NONE(null, 9);
 		Class classType;
 		public int sortOrder;
 
@@ -89,21 +93,46 @@ public class LogicInfoRegistry {
 	}
 
 	public static void init() {
-		infoRegistries.forEach(registry -> registry.registerBaseReturns());
-		infoRegistries.forEach(registry -> registry.registerBaseMethods());
-		infoRegistries.forEach(registry -> registry.registerAllFields());
-		infoRegistries.forEach(registry -> registry.registerAdjustments());
+
+		infoRegistries.forEach(registry -> {
+			try {
+				registry.registerBaseReturns();
+			} catch (NoClassDefFoundError e) {
+				e.printStackTrace();
+			}
+		});
+		infoRegistries.forEach(registry -> {
+			try {
+				registry.registerBaseMethods();
+			} catch (NoClassDefFoundError e) {
+				e.printStackTrace();
+			}
+		});
+		infoRegistries.forEach(registry -> {
+			try {
+				registry.registerAllFields();
+			} catch (NoClassDefFoundError e) {
+				e.printStackTrace();
+			}
+		});
+		infoRegistries.forEach(registry -> {
+			try {
+				registry.registerAdjustments();
+			} catch (NoClassDefFoundError e) {
+				e.printStackTrace();
+			}
+		});
 	}
-	
-	public static void reload(){
+
+	public static void reload() {
 		registeredReturnTypes.clear();
 		infoMethods.clear();
 		infoFields.clone();
 		invFields.clear();
 		infoAdjustments.clear();
-		
+
 		init();
-		
+
 		cachedFields.clear();
 		cachedMethods.clear();
 	}
@@ -113,6 +142,10 @@ public class LogicInfoRegistry {
 		if (Loader.isModLoaded(modid)) {
 			infoRegistries.add(handler);
 		}
+	}
+
+	public static void registerCapability(Capability capability) {
+		registeredCapabilities.add(capability);
 	}
 
 	public static void registerReturn(Class<?> classType) {
@@ -325,7 +358,7 @@ public class LogicInfoRegistry {
 	/** @param infoList the list to add to
 	 * @param available all available info about the tile, typically will include the World, BlockPos, IBlockState, EnumFacing, the Block and the tile entity
 	 * @return all the available info */
-	public static List<LogicInfo> getTileInfo(final List<LogicInfo> infoList, Object... available) {
+	public static List<LogicInfo> getTileInfo(final List<LogicInfo> infoList, EnumFacing currentFace, Object... available) {
 		for (Object arg : available) {
 			Class<?> argClass;
 			if (arg != null && containsAssignableType(argClass = arg.getClass(), acceptedTypes)) {
@@ -336,6 +369,22 @@ public class LogicInfoRegistry {
 					Map<String, Integer> fields = invFields.get(argClass);
 					if (fields != null && !fields.isEmpty()) {
 						fields.entrySet().forEach(field -> infoList.add(LogicInfo.buildDirectInfo(argClass.getSimpleName() + "." + field.getKey(), type, ((IInventory) arg).getField(field.getValue()))));
+					}
+				}
+				if (arg instanceof ICapabilityProvider && !registeredCapabilities.isEmpty()) {
+					ICapabilityProvider provider = (ICapabilityProvider) arg;
+					ArrayList<Capability> capabilities = new ArrayList();
+					for (Capability cap : registeredCapabilities) {
+						if (provider.hasCapability(cap, currentFace)) {
+							Capability providedCap = (Capability) provider.getCapability(cap, currentFace);
+							if (providedCap != null) {
+								capabilities.add(cap);
+							}
+						}
+					}
+					for (Capability cap : capabilities) {
+						getAssignableMethods(cap.getClass(), RegistryType.CAPABILITY).forEach(method -> getClassInfo(infoList, RegistryType.CAPABILITY, cap, method, available));
+						getAccessibleFields(cap.getClass(), RegistryType.CAPABILITY).forEach(field -> getFieldInfo(infoList, RegistryType.CAPABILITY, cap, field));
 					}
 				}
 			}

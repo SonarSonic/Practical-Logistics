@@ -6,8 +6,8 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.core.inventory.ContainerMultipartSync;
+import sonar.logistics.api.info.monitor.MonitorType;
 import sonar.logistics.common.multiparts.EnergyReaderPart;
-import sonar.logistics.common.multiparts.InfoReaderPart;
 
 public class ContainerEnergyReader extends ContainerMultipartSync {
 	public EnergyReaderPart part;
@@ -51,6 +51,6 @@ public class ContainerEnergyReader extends ContainerMultipartSync {
 
 	public void onContainerClosed(EntityPlayer player) {
 		super.onContainerClosed(player);
-		part.removeViewer(player);
+		part.getViewersList().removeViewer(player, MonitorType.INFO);
 	}
 }

@@ -2,19 +2,11 @@ package sonar.logistics.client.gui;
 
 import java.io.IOException;
 
-import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.ResourceLocation;
-import sonar.core.SonarCore;
 import sonar.core.helpers.FontHelper;
 import sonar.core.helpers.RenderHelper;
 import sonar.core.inventory.ContainerMultipartSync;
-import sonar.logistics.api.settings.InventoryReader.Modes;
 import sonar.logistics.client.LogisticsColours;
-import sonar.logistics.client.gui.GuiInventoryReader.FilterButton;
-import sonar.logistics.common.containers.ContainerArray;
-import sonar.logistics.common.multiparts.ArrayPart;
 import sonar.logistics.common.multiparts.DataEmitterPart;
 
 public class GuiDataEmitter extends GuiLogistics {

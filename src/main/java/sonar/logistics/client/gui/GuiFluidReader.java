@@ -11,7 +11,6 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.entity.player.EntityPlayer;
@@ -252,9 +251,9 @@ public class GuiFluidReader extends GuiSelectionGrid<MonitoredFluidStack> {
 		if (fluidStack.fluid != null) {
 			GL11.glPushMatrix();
 			GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-			ResourceLocation location = fluidStack.fluid.getFluid().getStill(fluidStack.fluid);
-			
-			drawTexturedModalRect(13 + (x * 18), 32 + (y * 18), mc.getTextureMapBlocks().getAtlasSprite(location.toString()), 16, 16);
+			TextureAtlasSprite sprite = Minecraft.getMinecraft().getTextureMapBlocks().getTextureExtry(fluidStack.fluid.getFluid().getStill().toString());
+			Minecraft.getMinecraft().renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+			drawTexturedModalRect(13 + (x * 18), 32 + (y * 18), sprite, 16, 16);
 			GL11.glPopMatrix();
 		}
 	}

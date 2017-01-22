@@ -48,8 +48,21 @@ public class MonitoredList<T extends IMonitorInfo> extends ArrayList<T> {
 	public MonitoredList<T> copyInfo() {
 		return new MonitoredList<T>(networkID, (ArrayList<T>) cloneInfo(), new StorageSize(sizing.getStored(), sizing.getMaxStored()), (ArrayList<T>) changed.clone(), (ArrayList<T>) removed.clone());
 	}
+	
+	public T findInfoInList(T newInfo, MonitoredList<T> previousList){
+		for(T lastInfo : previousList){
+			if(lastInfo.isIdenticalInfo(newInfo)){
+				return lastInfo;
+			}
+		}
+		return null;
+	}
 
-	public void addInfoToList(T newInfo) {
+	public void addInfoToList(T newInfo, MonitoredList<T> previousList) {			
+		T lastInfo = findInfoInList(newInfo, previousList);
+		if(lastInfo == null){
+			
+		}		
 		if (newInfo instanceof IJoinableInfo) {
 			for (int i = 0; i < this.size(); i++) {
 				T storedInfo = this.get(i);
@@ -65,17 +78,23 @@ public class MonitoredList<T extends IMonitorInfo> extends ArrayList<T> {
 	public MonitoredList<T> updateList(MonitoredList<T> lastList) {
 		ArrayList<T> changed = ((ArrayList<T>) cloneInfo());
 		ArrayList<T> removed = ((ArrayList<T>) lastList.cloneInfo());
-		if (lastList != null) {
-			changed.removeAll(removed);
-		}
-		((ArrayList<T>) removed.clone()).forEach(r -> changed.forEach(c -> {
-			if (r.isMatchingInfo(c)) {
-				removed.remove(r);
-			}
+		
+		
+		((ArrayList<T>) lastList.cloneInfo()).forEach(last -> 
+			forEach(current -> {				
+				if (last.isMatchingInfo(current)) {
+					removed.remove(last);
+				}
+				if(last.isIdenticalInfo(current)){
+					changed.remove(current);
+				}				
 		}));
 		this.changed = changed;
 		this.removed = removed;
 		hasChanged = !changed.isEmpty() || !removed.isEmpty();
+		if(this.hasChanged){
+			this.changed = changed;
+		}		
 		return this;
 	}
 

@@ -1,11 +1,9 @@
 package sonar.logistics.api.info.monitor;
 
-import java.util.ArrayList;
 import java.util.UUID;
 
 import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.connecting.IChannelledTile;
-import sonar.logistics.api.connecting.ILogicTile;
 import sonar.logistics.connections.monitoring.MonitoredList;
 
 /***/
@@ -20,12 +18,12 @@ public interface ILogicMonitor<T extends IMonitorInfo> extends IChannelledTile {
 	
 	/**gets a list of all the players viewing*/
 	
-	public void sentViewerPacket(MonitorViewer viewer, boolean sentFirstPacket);
+	//public void sentViewerPacket(MonitorViewer viewer, boolean sentFirstPacket);
 	
 	/**this is when the list should be set and added to the ClinetMonitoredLists*/
-	public MonitoredList<T> sortMonitoredList(MonitoredList<T> updateInfo);
+	public MonitoredList<T> sortMonitoredList(MonitoredList<T> updateInfo, int channelID);
 	
-	public void setMonitoredInfo(MonitoredList<T> updateInfo);
+	public void setMonitoredInfo(MonitoredList<T> updateInfo, int channelID);
 	
 	public ChannelType channelType();
 	
@@ -34,5 +32,10 @@ public interface ILogicMonitor<T extends IMonitorInfo> extends IChannelledTile {
 	public int getMaxInfo();
 	
 	public INetworkCache getNetwork();
+	
+	public String getDisplayName();
+	
+	/**the multipart UUID*/
+	public UUID getUUID();
 	
 }

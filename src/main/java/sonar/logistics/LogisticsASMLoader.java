@@ -63,5 +63,6 @@ public class LogisticsASMLoader {
 			infoIds.put(name, hashCode);
 			infoClasses.put(name, info.b);
 		}
+		Logistics.logger.info("Loaded: " + infoIds.size() + " Info Types");
 	}
 }

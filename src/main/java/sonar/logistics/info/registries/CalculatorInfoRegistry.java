@@ -24,6 +24,7 @@ public class CalculatorInfoRegistry extends IInfoRegistry {
 		LogicInfoRegistry.registerMethods(IGreenhouse.class, RegistryType.TILE, Lists.newArrayList("getState"), true);
 		LogicInfoRegistry.registerMethods(ITeleport.class, RegistryType.TILE, Lists.newArrayList("getCoords"), true);
 		LogicInfoRegistry.registerMethods(IFlawlessGreenhouse.class, RegistryType.TILE, Lists.newArrayList("getPlantsHarvested", "getPlantsGrown"));
+		//LogicInfoRegistry.registerMethods(ICalculatorGenerator.class, RegistryType.TILE, Lists.newArrayList("getItemLevel", "getMaxItemLevel"));
 	}
 
 	@Override

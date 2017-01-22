@@ -11,12 +11,14 @@ import net.minecraftforge.fml.common.network.ByteBufUtils;
 import sonar.core.api.utils.BlockCoords;
 import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.core.network.sync.ISyncPart;
+import sonar.core.network.sync.ISyncableListener;
 
 public class IdentifiedCoordsList extends ArrayList<BlockCoords> implements ISyncPart {
 
 	public UUID identity;
 	public boolean hasChanged = true;
 	public final int tagID;
+	private ISyncableListener listener;
 
 	public IdentifiedCoordsList(int tagID) {
 		super();
@@ -32,6 +34,11 @@ public class IdentifiedCoordsList extends ArrayList<BlockCoords> implements ISyn
 
 	public IdentifiedCoordsList setIdentity(UUID uuid) {
 		identity = uuid;
+		return this;
+	}
+
+	public IdentifiedCoordsList setListener(ISyncableListener listener) {
+		this.listener = listener;
 		return this;
 	}
 
@@ -51,8 +58,13 @@ public class IdentifiedCoordsList extends ArrayList<BlockCoords> implements ISyn
 				}
 				add(coords);
 			} else {
-				Iterator<BlockCoords> iterator = iterator();
-				this.removeIf(coord -> coord.equals(coords));
+				if (type == ChannelType.SINGLE) {
+					clear();
+				} else {
+					Iterator<BlockCoords> iterator = iterator();
+					this.removeIf(coord -> coord.equals(coords));
+				}
+				markDirty();
 			}
 		}
 	}
@@ -60,7 +72,7 @@ public class IdentifiedCoordsList extends ArrayList<BlockCoords> implements ISyn
 	public boolean add(BlockCoords coords) {
 		boolean add = super.add(coords);
 		if (add) {
-			setChanged(true);
+			markDirty();
 		}
 		return add;
 	}
@@ -68,23 +80,13 @@ public class IdentifiedCoordsList extends ArrayList<BlockCoords> implements ISyn
 	public boolean addAll(Collection<? extends BlockCoords> coords) {
 		boolean addAll = super.addAll(coords);
 		if (addAll) {
-			setChanged(true);
+			markDirty();
 		}
 		return addAll;
 	}
 
 	public int hashCode() {
 		return identity.hashCode();
-	}
-
-	@Override
-	public boolean hasChanged() {
-		return hasChanged;
-	}
-
-	@Override
-	public void setChanged(boolean set) {
-		hasChanged = set;
 	}
 
 	@Override
@@ -124,5 +126,15 @@ public class IdentifiedCoordsList extends ArrayList<BlockCoords> implements ISyn
 	@Override
 	public String getTagName() {
 		return String.valueOf(tagID);
+	}
+
+	@Override
+	public ISyncableListener getListener() {
+		return listener;
+	}
+
+	public void markDirty() {
+		if (listener != null)
+			listener.markChanged(this);
 	}
 }

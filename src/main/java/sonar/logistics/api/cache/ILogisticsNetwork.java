@@ -33,7 +33,10 @@ public interface ILogisticsNetwork extends INetworkCache {
 	 * @return TODO*/
 	public <T extends IMonitorInfo> MonitoredList<T> updateMonitoredList(ILogicMonitor<T> monitor, Map<Pair<BlockCoords, EnumFacing>, MonitoredList<?>> connections);
 
-	/** gets the full monitored list for the Handler type */
+	/**gets the full monitored list for the Handler type
+	 * @param type the type of handler to get a list for
+	 * @return a full list of data
+	 */
 	public <T extends IMonitorInfo> Map<Pair<BlockCoords, EnumFacing>, MonitoredList<?>> getMonitoredList(LogicMonitorHandler<T> type);
 	
 	

@@ -20,31 +20,31 @@ import sonar.core.helpers.NBTHelper;
 import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.core.utils.Pair;
 import sonar.core.utils.SortingDirection;
+import sonar.logistics.Logistics;
 import sonar.logistics.LogisticsASMLoader;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.display.DisplayType;
 import sonar.logistics.api.display.IInfoDisplay;
 import sonar.logistics.api.display.ScreenLayout;
+import sonar.logistics.api.info.IScaleableScreen;
 import sonar.logistics.api.info.LogicInfo;
 import sonar.logistics.api.info.RenderInfoProperties;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
 import sonar.logistics.common.multiparts.LogisticsMultipart;
-import sonar.logistics.connections.managers.NetworkManager;
 import sonar.logistics.connections.monitoring.MonitoredList;
-import sonar.logistics.helpers.InfoHelper.ItemInteractionType;
 
 public class InfoHelper {
 
 	public static final String DELETE = "del";
 	public static final String SYNC = "syn";
-	public static final String REMOVED = "r";
+	public static final String REMOVED = "rem";
 	public static final String SPECIAL = "spe";
 
 	public static void screenItemStackClicked(StoredItemStack itemstack, int networkID, BlockInteractionType type, boolean doubleClick, RenderInfoProperties renderInfo, EntityPlayer player, EnumHand hand, ItemStack stack, PartMOP hit) {
 		Pair<Integer, ItemInteractionType> toRemove = InfoHelper.getItemsToRemove(type);
 		if (toRemove.a != 0 && networkID != -1) {
-			INetworkCache cache = NetworkManager.getNetwork(networkID);
+			INetworkCache cache = Logistics.instance.networkManager.getNetwork(networkID);
 			switch (toRemove.b) {
 			case ADD:
 				if (stack != null) {
@@ -104,9 +104,8 @@ public class InfoHelper {
 					T info = stackList.get(i);
 					if (info != null && info.isValid()) {
 						NBTTagCompound compound = new NBTTagCompound();
-						if (listType == 1)
-							compound.setBoolean(REMOVED, true);
-						list.appendTag(InfoHelper.writeInfoToNBT(compound, info, listType == 1 ? SyncType.SAVE : SyncType.SAVE));
+						compound.setBoolean(REMOVED, listType == 1);
+						list.appendTag(InfoHelper.writeInfoToNBT(compound, info, SyncType.SAVE));
 					}
 				}
 			}
@@ -138,13 +137,13 @@ public class InfoHelper {
 			NBTTagList list = tag.getTagList(SPECIAL, 10);
 			tags: for (int i = 0; i < list.tagCount(); i++) {
 				NBTTagCompound infoTag = list.getCompoundTagAt(i);
+				boolean removed = infoTag.getBoolean(REMOVED);
 				T stack = (T) InfoHelper.readInfoFromNBT(infoTag);
-				// .forEachRemaining(stored -> {});
 				Iterator<T> iterator = stacks.iterator();
 				while (iterator.hasNext()) {
 					T stored = iterator.next();
 					if (stack.isMatchingInfo(stored)) {
-						if (infoTag.getBoolean(REMOVED)) {
+						if (removed) {
 							stacks.remove(stored);
 						} else {
 							stored.readData(infoTag, SyncType.SAVE);
@@ -193,33 +192,60 @@ public class InfoHelper {
 		return sortedInfo;
 	}
 
-	public static double[] getScaling(DisplayType type, ScreenLayout layout, int pos) {
+	public static double[] getScaling(IInfoDisplay display, ScreenLayout layout, int pos) {
+		DisplayType type = display.getDisplayType();
+		double width = type.width, height = type.height, scale = type.scale;
+		if (display instanceof IScaleableScreen) {
+			double[] scaling = ((IScaleableScreen) display).getScaling();
+			width = scaling[0];
+			height = scaling[1];
+			scale = scaling[2];
+		}
+
 		switch (layout) {
 		case DUAL:
-			return new double[] { type.width, type.height / 2, type.scale };
+			return new double[] { width, height / 2, scale };
 		case GRID:
-			return new double[] { type.width / 2, type.height / 2, type.scale / 1.5 };
+			return new double[] { width / 2, height / 2, scale / 1.5 };
 		case LIST:
-			return new double[] { type.width, type.height / 4, type.scale / 1.5 };
+			return new double[] { width, height / 4, scale / 1.5 };
 		default:
-			return new double[] { type.width, type.height, type.scale * 1.2 };
+			return new double[] { width, height, scale * 1.2 };
 		}
 	}
 
-	public static double[] getTranslation(DisplayType type, ScreenLayout layout, int pos) {
+	public static double[] getTranslation(IInfoDisplay display, ScreenLayout layout, int pos) {
+		DisplayType type = display.getDisplayType();
+		double width = type.width, height = type.height, scale = type.scale;
+		if (display instanceof IScaleableScreen) {
+			double[] scaling = ((IScaleableScreen) display).getScaling();
+			// width = scaling[0];
+			// height = scaling[1];
+			// scale = scaling[2];
+		}
+
 		switch (layout) {
 		case DUAL:
-			return new double[] { 0, pos == 1 ? type.height / 2 : 0, 0 };
+			return new double[] { 0, pos == 1 ? height / 2 : 0, 0 };
 		case GRID:
-			return new double[] { pos == 1 || pos == 3 ? type.height / 2 : 0, pos > 1 ? type.height / 2 : 0, 0 };
+			return new double[] { pos == 1 || pos == 3 ? height / 2 : 0, pos > 1 ? height / 2 : 0, 0 };
 		case LIST:
-			return new double[] { 0, pos * (type.height / 4), 0 };
+			return new double[] { 0, pos * (height / 4), 0 };
 		default:
 			return new double[] { 0, 0, 0 };
 		}
 	}
 
-	public static double[] getIntersect(DisplayType type, ScreenLayout layout, int pos) {
+	public static double[] getIntersect(IInfoDisplay display, ScreenLayout layout, int pos) {
+		DisplayType type = display.getDisplayType();
+		double width = type.width, height = type.height, scale = type.scale;
+		if (display instanceof IScaleableScreen) {
+			double[] scaling = ((IScaleableScreen) display).getScaling();
+			width = scaling[0];
+			height = scaling[1];
+			scale = scaling[2];
+		}
+
 		switch (layout) {
 		case DUAL:
 			return new double[] { 0, pos == 1 ? type.height / 2 : 0, pos == 1 ? 1 : type.width / 2, pos == 1 ? 1 : type.height / 2 };
@@ -238,11 +264,11 @@ public class InfoHelper {
 			return true;
 		}
 		IInfoDisplay display = renderInfo.container.getDisplay();
-		double[] intersect = getIntersect(display.getDisplayType(), display.getLayout(), renderInfo.infoPos);
+		double[] intersect = getIntersect(display, display.getLayout(), renderInfo.infoPos);
 		BlockPos pos = hit.getBlockPos();
 		double x = hit.hitVec.xCoord - pos.getX();
 		double y = hit.hitVec.yCoord - pos.getY();
-		if (x >= intersect[0] && x <= intersect[2] && y >= intersect[1] && y <= intersect[3]) {
+		if (x >= intersect[0] && x <= intersect[2] && 1 - y >= intersect[1] && 1 - y <= intersect[3]) {
 			return true;
 		}
 		return false;

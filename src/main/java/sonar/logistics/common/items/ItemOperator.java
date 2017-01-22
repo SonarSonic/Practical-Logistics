@@ -7,8 +7,6 @@ import mcmultipart.multipart.IMultipartContainer;
 import mcmultipart.multipart.MultipartHelper;
 import mcmultipart.raytrace.RayTraceUtils;
 import mcmultipart.raytrace.RayTraceUtils.AdvancedRayTraceResultPart;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -23,13 +21,11 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import sonar.core.SonarCore;
 import sonar.core.api.IFlexibleGui;
-import sonar.core.api.utils.BlockCoords;
 import sonar.core.common.item.SonarItem;
 import sonar.core.helpers.FontHelper;
 import sonar.core.helpers.SonarHelper;
 import sonar.core.integration.multipart.SonarMultipartHelper;
 import sonar.core.network.FlexibleGuiHandler;
-import sonar.core.utils.IGuiItem;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.connecting.IChannelledTile;
 import sonar.logistics.api.connecting.IOperatorTile;
@@ -38,7 +34,7 @@ import sonar.logistics.api.connecting.OperatorMode;
 import sonar.logistics.api.info.monitor.ILogicMonitor;
 import sonar.logistics.client.gui.GuiChannelSelection;
 import sonar.logistics.common.containers.ContainerChannelSelection;
-import sonar.logistics.connections.managers.LogicMonitorManager;
+import sonar.logistics.helpers.CableHelper;
 
 public class ItemOperator extends SonarItem implements IOperatorTool, IFlexibleGui<ItemStack> {
 
@@ -132,7 +128,7 @@ public class ItemOperator extends SonarItem implements IOperatorTool, IFlexibleG
 		switch (id) {
 		case 0:
 			int hash = tag.getInteger("hash");
-			ILogicMonitor part = LogicMonitorManager.getMonitorFromClient(hash);
+			ILogicMonitor part = CableHelper.getMonitorFromHashCode(hash, world.isRemote);
 			if (part != null && part instanceof IChannelledTile) {
 				return new ContainerChannelSelection((IChannelledTile) part);
 			}
@@ -145,9 +141,9 @@ public class ItemOperator extends SonarItem implements IOperatorTool, IFlexibleG
 		switch (id) {
 		case 0:
 			int hash = tag.getInteger("hash");
-			ILogicMonitor part = LogicMonitorManager.getMonitorFromClient(hash);
+			ILogicMonitor part = CableHelper.getMonitorFromHashCode(hash, world.isRemote);
 			if (part != null && part instanceof IChannelledTile) {
-				return new GuiChannelSelection((IChannelledTile) part);
+				return new GuiChannelSelection((IChannelledTile) part, 0);
 			}
 		}
 		return null;

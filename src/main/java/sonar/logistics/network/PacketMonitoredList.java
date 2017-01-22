@@ -1,35 +1,34 @@
 package sonar.logistics.network;
 
 import io.netty.buffer.ByteBuf;
+import mcmultipart.multipart.IMultipart;
+import mcmultipart.multipart.IMultipartContainer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import sonar.core.helpers.NBTHelper.SyncType;
-import sonar.core.utils.Pair;
+import sonar.core.network.PacketMultipart;
+import sonar.core.network.PacketMultipartHandler;
 import sonar.logistics.Logistics;
+import sonar.logistics.api.info.InfoUUID;
 import sonar.logistics.api.info.monitor.ILogicMonitor;
-import sonar.logistics.connections.managers.LogicMonitorManager;
 import sonar.logistics.connections.monitoring.MonitoredList;
 import sonar.logistics.helpers.InfoHelper;
-import sonar.logistics.helpers.LogisticsHelper;
 
-public class PacketMonitoredList implements IMessage {
+public class PacketMonitoredList extends PacketMultipart {
 
+	public InfoUUID id;
 	public int networkID;
-
 	public MonitoredList list;
-	public ILogicMonitor monitor;
-
 	public NBTTagCompound listTag;
 	public SyncType type;
 
-	public PacketMonitoredList() {
-	}
+	public PacketMonitoredList() {}
 
-	public PacketMonitoredList(ILogicMonitor monitor, int networkID, NBTTagCompound listTag, SyncType type) {
-		this.monitor = monitor;
+	public PacketMonitoredList(ILogicMonitor monitor, InfoUUID id, int networkID, NBTTagCompound listTag, SyncType type) {
+		super(monitor.getUUID(), monitor.getCoords().getBlockPos());
+		this.id = id;
 		this.networkID = networkID;
 		this.listTag = listTag;
 		this.type = type;
@@ -37,39 +36,28 @@ public class PacketMonitoredList implements IMessage {
 
 	@Override
 	public void fromBytes(ByteBuf buf) {
-		int hashCode = buf.readInt();
+		super.fromBytes(buf);
 		networkID = buf.readInt();
-		Pair<ILogicMonitor, MonitoredList<?>> pair = LogicMonitorManager.getMonitorFromServer(hashCode);
-		if (pair != null) {
-			monitor = pair.a;
-			if (monitor.getNetworkID() == networkID) {
-
-				list = pair.b == null ? MonitoredList.newMonitoredList(networkID) : pair.b.copyInfo();
-				list.networkID = networkID;
-				type = SyncType.values()[buf.readInt()];
-				list = InfoHelper.readMonitoredList(ByteBufUtils.readTag(buf), list, type);
-			}else{
-				list = MonitoredList.newMonitoredList(monitor.getNetworkID());
-			}
-		} else {
-			Logistics.logger.error("Couldn't get monitor for hashcode");
-		}
+		id = InfoUUID.getUUID(buf);
+		type = SyncType.values()[buf.readInt()];
+		list = InfoHelper.readMonitoredList(ByteBufUtils.readTag(buf), Logistics.getClientManager().getMonitoredList(networkID, id).copyInfo(), type);
 	}
 
 	@Override
 	public void toBytes(ByteBuf buf) {
-		buf.writeInt(monitor.getIdentity().hashCode());
+		super.toBytes(buf);
 		buf.writeInt(networkID);
+		id.writeToBuf(buf);
 		buf.writeInt(type.ordinal());
 		ByteBufUtils.writeTag(buf, listTag);
 	}
 
-	public static class Handler implements IMessageHandler<PacketMonitoredList, IMessage> {
+	public static class Handler extends PacketMultipartHandler<PacketMonitoredList> {
 
 		@Override
-		public IMessage onMessage(PacketMonitoredList message, MessageContext ctx) {
-			if (message.list != null) {
-				LogicMonitorManager.monitoredLists.put(message.monitor, message.monitor.sortMonitoredList(message.list));
+		public IMessage processMessage(PacketMonitoredList message, IMultipartContainer target, IMultipart part, MessageContext ctx) {
+			if (message.list != null && part instanceof ILogicMonitor) {
+				Logistics.getClientManager().monitoredLists.put(message.id, ((ILogicMonitor) part).sortMonitoredList(message.list, message.id.channelID));
 			}
 			return null;
 		}

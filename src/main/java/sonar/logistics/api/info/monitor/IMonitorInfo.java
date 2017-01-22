@@ -1,8 +1,11 @@
 package sonar.logistics.api.info.monitor;
 
+import net.minecraft.nbt.NBTTagCompound;
 import sonar.core.api.nbt.INBTSyncable;
+import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.logistics.api.asm.LogicInfoType;
-import sonar.logistics.api.display.DisplayType;
+import sonar.logistics.api.display.IDisplayInfo;
+import sonar.logistics.api.info.InfoContainer;
 
 /**for your info to be registered you must use {@link LogicInfoType} implement this for all types of info*/
 public interface IMonitorInfo<T extends IMonitorInfo> extends INBTSyncable{
@@ -27,5 +30,7 @@ public interface IMonitorInfo<T extends IMonitorInfo> extends INBTSyncable{
 	
 	public T copy();
 	
-	public void renderInfo(DisplayType displayType, double width, double height, double scale, int infoPos);
+	public void renderInfo(InfoContainer container, IDisplayInfo displayInfo, double width, double height, double scale, int infoPos);
+	
+	public void identifyChanges(T newInfo);
 }

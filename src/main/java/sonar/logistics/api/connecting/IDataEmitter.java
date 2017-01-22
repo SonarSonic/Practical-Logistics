@@ -3,7 +3,6 @@ package sonar.logistics.api.connecting;
 import java.util.ArrayList;
 import java.util.UUID;
 
-import sonar.core.api.utils.BlockCoords;
 import sonar.core.utils.IUUIDIdentity;
 
 /**implemented on the Data Emitter*/

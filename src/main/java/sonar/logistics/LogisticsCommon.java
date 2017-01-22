@@ -13,12 +13,13 @@ import sonar.core.utils.IGuiTile;
 import sonar.logistics.network.PacketClientEmitters;
 import sonar.logistics.network.PacketInfoList;
 import sonar.logistics.network.PacketInventoryReader;
+import sonar.logistics.network.PacketLogicMonitors;
 import sonar.logistics.network.PacketMonitorType;
 import sonar.logistics.network.PacketMonitoredCoords;
 import sonar.logistics.network.PacketMonitoredList;
-import sonar.logistics.network.PacketClientEmitters.Handler;
 
 public class LogisticsCommon implements IGuiHandler {
+
 
 	public static void registerPackets() {
 		Logistics.network.registerMessage(PacketMonitoredList.Handler.class, PacketMonitoredList.class, 0, Side.CLIENT);
@@ -27,6 +28,7 @@ public class LogisticsCommon implements IGuiHandler {
 		Logistics.network.registerMessage(PacketInfoList.Handler.class, PacketInfoList.class, 3, Side.CLIENT);
 		Logistics.network.registerMessage(PacketInventoryReader.Handler.class, PacketInventoryReader.class, 4, Side.SERVER);
 		Logistics.network.registerMessage(PacketClientEmitters.Handler.class, PacketClientEmitters.class, 5, Side.CLIENT);
+		Logistics.network.registerMessage(PacketLogicMonitors.Handler.class, PacketLogicMonitors.class, 6, Side.CLIENT);
 		/* Logistics.network.registerMessage(PacketProviders.Handler.class, PacketProviders.class, 0, Side.CLIENT); // Logistics.network.registerMessage(PacketInfoBlock.Handler.class, PacketInfoBlock.class, 1, Side.SERVER); Logistics.network.registerMessage(PacketDataEmitters.Handler.class, PacketDataEmitters.class, 2, Side.CLIENT); Logistics.network.registerMessage(PacketCoordsSelection.Handler.class, PacketCoordsSelection.class, 3, Side.SERVER); // Logistics.network.registerMessage(PacketFluidReader.Handler.class, PacketFluidReader.class, 5, Side.SERVER); Logistics.network.registerMessage(PacketRouterGui.Handler.class, PacketRouterGui.class, 6, Side.SERVER); Logistics.network.registerMessage(PacketGuiChange.Handler.class, PacketGuiChange.class, 7, Side.SERVER); Logistics.network.registerMessage(ItemHandler.class, PacketScreenInteraction.PacketItemStack.class, 8, Side.SERVER); Logistics.network.registerMessage(FluidHandler.class, PacketScreenInteraction.PacketFluidStack.class, 9, Side.SERVER); */
 	}
 
@@ -72,13 +74,17 @@ public class LogisticsCommon implements IGuiHandler {
 		return null;
 	}
 
-	public boolean isUsingOperator(){
+	public boolean isUsingOperator() {
 		return false;
 	}
-	
-	public void setUsingOperator(boolean bool){}
-	
-	public void registerRenderThings() {}
 
-	public void registerTextures() {}
+	public void setUsingOperator(boolean bool) {
+	}
+
+	public void registerRenderThings() {
+	}
+
+	public void registerTextures() {
+	}
+
 }

@@ -3,28 +3,24 @@ package sonar.logistics.client.gui;
 import java.util.ArrayList;
 
 import net.minecraft.client.gui.GuiButton;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.Container;
 import sonar.core.helpers.FontHelper;
+import sonar.logistics.Logistics;
 import sonar.logistics.api.connecting.IChannelledTile;
-import sonar.logistics.api.connecting.IOperatorTool;
-import sonar.logistics.api.info.monitor.IMonitorInfo;
 import sonar.logistics.client.LogisticsColours;
 import sonar.logistics.client.RenderBlockSelection;
 import sonar.logistics.common.containers.ContainerChannelSelection;
-import sonar.logistics.common.containers.ContainerInfoReader;
-import sonar.logistics.common.multiparts.InfoReaderPart;
-import sonar.logistics.connections.managers.NetworkManager;
 import sonar.logistics.connections.monitoring.MonitoredBlockCoords;
 import sonar.logistics.connections.monitoring.MonitoredList;
 import sonar.logistics.helpers.InfoRenderer;
 
 public class GuiChannelSelection extends GuiSelectionList<MonitoredBlockCoords> {
 	IChannelledTile tile;
+	int channelID;
 
-	public GuiChannelSelection(IChannelledTile tile) {
+	public GuiChannelSelection(IChannelledTile tile, int channelID) {
 		super(new ContainerChannelSelection(tile), tile);
 		this.tile = tile;
+		this.channelID = channelID;
 	}
 
 	@Override
@@ -36,14 +32,14 @@ public class GuiChannelSelection extends GuiSelectionList<MonitoredBlockCoords> 
 
 	public void selectionPressed(GuiButton button, int buttonID, MonitoredBlockCoords info) {
 		if (buttonID == 0) {
-			tile.modifyCoords(info);
+			tile.modifyCoords(info, channelID);
 		} else {
 			RenderBlockSelection.addPosition(info.syncCoords.getCoords(), false);
 		}
 	}
 
 	public void setInfo() {
-		infoList = (ArrayList<MonitoredBlockCoords>) NetworkManager.getCoordMap().getOrDefault(tile.getNetworkID(), MonitoredList.<MonitoredBlockCoords>newMonitoredList(tile.getNetworkID())).clone();
+		infoList = (ArrayList<MonitoredBlockCoords>) Logistics.getClientManager().coordMap.getOrDefault(tile.getNetworkID(), MonitoredList.<MonitoredBlockCoords>newMonitoredList(tile.getNetworkID())).clone();
 	}
 
 	@Override
@@ -58,7 +54,7 @@ public class GuiChannelSelection extends GuiSelectionList<MonitoredBlockCoords> 
 
 	@Override
 	public boolean isSelectedInfo(MonitoredBlockCoords info) {
-		if (info.isValid() && !info.isHeader() && tile.getChannels().contains(info.syncCoords.getCoords())) {
+		if (info.isValid() && !info.isHeader() && tile.getChannels(channelID).contains(info.syncCoords.getCoords())) {
 			return true;
 		}
 		return false;

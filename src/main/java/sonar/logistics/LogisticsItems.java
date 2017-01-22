@@ -8,7 +8,6 @@ import sonar.core.SonarCore;
 import sonar.core.registries.ISonarRegistryItem;
 import sonar.core.registries.SonarRegistryItem;
 import sonar.logistics.common.items.ItemDefaultMultipart;
-import sonar.logistics.common.items.ItemFacingMultipart;
 import sonar.logistics.common.items.ItemOperator;
 import sonar.logistics.common.items.ItemScreenMultipart;
 import sonar.logistics.common.items.ItemSidedMultipart;
@@ -65,11 +64,11 @@ public class LogisticsItems extends Logistics {
 		partNode = register(new SonarRegistryItem(new ItemSidedMultipart(NodePart.class), "Node"));
 		partTransferNode = register(new SonarRegistryItem(new ItemSidedMultipart(TransferNodePart.class), "TransferNode"));
 		infoReaderPart = register(new SonarRegistryItem(new ItemSidedMultipart(InfoReaderPart.class), "InfoReader"));
-		//energyReaderPart = register(new SonarRegistryItem(new ItemSidedMultipart(EnergyReaderPart.class), "EnergyReader"));
+		energyReaderPart = register(new SonarRegistryItem(new ItemSidedMultipart(EnergyReaderPart.class), "EnergyReader"));
 		transceiver = register(new SonarRegistryItem(new WirelessTransceiver().setMaxStackSize(1), "Transceiver"));
 		partEmitter = register(new SonarRegistryItem(new ItemWirelessMultipart(DataEmitterPart.class), "DataEmitter"));
 		partReceiver = register(new SonarRegistryItem(new ItemWirelessMultipart(DataReceiverPart.class), "DataReceiver"));
-		//partRedstoneSignaller = register(new SonarRegistryItem(new ItemSidedMultipart(RedstoneSignallerPart.class), "RedstoneSignaller"));
+		partRedstoneSignaller = register(new SonarRegistryItem(new ItemSidedMultipart(RedstoneSignallerPart.class), "RedstoneSignaller"));
 
 		MultipartRegistry.registerPart(DataCablePart.class, "practicallogistics:DataCable");
 		MultipartRegistry.registerPart(NodePart.class, "practicallogistics:Node");

@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import mcmultipart.MCMultiPartMod;
-import mcmultipart.multipart.ISlottedPart;
 import mcmultipart.raytrace.RayTraceUtils.AdvancedRayTraceResultPart;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyEnum;
@@ -35,7 +34,7 @@ public class TransferNodePart extends SidedMultipart implements IConnectionNode,
 	public SyncEnum<TransferMode> transferMode = new SyncEnum(TransferMode.values(), 1).setDefault(TransferMode.PULL);
 	public int ticks = 20;
 	{
-		syncParts.add(transferMode);
+		syncList.addPart(transferMode);
 	}
 
 	public TransferNodePart() {
@@ -75,12 +74,7 @@ public class TransferNodePart extends SidedMultipart implements IConnectionNode,
 	}
 
 	@Override
-	public void addConnections(Map<BlockCoords, EnumFacing> connections) {
-		// if (should add the connection) {
-		// BlockCoords tileCoords = new BlockCoords(getPos().offset(face), getWorld().provider.getDimension());
-		// connections.put(tileCoords, face);
-		// }
-	}
+	public void addConnections(Map<BlockCoords, EnumFacing> connections) {}
 
 	@Override
 	public ItemStack getItemStack() {

@@ -3,24 +3,13 @@ package sonar.logistics.client.gui;
 import java.util.ArrayList;
 
 import net.minecraft.client.gui.GuiButton;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.Container;
 import sonar.core.helpers.FontHelper;
+import sonar.logistics.Logistics;
 import sonar.logistics.api.connecting.ClientDataEmitter;
-import sonar.logistics.api.connecting.IChannelledTile;
-import sonar.logistics.api.connecting.IOperatorTool;
-import sonar.logistics.api.info.monitor.IMonitorInfo;
 import sonar.logistics.client.LogisticsColours;
 import sonar.logistics.client.RenderBlockSelection;
-import sonar.logistics.common.containers.ContainerChannelSelection;
 import sonar.logistics.common.containers.ContainerDataReceiver;
-import sonar.logistics.common.containers.ContainerInfoReader;
 import sonar.logistics.common.multiparts.DataReceiverPart;
-import sonar.logistics.common.multiparts.InfoReaderPart;
-import sonar.logistics.connections.managers.EmitterManager;
-import sonar.logistics.connections.managers.NetworkManager;
-import sonar.logistics.connections.monitoring.MonitoredBlockCoords;
-import sonar.logistics.connections.monitoring.MonitoredList;
 import sonar.logistics.helpers.InfoRenderer;
 
 public class GuiDataReceiver extends GuiSelectionList<ClientDataEmitter> {
@@ -48,7 +37,7 @@ public class GuiDataReceiver extends GuiSelectionList<ClientDataEmitter> {
 	}
 
 	public void setInfo() {
-		infoList = (ArrayList<ClientDataEmitter>) EmitterManager.clientEmitters.clone();
+		infoList = (ArrayList<ClientDataEmitter>) Logistics.getClientManager().clientEmitters.clone();
 	}
 
 	@Override

@@ -21,7 +21,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.core.utils.Pair;
-import sonar.logistics.api.connecting.ILogicTile.ConnectionType;
 
 public abstract class FacingMultipart extends LogisticsMultipart implements INormallyOccludingPart {
 

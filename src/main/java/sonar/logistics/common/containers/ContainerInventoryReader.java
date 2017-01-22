@@ -1,8 +1,6 @@
 package sonar.logistics.common.containers;
 
-import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
@@ -13,6 +11,7 @@ import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.core.inventory.ContainerMultipartSync;
 import sonar.core.inventory.slots.SlotList;
 import sonar.logistics.api.LogisticsAPI;
+import sonar.logistics.api.info.monitor.MonitorType;
 import sonar.logistics.api.settings.InventoryReader;
 import sonar.logistics.api.settings.InventoryReader.Modes;
 import sonar.logistics.common.multiparts.InventoryReaderPart;
@@ -121,7 +120,7 @@ public class ContainerInventoryReader extends ContainerMultipartSync implements 
 
 	public void onContainerClosed(EntityPlayer player) {
 		super.onContainerClosed(player);
-		part.removeViewer(player);
+		part.getViewersList().removeViewer(player, MonitorType.INFO);
 	}
 
 	@Override

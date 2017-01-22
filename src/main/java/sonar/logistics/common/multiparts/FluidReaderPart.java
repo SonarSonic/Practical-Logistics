@@ -1,36 +1,29 @@
 package sonar.logistics.common.multiparts;
 
-import com.google.common.collect.Lists;
-
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
+import sonar.core.helpers.FontHelper;
 import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.core.network.sync.SyncEnum;
 import sonar.core.network.sync.SyncTagType;
 import sonar.core.network.sync.SyncTagType.INT;
 import sonar.core.network.utils.IByteBufTile;
-import sonar.core.utils.IGuiTile;
 import sonar.core.utils.Pair;
 import sonar.core.utils.SortingDirection;
+import sonar.logistics.Logistics;
 import sonar.logistics.LogisticsItems;
 import sonar.logistics.api.info.InfoUUID;
 import sonar.logistics.api.info.LogicInfoList;
 import sonar.logistics.api.info.monitor.ChannelType;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
-import sonar.logistics.api.info.monitor.LogicMonitorHandler;
 import sonar.logistics.api.settings.FluidReader;
 import sonar.logistics.client.gui.GuiFluidReader;
-import sonar.logistics.client.gui.GuiInventoryReader;
 import sonar.logistics.common.containers.ContainerFluidReader;
-import sonar.logistics.common.containers.ContainerInventoryReader;
-import sonar.logistics.connections.managers.LogicMonitorManager;
 import sonar.logistics.connections.monitoring.FluidMonitorHandler;
-import sonar.logistics.connections.monitoring.InfoMonitorHandler;
 import sonar.logistics.connections.monitoring.MonitoredFluidStack;
-import sonar.logistics.connections.monitoring.MonitoredItemStack;
 import sonar.logistics.connections.monitoring.MonitoredList;
 import sonar.logistics.helpers.FluidHelper;
 import sonar.logistics.network.SyncMonitoredType;
@@ -44,7 +37,7 @@ public class FluidReaderPart extends ReaderMultipart<MonitoredFluidStack> implem
 	public SyncEnum<SortingDirection> sortingOrder = (SyncEnum) new SyncEnum(SortingDirection.values(), 5).addSyncType(SyncType.SPECIAL);
 	public SyncEnum<FluidReader.SortingType> sortingType = (SyncEnum) new SyncEnum(FluidReader.SortingType.values(), 6).addSyncType(SyncType.SPECIAL);
 	{
-		syncParts.addAll(Lists.newArrayList(setting, targetSlot, posSlot, sortingOrder, sortingType, selected));
+		syncList.addParts(setting, targetSlot, posSlot, sortingOrder, sortingType, selected);
 	}
 
 	public FluidReaderPart() {
@@ -61,7 +54,7 @@ public class FluidReaderPart extends ReaderMultipart<MonitoredFluidStack> implem
 	}
 
 	@Override
-	public MonitoredList<MonitoredFluidStack> sortMonitoredList(MonitoredList<MonitoredFluidStack> updateInfo) {
+	public MonitoredList<MonitoredFluidStack> sortMonitoredList(MonitoredList<MonitoredFluidStack> updateInfo, int channelID) {
 		FluidHelper.sortFluidList(updateInfo, sortingOrder.getObject(), sortingType.getObject());
 		return updateInfo;
 	}
@@ -72,7 +65,7 @@ public class FluidReaderPart extends ReaderMultipart<MonitoredFluidStack> implem
 	}
 
 	@Override
-	public void setMonitoredInfo(MonitoredList<MonitoredFluidStack> updateInfo) {
+	public void setMonitoredInfo(MonitoredList<MonitoredFluidStack> updateInfo, int channelID) {
 		IMonitorInfo info = null;
 		switch (setting.getObject()) {
 		case SELECTED:
@@ -96,9 +89,9 @@ public class FluidReaderPart extends ReaderMultipart<MonitoredFluidStack> implem
 		}
 		if (info != null) {
 			InfoUUID id = new InfoUUID(getIdentity().hashCode(), 0);
-			IMonitorInfo oldInfo = LogicMonitorManager.info.get(id);
+			IMonitorInfo oldInfo = Logistics.getServerManager().info.get(id);
 			if (oldInfo == null || !oldInfo.isMatchingType(info) || !oldInfo.isIdenticalInfo(info)) {
-				LogicMonitorManager.changeInfo(id, info);
+				Logistics.getServerManager().changeInfo(id, info);
 			}
 		}
 
@@ -121,4 +114,10 @@ public class FluidReaderPart extends ReaderMultipart<MonitoredFluidStack> implem
 		}
 		return null;
 	}
+
+	@Override
+	public String getDisplayName() {
+		return FontHelper.translate("item.FluidReader.name");
+	}
+
 }

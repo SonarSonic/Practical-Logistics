@@ -32,7 +32,7 @@ public class EnergyMonitorHandler extends LogicMonitorHandler<MonitoredEnergySta
 			if (tile != null && provider.canProvideEnergy(tile, side)) {
 				StoredEnergyStack info = provider.getEnergy(new StoredEnergyStack(provider.getProvidedType()), tile, side);
 				if (info != null)
-					list.addInfoToList(new MonitoredEnergyStack(info, new MonitoredBlockCoords(coords, coords.getBlock().getUnlocalizedName())));
+					list.addInfoToList(new MonitoredEnergyStack(info, new MonitoredBlockCoords(coords, coords.getBlock().getUnlocalizedName())), previousList);
 
 			}
 		}

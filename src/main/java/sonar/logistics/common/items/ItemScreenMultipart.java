@@ -20,11 +20,15 @@ public class ItemScreenMultipart extends ItemMultiPart {
 	@Override
 	public IMultipart createPart(World world, BlockPos pos, EnumFacing side, Vec3d hit, ItemStack stack, EntityPlayer player) {
 		try {
+			EnumFacing facing = side;
 			EnumFacing rotation = EnumFacing.NORTH;
-			if (side == EnumFacing.DOWN || side == EnumFacing.UP) {
+			if(player.rotationPitch>75 || player.rotationPitch<-75){
 				rotation = player.getHorizontalFacing().getOpposite();
+			}else{
+				facing = player.getHorizontalFacing().getOpposite();
 			}
-			return type.getConstructor(EnumFacing.class, EnumFacing.class).newInstance(side, rotation);
+			
+			return type.getConstructor(EnumFacing.class, EnumFacing.class).newInstance(facing, rotation);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

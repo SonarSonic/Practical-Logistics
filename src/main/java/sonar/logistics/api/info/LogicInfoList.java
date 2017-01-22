@@ -10,26 +10,24 @@ import mcmultipart.raytrace.PartMOP;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import sonar.core.api.inventories.StoredItemStack;
 import sonar.core.api.utils.BlockInteractionType;
+import sonar.core.helpers.FontHelper;
 import sonar.core.helpers.RenderHelper;
 import sonar.core.network.sync.SyncTagType;
-import sonar.core.network.sync.SyncUUID;
 import sonar.core.network.sync.SyncTagType.INT;
-import sonar.core.utils.Pair;
+import sonar.core.network.sync.SyncUUID;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.asm.LogicInfoType;
+import sonar.logistics.api.display.ConnectedDisplayScreen;
 import sonar.logistics.api.display.DisplayType;
 import sonar.logistics.api.display.IDisplayInfo;
-import sonar.logistics.api.display.ScreenLayout;
 import sonar.logistics.api.info.monitor.ILogicMonitor;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
 import sonar.logistics.api.info.monitor.LogicMonitorHandler;
 import sonar.logistics.common.multiparts.ScreenMultipart;
-import sonar.logistics.connections.managers.LogicMonitorManager;
 import sonar.logistics.connections.monitoring.MonitoredFluidStack;
 import sonar.logistics.connections.monitoring.MonitoredItemStack;
 import sonar.logistics.connections.monitoring.MonitoredList;
@@ -44,7 +42,7 @@ public class LogicInfoList extends BaseInfo<LogicInfoList> implements INameableI
 	public final SyncTagType.INT networkID = (INT) new SyncTagType.INT(2).setDefault(-1);
 
 	{
-		syncParts.addAll(Lists.newArrayList(monitorUUID, infoID, networkID));
+		syncParts.addParts(monitorUUID, infoID, networkID);
 	}
 
 	public LogicInfoList() {
@@ -92,12 +90,13 @@ public class LogicInfoList extends BaseInfo<LogicInfoList> implements INameableI
 	}
 
 	@Override
-	public void renderInfo(DisplayType displayType, double width, double height, double scale, int infoPos) {
+	public void renderInfo(InfoContainer container, IDisplayInfo displayInfo, double width, double height, double scale, int infoPos) {
+		MonitoredList<?> list = Logistics.getClientManager().getMonitoredList(networkID.getObject(), displayInfo.getInfoUUID());
+		ILogicMonitor monitor = Logistics.getClientManager().monitors.get(monitorUUID.getUUID());
+		
+		if (monitor == null || list == null)
+			return;
 		if (infoID.getObject().equals(MonitoredItemStack.id)) {
-			Pair<ILogicMonitor, MonitoredList<?>> monitor = LogicMonitorManager.getMonitorFromServer(monitorUUID.getUUID().hashCode());
-			if (monitor == null || monitor.b == null)
-				return;
-			MonitoredList<MonitoredItemStack> list = (MonitoredList<MonitoredItemStack>) monitor.b;
 			if (list == null || list.isEmpty()) {
 				// new InfoError("NO ITEMS").renderInfo(displayType, width, height, scale, infoPos);
 				return;
@@ -105,14 +104,13 @@ public class LogicInfoList extends BaseInfo<LogicInfoList> implements INameableI
 			int xSlots = (int) Math.round(width) * 2;
 			int ySlots = (int) (Math.round(height) * 2);
 			int currentSlot = 0;
-			double spacing = 22;
+			double spacing = 22.7;
 
 			GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 			GL11.glPushMatrix();
-			GL11.glTranslated(-1 + 0.0625 * 2, -1 + 0.0625 * 6, 0.00);
+			GL11.glTranslated(-1 + (0.0625*1.3), -1 + 0.0625 * 5, 0.00);
 			GL11.glRotated(180, 0, 1, 0);
 			GL11.glScaled(-1, 1, 1);
-
 			GlStateManager.enableDepth();
 			for (MonitoredItemStack stack : (MonitoredList<MonitoredItemStack>) list.copyInfo()) {
 				if (stack.isValid()) {
@@ -121,7 +119,7 @@ public class LogicInfoList extends BaseInfo<LogicInfoList> implements INameableI
 						int xLevel = (int) (currentSlot - ((Math.floor((currentSlot / xSlots))) * xSlots));
 						int yLevel = (int) (Math.floor((currentSlot / xSlots)));
 						GL11.glPushMatrix();
-						GL11.glScaled(scale * 2, scale * 2, scale * 2);
+						GL11.glScaled(0.022, 0.022, 0.01);
 						GL11.glTranslated(xLevel * spacing, yLevel * spacing, 0);
 						GlStateManager.disableLighting();
 						GlStateManager.enableCull();
@@ -141,50 +139,54 @@ public class LogicInfoList extends BaseInfo<LogicInfoList> implements INameableI
 			GlStateManager.enableDepth();
 			GL11.glPopMatrix();
 		}
-		if (infoID.getObject().equals(MonitoredFluidStack.id)) {
-
+		if (infoID.getObject().equals(MonitoredFluidStack.id)) {			
+			for (MonitoredFluidStack stack : (MonitoredList<MonitoredFluidStack>) list.copyInfo()) {
+				stack.renderInfo(container, displayInfo, width, height, scale, infoPos);
+				break;
+			}
 		}
 	}
 
 	@Override
-	public boolean onClicked(BlockInteractionType type, boolean doubleClick, RenderInfoProperties renderInfo, EntityPlayer player, EnumHand hand, ItemStack stack, PartMOP hit) {
+	public boolean onClicked(BlockInteractionType type, boolean doubleClick, IDisplayInfo renderInfo, EntityPlayer player, EnumHand hand, ItemStack stack, PartMOP hit, InfoContainer container) {
 		if (infoID.getObject().equals(MonitoredItemStack.id)) {
 			ScreenMultipart part = (ScreenMultipart) hit.partHit;
-			DisplayType displayType = part.getDisplayType();
-
+			DisplayType displayType = part.getDisplayType();					
 			BlockPos pos = part.getPos();// handler pos...
-			// BlockPos secondPos = pos;
+			//BlockPos secondPos = pos;
+			if(container.getDisplay() instanceof ConnectedDisplayScreen){
+				ConnectedDisplayScreen connected = (ConnectedDisplayScreen) container.getDisplay();
+				pos = connected.getTopLeftScreen().getCoords().getBlockPos();
+			}
 			int slot = -1;
 
-			int maxH = 1;
+			int maxH = (int) Math.ceil(renderInfo.getRenderProperties().getScaling()[0]);
 			int minH = 0;
-			int maxY = 1;
+			int maxY = (int) Math.ceil(renderInfo.getRenderProperties().getScaling()[1]);
 			int minY = 0;
 			int hSlots = (Math.round(maxH - minH) * 2);
-			int yPos = (int) ((maxY - (hit.hitVec.yCoord - pos.getY())) * 2), hPos = 0;
+			int yPos = (int) ((maxY - (hit.hitVec.yCoord - pos.getY())) * 2) - maxY, hPos = 0;
 			switch (part.face) {
 			case DOWN:
-				System.out.println(part.rotation);
 				switch (part.rotation) {
 				case EAST:
 					hPos = (int) ((maxH - minH - (hit.hitVec.zCoord - pos.getZ())) * 2);
-					yPos = (int)((maxH - minH - (hit.hitVec.xCoord - pos.getX())) * 2);		
+					yPos = (int) ((maxH - minH - (hit.hitVec.xCoord - pos.getX())) * 2);
 					slot = ((yPos * hSlots) + hPos);
 					break;
 				case NORTH:
-					hPos = (int) ((maxH - minH - (hit.hitVec.xCoord - pos.getX())) * 2);	
-					yPos = (int)((minH + (hit.hitVec.zCoord - pos.getZ())) * 2);
-					System.out.println(yPos);
-					slot = ((yPos * hSlots) + hPos);				
+					hPos = (int) ((maxH - minH - (hit.hitVec.xCoord - pos.getX())) * 2);
+					yPos = (int) ((minH + (hit.hitVec.zCoord - pos.getZ())) * 2);
+					slot = ((yPos * hSlots) + hPos);
 					break;
 				case SOUTH:
-					hPos = (int) ((minH + (hit.hitVec.xCoord - pos.getX())) * 2);	
-					yPos = (int)((maxH - minH - (hit.hitVec.zCoord - pos.getZ())) * 2);
+					hPos = (int) ((minH + (hit.hitVec.xCoord - pos.getX())) * 2);
+					yPos = (int) ((maxH - minH - (hit.hitVec.zCoord - pos.getZ())) * 2);
 					slot = ((yPos * hSlots) + hPos);
 					break;
 				case WEST:
 					hPos = (int) ((minH + (hit.hitVec.zCoord - pos.getZ())) * 2);
-					yPos = (int)((minH + (hit.hitVec.xCoord - pos.getX())) * 2);
+					yPos = (int) ((minH + (hit.hitVec.xCoord - pos.getX())) * 2);
 					slot = ((yPos * hSlots) + hPos);
 					break;
 				default:
@@ -192,7 +194,8 @@ public class LogicInfoList extends BaseInfo<LogicInfoList> implements INameableI
 				}
 				break;
 			case EAST:
-				hPos = (int) ((maxH - minH - (hit.hitVec.zCoord - pos.getZ())) * 2);
+				hPos = (int) ((1 + minH - (hit.hitVec.zCoord - pos.getZ())) * 2);
+				FontHelper.sendMessage("" + yPos, player.getEntityWorld(), player);
 				slot = ((yPos * hSlots) + hPos);
 				break;
 			case NORTH:
@@ -207,22 +210,22 @@ public class LogicInfoList extends BaseInfo<LogicInfoList> implements INameableI
 				switch (part.rotation) {
 				case EAST:
 					hPos = (int) ((maxH - minH - (hit.hitVec.zCoord - pos.getZ())) * 2);
-					yPos = (int)((minH + (hit.hitVec.xCoord - pos.getX())) * 2);
+					yPos = (int) ((minH + (hit.hitVec.xCoord - pos.getX())) * 2);
 					slot = ((yPos * hSlots) + hPos);
 					break;
 				case NORTH:
-					hPos = (int) ((maxH - minH - (hit.hitVec.xCoord - pos.getX())) * 2);	
-					yPos = (int)((maxH - (hit.hitVec.zCoord - pos.getZ())) * 2);
-					slot = ((yPos * hSlots) + hPos);					
+					hPos = (int) ((maxH - minH - (hit.hitVec.xCoord - pos.getX())) * 2);
+					yPos = (int) ((maxH - (hit.hitVec.zCoord - pos.getZ())) * 2);
+					slot = ((yPos * hSlots) + hPos);
 					break;
 				case SOUTH:
-					hPos = (int) ((maxH - minH + (hit.hitVec.xCoord - pos.getX())) * 2);	
-					yPos = (int)((minH + (hit.hitVec.zCoord - pos.getZ())) * 2);
+					hPos = (int) ((maxH - minH + (hit.hitVec.xCoord - pos.getX())) * 2);
+					yPos = (int) ((minH + (hit.hitVec.zCoord - pos.getZ())) * 2);
 					slot = ((yPos * hSlots) + hPos) - maxH * 2;
 					break;
 				case WEST:
 					hPos = (int) ((maxH - minH + (hit.hitVec.zCoord - pos.getZ())) * 2);
-					yPos = (int)((minH - (hit.hitVec.xCoord - pos.getX())) * 2);
+					yPos = (int) ((minH - (hit.hitVec.xCoord - pos.getX())) * 2);
 					slot = ((yPos * hSlots) + hPos);
 					break;
 				default:
@@ -238,14 +241,13 @@ public class LogicInfoList extends BaseInfo<LogicInfoList> implements INameableI
 				break;
 			}
 
-			System.out.println(slot);
-			Pair<ILogicMonitor, MonitoredList<?>> monitor = LogicMonitorManager.getMonitorFromServer(monitorUUID.getUUID().hashCode());
+			MonitoredList<?> list = Logistics.getInfoManager(player.getEntityWorld().isRemote).getMonitoredList(networkID.getObject(), renderInfo.getInfoUUID());
 			boolean isRemote = player.getEntityWorld().isRemote;
-			if (monitor.b != null && slot >= 0 && slot < monitor.b.size()) {
+			if (list != null && slot >= 0 && slot < list.size()) {
 				if (!player.getEntityWorld().isRemote) {
-					MonitoredItemStack itemStack = (MonitoredItemStack) monitor.b.get(slot);
+					MonitoredItemStack itemStack = (MonitoredItemStack) list.get(slot);
 					if (itemStack != null) {
-						InfoHelper.screenItemStackClicked(itemStack.itemStack.getObject(), networkID.getObject(), type, doubleClick, renderInfo, player, hand, stack, hit);
+						InfoHelper.screenItemStackClicked(itemStack.itemStack.getObject(), networkID.getObject(), type, doubleClick, renderInfo.getRenderProperties(), player, hand, stack, hit);
 					}
 				}
 				return true;
@@ -257,16 +259,20 @@ public class LogicInfoList extends BaseInfo<LogicInfoList> implements INameableI
 
 	@Override
 	public String getClientIdentifier() {
-		return "List: " + infoID.getObject().toUpperCase();
+		return "List: " + infoID.getObject().toLowerCase();
 	}
 
 	@Override
 	public String getClientObject() {
-		return monitorUUID.getUUID().toString();
+		/*
+		Pair<ILogicMonitor, MonitoredList<?>> monitor = LogicMonitorManager.getMonitorFromServer(monitorUUID.getUUID().hashCode());
+		return "Size: " + (monitor != null && monitor.b != null ? monitor.b.size() : 0);
+		*/
+		return "LIST";
 	}
 
 	@Override
 	public String getClientType() {
-		return "List";
+		return "list";
 	}
 }

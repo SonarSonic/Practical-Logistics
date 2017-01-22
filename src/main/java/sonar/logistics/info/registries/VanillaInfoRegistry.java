@@ -10,6 +10,8 @@ import net.minecraft.block.BlockCrops;
 import net.minecraft.entity.EntityAgeable;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.scoreboard.Team;
 import net.minecraft.tileentity.TileEntityFurnace;
 import net.minecraft.tileentity.TileEntityNote;
@@ -39,6 +41,7 @@ public class VanillaInfoRegistry extends IInfoRegistry {
 		LogicInfoRegistry.registerReturn(Fluid.class);
 		LogicInfoRegistry.registerReturn(FoodStats.class);
 		LogicInfoRegistry.registerReturn(Team.class);
+		LogicInfoRegistry.registerReturn(NBTTagCompound.class);
 	}
 
 	@Override
@@ -59,6 +62,7 @@ public class VanillaInfoRegistry extends IInfoRegistry {
 		LogicInfoRegistry.registerMethods(EntityPlayer.class, RegistryType.ENTITY, Lists.newArrayList("isCreative", "isSpectator", "getFoodStats", "getAbsorptionAmount", "getTeam", "getExperiencePoints"));
 		LogicInfoRegistry.registerMethods(FoodStats.class, RegistryType.ENTITY, Lists.newArrayList("getFoodLevel", "needFood", "getSaturationLevel"));
 		LogicInfoRegistry.registerMethods(Team.class, RegistryType.ENTITY, Lists.newArrayList("getRegisteredName"));
+		LogicInfoRegistry.registerMethods(ItemStack.class, RegistryType.ITEMSTACK, Lists.newArrayList("getItem", "getMaxStackSize", "getTagCompound"));		
 	}
 
 	@Override
@@ -70,13 +74,14 @@ public class VanillaInfoRegistry extends IInfoRegistry {
 		furnaceFields.put("totalCookTime", 3);
 		LogicInfoRegistry.registerInvFields(TileEntityFurnace.class, furnaceFields);
 		LogicInfoRegistry.registerFields(TileEntityNote.class, RegistryType.TILE, Lists.newArrayList("note"));
+		LogicInfoRegistry.registerFields(ItemStack.class, RegistryType.ITEMSTACK, Lists.newArrayList("stackSize"));
 	}
 
 	@Override
 	public void registerAdjustments() {
 		LogicInfoRegistry.registerInfoAdjustments(Lists.newArrayList("EntityLivingBase.getHealth", "EntityLivingBase.getMaxHealth"), "", "HP");
-		LogicInfoRegistry.registerInfoAdjustments(Lists.newArrayList("TileEntityFurnace.furnaceBurnTime", "TileEntityFurnace.currentItemBurnTime","TileEntityFurnace.cookTime","TileEntityFurnace.totalCookTime"), "", "ticks");
-		//LogicRegistry.registerInfoAdjustments(Lists.newArrayList("Block.getUnlocalizedName"), "", ".name");
+		LogicInfoRegistry.registerInfoAdjustments(Lists.newArrayList("TileEntityFurnace.furnaceBurnTime", "TileEntityFurnace.currentItemBurnTime", "TileEntityFurnace.cookTime", "TileEntityFurnace.totalCookTime"), "", "ticks");
+		// LogicRegistry.registerInfoAdjustments(Lists.newArrayList("Block.getUnlocalizedName"), "", ".name");
 	}
 
 }

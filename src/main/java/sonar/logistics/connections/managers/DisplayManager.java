@@ -1,174 +1,82 @@
 package sonar.logistics.connections.managers;
-/*
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
-import gnu.trove.map.hash.THashMap;
+import java.util.concurrent.ConcurrentHashMap;
+
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import sonar.core.api.utils.BlockCoords;
-import sonar.core.integration.fmp.OLDMultipartHelper;
-import sonar.logistics.api.connecting.ILargeDisplay;
-import sonar.logistics.helpers.DisplayHelper;
+import sonar.core.utils.Pair;
+import sonar.logistics.Logistics;
+import sonar.logistics.api.LogisticsAPI;
+import sonar.logistics.api.connecting.ConnectableType;
+import sonar.logistics.api.display.ConnectedDisplayScreen;
+import sonar.logistics.api.display.IInfoDisplay;
+import sonar.logistics.api.display.ILargeDisplay;
 
-public class DisplayRegistry {
-
-	private static Map<Integer, List<BlockCoords>> screens = new THashMap<Integer, List<BlockCoords>>();
-
-	private static ArrayList<Integer> needUpdate = new ArrayList();
-
-	public static void removeAll() {
-		screens.clear();
-	}
-
-	public static boolean hasChanged(int registryID) {
-		Integer inte = Integer.valueOf(registryID);
-		return needUpdate.contains(inte);
-	}
-
-	public static void setChanged(int registryID) {
-		Integer inte = Integer.valueOf(registryID);
-		if (!needUpdate.contains(inte)) {
-			needUpdate.add(inte);
+public class DisplayManager extends AbstractConnectionManager<ILargeDisplay> {
+	
+	public static ConnectedDisplayScreen getOrCreateDisplayScreen(World world, ILargeDisplay display, int registryID) {
+		ConcurrentHashMap<Integer, ConnectedDisplayScreen> displays = Logistics.getInfoManager(world.isRemote).getConnectedDisplays();
+		ConnectedDisplayScreen toSet = displays.get(registryID);
+		if (toSet == null) {
+			toSet = new ConnectedDisplayScreen(display);
+			displays.put(registryID, toSet);
 		}
+		return toSet;
 	}
 
-	public static void onUpdate(int registryID) {
-		Integer inte = Integer.valueOf(registryID);
-		if (needUpdate.contains(inte)) {
-			needUpdate.remove(inte);
+	@Override
+	public void onNetworksConnected(int newID, int oldID) {
+		ConnectedDisplayScreen screen = Logistics.getInfoManager(false).getConnectedDisplays().get(newID);
+		if (screen != null) {
+			screen.setHasChanged();
+		} else
+			Logistics.logger.error("CONNECTED DISPLAY SCREEN SHOULD NOT BE NULL!");
+	}
+
+	@Override
+	public void onConnectionAdded(int registryID, ILargeDisplay added) {
+		ConnectedDisplayScreen screen = Logistics.getInfoManager(false).getConnectedDisplays().get(registryID);
+		if (screen == null) {
+			Logistics.getInfoManager(false).getConnectedDisplays().put(registryID, screen = new ConnectedDisplayScreen(added));
 		}
+		screen.setHasChanged();
+		added.setConnectedDisplay(screen);
 	}
 
-	public static int getNextAvailableID() {
-		for (int i = 0; i < screens.size(); i++) {
-			if (screens.get(i) == null || screens.get(i).isEmpty() || screens.get(i).size() == 0) {
-				return i;
+	public Pair<ConnectableType, Integer> getConnectionType(ILargeDisplay source, World world, BlockPos pos, EnumFacing dir, ConnectableType cableType) {
+		IInfoDisplay display = LogisticsAPI.getCableHelper().getDisplayScreen(new BlockCoords(pos.offset(dir)), source.getFace());
+		if (display != null && display instanceof ILargeDisplay) {
+			ILargeDisplay largeDisplay = (ILargeDisplay) display;
+			if (largeDisplay.getFace().equals(source.getFace()) && largeDisplay.canConnectOnSide(dir)) {
+				return new Pair(ConnectableType.CONNECTION, largeDisplay.getRegistryID());
 			}
 		}
-		return screens.size();
+		return new Pair(ConnectableType.NONE, -1);
 	}
 
-	public static List<BlockCoords> getScreens(int registryID) {
-		if (registryID == -1) {
-			return new ArrayList();
-		}
-		List<BlockCoords> coords = screens.get(registryID);
-		if (coords == null) {
-			return new ArrayList();
-		}
-		return coords;
+	public Pair<ConnectableType, Integer> getConnectionTypeFromObject(ILargeDisplay source, Object connection, EnumFacing dir, ConnectableType cableType) {
+		return new Pair(ConnectableType.NONE, -1);
 	}
 
-	public static void addScreens(int registryID, List<BlockCoords> cables) {
-		for (BlockCoords coords : cables) {
-			addScreen(registryID, coords);
+	public void tick() {
+		for (ConnectedDisplayScreen screen : Logistics.getInfoManager(false).getConnectedDisplays().values()) {
+			// screen.setHasChanged();
+			screen.update();
 		}
 	}
 
-	public static void addScreen(int registryID, BlockCoords cable) {
-		if (registryID != -1 && cable != null) {
-			Object target = OLDMultipartHelper.checkObject(cable.getTileEntity());
-			if (target != null && target instanceof ILargeDisplay) {
-				if (screens.get(registryID) == null) {
-					screens.put(registryID, new ArrayList());
-					screens.get(registryID).add(cable);
-					((ILargeDisplay) target).setRegistryID(registryID);
-					setHandler(registryID);
-					return;
-
-				}
-				List<BlockCoords> removeList = new ArrayList();
-				for (BlockCoords coords : screens.get(registryID)) {
-					if (BlockCoords.equalCoords(coords, cable)) {
-						setHandler(registryID);
-						return;
-					}
-				}
-				screens.get(registryID).add(cable);
-				((ILargeDisplay) target).setRegistryID(registryID);
-				setHandler(registryID);
-			}
+	@Override
+	public void onConnectionRemoved(int registryID, ILargeDisplay added) {
+		Logistics.getServerManager().removeDisplay(added);
+		if (this.getConnections(registryID).isEmpty()) {
+			Logistics.getInfoManager(false).getConnectedDisplays().remove(registryID);
+		} else {
+			ConnectedDisplayScreen screen = Logistics.getInfoManager(false).getConnectedDisplays().get(registryID);
+			screen.setHasChanged();
 		}
+
 	}
 
-	public static void removeScreen(int registryID, ILargeDisplay cable) {
-		if (registryID != -1 && cable.getCoords() != null) {
-			if (screens.get(registryID) == null) {
-				return;
-			}
-			List<BlockCoords> removeList = new ArrayList();
-			for (BlockCoords coords : screens.get(registryID)) {
-				if (BlockCoords.equalCoords(coords, cable.getCoords())) {
-					removeList.add(coords);
-				}
-			}
-			for (BlockCoords remove : removeList) {
-				screens.get(registryID).remove(remove);
-			}
-
-			List<BlockCoords> oldCables = new ArrayList();
-			if (screens.get(registryID) != null) {
-				oldCables.addAll(screens.get(registryID));
-				screens.get(registryID).clear();
-			}
-
-			int newID = getNextAvailableID();
-			for (BlockCoords oldScreens : oldCables) {
-				Object target = OLDMultipartHelper.checkObject(oldScreens.getTileEntity());
-				if (target != null && target instanceof ILargeDisplay) {
-					ILargeDisplay tile = (ILargeDisplay) target;
-					tile.setRegistryID(-1);
-				}
-			}
-			for (BlockCoords oldCable : oldCables) {
-				Object target = OLDMultipartHelper.checkObject(oldCable.getTileEntity());
-				if (target != null && target instanceof ILargeDisplay) {
-					ILargeDisplay tile = (ILargeDisplay) target;
-					DisplayHelper.addScreen(tile);
-				}
-			}
-			setHandler(newID);
-		}
-	}
-
-	public static void connectScreens(int newID, int secondaryID) {
-		List<BlockCoords> oldCables = new ArrayList();
-		if (screens.get(secondaryID) != null) {
-			oldCables.addAll(screens.get(secondaryID));
-			screens.get(secondaryID).clear();
-		}
-		addScreens(newID, oldCables);
-		setHandler(newID);
-	}
-
-	public static void setHandler(int id) {
-		List<BlockCoords> coords = getScreens(id);
-		int y = 1000;
-		BlockCoords handler = null;
-		for (BlockCoords coord : coords) {
-			if (coord.getY() < y) {
-				handler = coord;
-				y = coord.getY();
-			}
-		}
-		if (handler != null && y != 1000) {
-			for (BlockCoords coord : coords) {
-				Object object = OLDMultipartHelper.getHandler(coord.getTileEntity());
-				if (object != null && object instanceof LargeDisplayScreenHandler) {
-					LargeDisplayScreenHandler screen = (LargeDisplayScreenHandler) object;
-					if (BlockCoords.equalCoords(handler, coord)) {
-						screen.isHandler.setObject(true);
-						screen.resetHandler = true;
-					} else {
-						if (screen.isHandler.getObject()) {
-							screen.isHandler.setObject(false);
-							screen.resetHandler = true;
-						}
-					}
-				}
-			}
-		}
-		setChanged(id);
-	}
 }
-*/

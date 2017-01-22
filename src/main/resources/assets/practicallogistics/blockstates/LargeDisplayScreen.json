@@ -3,6 +3,7 @@
     "defaults": {
         "model":"practicallogistics:LargeDisplayScreen",
         "textures": {
+            "front": "practicallogistics:model/large_screen/large_display_none",
             "particle":"practicallogistics:blocks/data_cable"
         }
      },
@@ -10,7 +11,7 @@
         "normal":[],
         "inventory": [{   
             "x": 90, "y": 0,
-            "model":"practicallogistics:LargeDisplayScreen"
+            "model":"practicallogistics:LargeDisplayScreen"            
         }],
         "facing":{  
             "north":{"x": 90, "y": 180},            
@@ -27,6 +28,24 @@
             "east":{"y": 90},
             "up":{},
             "down":{}
-        }          
-    }
+        },
+        "type": {
+            "none": {"textures": {"front": "practicallogistics:model/large_screen/large_display_none","back": "practicallogistics:model/large_screen_back/large_display_none"}},
+            "one_n": {"textures": {"front": "practicallogistics:model/large_screen/large_display_one_n","back": "practicallogistics:model/large_screen_back/large_display_one_s"}},
+            "one_e": {"textures": {"front": "practicallogistics:model/large_screen/large_display_one_e","back": "practicallogistics:model/large_screen_back/large_display_one_e"}},
+            "one_s": {"textures": {"front": "practicallogistics:model/large_screen/large_display_one_s","back": "practicallogistics:model/large_screen_back/large_display_one_n"}},
+            "one_w": {"textures": {"front": "practicallogistics:model/large_screen/large_display_one_w","back": "practicallogistics:model/large_screen_back/large_display_one_w"}},
+            "two_n": {"textures": {"front": "practicallogistics:model/large_screen/large_display_two_n","back": "practicallogistics:model/large_screen_back/large_display_two_e"}},
+            "two_e": {"textures": {"front": "practicallogistics:model/large_screen/large_display_two_e","back": "practicallogistics:model/large_screen_back/large_display_two_n"}},
+            "two_s": {"textures": {"front": "practicallogistics:model/large_screen/large_display_two_s","back": "practicallogistics:model/large_screen_back/large_display_two_w"}},
+            "two_w": {"textures": {"front": "practicallogistics:model/large_screen/large_display_two_w","back": "practicallogistics:model/large_screen_back/large_display_two_s"}},
+            "opposite_1": {"textures": {"front": "practicallogistics:model/large_screen/large_display_opposite_1","back": "practicallogistics:model/large_screen_back/large_display_opposite_1"}},
+            "opposite_2": {"textures": {"front": "practicallogistics:model/large_screen/large_display_opposite_2","back": "practicallogistics:model/large_screen_back/large_display_opposite_2"}},
+            "three_n": {"textures": {"front": "practicallogistics:model/large_screen/large_display_three_n","back": "practicallogistics:model/large_screen_back/large_display_three_s"}},
+            "three_e": {"textures": {"front": "practicallogistics:model/large_screen/large_display_three_e","back": "practicallogistics:model/large_screen_back/large_display_three_e"}},
+            "three_s": {"textures": {"front": "practicallogistics:model/large_screen/large_display_three_s","back": "practicallogistics:model/large_screen_back/large_display_three_n"}},
+            "three_w": {"textures": {"front": "practicallogistics:model/large_screen/large_display_three_w","back": "practicallogistics:model/large_screen_back/large_display_three_w"}},
+            "all": {"textures": {"front": "practicallogistics:model/large_screen/large_display_all","back": "practicallogistics:model/large_screen/large_display_all"}}    
+        }    
+  }
 }

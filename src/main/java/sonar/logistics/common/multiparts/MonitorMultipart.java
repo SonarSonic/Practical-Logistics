@@ -1,26 +1,25 @@
 package sonar.logistics.common.multiparts;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
-
-import com.google.common.collect.Lists;
 
 import io.netty.buffer.ByteBuf;
 import mcmultipart.MCMultiPartMod;
 import mcmultipart.multipart.IMultipart;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyBool;
-import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import sonar.core.api.utils.BlockCoords;
+import sonar.core.helpers.NBTHelper.SyncType;
+import sonar.core.integration.multipart.SonarMultipartHelper;
 import sonar.core.network.sync.SyncTagType;
 import sonar.core.network.sync.SyncUUID;
 import sonar.core.network.utils.IByteBufTile;
@@ -28,26 +27,24 @@ import sonar.logistics.Logistics;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.cache.ILogisticsNetwork;
 import sonar.logistics.api.cache.INetworkCache;
-import sonar.logistics.api.cache.RefreshType;
 import sonar.logistics.api.connecting.IChannelledTile;
-import sonar.logistics.api.connecting.TransferMode;
 import sonar.logistics.api.info.InfoUUID;
-import sonar.logistics.api.info.monitor.ChannelType;
 import sonar.logistics.api.info.monitor.ILogicMonitor;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
 import sonar.logistics.api.info.monitor.IdentifiedCoordsList;
 import sonar.logistics.api.info.monitor.LogicMonitorHandler;
-import sonar.logistics.api.info.monitor.MonitorViewer;
-import sonar.logistics.connections.managers.LogicMonitorManager;
+import sonar.logistics.api.info.monitor.MonitorType;
 import sonar.logistics.connections.monitoring.MonitoredBlockCoords;
 import sonar.logistics.connections.monitoring.MonitoredList;
+import sonar.logistics.connections.monitoring.ViewersList;
+import sonar.logistics.helpers.InfoHelper;
+import sonar.logistics.network.PacketMonitoredList;
 import sonar.logistics.network.SyncMonitoredType;
 
 public abstract class MonitorMultipart<T extends IMonitorInfo> extends SidedMultipart implements ILogicMonitor<T>, IByteBufTile, IChannelledTile {
 
 	public static final PropertyBool hasDisplay = PropertyBool.create("display");
 	protected IdentifiedCoordsList list = new IdentifiedCoordsList(-1);
-	protected HashMap<Boolean, ArrayList<MonitorViewer>> viewers = new HashMap<Boolean, ArrayList<MonitorViewer>>();
 	protected SyncUUID uuid = new SyncUUID(-2); // CAN I USE THE MULTIPART UUID INSTEAD?
 	protected LogicMonitorHandler handler = null;
 	protected String handlerID;
@@ -55,19 +52,20 @@ public abstract class MonitorMultipart<T extends IMonitorInfo> extends SidedMult
 	public BlockCoords lastSelected = null;
 	public IMonitorInfo lastInfo = null;
 	public SyncTagType.BOOLEAN hasMonitor = new SyncTagType.BOOLEAN(-2);
+	public ViewersList viewers = new ViewersList(this, MonitorType.ALL);
 	public int lastPos = -1;
 
 	public MonitorMultipart(String handlerID, double width, double heightMin, double heightMax) {
 		super(width, heightMin, heightMax);
 		this.handlerID = handlerID;
-		this.syncParts.addAll(Lists.newArrayList(list, uuid, hasMonitor));
+		this.syncList.addParts(list, uuid, hasMonitor);
 		selectedInfo = new SyncMonitoredType<T>(-4);
 	}
 
 	public MonitorMultipart(String handlerID, EnumFacing face, double width, double heightMin, double heightMax) {
 		super(face, width, heightMin, heightMax);
 		this.handlerID = handlerID;
-		this.syncParts.addAll(Lists.newArrayList(list, uuid, hasMonitor));
+		this.syncList.addParts(list, uuid, hasMonitor);
 		selectedInfo = new SyncMonitoredType<T>(-4);
 	}
 
@@ -75,7 +73,7 @@ public abstract class MonitorMultipart<T extends IMonitorInfo> extends SidedMult
 		for (int i = 0; i < getMaxInfo(); i++) {
 			IMonitorInfo info = getMonitorInfo(i);
 			InfoUUID id = new InfoUUID(getIdentity().hashCode(), i);
-			LogicMonitorManager.changeInfo(id, info);
+			Logistics.getServerManager().changeInfo(id, info);
 		}
 	}
 
@@ -94,25 +92,31 @@ public abstract class MonitorMultipart<T extends IMonitorInfo> extends SidedMult
 
 	public void onLoaded() {
 		super.onLoaded();
-		LogicMonitorManager.addMonitor(this);
-		updateAllInfo();
+		if (isServer()) {
+			Logistics.getServerManager().addMonitor(this);
+			updateAllInfo();
+		}
 	}
 
 	public void onRemoved() {
 		super.onRemoved();
-		LogicMonitorManager.removeMonitor(this);
+		Logistics.getInfoManager(this.getWorld().isRemote).removeMonitor(this);
 	}
 
 	public void onUnloaded() {
 		super.onUnloaded();
-		LogicMonitorManager.removeMonitor(this);
+		Logistics.getInfoManager(this.getWorld().isRemote).removeMonitor(this);
 	}
 
 	public void onFirstTick() {
 		super.onFirstTick();
-		setUUID();
-		LogicMonitorManager.addMonitor(this);
-		hasMonitor.setObject(LogisticsAPI.getCableHelper().getDisplayScreen(getCoords(), face) != null);
+		if (isServer()) {
+			setUUID();
+			Logistics.getServerManager().addMonitor(this);
+			hasMonitor.setObject(LogisticsAPI.getCableHelper().getDisplayScreen(getCoords(), face) != null);
+		} else {
+			this.sendByteBufPacket(-4); // request the monitor UUID
+		}
 	}
 
 	public void setUUID() {
@@ -120,14 +124,14 @@ public abstract class MonitorMultipart<T extends IMonitorInfo> extends SidedMult
 			if (uuid.getUUID() == null) {
 				uuid.setObject(UUID.randomUUID());
 				list.setIdentity(uuid.getUUID());
-				LogicMonitorManager.monitors.add(this);
+				Logistics.getServerManager().addMonitor(this);
 			}
 			sendByteBufPacket(-2);
 		}
 	}
 
 	@Override
-	public IdentifiedCoordsList getChannels() {
+	public IdentifiedCoordsList getChannels(int channelID) {
 		return list;
 	}
 
@@ -136,37 +140,8 @@ public abstract class MonitorMultipart<T extends IMonitorInfo> extends SidedMult
 		return handler == null ? handler = LogicMonitorHandler.instance(handlerID) : handler;
 	}
 
-	@Override
-	public ArrayList<MonitorViewer> getViewers(boolean sentFirstPacket) {		
-		return viewers.getOrDefault(sentFirstPacket, new ArrayList());
-	}
-
-	public void sentViewerPacket(MonitorViewer viewer, boolean sentFirstPacket) {
-		if (viewers.get(!sentFirstPacket).contains(viewer)) {
-			viewers.get(!sentFirstPacket).remove(viewer);
-		}
-		if (!viewers.get(!sentFirstPacket).contains(viewer)) {
-			viewers.get(!sentFirstPacket).add(viewer);
-		}
-	}
-
-	public void addViewer(MonitorViewer viewer) {
-		viewers.putIfAbsent(false, new ArrayList());
-		viewers.get(false).add(viewer);
-	}
-
-	public void removeViewer(EntityPlayer player) {
-		boolean isClient = this.isClient();
-		ArrayList<MonitorViewer> toRemove = new ArrayList();
-		for (Boolean bool : new Boolean[] { true, false }) {
-			viewers.putIfAbsent(bool, new ArrayList());
-			for (MonitorViewer viewer : viewers.get(bool)) {
-				if (viewer.player.getGameProfile().getId().equals(player.getGameProfile().getId())) {
-					toRemove.add(viewer);
-				}
-			}
-			toRemove.forEach(viewers.get(bool)::remove);
-		}
+	public ViewersList getViewersList() {
+		return viewers;
 	}
 
 	public UUID getIdentity() {
@@ -177,7 +152,6 @@ public abstract class MonitorMultipart<T extends IMonitorInfo> extends SidedMult
 	}
 
 	public void setLocalNetworkCache(INetworkCache network) {
-		setMonitoredInfo(MonitoredList.newMonitoredList(getNetworkID()));		
 		if (!this.network.isFakeNetwork() && this.network.getNetworkID() != network.getNetworkID()) {
 			((ILogisticsNetwork) this.network).removeMonitor(this);
 		}
@@ -185,11 +159,12 @@ public abstract class MonitorMultipart<T extends IMonitorInfo> extends SidedMult
 		if (network instanceof ILogisticsNetwork) {
 			ILogisticsNetwork storageCache = (ILogisticsNetwork) network;
 			storageCache.<T>addMonitor(this);
-		}		
+		}
 	}
 
 	public MonitoredList<T> getMonitoredList() {
-		return this.getNetworkID() == -1 ? MonitoredList.newMonitoredList(getNetworkID()) : LogicMonitorManager.getMonitoredList(this);
+		// TODO only using one INFO UUID
+		return getNetworkID() == -1 ? MonitoredList.newMonitoredList(getNetworkID()) : Logistics.getInfoManager(this.getWorld().isRemote).getMonitoredList(getNetworkID(), new InfoUUID(this.getIdentity().hashCode(), 0));
 	}
 
 	public int getMaxInfo() {
@@ -206,7 +181,7 @@ public abstract class MonitorMultipart<T extends IMonitorInfo> extends SidedMult
 
 	public final int ADD = -9, PAIRED = -10, ALL = 100;
 
-	public void modifyCoords(MonitoredBlockCoords coords) {
+	public void modifyCoords(MonitoredBlockCoords coords, int channelID) {
 		lastSelected = coords.syncCoords.getCoords();
 		sendByteBufPacket(-3);
 	}
@@ -226,6 +201,8 @@ public abstract class MonitorMultipart<T extends IMonitorInfo> extends SidedMult
 	@Override
 	public void writePacket(ByteBuf buf, int id) {
 		switch (id) {
+		case -4:
+			break;
 		case -3:
 			BlockCoords.writeToBuf(buf, lastSelected);
 			break;
@@ -238,6 +215,9 @@ public abstract class MonitorMultipart<T extends IMonitorInfo> extends SidedMult
 	@Override
 	public void readPacket(ByteBuf buf, int id) {
 		switch (id) {
+		case -4:
+			sendByteBufPacket(-2);
+			break;
 		case -3:
 			BlockCoords coords = BlockCoords.readFromBuf(buf);
 			list.modifyCoords(channelType(), coords);
@@ -246,7 +226,7 @@ public abstract class MonitorMultipart<T extends IMonitorInfo> extends SidedMult
 		case -2:
 			uuid.readFromBuf(buf);
 			list.setIdentity(uuid.getUUID());
-			LogicMonitorManager.monitoredLists.put(this, MonitoredList.<T>newMonitoredList(getNetworkID()));
+			Logistics.getInfoManager(this.getWorld().isRemote).addMonitor(this);
 			break;
 		}
 	}
@@ -261,4 +241,13 @@ public abstract class MonitorMultipart<T extends IMonitorInfo> extends SidedMult
 	public BlockStateContainer createBlockState() {
 		return new BlockStateContainer(MCMultiPartMod.multipart, new IProperty[] { ORIENTATION, hasDisplay });
 	}
+
+
+	@Override
+	public void onViewerAdded(EntityPlayer player, List<MonitorType> type) {
+		SonarMultipartHelper.sendMultipartSyncToPlayer(this, (EntityPlayerMP) player);
+	}
+
+	@Override
+	public void onViewerRemoved(EntityPlayer player, List<MonitorType> type) {}
 }

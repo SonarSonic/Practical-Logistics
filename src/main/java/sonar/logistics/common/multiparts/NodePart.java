@@ -8,7 +8,6 @@ import net.minecraft.util.EnumFacing;
 import sonar.core.api.utils.BlockCoords;
 import sonar.logistics.LogisticsItems;
 import sonar.logistics.api.cache.INetworkCache;
-import sonar.logistics.api.cache.RefreshType;
 import sonar.logistics.api.connecting.IConnectionNode;
 
 public class NodePart extends SidedMultipart implements IConnectionNode, ISlottedPart{

@@ -153,6 +153,8 @@ pl.ITeleport.name=Name
 pl.ITeleport.teleporterID=Teleporter ID
 pl.IFlawlessGreenhouse.getPlantsHarvested=Plants Harvested
 pl.IFlawlessGreenhouse.getPlantsGrown=Plants Grown
+pl.ICalculatorGenerator.getItemLevel=Item Level
+pl.ICalculatorGenerator.getMaxItemLevel=Max Item Level
 
 //mekanism
 pl.IHeatTransfer.getTemp=Temperature

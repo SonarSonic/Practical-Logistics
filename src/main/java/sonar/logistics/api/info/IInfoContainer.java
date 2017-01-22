@@ -5,12 +5,19 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHand;
 import net.minecraft.world.World;
+import sonar.core.api.nbt.INBTSyncable;
 import sonar.core.api.utils.BlockInteractionType;
+import sonar.core.network.sync.IDirtyPart;
+import sonar.core.network.sync.ISyncableListener;
+import sonar.logistics.api.display.DisplayInfo;
 import sonar.logistics.api.display.IInfoDisplay;
 
 /**used for storing display info to be used on Screens*/
-public interface IInfoContainer {
+public interface IInfoContainer extends INBTSyncable, IDirtyPart, ISyncableListener {
 
+	/**if this Display requires this InfoUUID to be synced*/
+	public boolean monitorsUUID(InfoUUID id);
+	
 	/**get the current info UUID of the Monitor Info at the given position*/
 	public InfoUUID getInfoUUID(int pos);
 
@@ -28,5 +35,7 @@ public interface IInfoContainer {
 	public boolean onClicked(BlockInteractionType type, World world, EntityPlayer player, EnumHand hand, ItemStack stack, PartMOP hit);
 	
 	/**gets the display this InfoContainer is connected to*/
-	public IInfoDisplay getDisplay();
+	public IInfoDisplay getDisplay();	
+
+	public DisplayInfo getDisplayInfo(int pos);
 }

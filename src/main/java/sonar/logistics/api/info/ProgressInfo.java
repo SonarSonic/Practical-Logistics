@@ -9,14 +9,15 @@ import sonar.core.api.nbt.INBTSyncable;
 import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.asm.LogicInfoType;
-import sonar.logistics.api.display.DisplayType;
+import sonar.logistics.api.display.IDisplayInfo;
+import sonar.logistics.api.display.ISuffixable;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
 import sonar.logistics.api.info.monitor.LogicMonitorHandler;
 import sonar.logistics.helpers.InfoHelper;
 import sonar.logistics.helpers.InfoRenderer;
 
 @LogicInfoType(id = ProgressInfo.id, modid = Logistics.MODID)
-public class ProgressInfo implements IMonitorInfo<ProgressInfo>, INBTSyncable, INameableInfo<ProgressInfo> {
+public class ProgressInfo implements IMonitorInfo<ProgressInfo>, INBTSyncable, INameableInfo<ProgressInfo>, ISuffixable {
 
 	public static final String id = "progress";
 	public LogicInfo first, second;
@@ -49,16 +50,40 @@ public class ProgressInfo implements IMonitorInfo<ProgressInfo>, INBTSyncable, I
 	}
 
 	@Override
+	public String getRawData() {
+		if (!isValid()) {
+			return "ERROR";
+		}
+		return (compare == 1 ? second : first).getRawData();
+	}
+
+	@Override
 	public String getClientObject() {
 		if (!isValid()) {
 			return "ERROR";
 		}
-		return (compare == 1 ? second : first).getClientObject(); // + "/"  + (compare != 1 ? second : first).getClientObject();
+		return (compare == 1 ? second : first).getClientObject(); // + "/" + (compare != 1 ? second : first).getClientObject();
 	}
 
 	@Override
 	public String getClientType() {
 		return "Progress";
+	}
+
+	@Override
+	public String getSuffix() {
+		if (!isValid()) {
+			return "ERROR";
+		}
+		return (compare == 1 ? second : first).getSuffix();
+	}
+
+	@Override
+	public String getPrefix() {
+		if (!isValid()) {
+			return "ERROR";
+		}
+		return (compare == 1 ? second : first).getPrefix();
 	}
 
 	@Override
@@ -102,7 +127,7 @@ public class ProgressInfo implements IMonitorInfo<ProgressInfo>, INBTSyncable, I
 
 	@Override
 	public boolean isValid() {
-		return first != null && second != null;
+		return first != null && second != null && first.isValid() && second.isValid();
 	}
 
 	@Override
@@ -116,18 +141,24 @@ public class ProgressInfo implements IMonitorInfo<ProgressInfo>, INBTSyncable, I
 	}
 
 	@Override
-	public void renderInfo(DisplayType displayType, double displayWidth, double displayHeight, double displayScale, int infoPos) {
+	public void renderInfo(InfoContainer container, IDisplayInfo displayInfo, double displayWidth, double displayHeight, double displayScale, int infoPos) {
 		GL11.glPushMatrix();
 		GL11.glPushMatrix();
 		GlStateManager.disableLighting();
-		GL11.glTranslated(-1, -0.0625 * 12, +0.004);		
+		GL11.glTranslated(-1, -+0.0625 * 12, +0.004);
 		Minecraft.getMinecraft().getTextureManager().bindTexture(InfoContainer.getColour(infoPos));
 		InfoRenderer.renderProgressBar(displayWidth, displayHeight, displayScale, (compare == 1 ? secondNum : firstNum), (compare == 1 ? firstNum : secondNum));
 		GlStateManager.enableLighting();
 		GL11.glTranslated(0, 0, -0.001);
 		GL11.glPopMatrix();
-		InfoRenderer.renderNormalInfo(displayType, displayWidth, displayHeight,displayScale, /*(compare == 1 ? second : first).getClientIdentifier(),*/ getClientObject());
+		InfoRenderer.renderNormalInfo(container.display.getDisplayType(), displayWidth, displayHeight, displayScale, displayInfo.getFormattedStrings());
 		GL11.glPopMatrix();
+	}
+
+	@Override
+	public void identifyChanges(ProgressInfo newInfo) {
+		first.identifyChanges(newInfo.first);
+		second.identifyChanges(newInfo.second);
 	}
 
 }

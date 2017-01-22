@@ -1,5 +1,7 @@
 package sonar.logistics.api.display;
 
+import java.util.ArrayList;
+
 import javax.annotation.Nullable;
 
 import sonar.core.api.nbt.INBTSyncable;
@@ -30,4 +32,10 @@ public interface IDisplayInfo extends INBTSyncable {
 
 	/** the info current render properties */
 	public RenderInfoProperties getRenderProperties();
+	
+	public void setFormatStrings(ArrayList<String> strings);
+	
+	public ArrayList<String> getUnformattedStrings();
+	
+	public ArrayList<String> getFormattedStrings();
 }

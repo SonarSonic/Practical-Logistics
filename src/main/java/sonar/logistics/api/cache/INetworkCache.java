@@ -8,7 +8,6 @@ import java.util.Map.Entry;
 import net.minecraft.util.EnumFacing;
 import sonar.core.api.utils.BlockCoords;
 import sonar.core.utils.IWorldPosition;
-import sonar.logistics.api.connecting.ILogicTile;
 import sonar.logistics.api.info.monitor.ILogicMonitor;
 
 /** implemented on Logistics Network Caches, used for retrieving info about */

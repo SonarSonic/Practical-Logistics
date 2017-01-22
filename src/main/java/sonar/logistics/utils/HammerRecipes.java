@@ -1,7 +1,6 @@
 package sonar.logistics.utils;
 
 import net.minecraft.item.ItemStack;
-import sonar.core.helpers.RecipeHelper;
 import sonar.core.recipes.DefinedRecipeHelper;
 import sonar.logistics.LogisticsItems;
 

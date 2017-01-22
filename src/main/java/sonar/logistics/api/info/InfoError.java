@@ -5,7 +5,8 @@ import sonar.core.helpers.FontHelper;
 import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.asm.LogicInfoType;
-import sonar.logistics.api.display.DisplayType;
+import sonar.logistics.api.display.DisplayConstants;
+import sonar.logistics.api.display.IDisplayInfo;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
 import sonar.logistics.api.info.monitor.LogicMonitorHandler;
 import sonar.logistics.helpers.InfoRenderer;
@@ -66,8 +67,8 @@ public class InfoError implements IMonitorInfo<InfoError> {
 	}
 
 	@Override
-	public void renderInfo(DisplayType displayType, double width, double height, double scale, int infoPos) {
-		InfoRenderer.renderNormalInfo(displayType, width, height, scale, error);
+	public void renderInfo(InfoContainer container, IDisplayInfo displayInfo, double width, double height, double scale, int infoPos) {
+		InfoRenderer.renderNormalInfo(container.display.getDisplayType(), width, height, scale, DisplayConstants.formatText(error, displayInfo));
 	}
 
 	@Override
@@ -77,5 +78,8 @@ public class InfoError implements IMonitorInfo<InfoError> {
 	public NBTTagCompound writeData(NBTTagCompound nbt, SyncType type) {
 		return nbt;
 	}
+
+	@Override
+	public void identifyChanges(InfoError newInfo) {}
 
 }

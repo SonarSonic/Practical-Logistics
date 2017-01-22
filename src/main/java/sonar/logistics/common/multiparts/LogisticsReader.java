@@ -7,11 +7,11 @@ import com.google.common.collect.Lists;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.util.EnumFacing;
 import sonar.core.utils.Pair;
+import sonar.logistics.Logistics;
 import sonar.logistics.api.info.InfoUUID;
 import sonar.logistics.api.info.LogicInfo;
 import sonar.logistics.api.info.ProgressInfo;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
-import sonar.logistics.connections.managers.LogicMonitorManager;
 import sonar.logistics.connections.monitoring.MonitoredList;
 import sonar.logistics.network.SyncMonitoredType;
 
@@ -23,8 +23,8 @@ public abstract class LogisticsReader<T extends IMonitorInfo> extends ReaderMult
 			selected.add(i, new SyncMonitoredType<T>(i + 10));
 			paired.add(i, new SyncMonitoredType<T>(i + 10 + 100));
 		}
-		selected.forEach(part -> syncParts.add(part));
-		paired.forEach(part -> syncParts.add(part));
+		syncList.addParts(selected);
+		syncList.addParts(paired);
 	}
 
 	public LogisticsReader(String handlerID) {
@@ -48,13 +48,13 @@ public abstract class LogisticsReader<T extends IMonitorInfo> extends ReaderMult
 	}
 
 	@Override
-	public void setMonitoredInfo(MonitoredList<T> updateInfo) {
+	public void setMonitoredInfo(MonitoredList<T> updateInfo, int channelID) {
 		ArrayList<IMonitorInfo> cachedSelected = this.getSelectedInfo();
 		ArrayList<IMonitorInfo> cachedPaired = this.getPairedInfo();
 		for (int i = 0; i < this.getMaxInfo(); i++) {
 			InfoUUID id = new InfoUUID(getIdentity().hashCode(), i);
 			IMonitorInfo selectedInfo = cachedSelected.get(i);
-			IMonitorInfo lastInfo = LogicMonitorManager.info.get(id);
+			IMonitorInfo lastInfo = Logistics.getServerManager().info.get(id);
 			if (selectedInfo != null) {
 				IMonitorInfo latestInfo = selectedInfo;
 				Pair<Boolean, IMonitorInfo> newInfo = updateInfo.getLatestInfo(selectedInfo);
@@ -75,10 +75,10 @@ public abstract class LogisticsReader<T extends IMonitorInfo> extends ReaderMult
 					latestInfo = newInfo.b; // FIXME: why was this commented out then?
 				}
 
-				LogicMonitorManager.changeInfo(id, latestInfo);
+				Logistics.getServerManager().changeInfo(id, latestInfo);
 			} else if (lastInfo != null) {
 				// set to empty info type
-				LogicMonitorManager.changeInfo(id, null);
+				Logistics.getServerManager().changeInfo(id, null);
 			}
 		}
 	}

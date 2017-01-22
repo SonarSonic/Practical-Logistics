@@ -3,14 +3,14 @@ package sonar.logistics.connections.monitoring;
 import com.google.common.collect.Lists;
 
 import sonar.core.api.utils.BlockCoords;
-import sonar.core.helpers.FontHelper;
 import sonar.core.network.sync.SyncCoords;
 import sonar.core.network.sync.SyncTagType;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.asm.LogicInfoType;
-import sonar.logistics.api.display.DisplayType;
+import sonar.logistics.api.display.IDisplayInfo;
 import sonar.logistics.api.info.BaseInfo;
 import sonar.logistics.api.info.INameableInfo;
+import sonar.logistics.api.info.InfoContainer;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
 import sonar.logistics.api.info.monitor.LogicMonitorHandler;
 import sonar.logistics.helpers.InfoRenderer;
@@ -23,11 +23,10 @@ public class MonitoredBlockCoords extends BaseInfo<MonitoredBlockCoords> impleme
 	public SyncCoords syncCoords = new SyncCoords(1);
 	public SyncTagType.STRING unlocalizedName = new SyncTagType.STRING(2);
 	{
-		syncParts.addAll(Lists.newArrayList(syncCoords, unlocalizedName));
+		syncParts.addParts(syncCoords, unlocalizedName);
 	}
 
-	public MonitoredBlockCoords() {
-	}
+	public MonitoredBlockCoords() {}
 
 	public MonitoredBlockCoords(BlockCoords coords, String unlocalizedName) {
 		this.syncCoords.setCoords(coords);
@@ -54,9 +53,9 @@ public class MonitoredBlockCoords extends BaseInfo<MonitoredBlockCoords> impleme
 		return unlocalizedName.getObject();
 	}
 
+
 	@Override
-	public String getClientObject() {
-		
+	public String getClientObject() {		
 		return syncCoords.getCoords().toString();
 	}
 
@@ -94,9 +93,7 @@ public class MonitoredBlockCoords extends BaseInfo<MonitoredBlockCoords> impleme
 	}
 
 	@Override
-	public void renderInfo(DisplayType displayType, double width, double height, double scale, int infoPos) {
-		InfoRenderer.renderNormalInfo(displayType, width, height, scale, getClientIdentifier(), getClientObject());
-
+	public void renderInfo(InfoContainer container, IDisplayInfo displayInfo, double width, double height, double scale, int infoPos) {
+		InfoRenderer.renderNormalInfo(container.display.getDisplayType(), width, height, scale, getClientIdentifier(), getClientObject());
 	}
-
 }

@@ -5,15 +5,12 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
+import sonar.core.helpers.FontHelper;
 import sonar.core.network.utils.IByteBufTile;
-import sonar.core.utils.IGuiTile;
 import sonar.logistics.LogisticsItems;
 import sonar.logistics.api.info.LogicInfo;
 import sonar.logistics.api.info.monitor.ChannelType;
-import sonar.logistics.api.info.monitor.LogicMonitorHandler;
-import sonar.logistics.client.gui.GuiChannelSelection;
 import sonar.logistics.client.gui.GuiInfoReader;
-import sonar.logistics.client.gui.GuiSelectionList;
 import sonar.logistics.common.containers.ContainerInfoReader;
 import sonar.logistics.connections.monitoring.InfoMonitorHandler;
 import sonar.logistics.connections.monitoring.MonitoredList;
@@ -35,7 +32,7 @@ public class InfoReaderPart extends LogisticsReader<LogicInfo> implements IByteB
 	}
 
 	@Override
-	public MonitoredList<LogicInfo> sortMonitoredList(MonitoredList<LogicInfo> updateInfo) {
+	public MonitoredList<LogicInfo> sortMonitoredList(MonitoredList<LogicInfo> updateInfo, int channelID) {
 		updateInfo.setInfo(InfoHelper.sortInfoList(updateInfo));
 		return updateInfo;
 	}
@@ -47,20 +44,17 @@ public class InfoReaderPart extends LogisticsReader<LogicInfo> implements IByteB
 
 	@Override
 	public Object getServerElement(Object obj, int id, World world, EntityPlayer player, NBTTagCompound tag) {
-		switch (id) {
-		case 0:
-			return new ContainerInfoReader(player, this);
-		}
-		return null;
+		return id == 0 ? new ContainerInfoReader(player, this) : null;
 	}
 
 	@Override
 	public Object getClientElement(Object obj, int id, World world, EntityPlayer player, NBTTagCompound tag) {
-		switch (id) {
-		case 0:
-			return new GuiInfoReader(player, this);
-		}
-		return null;
+		return id == 0 ? new GuiInfoReader(player, this) : null;
+	}
+
+	@Override
+	public String getDisplayName() {
+		return FontHelper.translate("item.InfoReader.name");
 	}
 
 }

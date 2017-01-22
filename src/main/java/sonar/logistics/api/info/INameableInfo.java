@@ -7,7 +7,7 @@ public interface INameableInfo<T extends IMonitorInfo> extends IMonitorInfo<T> {
 	
 	/**the objects identifier (translated)*/
 	public String getClientIdentifier();
-
+	
 	/**the object itself*/
 	public String getClientObject();
 
