@@ -11,9 +11,9 @@ import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.core.inventory.ContainerMultipartSync;
 import sonar.core.inventory.slots.SlotList;
 import sonar.logistics.api.LogisticsAPI;
-import sonar.logistics.api.info.monitor.MonitorType;
 import sonar.logistics.api.settings.InventoryReader;
 import sonar.logistics.api.settings.InventoryReader.Modes;
+import sonar.logistics.api.viewers.ViewerType;
 import sonar.logistics.common.multiparts.InventoryReaderPart;
 
 public class ContainerInventoryReader extends ContainerMultipartSync implements IFlexibleContainer<InventoryReader.Modes> {
@@ -120,7 +120,7 @@ public class ContainerInventoryReader extends ContainerMultipartSync implements 
 
 	public void onContainerClosed(EntityPlayer player) {
 		super.onContainerClosed(player);
-		part.getViewersList().removeViewer(player, MonitorType.INFO);
+		part.getViewersList().removeViewer(player, ViewerType.INFO);
 	}
 
 	@Override

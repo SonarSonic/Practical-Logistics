@@ -6,13 +6,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-import mcmultipart.multipart.ISlottedPart;
-import mcmultipart.multipart.PartSlot;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.EnumFacing;
 import sonar.core.api.utils.BlockCoords;
 import sonar.logistics.Logistics;
@@ -20,17 +15,10 @@ import sonar.logistics.api.cache.EmptyNetworkCache;
 import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.cache.IRefreshCache;
 import sonar.logistics.api.cache.RefreshType;
-import sonar.logistics.api.connecting.ClientLogicMonitor;
-import sonar.logistics.api.display.ConnectedDisplayScreen;
-import sonar.logistics.api.display.ILargeDisplay;
-import sonar.logistics.api.info.monitor.ILogicMonitor;
-import sonar.logistics.api.info.monitor.MonitorType;
-import sonar.logistics.common.multiparts.ScreenMultipart;
 import sonar.logistics.connections.DefaultNetwork;
 import sonar.logistics.connections.monitoring.ChannelMonitorHandler;
 import sonar.logistics.connections.monitoring.MonitoredBlockCoords;
 import sonar.logistics.connections.monitoring.MonitoredList;
-import sonar.logistics.network.PacketLogicMonitors;
 
 public class NetworkManager {
 

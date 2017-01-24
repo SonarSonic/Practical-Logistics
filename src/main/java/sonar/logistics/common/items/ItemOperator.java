@@ -32,6 +32,7 @@ import sonar.logistics.api.connecting.IOperatorTile;
 import sonar.logistics.api.connecting.IOperatorTool;
 import sonar.logistics.api.connecting.OperatorMode;
 import sonar.logistics.api.info.monitor.ILogicMonitor;
+import sonar.logistics.api.viewers.ViewerType;
 import sonar.logistics.client.gui.GuiChannelSelection;
 import sonar.logistics.common.containers.ContainerChannelSelection;
 import sonar.logistics.helpers.CableHelper;
@@ -63,6 +64,7 @@ public class ItemOperator extends SonarItem implements IOperatorTool, IFlexibleG
 				if (part != null && part instanceof IChannelledTile) {
 					if (!world.isRemote) {
 						IChannelledTile tile = (IChannelledTile) part;
+						tile.getViewersList().addViewer(player, ViewerType.CHANNEL);
 						NBTTagCompound tag = new NBTTagCompound();
 						tag.setBoolean(FlexibleGuiHandler.ITEM, true);
 						tag.setInteger(FlexibleGuiHandler.ID, 0);

@@ -32,5 +32,6 @@ public interface ILogicTile extends IWorldPosition {
 	/**gets the network cache's ID*/
 	public int getNetworkID();
 	
+	/**sets the network this tile is connected to*/
 	public void setLocalNetworkCache(INetworkCache network);
 }

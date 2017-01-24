@@ -7,7 +7,6 @@ import javax.annotation.Nullable;
 import sonar.core.api.nbt.INBTSyncable;
 import sonar.core.utils.CustomColour;
 import sonar.logistics.api.info.InfoUUID;
-import sonar.logistics.api.info.RenderInfoProperties;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
 
 /** used within a IInfoContainer */
@@ -33,9 +32,12 @@ public interface IDisplayInfo extends INBTSyncable {
 	/** the info current render properties */
 	public RenderInfoProperties getRenderProperties();
 	
+	/**set the player inputed data layout*/
 	public void setFormatStrings(ArrayList<String> strings);
-	
+
+	/**gets the player inputed data layout with the constants still in place*/	
 	public ArrayList<String> getUnformattedStrings();
 	
+	/**gets the player inputed data layout with the format constants replaced*/	
 	public ArrayList<String> getFormattedStrings();
 }

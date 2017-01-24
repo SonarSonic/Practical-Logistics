@@ -12,13 +12,11 @@ import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import sonar.core.api.utils.BlockCoords;
-import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.core.integration.multipart.SonarMultipartHelper;
 import sonar.core.network.sync.SyncTagType;
 import sonar.core.network.sync.SyncUUID;
@@ -27,21 +25,19 @@ import sonar.logistics.Logistics;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.cache.ILogisticsNetwork;
 import sonar.logistics.api.cache.INetworkCache;
-import sonar.logistics.api.connecting.IChannelledTile;
 import sonar.logistics.api.info.InfoUUID;
 import sonar.logistics.api.info.monitor.ILogicMonitor;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
 import sonar.logistics.api.info.monitor.IdentifiedCoordsList;
 import sonar.logistics.api.info.monitor.LogicMonitorHandler;
-import sonar.logistics.api.info.monitor.MonitorType;
+import sonar.logistics.api.viewers.MonitorTally;
+import sonar.logistics.api.viewers.ViewerType;
+import sonar.logistics.api.viewers.ViewersList;
 import sonar.logistics.connections.monitoring.MonitoredBlockCoords;
 import sonar.logistics.connections.monitoring.MonitoredList;
-import sonar.logistics.connections.monitoring.ViewersList;
-import sonar.logistics.helpers.InfoHelper;
-import sonar.logistics.network.PacketMonitoredList;
 import sonar.logistics.network.SyncMonitoredType;
 
-public abstract class MonitorMultipart<T extends IMonitorInfo> extends SidedMultipart implements ILogicMonitor<T>, IByteBufTile, IChannelledTile {
+public abstract class MonitorMultipart<T extends IMonitorInfo> extends SidedMultipart implements ILogicMonitor<T>, IByteBufTile {
 
 	public static final PropertyBool hasDisplay = PropertyBool.create("display");
 	protected IdentifiedCoordsList list = new IdentifiedCoordsList(-1);
@@ -52,7 +48,7 @@ public abstract class MonitorMultipart<T extends IMonitorInfo> extends SidedMult
 	public BlockCoords lastSelected = null;
 	public IMonitorInfo lastInfo = null;
 	public SyncTagType.BOOLEAN hasMonitor = new SyncTagType.BOOLEAN(-2);
-	public ViewersList viewers = new ViewersList(this, MonitorType.ALL);
+	public ViewersList viewers = new ViewersList(this, ViewerType.ALL);
 	public int lastPos = -1;
 
 	public MonitorMultipart(String handlerID, double width, double heightMin, double heightMax) {
@@ -164,7 +160,8 @@ public abstract class MonitorMultipart<T extends IMonitorInfo> extends SidedMult
 
 	public MonitoredList<T> getMonitoredList() {
 		// TODO only using one INFO UUID
-		return getNetworkID() == -1 ? MonitoredList.newMonitoredList(getNetworkID()) : Logistics.getInfoManager(this.getWorld().isRemote).getMonitoredList(getNetworkID(), new InfoUUID(this.getIdentity().hashCode(), 0));
+		InfoUUID id = new InfoUUID(this.getIdentity().hashCode(), 0);
+		return getNetworkID() == -1 ? MonitoredList.newMonitoredList(getNetworkID()) : Logistics.getClientManager().getMonitoredList(getNetworkID(), id);
 	}
 
 	public int getMaxInfo() {
@@ -244,10 +241,10 @@ public abstract class MonitorMultipart<T extends IMonitorInfo> extends SidedMult
 
 
 	@Override
-	public void onViewerAdded(EntityPlayer player, List<MonitorType> type) {
+	public void onViewerAdded(EntityPlayer player, List<MonitorTally> type) {
 		SonarMultipartHelper.sendMultipartSyncToPlayer(this, (EntityPlayerMP) player);
 	}
 
 	@Override
-	public void onViewerRemoved(EntityPlayer player, List<MonitorType> type) {}
+	public void onViewerRemoved(EntityPlayer player, List<MonitorTally> type) {}
 }

@@ -8,6 +8,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.IStringSerializable;
 import sonar.core.helpers.SonarHelper;
 
+/**used for checking the connections of Large Display Screens for rendering*/
 public enum DisplayConnections implements IStringSerializable {
 	NONE, //
 	ONE_N(EnumFacing.NORTH), //
@@ -31,7 +32,6 @@ public enum DisplayConnections implements IStringSerializable {
 
 	static {
 		for (DisplayConnections connect : DisplayConnections.VALUES) {
-
 			int size = connect.getFaces().size();
 			ArrayList list = connections.get(size);
 			if (list == null) {
@@ -56,7 +56,7 @@ public enum DisplayConnections implements IStringSerializable {
 	public String getName() {
 		return this.toString().toLowerCase();
 	}
-
+	/**returns the type of DisplayConnections on a Display screen based on the provided EnumFacing values*/
 	public static DisplayConnections getType(List<EnumFacing> faces) {
 		if (faces.size() == 4) {
 			return DisplayConnections.ALL;

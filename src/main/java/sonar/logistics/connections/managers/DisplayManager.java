@@ -29,6 +29,7 @@ public class DisplayManager extends AbstractConnectionManager<ILargeDisplay> {
 	@Override
 	public void onNetworksConnected(int newID, int oldID) {
 		ConnectedDisplayScreen screen = Logistics.getInfoManager(false).getConnectedDisplays().get(newID);
+		Logistics.getInfoManager(false).getConnectedDisplays().remove(oldID);
 		if (screen != null) {
 			screen.setHasChanged();
 		} else
@@ -42,7 +43,6 @@ public class DisplayManager extends AbstractConnectionManager<ILargeDisplay> {
 			Logistics.getInfoManager(false).getConnectedDisplays().put(registryID, screen = new ConnectedDisplayScreen(added));
 		}
 		screen.setHasChanged();
-		added.setConnectedDisplay(screen);
 	}
 
 	public Pair<ConnectableType, Integer> getConnectionType(ILargeDisplay source, World world, BlockPos pos, EnumFacing dir, ConnectableType cableType) {
@@ -61,10 +61,7 @@ public class DisplayManager extends AbstractConnectionManager<ILargeDisplay> {
 	}
 
 	public void tick() {
-		for (ConnectedDisplayScreen screen : Logistics.getInfoManager(false).getConnectedDisplays().values()) {
-			// screen.setHasChanged();
-			screen.update();
-		}
+		Logistics.getInfoManager(false).getConnectedDisplays().entrySet().forEach(entry -> entry.getValue().update(entry.getKey()));
 	}
 
 	@Override

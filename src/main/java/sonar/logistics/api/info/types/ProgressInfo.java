@@ -1,4 +1,4 @@
-package sonar.logistics.api.info;
+package sonar.logistics.api.info.types;
 
 import org.lwjgl.opengl.GL11;
 
@@ -11,6 +11,8 @@ import sonar.logistics.Logistics;
 import sonar.logistics.api.asm.LogicInfoType;
 import sonar.logistics.api.display.IDisplayInfo;
 import sonar.logistics.api.display.ISuffixable;
+import sonar.logistics.api.display.InfoContainer;
+import sonar.logistics.api.info.INameableInfo;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
 import sonar.logistics.api.info.monitor.LogicMonitorHandler;
 import sonar.logistics.helpers.InfoHelper;

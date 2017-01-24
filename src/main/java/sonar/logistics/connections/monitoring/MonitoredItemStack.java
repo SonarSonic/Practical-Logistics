@@ -4,8 +4,6 @@ import java.util.Map;
 
 import org.lwjgl.opengl.GL11;
 
-import com.google.common.collect.Lists;
-
 import mcmultipart.raytrace.PartMOP;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
@@ -21,14 +19,14 @@ import sonar.logistics.Logistics;
 import sonar.logistics.api.asm.LogicInfoType;
 import sonar.logistics.api.display.DisplayType;
 import sonar.logistics.api.display.IDisplayInfo;
-import sonar.logistics.api.info.BaseInfo;
+import sonar.logistics.api.display.InfoContainer;
 import sonar.logistics.api.info.IClickableInfo;
 import sonar.logistics.api.info.IComparableInfo;
 import sonar.logistics.api.info.INameableInfo;
-import sonar.logistics.api.info.InfoContainer;
 import sonar.logistics.api.info.monitor.IJoinableInfo;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
 import sonar.logistics.api.info.monitor.LogicMonitorHandler;
+import sonar.logistics.api.info.types.BaseInfo;
 import sonar.logistics.helpers.InfoHelper;
 
 @LogicInfoType(id = MonitoredItemStack.id, modid = Logistics.MODID)

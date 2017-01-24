@@ -29,7 +29,7 @@ import sonar.logistics.Logistics;
 import sonar.logistics.api.info.ICustomEntityHandler;
 import sonar.logistics.api.info.ICustomTileHandler;
 import sonar.logistics.api.info.IInfoRegistry;
-import sonar.logistics.api.info.LogicInfo;
+import sonar.logistics.api.info.types.LogicInfo;
 
 /** where all the registering for LogicInfo happens */
 public class LogicInfoRegistry {

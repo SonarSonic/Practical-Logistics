@@ -26,11 +26,11 @@ import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.display.DisplayType;
 import sonar.logistics.api.display.IInfoDisplay;
+import sonar.logistics.api.display.IScaleableDisplay;
+import sonar.logistics.api.display.RenderInfoProperties;
 import sonar.logistics.api.display.ScreenLayout;
-import sonar.logistics.api.info.IScaleableScreen;
-import sonar.logistics.api.info.LogicInfo;
-import sonar.logistics.api.info.RenderInfoProperties;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
+import sonar.logistics.api.info.types.LogicInfo;
 import sonar.logistics.common.multiparts.LogisticsMultipart;
 import sonar.logistics.connections.monitoring.MonitoredList;
 
@@ -195,8 +195,8 @@ public class InfoHelper {
 	public static double[] getScaling(IInfoDisplay display, ScreenLayout layout, int pos) {
 		DisplayType type = display.getDisplayType();
 		double width = type.width, height = type.height, scale = type.scale;
-		if (display instanceof IScaleableScreen) {
-			double[] scaling = ((IScaleableScreen) display).getScaling();
+		if (display instanceof IScaleableDisplay) {
+			double[] scaling = ((IScaleableDisplay) display).getScaling();
 			width = scaling[0];
 			height = scaling[1];
 			scale = scaling[2];
@@ -217,8 +217,8 @@ public class InfoHelper {
 	public static double[] getTranslation(IInfoDisplay display, ScreenLayout layout, int pos) {
 		DisplayType type = display.getDisplayType();
 		double width = type.width, height = type.height, scale = type.scale;
-		if (display instanceof IScaleableScreen) {
-			double[] scaling = ((IScaleableScreen) display).getScaling();
+		if (display instanceof IScaleableDisplay) {
+			double[] scaling = ((IScaleableDisplay) display).getScaling();
 			// width = scaling[0];
 			// height = scaling[1];
 			// scale = scaling[2];
@@ -239,8 +239,8 @@ public class InfoHelper {
 	public static double[] getIntersect(IInfoDisplay display, ScreenLayout layout, int pos) {
 		DisplayType type = display.getDisplayType();
 		double width = type.width, height = type.height, scale = type.scale;
-		if (display instanceof IScaleableScreen) {
-			double[] scaling = ((IScaleableScreen) display).getScaling();
+		if (display instanceof IScaleableDisplay) {
+			double[] scaling = ((IScaleableDisplay) display).getScaling();
 			width = scaling[0];
 			height = scaling[1];
 			scale = scaling[2];

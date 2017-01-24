@@ -42,9 +42,12 @@ import sonar.logistics.api.display.DisplayConnections;
 import sonar.logistics.api.display.DisplayType;
 import sonar.logistics.api.display.IInfoDisplay;
 import sonar.logistics.api.display.ILargeDisplay;
-import sonar.logistics.api.info.InfoContainer;
+import sonar.logistics.api.display.InfoContainer;
+import sonar.logistics.api.viewers.EmptyViewersList;
+import sonar.logistics.api.viewers.IViewersList;
 import sonar.logistics.client.gui.GuiDisplayScreen;
 import sonar.logistics.connections.managers.DisplayManager;
+import sonar.logistics.network.PacketConnectedDisplayScreen;
 
 public class LargeDisplayScreenPart extends ScreenMultipart implements ILargeDisplay {
 
@@ -53,8 +56,9 @@ public class LargeDisplayScreenPart extends ScreenMultipart implements ILargeDis
 	public static final PropertyEnum<DisplayConnections> TYPE = PropertyEnum.<DisplayConnections>create("type", DisplayConnections.class);
 	public ConnectedDisplayScreen connectedDisplay = null;
 	public NBTTagCompound savedTag = null;
-
 	public SyncTagType.BOOLEAN shouldRender = (BOOLEAN) new SyncTagType.BOOLEAN(3); // set default info
+	public boolean onRenderChange = true;
+
 	{
 		syncList.addPart(shouldRender);
 	}
@@ -67,8 +71,19 @@ public class LargeDisplayScreenPart extends ScreenMultipart implements ILargeDis
 		super(dir, rotation);
 	}
 
+	public void update() {
+		super.update();
+		if (isServer() && onRenderChange) {
+			if (this.shouldRender()) {
+				this.getDisplayScreen().sendViewers();
+			}
+			this.sendByteBufPacket(5);
+			onRenderChange = false;
+		}
+	}
+
 	public void updateDefaultInfo() {
-		if (this.connectedDisplay != null && this.shouldRender()) {
+		if (this.getDisplayScreen() != null && this.shouldRender()) {
 			super.updateDefaultInfo();
 		}
 	}
@@ -98,6 +113,9 @@ public class LargeDisplayScreenPart extends ScreenMultipart implements ILargeDis
 	@Override
 	public int maxInfo() {
 		return 4;
+	}
+
+	public void onLoaded() {
 	}
 
 	@Override
@@ -142,6 +160,13 @@ public class LargeDisplayScreenPart extends ScreenMultipart implements ILargeDis
 		}
 	}
 
+	public void onSyncPacketRequested(EntityPlayer player) {
+		super.onSyncPacketRequested(player);
+		ConnectedDisplayScreen screen = this.getDisplayScreen();
+		if (screen != null)
+			Logistics.network.sendTo(new PacketConnectedDisplayScreen(screen, registryID), (EntityPlayerMP) player);
+	}
+
 	@Override
 	public boolean canConnectOnSide(EnumFacing dir) {
 		return dir != face && dir != face.getOpposite();
@@ -160,6 +185,7 @@ public class LargeDisplayScreenPart extends ScreenMultipart implements ILargeDis
 			if (isServer()) {
 				LargeDisplayScreenPart part = (LargeDisplayScreenPart) this.getDisplayScreen().getTopLeftScreen();
 				if (part != null) {
+					Logistics.network.sendTo(new PacketConnectedDisplayScreen(this.getDisplayScreen(), registryID), (EntityPlayerMP) player);
 					Logistics.getServerManager().sendLocalMonitorsToClient(part, player);
 					SonarMultipartHelper.sendMultipartSyncToPlayer(this, (EntityPlayerMP) player);
 					part.openFlexibleGui(player, 0);
@@ -172,11 +198,8 @@ public class LargeDisplayScreenPart extends ScreenMultipart implements ILargeDis
 
 	public void setLocalNetworkCache(INetworkCache network) {
 		super.setLocalNetworkCache(network);
-		if (this.isServer()) {
-			connectedDisplay = Logistics.getInfoManager(this.getWorld().isRemote).getConnectedDisplays().get(registryID);
-			if (connectedDisplay != null) {
-				connectedDisplay.setHasChanged();
-			}
+		if (this.isServer() && getDisplayScreen() != null) {
+			getDisplayScreen().setHasChanged();
 		}
 	}
 
@@ -185,19 +208,25 @@ public class LargeDisplayScreenPart extends ScreenMultipart implements ILargeDis
 		super.readData(nbt, type);
 		if (type.isType(SyncType.DEFAULT_SYNC)) {
 			registryID = nbt.getInteger("id");
-			// shouldRender.readData(nbt, type);
+			shouldRender.readData(nbt, type);
 		}
-		if (this.isServer() && this.shouldRender.getObject() && type.isType(SyncType.SAVE)) {
-			if (this.connectedDisplay == null && nbt.hasKey("connected")) {
-				this.savedTag = nbt.getCompoundTag("connected");
-			}
+		if (this.isServer() && type.isType(SyncType.SAVE) && nbt.hasKey("connected")) {
+			this.savedTag = nbt;
+			// this.getDisplayScreen().readData(nbt, type);
 		}
+		/* if (this.isServer() && this.shouldRender.getObject() && type.isType(SyncType.SAVE)) { if (this.connectedDisplay == null && nbt.hasKey("connected")) { this.savedTag = nbt.getCompoundTag("connected"); } } if (this.isClient() && this.shouldRender.getObject() && type.isType(SyncType.SAVE)) { if (nbt.hasKey("connected")) { this.savedTag = nbt.getCompoundTag("connected"); } } */
 	}
 
 	@Override
 	public NBTTagCompound writeData(NBTTagCompound nbt, SyncType type) {
 		if (type.isType(SyncType.DEFAULT_SYNC)) {
 			nbt.setInteger("id", registryID);
+			shouldRender.writeData(nbt, type);
+		}
+		if (this.isServer() && type.isType(SyncType.SAVE) && this.shouldRender()) {
+			if (this.getDisplayScreen() != null) {
+				this.getDisplayScreen().writeData(nbt, type);
+			}
 		}
 		return super.writeData(nbt, type);
 	}
@@ -317,22 +346,29 @@ public class LargeDisplayScreenPart extends ScreenMultipart implements ILargeDis
 
 	@Override
 	public void setConnectedDisplay(ConnectedDisplayScreen connectedDisplay) {
-		if (savedTag != null && registryID != -1) {
-			connectedDisplay.readData(savedTag, SyncType.SAVE);
-			savedTag = null;
-		}
 		this.connectedDisplay = connectedDisplay;
-		if (shouldRender.getObject()) {
-			syncList.addPart(connectedDisplay);
-		} else {
-			syncList.removePart(connectedDisplay);
+		/* if (savedTag != null && registryID != -1) { connectedDisplay.readData(savedTag, SyncType.SAVE); savedTag = null; } if (shouldRender.getObject()) { syncList.addPart(connectedDisplay); } else { syncList.removePart(connectedDisplay); } */
+	}
+
+	@Override
+	public IViewersList getViewersList() {
+		if (getDisplayScreen() == null) {
+			//this.connectedDisplay = connectedDisplay;
 		}
+		return getDisplayScreen() != null ? getDisplayScreen().getViewersList() : EmptyViewersList.INSTANCE;
 	}
 
 	@Override
 	public ConnectedDisplayScreen getDisplayScreen() {
-		if (connectedDisplay == null) {
+		if (connectedDisplay == null && registryID != -1) {
 			setConnectedDisplay(connectedDisplay = DisplayManager.getOrCreateDisplayScreen(getWorld(), this, registryID));
+			if (this.savedTag != null) {
+				connectedDisplay.readData(savedTag, SyncType.SAVE);
+				savedTag = null;
+			}
+			if (isServer()) {
+				Logistics.getServerManager().updateViewingMonitors = true;
+			}
 		}
 		return connectedDisplay;
 	}
@@ -342,42 +378,31 @@ public class LargeDisplayScreenPart extends ScreenMultipart implements ILargeDis
 		if (shouldRender != this.shouldRender.getObject()) {
 			this.shouldRender.setObject(shouldRender);
 		}
-		if (shouldRender) {
-			syncList.addPart(connectedDisplay);
-		} else {
-			syncList.removePart(connectedDisplay);
+		onRenderChange = true;
+		if (isServer()) {
+			Logistics.getServerManager().updateViewingMonitors = true;
 		}
-		// this.sendByteBufPacket(5);
-		this.sendSyncPacket();
-		this.markDirty();
+		//// this.sendSyncPacket();
+		//// this.markDirty();
 	}
 
 	@Override
 	public boolean shouldRender() {
-		// return connectedDisplay != null ? connectedDisplay.canBeRendered.getObject() && shouldRender.getObject() : shouldRender.getObject();
-		return shouldRender.getObject();
+		// return shouldRender.getObject();
+		return shouldRender.getObject() && this.getDisplayScreen() != null;
 	}
 
 	@SideOnly(Side.CLIENT)
 	@Override
 	public AxisAlignedBB getRenderBoundingBox() {
-
 		return TileEntity.INFINITE_EXTENT_AABB;
 	}
 
 	public Object getServerElement(ScreenMultipart obj, int id, World world, EntityPlayer player, NBTTagCompound tag) {
-		switch (id) {
-		case 0:
-			return new ContainerMultipartSync(obj);
-		}
-		return null;
+		return id == 0 ? new ContainerMultipartSync(obj) : null;
 	}
 
 	public Object getClientElement(ScreenMultipart obj, int id, World world, EntityPlayer player, NBTTagCompound tag) {
-		switch (id) {
-		case 0:
-			return new GuiDisplayScreen(obj);
-		}
-		return null;
+		return id == 0 ? new GuiDisplayScreen(obj) : null;
 	}
 }

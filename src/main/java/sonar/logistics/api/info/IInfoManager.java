@@ -1,11 +1,10 @@
-package sonar.logistics.connections.managers;
+package sonar.logistics.api.info;
 
 import java.util.LinkedHashMap;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import sonar.logistics.api.display.ConnectedDisplayScreen;
-import sonar.logistics.api.info.InfoUUID;
 import sonar.logistics.api.info.monitor.ILogicMonitor;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
 import sonar.logistics.connections.monitoring.MonitoredList;

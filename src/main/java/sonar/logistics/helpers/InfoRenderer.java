@@ -15,8 +15,8 @@ import sonar.core.helpers.RenderHelper;
 import sonar.core.helpers.SonarHelper;
 import sonar.logistics.api.display.DisplayType;
 import sonar.logistics.api.info.INameableInfo;
-import sonar.logistics.api.info.LogicInfo;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
+import sonar.logistics.api.info.types.LogicInfo;
 import sonar.logistics.connections.monitoring.MonitoredBlockCoords;
 
 public class InfoRenderer {

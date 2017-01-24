@@ -1,5 +1,8 @@
-package sonar.logistics.api.info;
+package sonar.logistics.api.display;
 
+import sonar.logistics.api.info.IInfoContainer;
+
+/**the render properties for a {@link IMonitorInfo} when rendered in a {@link InfoContainer}*/
 public class RenderInfoProperties {
 
 	public IInfoContainer container;

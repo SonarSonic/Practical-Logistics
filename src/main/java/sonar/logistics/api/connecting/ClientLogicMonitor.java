@@ -17,6 +17,7 @@ import sonar.core.network.sync.SyncUUID;
 import sonar.core.utils.IUUIDIdentity;
 import sonar.logistics.api.info.monitor.ILogicMonitor;
 
+/**used when syncing Logic Monitors for display in the Display Screen with the client, since some may not be loaded on client side.*/
 public class ClientLogicMonitor implements IUUIDIdentity, INBTSyncable {
 
 	public ArrayList<ISyncPart> syncParts = new ArrayList<ISyncPart>();

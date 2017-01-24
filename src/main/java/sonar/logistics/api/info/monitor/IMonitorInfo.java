@@ -1,11 +1,9 @@
 package sonar.logistics.api.info.monitor;
 
-import net.minecraft.nbt.NBTTagCompound;
 import sonar.core.api.nbt.INBTSyncable;
-import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.logistics.api.asm.LogicInfoType;
 import sonar.logistics.api.display.IDisplayInfo;
-import sonar.logistics.api.info.InfoContainer;
+import sonar.logistics.api.display.InfoContainer;
 
 /**for your info to be registered you must use {@link LogicInfoType} implement this for all types of info*/
 public interface IMonitorInfo<T extends IMonitorInfo> extends INBTSyncable{

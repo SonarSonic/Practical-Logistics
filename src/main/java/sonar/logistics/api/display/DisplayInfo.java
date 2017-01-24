@@ -17,9 +17,7 @@ import sonar.core.network.sync.SyncableList;
 import sonar.core.utils.CustomColour;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.info.INameableInfo;
-import sonar.logistics.api.info.InfoContainer;
 import sonar.logistics.api.info.InfoUUID;
-import sonar.logistics.api.info.RenderInfoProperties;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
 import sonar.logistics.client.LogisticsColours;
 

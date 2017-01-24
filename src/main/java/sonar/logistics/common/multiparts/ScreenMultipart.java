@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import com.google.common.collect.Lists;
-
 import io.netty.buffer.ByteBuf;
 import mcmultipart.MCMultiPartMod;
 import mcmultipart.multipart.INormallyOccludingPart;
@@ -44,13 +42,12 @@ import sonar.logistics.api.display.IInfoDisplay;
 import sonar.logistics.api.display.ScreenLayout;
 import sonar.logistics.api.info.InfoUUID;
 import sonar.logistics.api.info.monitor.ILogicMonitor;
-import sonar.logistics.api.info.monitor.MonitorType;
+import sonar.logistics.api.viewers.MonitorTally;
+import sonar.logistics.api.viewers.ViewerType;
 import sonar.logistics.client.gui.GuiDisplayScreen;
-import sonar.logistics.connections.monitoring.ViewersList;
 
 public abstract class ScreenMultipart extends LogisticsMultipart implements IByteBufTile, INormallyOccludingPart, IInfoDisplay, IOperatorTile, IFlexibleGui<ScreenMultipart> {
 
-	public ViewersList viewers = new ViewersList(this, Lists.newArrayList(MonitorType.INFO));
 	public SyncEnum<ScreenLayout> layout = new SyncEnum(ScreenLayout.values(), 1);
 	public SyncTagType.BOOLEAN defaultData = new SyncTagType.BOOLEAN(2); // set default info
 	public ILogicMonitor monitor = null;
@@ -117,8 +114,8 @@ public abstract class ScreenMultipart extends LogisticsMultipart implements IByt
 	}
 
 	public void markChanged(IDirtyPart part) {
-		super.markChanged(part);
-		ArrayList<EntityPlayer> viewers = this.getViewersList().getViewers(false, MonitorType.INFO);
+		super.markChanged(part);		
+		ArrayList<EntityPlayer> viewers = getViewersList().getViewers(false, ViewerType.INFO);
 		for (EntityPlayer player : viewers) {
 			SonarMultipartHelper.sendMultipartSyncToPlayer(this, (EntityPlayerMP) player);
 		}
@@ -126,7 +123,7 @@ public abstract class ScreenMultipart extends LogisticsMultipart implements IByt
 
 	public void onSyncPacketRequested(EntityPlayer player) {
 		super.onSyncPacketRequested(player);
-		viewers.addViewer(player, MonitorType.INFO);
+		this.getViewersList().addViewer(player, ViewerType.INFO);
 	}
 
 	public void onFirstTick() {
@@ -275,11 +272,11 @@ public abstract class ScreenMultipart extends LogisticsMultipart implements IByt
 	}
 
 	@Override
-	public void onViewerAdded(EntityPlayer player, List<MonitorType> type) {
+	public void onViewerAdded(EntityPlayer player, List<MonitorTally> type) {
 	}
 
 	@Override
-	public void onViewerRemoved(EntityPlayer player, List<MonitorType> type) {
+	public void onViewerRemoved(EntityPlayer player, List<MonitorTally> type) {
 	}
 
 	public Object getServerElement(ScreenMultipart obj, int id, World world, EntityPlayer player, NBTTagCompound tag) {
@@ -292,10 +289,5 @@ public abstract class ScreenMultipart extends LogisticsMultipart implements IByt
 
 	public UUID getIdentity() {
 		return getUUID();
-	}
-
-	@Override
-	public ViewersList getViewersList() {
-		return viewers;
 	}
 }

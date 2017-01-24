@@ -1,4 +1,4 @@
-package sonar.logistics.api.info;
+package sonar.logistics.api.info.types;
 
 import java.util.ArrayList;
 

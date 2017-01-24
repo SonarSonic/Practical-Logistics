@@ -11,8 +11,8 @@ import sonar.logistics.Logistics;
 import sonar.logistics.api.asm.MonitorHandler;
 import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.info.ICustomTileHandler;
-import sonar.logistics.api.info.LogicInfo;
 import sonar.logistics.api.info.monitor.LogicMonitorHandler;
+import sonar.logistics.api.info.types.LogicInfo;
 import sonar.logistics.info.LogicInfoRegistry;
 
 @MonitorHandler(handlerID = InfoMonitorHandler.id, modid = Logistics.MODID)

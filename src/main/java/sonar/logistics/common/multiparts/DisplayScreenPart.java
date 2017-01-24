@@ -2,6 +2,8 @@ package sonar.logistics.common.multiparts;
 
 import java.util.List;
 
+import com.google.common.collect.Lists;
+
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
@@ -11,11 +13,14 @@ import net.minecraftforge.fml.common.network.ByteBufUtils;
 import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.logistics.LogisticsItems;
 import sonar.logistics.api.display.DisplayType;
+import sonar.logistics.api.display.InfoContainer;
 import sonar.logistics.api.info.IInfoContainer;
-import sonar.logistics.api.info.InfoContainer;
+import sonar.logistics.api.viewers.ViewerType;
+import sonar.logistics.api.viewers.ViewersList;
 
 public class DisplayScreenPart extends ScreenMultipart {
 
+	public ViewersList viewers = new ViewersList(this, Lists.newArrayList(ViewerType.INFO));
 	public InfoContainer container = new InfoContainer(this);
 	
 	public DisplayScreenPart() {
@@ -97,4 +102,8 @@ public class DisplayScreenPart extends ScreenMultipart {
 		container().readData(ByteBufUtils.readTag(buf), SyncType.SAVE);
 	}
 
+	@Override
+	public ViewersList getViewersList() {
+		return viewers;
+	}
 }

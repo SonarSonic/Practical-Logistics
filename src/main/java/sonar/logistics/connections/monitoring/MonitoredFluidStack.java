@@ -18,13 +18,13 @@ import sonar.core.network.sync.SyncNBTAbstract;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.asm.LogicInfoType;
 import sonar.logistics.api.display.IDisplayInfo;
-import sonar.logistics.api.info.BaseInfo;
+import sonar.logistics.api.display.InfoContainer;
 import sonar.logistics.api.info.IClickableInfo;
 import sonar.logistics.api.info.INameableInfo;
-import sonar.logistics.api.info.InfoContainer;
 import sonar.logistics.api.info.monitor.IJoinableInfo;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
 import sonar.logistics.api.info.monitor.LogicMonitorHandler;
+import sonar.logistics.api.info.types.BaseInfo;
 import sonar.logistics.helpers.InfoRenderer;
 
 @LogicInfoType(id = MonitoredFluidStack.id, modid = Logistics.MODID)

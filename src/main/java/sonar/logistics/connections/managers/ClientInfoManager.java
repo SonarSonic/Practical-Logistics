@@ -15,6 +15,7 @@ import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.logistics.api.connecting.ClientDataEmitter;
 import sonar.logistics.api.connecting.ClientLogicMonitor;
 import sonar.logistics.api.display.ConnectedDisplayScreen;
+import sonar.logistics.api.info.IInfoManager;
 import sonar.logistics.api.info.InfoUUID;
 import sonar.logistics.api.info.monitor.ILogicMonitor;
 import sonar.logistics.api.info.monitor.IMonitorInfo;

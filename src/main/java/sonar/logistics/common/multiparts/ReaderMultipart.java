@@ -16,7 +16,7 @@ import sonar.logistics.Logistics;
 import sonar.logistics.api.info.InfoUUID;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
 import sonar.logistics.api.info.monitor.IReader;
-import sonar.logistics.api.info.monitor.MonitorType;
+import sonar.logistics.api.viewers.ViewerType;
 import sonar.logistics.helpers.LogisticsHelper;
 
 public abstract class ReaderMultipart<T extends IMonitorInfo> extends MonitorMultipart<T> implements ISlottedPart, IReader<T>, IFlexibleGui {
@@ -40,7 +40,7 @@ public abstract class ReaderMultipart<T extends IMonitorInfo> extends MonitorMul
 		if (!LogisticsHelper.isPlayerUsingOperator(player)) {
 			if (!getWorld().isRemote) {
 				SonarMultipartHelper.sendMultipartSyncToPlayer(this, (EntityPlayerMP) player);
-				viewers.addViewer(player, MonitorType.FULL_INFO);
+				viewers.addViewer(player, ViewerType.FULL_INFO);
 				openFlexibleGui(player, 0);
 			}
 			return true;

@@ -4,13 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import com.google.common.collect.Lists;
+
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumFacing.Axis;
 import net.minecraft.util.EnumFacing.AxisDirection;
-import net.minecraft.util.ITickable;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import sonar.core.api.nbt.INBTSyncable;
 import sonar.core.api.utils.BlockCoords;
@@ -29,15 +31,17 @@ import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.connecting.ConnectableType;
 import sonar.logistics.api.connecting.INetworkConnectable;
 import sonar.logistics.api.info.IInfoContainer;
-import sonar.logistics.api.info.IScaleableScreen;
-import sonar.logistics.api.info.InfoContainer;
 import sonar.logistics.api.info.monitor.ILogicMonitor;
-import sonar.logistics.api.info.monitor.MonitorType;
+import sonar.logistics.api.viewers.MonitorTally;
+import sonar.logistics.api.viewers.ViewerType;
+import sonar.logistics.api.viewers.ViewersList;
 import sonar.logistics.common.multiparts.ScreenMultipart;
-import sonar.logistics.connections.monitoring.ViewersList;
+import sonar.logistics.network.PacketConnectedDisplayScreen;
 
-public class ConnectedDisplayScreen implements IInfoDisplay, INetworkConnectable, INBTSyncable, ITickable, IScaleableScreen, ISyncPart {
+/**used with Large Display Screens so they all have one uniform InfoContainer, Viewer list etc.*/
+public class ConnectedDisplayScreen implements IInfoDisplay, INetworkConnectable, INBTSyncable, IScaleableDisplay, ISyncPart {
 
+	public ViewersList viewers = new ViewersList(this, Lists.newArrayList(ViewerType.INFO));
 	private int registryID = -1;
 	public ILargeDisplay topLeftScreen = null;
 	public SyncableList syncParts = new SyncableList(this);;
@@ -49,6 +53,7 @@ public class ConnectedDisplayScreen implements IInfoDisplay, INetworkConnectable
 	public SyncCoords topLeftCoords = new SyncCoords(5);
 	// public double[] scaling = null;
 	public boolean hasChanged = true;
+	public boolean sendViewers;
 
 	// server side
 	public ArrayList<ILargeDisplay> displays = new ArrayList(); // cached
@@ -63,16 +68,35 @@ public class ConnectedDisplayScreen implements IInfoDisplay, INetworkConnectable
 		this.hasChanged = true;
 	}
 
-	@Override
-	public void update() {
-		if (hasChanged) {
+	public ConnectedDisplayScreen(int registryID) {
+		this.registryID = registryID;
+		this.hasChanged = true;
+	}
+
+	public void update(int registryID) {
+		if (sendViewers) {
+			sendViewers();
+		}
+		if (hasChanged || this.registryID != registryID) {
+			this.registryID = registryID;
 			displays = Logistics.getDisplayManager().getConnections(registryID);
 			if (!displays.isEmpty()) {
 				if (!displays.get(0).getCoords().getWorld().isRemote) {
 					setDisplayScaling(displays.get(0), displays);
 				}
 			}
+
 			hasChanged = false;
+		}
+	}
+
+	public void sendViewers() {
+		ArrayList<EntityPlayer> players = getViewersList().getViewers(false, ViewerType.INFO, ViewerType.FULL_INFO);
+		if (!players.isEmpty()) {
+			players.forEach(player -> Logistics.network.sendTo(new PacketConnectedDisplayScreen(this, registryID), (EntityPlayerMP) player));
+			sendViewers = false;
+		} else {
+			sendViewers = true;
 		}
 	}
 
@@ -254,7 +278,7 @@ public class ConnectedDisplayScreen implements IInfoDisplay, INetworkConnectable
 			NBTTagCompound tag = nbt.getCompoundTag(this.getTagName());
 			NBTHelper.readSyncParts(tag, type, this.syncParts);
 			container.resetRenderProperties();
-			//Logistics.getInfoManager().getConnectedDisplays().put(registryID, this);
+			// Logistics.getInfoManager().getConnectedDisplays().put(registryID, this);
 		}
 	}
 
@@ -287,6 +311,7 @@ public class ConnectedDisplayScreen implements IInfoDisplay, INetworkConnectable
 	@Override
 	public void readFromBuf(ByteBuf buf) {
 		readData(ByteBufUtils.readTag(buf), SyncType.SAVE);
+		container.resetRenderProperties();
 	}
 
 	@Override
@@ -323,7 +348,7 @@ public class ConnectedDisplayScreen implements IInfoDisplay, INetworkConnectable
 
 	@Override
 	public ViewersList getViewersList() {
-		return null;
+		return viewers;
 	}
 
 	@Override
@@ -332,8 +357,10 @@ public class ConnectedDisplayScreen implements IInfoDisplay, INetworkConnectable
 	}
 
 	@Override
-	public void onViewerAdded(EntityPlayer player, List<MonitorType> type) {}
+	public void onViewerAdded(EntityPlayer player, List<MonitorTally> type) {
+	}
 
 	@Override
-	public void onViewerRemoved(EntityPlayer player, List<MonitorType> type) {}
+	public void onViewerRemoved(EntityPlayer player, List<MonitorTally> type) {
+	}
 }

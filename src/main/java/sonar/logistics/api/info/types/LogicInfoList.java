@@ -1,10 +1,8 @@
-package sonar.logistics.api.info;
+package sonar.logistics.api.info.types;
 
 import java.util.UUID;
 
 import org.lwjgl.opengl.GL11;
-
-import com.google.common.collect.Lists;
 
 import mcmultipart.raytrace.PartMOP;
 import net.minecraft.client.renderer.GlStateManager;
@@ -24,6 +22,9 @@ import sonar.logistics.api.asm.LogicInfoType;
 import sonar.logistics.api.display.ConnectedDisplayScreen;
 import sonar.logistics.api.display.DisplayType;
 import sonar.logistics.api.display.IDisplayInfo;
+import sonar.logistics.api.display.InfoContainer;
+import sonar.logistics.api.info.IClickableInfo;
+import sonar.logistics.api.info.INameableInfo;
 import sonar.logistics.api.info.monitor.ILogicMonitor;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
 import sonar.logistics.api.info.monitor.LogicMonitorHandler;

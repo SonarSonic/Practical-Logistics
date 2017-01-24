@@ -36,17 +36,19 @@ public class LogisticsEvents {
 	@SubscribeEvent
 	public void onChangeDimension(PlayerEvent.PlayerChangedDimensionEvent event) {
 		Logistics.getServerManager().sendFullPacket(event.player);
+		Logistics.getServerManager().requireUpdates.add((EntityPlayer) event.player);
 	}
 
 	@SubscribeEvent
 	public void onLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
 		Logistics.getServerManager().sendFullPacket(event.player);
+		Logistics.getServerManager().requireUpdates.add((EntityPlayer) event.player);
 	}
 
 	@SubscribeEvent
 	public void onLoggedIn(EntityEvent.EnteringChunk event) {
 		if (event.getEntity() != null && !event.getEntity().getEntityWorld().isRemote && event.getEntity() instanceof EntityPlayer) {
-			Logistics.getServerManager().requireUpdates.put((EntityPlayer) event.getEntity(), event);
+			Logistics.getServerManager().requireUpdates.add((EntityPlayer) event.getEntity());
 		}
 	}
 }

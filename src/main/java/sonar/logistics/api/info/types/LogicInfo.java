@@ -1,9 +1,6 @@
-package sonar.logistics.api.info;
+package sonar.logistics.api.info.types;
 
-import java.util.ArrayList;
 import java.util.Map;
-
-import com.google.common.collect.Lists;
 
 import mcmultipart.raytrace.PartMOP;
 import net.minecraft.entity.player.EntityPlayer;
@@ -11,7 +8,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHand;
 import sonar.core.api.utils.BlockInteractionType;
 import sonar.core.helpers.FontHelper;
-import sonar.core.network.sync.ISyncPart;
 import sonar.core.network.sync.ObjectType;
 import sonar.core.network.sync.SyncEnum;
 import sonar.core.network.sync.SyncTagType;
@@ -21,6 +17,10 @@ import sonar.logistics.Logistics;
 import sonar.logistics.api.asm.LogicInfoType;
 import sonar.logistics.api.display.IDisplayInfo;
 import sonar.logistics.api.display.ISuffixable;
+import sonar.logistics.api.display.InfoContainer;
+import sonar.logistics.api.info.IClickableInfo;
+import sonar.logistics.api.info.IComparableInfo;
+import sonar.logistics.api.info.INameableInfo;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
 import sonar.logistics.api.info.monitor.LogicMonitorHandler;
 import sonar.logistics.connections.monitoring.InfoMonitorHandler;

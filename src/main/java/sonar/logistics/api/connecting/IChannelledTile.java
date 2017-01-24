@@ -11,6 +11,6 @@ public interface IChannelledTile extends ILogicViewable {
 	public IdentifiedCoordsList getChannels(int channelID);
 	
 	/**call this client side only, sends the selected coords to the server
-	 * @param channelID TODO*/
+	 * @param channelID the id to modify the coords on*/
 	public void modifyCoords(MonitoredBlockCoords coords, int channelID);
 }

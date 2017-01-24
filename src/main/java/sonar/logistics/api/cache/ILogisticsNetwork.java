@@ -31,13 +31,14 @@ public interface ILogisticsNetwork extends INetworkCache {
 	/** gathers the monitored list required by the {@link ILogicMonitor} which is then cached 
 	 * @param connections TODO
 	 * @return TODO*/
-	public <T extends IMonitorInfo> MonitoredList<T> updateMonitoredList(ILogicMonitor<T> monitor, Map<Pair<BlockCoords, EnumFacing>, MonitoredList<?>> connections);
+	public <T extends IMonitorInfo> MonitoredList<T> updateMonitoredList(ILogicMonitor<T> monitor, int infoID, Map<Pair<BlockCoords, EnumFacing>, MonitoredList<?>> connections);
 
 	/**gets the full monitored list for the Handler type
 	 * @param type the type of handler to get a list for
 	 * @return a full list of data
 	 */
 	public <T extends IMonitorInfo> Map<Pair<BlockCoords, EnumFacing>, MonitoredList<?>> getMonitoredList(LogicMonitorHandler<T> type);
-	
+
+	//public MonitoredList<?> getListForMonitor(ILogicMonitor monitor);
 	
 }

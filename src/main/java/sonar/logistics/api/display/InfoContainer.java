@@ -1,4 +1,4 @@
-package sonar.logistics.api.info;
+package sonar.logistics.api.display;
 
 import java.util.ArrayList;
 import java.util.UUID;
@@ -22,15 +22,14 @@ import sonar.core.network.sync.IDirtyPart;
 import sonar.core.network.sync.ISyncPart;
 import sonar.core.network.sync.SyncableList;
 import sonar.logistics.Logistics;
-import sonar.logistics.api.display.DisplayInfo;
-import sonar.logistics.api.display.DisplayType;
-import sonar.logistics.api.display.IDisplayInfo;
-import sonar.logistics.api.display.IInfoDisplay;
-import sonar.logistics.api.display.ScreenLayout;
+import sonar.logistics.api.info.IClickableInfo;
+import sonar.logistics.api.info.IInfoContainer;
+import sonar.logistics.api.info.InfoUUID;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
+import sonar.logistics.api.info.types.InfoError;
 import sonar.logistics.helpers.InfoHelper;
 
-/** the typical implementation */
+/** used to store {@link IMonitorInfo} along with their respective {@link DisplayInfo} for rendering on a {@link IInfoDisplay}*/
 public class InfoContainer extends DirtyPart implements IInfoContainer, ISyncPart {
 
 	public static final ResourceLocation colour1 = new ResourceLocation(Logistics.MODID + ":textures/model/" + "progress1.png");
@@ -127,16 +126,17 @@ public class InfoContainer extends DirtyPart implements IInfoContainer, ISyncPar
 			doubleClick = true;
 		}
 		boolean bool = !world.isRemote;
-
-		lastClickTime = world.getTotalWorldTime();
-		lastClickUUID = player.getPersistentID();
-		for (int i = 0; i < display.maxInfo(); i++) {
-			IDisplayInfo info = storedInfo.get(i);
-			IMonitorInfo cachedInfo = info.getCachedInfo();
-			if (cachedInfo instanceof IClickableInfo) {
-				boolean clicked = ((IClickableInfo) cachedInfo).onClicked(type, doubleClick, info, player, hand, stack, hit, this);
-				if (clicked) {
-					return true;
+		if (world.isRemote) {
+			lastClickTime = world.getTotalWorldTime();
+			lastClickUUID = player.getPersistentID();
+			for (int i = 0; i < display.maxInfo(); i++) {
+				IDisplayInfo info = storedInfo.get(i);
+				IMonitorInfo cachedInfo = info.getCachedInfo();
+				if (cachedInfo instanceof IClickableInfo) {
+					boolean clicked = ((IClickableInfo) cachedInfo).onClicked(type, doubleClick, info, player, hand, stack, hit, this);
+					if (clicked) {
+						return true;
+					}
 				}
 			}
 		}

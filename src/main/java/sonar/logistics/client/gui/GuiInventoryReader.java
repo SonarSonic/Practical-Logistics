@@ -164,12 +164,12 @@ public class GuiInventoryReader extends GuiSelectionGrid<MonitoredItemStack> {
 
 	public void setTargetSlot(String string) {
 		part.targetSlot.setObject(Integer.parseInt(string));
-		part.sendByteBufPacket(2);
+		part.sendByteBufPacket(part.targetSlot.id);
 	}
 
 	public void setPosSlot(String string) {
 		part.posSlot.setObject(Integer.parseInt(string));
-		part.sendByteBufPacket(3);
+		part.sendByteBufPacket(part.posSlot.id);
 	}
 
 	public String getSettingsString() {

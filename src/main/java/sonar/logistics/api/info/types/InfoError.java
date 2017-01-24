@@ -1,4 +1,4 @@
-package sonar.logistics.api.info;
+package sonar.logistics.api.info.types;
 
 import net.minecraft.nbt.NBTTagCompound;
 import sonar.core.helpers.FontHelper;
@@ -7,6 +7,7 @@ import sonar.logistics.Logistics;
 import sonar.logistics.api.asm.LogicInfoType;
 import sonar.logistics.api.display.DisplayConstants;
 import sonar.logistics.api.display.IDisplayInfo;
+import sonar.logistics.api.display.InfoContainer;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
 import sonar.logistics.api.info.monitor.LogicMonitorHandler;
 import sonar.logistics.helpers.InfoRenderer;

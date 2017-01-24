@@ -10,8 +10,8 @@ import net.minecraftforge.fluids.IFluidContainerItem;
 import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.core.inventory.ContainerMultipartSync;
 import sonar.core.inventory.slots.SlotList;
-import sonar.logistics.api.info.monitor.MonitorType;
 import sonar.logistics.api.settings.FluidReader.Modes;
+import sonar.logistics.api.viewers.ViewerType;
 import sonar.logistics.common.multiparts.FluidReaderPart;
 
 public class ContainerFluidReader extends ContainerMultipartSync {
@@ -118,7 +118,7 @@ public class ContainerFluidReader extends ContainerMultipartSync {
 
 	public void onContainerClosed(EntityPlayer player) {
 		super.onContainerClosed(player);
-		part.getViewersList().removeViewer(player, MonitorType.INFO);
+		part.getViewersList().removeViewer(player, ViewerType.INFO);
 	}
 
 }

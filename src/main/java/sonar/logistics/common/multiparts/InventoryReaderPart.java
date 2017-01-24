@@ -1,5 +1,8 @@
 package sonar.logistics.common.multiparts;
 
+import java.util.ArrayList;
+
+import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -18,12 +21,13 @@ import sonar.core.utils.SortingDirection;
 import sonar.logistics.Logistics;
 import sonar.logistics.LogisticsItems;
 import sonar.logistics.api.info.InfoUUID;
-import sonar.logistics.api.info.LogicInfo;
-import sonar.logistics.api.info.LogicInfoList;
-import sonar.logistics.api.info.ProgressInfo;
 import sonar.logistics.api.info.monitor.ChannelType;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
+import sonar.logistics.api.info.types.LogicInfo;
+import sonar.logistics.api.info.types.LogicInfoList;
+import sonar.logistics.api.info.types.ProgressInfo;
 import sonar.logistics.api.settings.InventoryReader;
+import sonar.logistics.api.viewers.ViewerType;
 import sonar.logistics.client.gui.GuiInventoryReader;
 import sonar.logistics.common.containers.ContainerInventoryReader;
 import sonar.logistics.connections.monitoring.ItemMonitorHandler;
@@ -87,7 +91,7 @@ public class InventoryReaderPart extends ReaderMultipart<MonitoredItemStack> imp
 			ItemStack stack = inventory.getStackInSlot(0);
 			if (stack != null) {
 				MonitoredItemStack dummyInfo = new MonitoredItemStack(new StoredItemStack(stack.copy(), 0), network.getNetworkID());
-				Pair<Boolean, IMonitorInfo> latestInfo = updateInfo.getLatestInfo(dummyInfo);				
+				Pair<Boolean, IMonitorInfo> latestInfo = updateInfo.getLatestInfo(dummyInfo);
 				if (latestInfo.b instanceof MonitoredItemStack) {
 					((MonitoredItemStack) latestInfo.b).networkID.setObject(network.getNetworkID());
 				}
@@ -109,22 +113,26 @@ public class InventoryReaderPart extends ReaderMultipart<MonitoredItemStack> imp
 		}
 	}
 
+	public void readPacket(ByteBuf buf, int id) {
+		super.readPacket(buf, id);
+		
+		//when the order of the list is changed the viewers need to recieve a full update
+		if (id == 5 || id == 6) {
+			ArrayList<EntityPlayer> players = viewers.getViewers(true, ViewerType.INFO);
+			for(EntityPlayer player : players){
+				viewers.addViewer(player, ViewerType.TEMPORARY);
+			}
+		}
+	}
+
 	@Override
 	public Object getServerElement(Object obj, int id, World world, EntityPlayer player, NBTTagCompound tag) {
-		switch (id) {
-		case 0:
-			return new ContainerInventoryReader(this, player);
-		}
-		return null;
+		return id == 0 ? new ContainerInventoryReader(this, player) : null;
 	}
 
 	@Override
 	public Object getClientElement(Object obj, int id, World world, EntityPlayer player, NBTTagCompound tag) {
-		switch (id) {
-		case 0:
-			return new GuiInventoryReader(this, player);
-		}
-		return null;
+		return id == 0 ? new GuiInventoryReader(this, player) : null;
 	}
 
 	@Override

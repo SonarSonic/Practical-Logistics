@@ -2,6 +2,7 @@ package sonar.logistics.api.display;
 
 import sonar.logistics.api.info.INameableInfo;
 
+/**these constants are used when configuring data on Display Screens*/
 public class DisplayConstants {
 
 	public static final String DATA = "%DATA%";
@@ -10,6 +11,7 @@ public class DisplayConstants {
 	public static final String SUFFIX = "%SUF%";
 	public static final String SPACE = "%S%";
 	
+	/**replaces the constants with the data from the provided {@link IDisplayInfo}*/
 	public static String formatText(String string, IDisplayInfo info) {
 		String formatted = string;
 		if (info.getCachedInfo() != null && info.getCachedInfo() instanceof INameableInfo) {

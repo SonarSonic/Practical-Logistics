@@ -15,7 +15,7 @@ import net.minecraftforge.fluids.FluidRegistry;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.asm.CustomTileHandler;
 import sonar.logistics.api.info.ICustomTileHandler;
-import sonar.logistics.api.info.LogicInfo;
+import sonar.logistics.api.info.types.LogicInfo;
 import sonar.logistics.info.LogicInfoRegistry;
 import sonar.logistics.info.LogicInfoRegistry.RegistryType;
 

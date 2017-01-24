@@ -1,5 +1,8 @@
 package sonar.logistics.common.multiparts;
 
+import java.util.ArrayList;
+
+import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -16,16 +19,20 @@ import sonar.core.utils.SortingDirection;
 import sonar.logistics.Logistics;
 import sonar.logistics.LogisticsItems;
 import sonar.logistics.api.info.InfoUUID;
-import sonar.logistics.api.info.LogicInfoList;
 import sonar.logistics.api.info.monitor.ChannelType;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
+import sonar.logistics.api.info.types.LogicInfo;
+import sonar.logistics.api.info.types.LogicInfoList;
+import sonar.logistics.api.info.types.ProgressInfo;
 import sonar.logistics.api.settings.FluidReader;
+import sonar.logistics.api.viewers.ViewerType;
 import sonar.logistics.client.gui.GuiFluidReader;
 import sonar.logistics.common.containers.ContainerFluidReader;
 import sonar.logistics.connections.monitoring.FluidMonitorHandler;
 import sonar.logistics.connections.monitoring.MonitoredFluidStack;
 import sonar.logistics.connections.monitoring.MonitoredList;
 import sonar.logistics.helpers.FluidHelper;
+import sonar.logistics.info.LogicInfoRegistry.RegistryType;
 import sonar.logistics.network.SyncMonitoredType;
 
 public class FluidReaderPart extends ReaderMultipart<MonitoredFluidStack> implements IByteBufTile {
@@ -71,7 +78,7 @@ public class FluidReaderPart extends ReaderMultipart<MonitoredFluidStack> implem
 		case SELECTED:
 			MonitoredFluidStack stack = selected.getMonitoredInfo();
 			if (stack != null && stack.isValid()) {
-				stack.fluidStack.getObject().stored=0;
+				stack.fluidStack.getObject().stored = 0;
 				MonitoredFluidStack dummyInfo = stack.copy();
 				Pair<Boolean, IMonitorInfo> latestInfo = updateInfo.getLatestInfo(dummyInfo);
 				info = latestInfo.a ? latestInfo.b : dummyInfo;
@@ -80,6 +87,8 @@ public class FluidReaderPart extends ReaderMultipart<MonitoredFluidStack> implem
 		case POS:
 			break;
 		case STORAGE:
+
+			info = new ProgressInfo(LogicInfo.buildDirectInfo("fluid.storage", RegistryType.TILE, updateInfo.sizing.getStored()), LogicInfo.buildDirectInfo("max", RegistryType.TILE, updateInfo.sizing.getMaxStored()));
 			break;
 		case TANKS:
 			info = new LogicInfoList(getIdentity(), MonitoredFluidStack.id, this.getNetworkID());
@@ -94,25 +103,28 @@ public class FluidReaderPart extends ReaderMultipart<MonitoredFluidStack> implem
 				Logistics.getServerManager().changeInfo(id, info);
 			}
 		}
+	}
 
+	public void readPacket(ByteBuf buf, int id) {
+		super.readPacket(buf, id);
+		
+		//when the order of the list is changed the viewers need to recieve a full update
+		if (id == 5 || id == 6) {
+			ArrayList<EntityPlayer> players = viewers.getViewers(true, ViewerType.INFO);
+			for(EntityPlayer player : players){
+				viewers.addViewer(player, ViewerType.TEMPORARY);
+			}
+		}
 	}
 
 	@Override
 	public Object getServerElement(Object obj, int id, World world, EntityPlayer player, NBTTagCompound tag) {
-		switch (id) {
-		case 0:
-			return new ContainerFluidReader(this, player);
-		}
-		return null;
+		return id == 0 ? new ContainerFluidReader(this, player) : null;
 	}
 
 	@Override
 	public Object getClientElement(Object obj, int id, World world, EntityPlayer player, NBTTagCompound tag) {
-		switch (id) {
-		case 0:
-			return new GuiFluidReader(this, player);
-		}
-		return null;
+		return id == 0 ? new GuiFluidReader(this, player) : null;
 	}
 
 	@Override

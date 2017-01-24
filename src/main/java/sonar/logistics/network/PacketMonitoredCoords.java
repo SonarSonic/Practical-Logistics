@@ -42,8 +42,8 @@ public class PacketMonitoredCoords implements IMessage {
 	public static class Handler implements IMessageHandler<PacketMonitoredCoords, IMessage> {
 		@Override
 		public IMessage onMessage(PacketMonitoredCoords message, MessageContext ctx) {
-			//if (message.list != null)
-				//Logistics.getClientManager().coordMap.put(message.registryID, message.list);
+			if (message.list != null)
+				Logistics.getClientManager().coordMap.put(message.registryID, message.list);
 			return null;
 		}
 	}

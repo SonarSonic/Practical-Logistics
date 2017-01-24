@@ -7,18 +7,18 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import sonar.core.SonarCore;
 import sonar.logistics.api.info.monitor.ILogicMonitor;
-import sonar.logistics.api.info.monitor.MonitorType;
+import sonar.logistics.api.viewers.ViewerType;
 import sonar.logistics.helpers.CableHelper;
 
 public class PacketMonitorType implements IMessage {
 
 	public ILogicMonitor monitor;
-	public MonitorType type;
+	public ViewerType type;
 
 	public PacketMonitorType() {
 	}
 
-	public PacketMonitorType(ILogicMonitor monitor, MonitorType type) {
+	public PacketMonitorType(ILogicMonitor monitor, ViewerType type) {
 		this.monitor = monitor;
 		this.type = type;
 	}
@@ -26,7 +26,7 @@ public class PacketMonitorType implements IMessage {
 	@Override
 	public void fromBytes(ByteBuf buf) {
 		monitor = CableHelper.getMonitorFromHashCode(buf.readInt(), false);
-		type = MonitorType.values()[buf.readInt()];
+		type = ViewerType.values()[buf.readInt()];
 	}
 
 	@Override

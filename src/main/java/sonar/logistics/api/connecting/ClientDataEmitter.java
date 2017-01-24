@@ -16,6 +16,7 @@ import sonar.core.network.sync.SyncTagType;
 import sonar.core.network.sync.SyncUUID;
 import sonar.core.utils.IUUIDIdentity;
 
+/**used when syncing Data Emitters for display in the Data Receiver with the client, since some may not be loaded on client side.*/
 public class ClientDataEmitter implements IUUIDIdentity, INBTSyncable {
 
 	public ArrayList<ISyncPart> syncParts = new ArrayList<ISyncPart>();
