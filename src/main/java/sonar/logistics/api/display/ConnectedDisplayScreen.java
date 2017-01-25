@@ -32,7 +32,7 @@ import sonar.logistics.api.connecting.ConnectableType;
 import sonar.logistics.api.connecting.INetworkConnectable;
 import sonar.logistics.api.info.IInfoContainer;
 import sonar.logistics.api.info.monitor.ILogicMonitor;
-import sonar.logistics.api.viewers.MonitorTally;
+import sonar.logistics.api.viewers.ViewerTally;
 import sonar.logistics.api.viewers.ViewerType;
 import sonar.logistics.api.viewers.ViewersList;
 import sonar.logistics.common.multiparts.ScreenMultipart;
@@ -277,8 +277,8 @@ public class ConnectedDisplayScreen implements IInfoDisplay, INetworkConnectable
 		if (nbt.hasKey(this.getTagName())) {
 			NBTTagCompound tag = nbt.getCompoundTag(this.getTagName());
 			NBTHelper.readSyncParts(tag, type, this.syncParts);
+			layout.readData(tag, type);
 			container.resetRenderProperties();
-			// Logistics.getInfoManager().getConnectedDisplays().put(registryID, this);
 		}
 	}
 
@@ -286,6 +286,7 @@ public class ConnectedDisplayScreen implements IInfoDisplay, INetworkConnectable
 	public NBTTagCompound writeData(NBTTagCompound nbt, SyncType type) {
 		NBTTagCompound tag = new NBTTagCompound();
 		NBTHelper.writeSyncParts(tag, type, this.syncParts, true);
+		layout.writeData(tag, type);
 		if (!tag.hasNoTags())
 			nbt.setTag(this.getTagName(), tag);
 		return nbt;
@@ -300,7 +301,8 @@ public class ConnectedDisplayScreen implements IInfoDisplay, INetworkConnectable
 
 	@Override
 	public double[] getScaling() {
-		return new double[] { this.getDisplayType().width + this.width.getObject().intValue(), this.getDisplayType().height + this.height.getObject().intValue(), Math.min(this.height.getObject().intValue() + 2, this.width.getObject().intValue() + 1) * this.getDisplayType().scale };
+		double max = Math.min(this.height.getObject().intValue() + 1, this.width.getObject().intValue()+1);
+		return new double[] { this.getDisplayType().width + this.width.getObject().intValue(), this.getDisplayType().height + this.height.getObject().intValue(),  max/100};
 	}
 
 	@Override
@@ -357,10 +359,10 @@ public class ConnectedDisplayScreen implements IInfoDisplay, INetworkConnectable
 	}
 
 	@Override
-	public void onViewerAdded(EntityPlayer player, List<MonitorTally> type) {
+	public void onViewerAdded(EntityPlayer player, List<ViewerTally> type) {
 	}
 
 	@Override
-	public void onViewerRemoved(EntityPlayer player, List<MonitorTally> type) {
+	public void onViewerRemoved(EntityPlayer player, List<ViewerTally> type) {
 	}
 }

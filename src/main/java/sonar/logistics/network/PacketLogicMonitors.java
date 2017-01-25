@@ -13,6 +13,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
+import sonar.core.SonarCore;
 import sonar.core.helpers.NBTHelper;
 import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.logistics.Logistics;
@@ -67,7 +68,6 @@ public class PacketLogicMonitors implements IMessage {
 		@Override
 		public IMessage onMessage(PacketLogicMonitors message, MessageContext ctx) {
 			if (ctx.side == Side.CLIENT) {
-
 				Map<UUID, ArrayList<ClientLogicMonitor>> monitors = Logistics.getClientManager().clientLogicMonitors;
 				if (monitors.get(message.screenID) == null) {
 					monitors.put(message.screenID, message.monitors);
@@ -94,6 +94,7 @@ public class PacketLogicMonitors implements IMessage {
 					sortedMonitors.get(message.screenID).clear();
 					sortedMonitors.get(message.screenID).addAll(cache);
 				}
+
 			}
 			return null;
 		}

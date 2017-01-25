@@ -26,7 +26,7 @@ import sonar.logistics.api.info.monitor.IMonitorInfo;
 import sonar.logistics.api.info.monitor.IdentifiedCoordsList;
 import sonar.logistics.api.info.monitor.LogicMonitorHandler;
 import sonar.logistics.api.viewers.IViewersList;
-import sonar.logistics.api.viewers.MonitorTally;
+import sonar.logistics.api.viewers.ViewerTally;
 import sonar.logistics.api.viewers.ViewerType;
 import sonar.logistics.connections.monitoring.MonitoredBlockCoords;
 import sonar.logistics.connections.monitoring.MonitoredList;
@@ -94,8 +94,8 @@ public abstract class AbstractNetwork implements ILogisticsNetwork {
 		NBTTagCompound tag = !viewers.getViewers(true, ViewerType.INFO).isEmpty() ? InfoHelper.writeMonitoredList(new NBTTagCompound(), lastList.isEmpty(), saveList, SyncType.SPECIAL) : null;
 		if (saveTag != null || tag != null || coordTag != null) {
 			// if (resendAllLists) {
-			for (Entry<EntityPlayer, ArrayList<MonitorTally>> entry : ((HashMap<EntityPlayer, ArrayList<MonitorTally>>) viewers.getViewers(true).clone()).entrySet()) {
-				for (MonitorTally tally : (ArrayList<MonitorTally>) entry.getValue().clone()) {
+			for (Entry<EntityPlayer, ArrayList<ViewerTally>> entry : ((HashMap<EntityPlayer, ArrayList<ViewerTally>>) viewers.getViewers(true).clone()).entrySet()) {
+				for (ViewerTally tally : (ArrayList<ViewerTally>) entry.getValue().clone()) {
 					switch (tally.type) {
 					case CHANNEL:
 						if (!coordTag.hasNoTags())

@@ -39,10 +39,10 @@ public class LogicInfo extends BaseInfo<LogicInfo> implements INameableInfo<Logi
 	private SyncTagType.STRING identifier = new SyncTagType.STRING(1);
 	private SyncEnum<RegistryType> registryType = new SyncEnum(RegistryType.values(), 2);
 	private SyncUnidentifiedObject obj = new SyncUnidentifiedObject(3);
-	private boolean isCategory = false;
+	private SyncTagType.BOOLEAN isCategory = new SyncTagType.BOOLEAN(4);
 
 	{
-		syncParts.addParts(identifier, registryType, obj);
+		syncParts.addParts(identifier, registryType, obj, isCategory);
 	}
 
 	public LogicInfo() {
@@ -52,7 +52,7 @@ public class LogicInfo extends BaseInfo<LogicInfo> implements INameableInfo<Logi
 	public static LogicInfo buildCategoryInfo(RegistryType type) {
 		LogicInfo info = new LogicInfo();
 		info.registryType.setObject(type);
-		info.isCategory = true;
+		info.isCategory.setObject(true);
 		return info;
 	}
 
@@ -80,6 +80,9 @@ public class LogicInfo extends BaseInfo<LogicInfo> implements INameableInfo<Logi
 
 	@Override
 	public boolean isMatchingInfo(LogicInfo info) {
+		if (this.isCategory.getObject()) {
+			return info.isCategory.getObject() && registryType.getObject().equals(info.registryType.getObject());
+		}
 		return obj.objectType != null && obj.objectType.equals(info.obj.objectType) && identifier.getObject().equals(info.identifier.getObject()) && registryType.getObject().equals(info.registryType.getObject());
 	}
 
@@ -131,7 +134,7 @@ public class LogicInfo extends BaseInfo<LogicInfo> implements INameableInfo<Logi
 
 	@Override
 	public boolean isHeader() {
-		return isCategory;
+		return isCategory.getObject();
 	}
 
 	@Override
@@ -141,7 +144,7 @@ public class LogicInfo extends BaseInfo<LogicInfo> implements INameableInfo<Logi
 
 	@Override
 	public boolean isValid() {
-		return obj.get() != null && obj.objectType != null;
+		return this.isCategory.getObject() ? registryType != null : obj.get() != null && obj.objectType != null;
 	}
 
 	@Override

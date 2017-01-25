@@ -9,6 +9,7 @@ import sonar.core.api.nbt.INBTSyncable;
 import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.asm.LogicInfoType;
+import sonar.logistics.api.display.DisplayConstants;
 import sonar.logistics.api.display.IDisplayInfo;
 import sonar.logistics.api.display.ISuffixable;
 import sonar.logistics.api.display.InfoContainer;
@@ -153,8 +154,9 @@ public class ProgressInfo implements IMonitorInfo<ProgressInfo>, INBTSyncable, I
 		GlStateManager.enableLighting();
 		GL11.glTranslated(0, 0, -0.001);
 		GL11.glPopMatrix();
-		InfoRenderer.renderNormalInfo(container.display.getDisplayType(), displayWidth, displayHeight, displayScale, displayInfo.getFormattedStrings());
+		InfoRenderer.renderNormalInfo(container.display.getDisplayType(), displayWidth, displayHeight, displayScale, displayInfo.getFormattedStrings());		
 		GL11.glPopMatrix();
+		
 	}
 
 	@Override

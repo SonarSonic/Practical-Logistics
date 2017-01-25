@@ -10,6 +10,7 @@ import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import sonar.core.SonarCore;
 import sonar.core.helpers.NBTHelper;
 import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.logistics.Logistics;
@@ -19,7 +20,8 @@ public class PacketClientEmitters implements IMessage {
 
 	public ArrayList<ClientDataEmitter> emitters;
 
-	public PacketClientEmitters() {}
+	public PacketClientEmitters() {
+	}
 
 	public PacketClientEmitters(ArrayList<ClientDataEmitter> emitters) {
 		this.emitters = emitters;
@@ -52,7 +54,11 @@ public class PacketClientEmitters implements IMessage {
 	public static class Handler implements IMessageHandler<PacketClientEmitters, IMessage> {
 		@Override
 		public IMessage onMessage(PacketClientEmitters message, MessageContext ctx) {
-			Logistics.getClientManager().clientEmitters = message.emitters;
+			SonarCore.proxy.getThreadListener().addScheduledTask(new Runnable() {
+				public void run() {
+					Logistics.getClientManager().clientEmitters = message.emitters;
+				}
+			});
 			return null;
 		}
 	}

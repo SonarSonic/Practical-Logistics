@@ -12,7 +12,7 @@ public interface IViewersList {
 
 	public ArrayList<ILogicViewable> getConnectedDisplays();
 
-	public HashMap<EntityPlayer, ArrayList<MonitorTally>> getViewers(boolean includeDisplays);
+	public HashMap<EntityPlayer, ArrayList<ViewerTally>> getViewers(boolean includeDisplays);
 
 	public ArrayList<EntityPlayer> getViewers(boolean includeDisplays, ViewerType... types);
 

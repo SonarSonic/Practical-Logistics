@@ -13,7 +13,7 @@ import sonar.logistics.api.info.monitor.ILogicViewable;
 public class ViewersList implements IViewersList {
 
 	// protected ArrayList<MonitorViewer> viewers = new ArrayList<MonitorViewer>();
-	protected HashMap<EntityPlayer, ArrayList<MonitorTally>> viewers = new HashMap();
+	protected HashMap<EntityPlayer, ArrayList<ViewerTally>> viewers = new HashMap();
 	public List<ViewerType> validTypes;
 	public ILogicViewable viewable;
 	public ArrayList<ILogicViewable> connectedDisplays = new ArrayList();
@@ -35,10 +35,10 @@ public class ViewersList implements IViewersList {
 		return !viewers.isEmpty();
 	}
 
-	public HashMap<EntityPlayer, ArrayList<MonitorTally>> getViewers(boolean includeDisplays) {
+	public HashMap<EntityPlayer, ArrayList<ViewerTally>> getViewers(boolean includeDisplays) {
 		if (includeDisplays) {
 			ViewersList viewerList = new ViewersList(this.viewable, this.validTypes);
-			viewerList.viewers = (HashMap<EntityPlayer, ArrayList<MonitorTally>>) this.viewers.clone();
+			viewerList.viewers = (HashMap<EntityPlayer, ArrayList<ViewerTally>>) this.viewers.clone();
 			viewerList.connectedDisplays = (ArrayList<ILogicViewable>) this.connectedDisplays.clone();
 			if (includeDisplays) {
 				connectedDisplays.forEach(viewable -> {
@@ -56,9 +56,9 @@ public class ViewersList implements IViewersList {
 
 	public ArrayList<EntityPlayer> getViewers(boolean includeDisplays, ViewerType... types) {
 		ArrayList<EntityPlayer> players = new ArrayList();
-		viewers: for (Entry<EntityPlayer, ArrayList<MonitorTally>> viewers : getViewers(includeDisplays).entrySet()) {
+		viewers: for (Entry<EntityPlayer, ArrayList<ViewerTally>> viewers : getViewers(includeDisplays).entrySet()) {
 			for (ViewerType type : types) {
-				for (MonitorTally tally : viewers.getValue()) {
+				for (ViewerTally tally : viewers.getValue()) {
 					if (tally.type == type) {
 						players.add(viewers.getKey());
 						continue viewers;
@@ -91,21 +91,21 @@ public class ViewersList implements IViewersList {
 
 	public static boolean addViewerToMap(ViewersList viewerList, EntityPlayer player, ArrayList<ViewerType> types) {
 		ArrayList<ViewerType> currentTypes = (ArrayList<ViewerType>) types.clone();
-		ArrayList<MonitorTally> playerTypes = viewerList.viewers.get(player);
+		ArrayList<ViewerTally> playerTypes = viewerList.viewers.get(player);
 		if (playerTypes == null) {
-			ArrayList<MonitorTally> newTallies = new ArrayList();
+			ArrayList<ViewerTally> newTallies = new ArrayList();
 			for (ViewerType type : currentTypes) {
 				if (viewerList.validTypes.contains(type)) {
-					newTallies.add(new MonitorTally(type, 1));
+					newTallies.add(new ViewerTally(type, 1));
 				}
 			}
 			viewerList.viewers.put(player, newTallies);
 		} else {
-			ArrayList<MonitorTally> toAdd = new ArrayList();
+			ArrayList<ViewerTally> toAdd = new ArrayList();
 			for (ViewerType type : (ArrayList<ViewerType>) currentTypes.clone()) {
 				if (viewerList.validTypes.contains(type)) {
 					boolean added = false;
-					for (MonitorTally tally : playerTypes) {
+					for (ViewerTally tally : playerTypes) {
 						if (tally.type == type) {
 							tally.value += 1;
 							currentTypes.remove(type);
@@ -114,7 +114,7 @@ public class ViewersList implements IViewersList {
 						}
 					}
 					if (!added) {
-						toAdd.add(new MonitorTally(type, 1));
+						toAdd.add(new ViewerTally(type, 1));
 					}
 				}
 			}
@@ -123,14 +123,14 @@ public class ViewersList implements IViewersList {
 		return currentTypes.size() < types.size();
 	}
 
-	public static void addTalliesToMap(ViewersList viewerList, EntityPlayer player, ArrayList<MonitorTally> tallies) {
-		ArrayList<MonitorTally> playerTypes = viewerList.viewers.get(player);
+	public static void addTalliesToMap(ViewersList viewerList, EntityPlayer player, ArrayList<ViewerTally> tallies) {
+		ArrayList<ViewerTally> playerTypes = viewerList.viewers.get(player);
 		if (playerTypes == null) {
-			viewerList.viewers.put(player, (ArrayList<MonitorTally>) tallies.clone());
+			viewerList.viewers.put(player, (ArrayList<ViewerTally>) tallies.clone());
 		} else {
-			for (MonitorTally tally : tallies) {
+			for (ViewerTally tally : tallies) {
 				boolean found = false;
-				for (MonitorTally currentTally : playerTypes) {
+				for (ViewerTally currentTally : playerTypes) {
 					if (tally.type == currentTally.type) {
 						// currentTally.value += tally.value;
 						found = true;
@@ -145,10 +145,10 @@ public class ViewersList implements IViewersList {
 	}
 
 	public static boolean removeViewerFromMap(ViewersList viewerList, EntityPlayer player, ArrayList<ViewerType> types) {
-		ArrayList<MonitorTally> playerTypes = viewerList.viewers.get(player);
+		ArrayList<ViewerTally> playerTypes = viewerList.viewers.get(player);
 		if (playerTypes != null) {
 			types: for (ViewerType type : types) {
-				for (MonitorTally tally : playerTypes) {
+				for (ViewerTally tally : playerTypes) {
 					if (tally.type == type) {
 						tally.value -= 1;
 						if (tally.value <= 0) {

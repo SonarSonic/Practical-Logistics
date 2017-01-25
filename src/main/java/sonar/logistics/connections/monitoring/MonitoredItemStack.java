@@ -111,20 +111,23 @@ public class MonitoredItemStack extends BaseInfo<MonitoredItemStack> implements 
 			StoredItemStack stack = itemStack.getObject();
 			ItemStack item = stack.item;
 			GL11.glPushMatrix();
-			GL11.glTranslated(-(1 - width / 2 - 0.0625), -(1 - height / 2 - 0.0625), 0.00);
+			GL11.glTranslated(-(1 - width / 2 - 0.0625),  -0.68 + height/2, 0.00);
 			GL11.glRotated(180, 0, 1, 0);
 			GL11.glScaled(-1, 1, 1);
-			double actualScale = type == DisplayType.LARGE ? 0.03 : scale * 2;
+			double actualScale = type == DisplayType.LARGE ? scale*3 : scale * 2;
+			
+			
+			
 			GL11.glScaled(actualScale, actualScale, 0.01);
-			double trans = type == DisplayType.SMALL ? 4 : 0;
-			GL11.glTranslated(-8, trans, 0);
+			double trans = type == DisplayType.SMALL ? 4 : - (7);
+			GL11.glTranslated(-8, -8, 0);
 			GlStateManager.disableLighting();
 			GlStateManager.enablePolygonOffset();
 			GlStateManager.doPolygonOffset(-1, -1);
 			GlStateManager.enableCull();
 			RenderHelper.renderItemIntoGUI(item, 0, 0);
 			GlStateManager.disablePolygonOffset();
-			GlStateManager.translate(0, 0, 1);
+			GlStateManager.translate(0, 0, 2);
 			GlStateManager.depthMask(false);
 			RenderHelper.renderStoredItemStackOverlay(item, 0, 0, 0, "" + stack.stored, false);
 			GlStateManager.depthMask(true);

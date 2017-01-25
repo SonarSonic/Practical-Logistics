@@ -6,6 +6,7 @@ import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import sonar.core.SonarCore;
 import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.logistics.Logistics;
 import sonar.logistics.connections.monitoring.MonitoredBlockCoords;
@@ -18,7 +19,8 @@ public class PacketMonitoredCoords implements IMessage {
 	public NBTTagCompound listTag;
 	public int registryID;
 
-	public PacketMonitoredCoords() {}
+	public PacketMonitoredCoords() {
+	}
 
 	public PacketMonitoredCoords(int registryID, NBTTagCompound listTag) {
 		this.listTag = listTag;

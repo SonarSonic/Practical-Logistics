@@ -30,7 +30,7 @@ import sonar.logistics.api.info.monitor.ILogicMonitor;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
 import sonar.logistics.api.info.monitor.IdentifiedCoordsList;
 import sonar.logistics.api.info.monitor.LogicMonitorHandler;
-import sonar.logistics.api.viewers.MonitorTally;
+import sonar.logistics.api.viewers.ViewerTally;
 import sonar.logistics.api.viewers.ViewerType;
 import sonar.logistics.api.viewers.ViewersList;
 import sonar.logistics.connections.monitoring.MonitoredBlockCoords;
@@ -241,10 +241,10 @@ public abstract class MonitorMultipart<T extends IMonitorInfo> extends SidedMult
 
 
 	@Override
-	public void onViewerAdded(EntityPlayer player, List<MonitorTally> type) {
+	public void onViewerAdded(EntityPlayer player, List<ViewerTally> type) {
 		SonarMultipartHelper.sendMultipartSyncToPlayer(this, (EntityPlayerMP) player);
 	}
 
 	@Override
-	public void onViewerRemoved(EntityPlayer player, List<MonitorTally> type) {}
+	public void onViewerRemoved(EntityPlayer player, List<ViewerTally> type) {}
 }

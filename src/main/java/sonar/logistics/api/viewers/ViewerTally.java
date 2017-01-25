@@ -1,15 +1,15 @@
 package sonar.logistics.api.viewers;
 
-public class MonitorTally {
+public class ViewerTally {
 	public ViewerType type;
 	public int value = 0;
 
-	public MonitorTally(ViewerType type, int value) {
+	public ViewerTally(ViewerType type, int value) {
 		this(type);
 		this.value = value;
 	}
 
-	public MonitorTally(ViewerType type) {
+	public ViewerTally(ViewerType type) {
 		this.type = type;
 	}
 
@@ -22,8 +22,8 @@ public class MonitorTally {
 	}
 
 	public boolean equals(Object object) {
-		if (object != null && object instanceof MonitorTally) {
-			return ((MonitorTally) object).type == this.type;
+		if (object != null && object instanceof ViewerTally) {
+			return ((ViewerTally) object).type == this.type;
 		}
 		return false;
 	}

@@ -6,6 +6,7 @@ import java.util.List;
 import io.netty.buffer.ByteBuf;
 import mcmultipart.MCMultiPartMod;
 import mcmultipart.raytrace.PartMOP;
+import mcmultipart.raytrace.RayTraceUtils.AdvancedRayTraceResultPart;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockStateContainer;
@@ -26,6 +27,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import sonar.core.api.utils.BlockCoords;
 import sonar.core.api.utils.BlockInteractionType;
+import sonar.core.helpers.FontHelper;
 import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.core.integration.multipart.SonarMultipartHelper;
 import sonar.core.inventory.ContainerMultipartSync;
@@ -37,12 +39,14 @@ import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.cache.INetworkCache;
 import sonar.logistics.api.connecting.ConnectableType;
 import sonar.logistics.api.connecting.IOperatorTool;
+import sonar.logistics.api.connecting.OperatorMode;
 import sonar.logistics.api.display.ConnectedDisplayScreen;
 import sonar.logistics.api.display.DisplayConnections;
 import sonar.logistics.api.display.DisplayType;
 import sonar.logistics.api.display.IInfoDisplay;
 import sonar.logistics.api.display.ILargeDisplay;
 import sonar.logistics.api.display.InfoContainer;
+import sonar.logistics.api.display.ScreenLayout;
 import sonar.logistics.api.viewers.EmptyViewersList;
 import sonar.logistics.api.viewers.IViewersList;
 import sonar.logistics.client.gui.GuiDisplayScreen;
@@ -77,6 +81,7 @@ public class LargeDisplayScreenPart extends ScreenMultipart implements ILargeDis
 			if (this.shouldRender()) {
 				this.getDisplayScreen().sendViewers();
 			}
+			this.sendSyncPacket();
 			this.sendByteBufPacket(5);
 			onRenderChange = false;
 		}
@@ -185,9 +190,9 @@ public class LargeDisplayScreenPart extends ScreenMultipart implements ILargeDis
 			if (isServer()) {
 				LargeDisplayScreenPart part = (LargeDisplayScreenPart) this.getDisplayScreen().getTopLeftScreen();
 				if (part != null) {
+					SonarMultipartHelper.sendMultipartSyncToPlayer(this, (EntityPlayerMP) player);
 					Logistics.network.sendTo(new PacketConnectedDisplayScreen(this.getDisplayScreen(), registryID), (EntityPlayerMP) player);
 					Logistics.getServerManager().sendLocalMonitorsToClient(part, player);
-					SonarMultipartHelper.sendMultipartSyncToPlayer(this, (EntityPlayerMP) player);
 					part.openFlexibleGui(player, 0);
 				}
 			}
@@ -352,9 +357,6 @@ public class LargeDisplayScreenPart extends ScreenMultipart implements ILargeDis
 
 	@Override
 	public IViewersList getViewersList() {
-		if (getDisplayScreen() == null) {
-			//this.connectedDisplay = connectedDisplay;
-		}
 		return getDisplayScreen() != null ? getDisplayScreen().getViewersList() : EmptyViewersList.INSTANCE;
 	}
 
@@ -404,5 +406,25 @@ public class LargeDisplayScreenPart extends ScreenMultipart implements ILargeDis
 
 	public Object getClientElement(ScreenMultipart obj, int id, World world, EntityPlayer player, NBTTagCompound tag) {
 		return id == 0 ? new GuiDisplayScreen(obj) : null;
+	}
+
+	@Override
+	public ScreenLayout getLayout() {
+		
+		return connectedDisplay==null?ScreenLayout.ONE : connectedDisplay.getLayout();
+	}
+
+	@Override
+	public boolean performOperation(AdvancedRayTraceResultPart rayTrace, OperatorMode mode, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+		if (getDisplayScreen()!=null && !getWorld().isRemote) {
+			getDisplayScreen().layout.incrementEnum();
+			while (!(getDisplayScreen().layout.getObject().maxInfo <= this.maxInfo())) {
+				getDisplayScreen().layout.incrementEnum();
+			}
+			sendSyncPacket();
+			connectedDisplay.sendViewers();
+			FontHelper.sendMessage("Screen Layout: " + getDisplayScreen().layout.getObject(), getWorld(), player);
+		}
+		return false;
 	}
 }

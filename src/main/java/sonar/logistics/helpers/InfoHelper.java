@@ -183,7 +183,7 @@ public class InfoHelper {
 		ArrayList<LogicInfo> sortedInfo = new ArrayList();
 		LogicInfo lastInfo = null;
 		for (LogicInfo blockInfo : (ArrayList<LogicInfo>) providerInfo.clone()) {
-			if (lastInfo == null || !lastInfo.getRegistryType().equals(blockInfo.getRegistryType())) {
+			if (lastInfo == null || (!lastInfo.isHeader() && !lastInfo.getRegistryType().equals(blockInfo.getRegistryType()))) {
 				sortedInfo.add(LogicInfo.buildCategoryInfo(blockInfo.getRegistryType()));
 			}
 			sortedInfo.add(blockInfo);
@@ -219,16 +219,16 @@ public class InfoHelper {
 		double width = type.width, height = type.height, scale = type.scale;
 		if (display instanceof IScaleableDisplay) {
 			double[] scaling = ((IScaleableDisplay) display).getScaling();
-			// width = scaling[0];
-			// height = scaling[1];
-			// scale = scaling[2];
+			width = scaling[0];
+			height = scaling[1];
+			scale = scaling[2];
 		}
 
 		switch (layout) {
 		case DUAL:
 			return new double[] { 0, pos == 1 ? height / 2 : 0, 0 };
 		case GRID:
-			return new double[] { pos == 1 || pos == 3 ? height / 2 : 0, pos > 1 ? height / 2 : 0, 0 };
+			return new double[] { pos == 1 || pos == 3 ? (double)width / 2 : 0, (double)pos > 1 ? height / 2 : 0, 0 };
 		case LIST:
 			return new double[] { 0, pos * (height / 4), 0 };
 		default:

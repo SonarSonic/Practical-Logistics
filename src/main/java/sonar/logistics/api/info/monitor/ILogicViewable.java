@@ -6,14 +6,14 @@ import net.minecraft.entity.player.EntityPlayer;
 import sonar.core.utils.IUUIDIdentity;
 import sonar.logistics.api.connecting.ILogicTile;
 import sonar.logistics.api.viewers.IViewersList;
-import sonar.logistics.api.viewers.MonitorTally;
+import sonar.logistics.api.viewers.ViewerTally;
 
 public interface ILogicViewable extends ILogicTile, IUUIDIdentity {
 
 	public IViewersList getViewersList();
 	
-	public void onViewerAdded(EntityPlayer player, List<MonitorTally> arrayList);
+	public void onViewerAdded(EntityPlayer player, List<ViewerTally> arrayList);
 	
-	public void onViewerRemoved(EntityPlayer player, List<MonitorTally> arrayList);
+	public void onViewerRemoved(EntityPlayer player, List<ViewerTally> arrayList);
 				
 }

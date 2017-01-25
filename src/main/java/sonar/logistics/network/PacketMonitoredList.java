@@ -7,12 +7,14 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import sonar.core.SonarCore;
 import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.core.network.PacketMultipart;
 import sonar.core.network.PacketMultipartHandler;
 import sonar.logistics.Logistics;
 import sonar.logistics.api.info.InfoUUID;
 import sonar.logistics.api.info.monitor.ILogicMonitor;
+import sonar.logistics.common.multiparts.InfoReaderPart;
 import sonar.logistics.connections.monitoring.MonitoredList;
 import sonar.logistics.helpers.InfoHelper;
 
@@ -24,7 +26,8 @@ public class PacketMonitoredList extends PacketMultipart {
 	public NBTTagCompound listTag;
 	public SyncType type;
 
-	public PacketMonitoredList() {}
+	public PacketMonitoredList() {
+	}
 
 	public PacketMonitoredList(ILogicMonitor monitor, InfoUUID id, int networkID, NBTTagCompound listTag, SyncType type) {
 		super(monitor.getUUID(), monitor.getCoords().getBlockPos());

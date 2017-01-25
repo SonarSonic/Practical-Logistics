@@ -21,7 +21,7 @@ public class EmptyViewersList implements IViewersList {
 	}
 
 	@Override
-	public HashMap<EntityPlayer, ArrayList<MonitorTally>> getViewers(boolean includeDisplays) {
+	public HashMap<EntityPlayer, ArrayList<ViewerTally>> getViewers(boolean includeDisplays) {
 		return new HashMap();
 	}
 

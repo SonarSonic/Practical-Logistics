@@ -94,7 +94,7 @@ public class LogicInfoList extends BaseInfo<LogicInfoList> implements INameableI
 	public void renderInfo(InfoContainer container, IDisplayInfo displayInfo, double width, double height, double scale, int infoPos) {
 		MonitoredList<?> list = Logistics.getClientManager().getMonitoredList(networkID.getObject(), displayInfo.getInfoUUID());
 		ILogicMonitor monitor = Logistics.getClientManager().monitors.get(monitorUUID.getUUID());
-		
+
 		if (monitor == null || list == null)
 			return;
 		if (infoID.getObject().equals(MonitoredItemStack.id)) {
@@ -102,14 +102,14 @@ public class LogicInfoList extends BaseInfo<LogicInfoList> implements INameableI
 				// new InfoError("NO ITEMS").renderInfo(displayType, width, height, scale, infoPos);
 				return;
 			}
-			int xSlots = (int) Math.round(width) * 2;
-			int ySlots = (int) (Math.round(height) * 2);
+			int xSlots = (int) Math.ceil(width * 2);
+			int ySlots = (int) (Math.round(height * 2));
 			int currentSlot = 0;
 			double spacing = 22.7;
 
 			GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 			GL11.glPushMatrix();
-			GL11.glTranslated(-1 + (0.0625*1.3), -1 + 0.0625 * 5, 0.00);
+			GL11.glTranslated(-1 + (0.0625 * 1.3), -1 + 0.0625 * 5, 0.00);
 			GL11.glRotated(180, 0, 1, 0);
 			GL11.glScaled(-1, 1, 1);
 			GlStateManager.enableDepth();
@@ -128,7 +128,7 @@ public class LogicInfoList extends BaseInfo<LogicInfoList> implements INameableI
 						GlStateManager.doPolygonOffset(-1, -1);
 						RenderHelper.renderItemIntoGUI(item.item, 0, 0);
 						GlStateManager.disablePolygonOffset();
-						GlStateManager.translate(0, 0, 0.5);
+						GlStateManager.translate(0, 0, 1);
 						GlStateManager.depthMask(false);
 						RenderHelper.renderStoredItemStackOverlay(item.item, 0, 0, 0, "" + item.stored, false);
 						GlStateManager.depthMask(true);
@@ -140,7 +140,7 @@ public class LogicInfoList extends BaseInfo<LogicInfoList> implements INameableI
 			GlStateManager.enableDepth();
 			GL11.glPopMatrix();
 		}
-		if (infoID.getObject().equals(MonitoredFluidStack.id)) {			
+		if (infoID.getObject().equals(MonitoredFluidStack.id)) {
 			for (MonitoredFluidStack stack : (MonitoredList<MonitoredFluidStack>) list.copyInfo()) {
 				stack.renderInfo(container, displayInfo, width, height, scale, infoPos);
 				break;
@@ -152,12 +152,14 @@ public class LogicInfoList extends BaseInfo<LogicInfoList> implements INameableI
 	public boolean onClicked(BlockInteractionType type, boolean doubleClick, IDisplayInfo renderInfo, EntityPlayer player, EnumHand hand, ItemStack stack, PartMOP hit, InfoContainer container) {
 		if (infoID.getObject().equals(MonitoredItemStack.id)) {
 			ScreenMultipart part = (ScreenMultipart) hit.partHit;
-			DisplayType displayType = part.getDisplayType();					
+			DisplayType displayType = part.getDisplayType();
 			BlockPos pos = part.getPos();// handler pos...
-			//BlockPos secondPos = pos;
-			if(container.getDisplay() instanceof ConnectedDisplayScreen){
+			// BlockPos secondPos = pos;
+			if (container.getDisplay() instanceof ConnectedDisplayScreen) {
 				ConnectedDisplayScreen connected = (ConnectedDisplayScreen) container.getDisplay();
-				pos = connected.getTopLeftScreen().getCoords().getBlockPos();
+				if (connected.getTopLeftScreen() != null && connected.getTopLeftScreen().getCoords() != null){
+					pos = connected.getTopLeftScreen().getCoords().getBlockPos();
+				}
 			}
 			int slot = -1;
 
@@ -265,10 +267,7 @@ public class LogicInfoList extends BaseInfo<LogicInfoList> implements INameableI
 
 	@Override
 	public String getClientObject() {
-		/*
-		Pair<ILogicMonitor, MonitoredList<?>> monitor = LogicMonitorManager.getMonitorFromServer(monitorUUID.getUUID().hashCode());
-		return "Size: " + (monitor != null && monitor.b != null ? monitor.b.size() : 0);
-		*/
+		/* Pair<ILogicMonitor, MonitoredList<?>> monitor = LogicMonitorManager.getMonitorFromServer(monitorUUID.getUUID().hashCode()); return "Size: " + (monitor != null && monitor.b != null ? monitor.b.size() : 0); */
 		return "LIST";
 	}
 

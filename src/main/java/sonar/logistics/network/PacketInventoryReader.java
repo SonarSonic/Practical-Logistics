@@ -61,7 +61,7 @@ public class PacketInventoryReader extends PacketMultipart {
 
 	public static class Handler extends PacketMultipartHandler<PacketInventoryReader> {
 		@Override
-		public IMessage processMessage(PacketInventoryReader message, IMultipartContainer target, IMultipart part, MessageContext ctx) {
+		public IMessage processMessage(PacketInventoryReader message, IMultipartContainer target, IMultipart part, MessageContext ctx) {			
 			EntityPlayer player = SonarCore.proxy.getPlayerEntity(ctx);
 			if (player == null || player.getEntityWorld().isRemote || !(part instanceof InventoryReaderPart)) {
 				return null;

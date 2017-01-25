@@ -42,13 +42,12 @@ import sonar.logistics.api.display.IInfoDisplay;
 import sonar.logistics.api.display.ScreenLayout;
 import sonar.logistics.api.info.InfoUUID;
 import sonar.logistics.api.info.monitor.ILogicMonitor;
-import sonar.logistics.api.viewers.MonitorTally;
+import sonar.logistics.api.viewers.ViewerTally;
 import sonar.logistics.api.viewers.ViewerType;
 import sonar.logistics.client.gui.GuiDisplayScreen;
 
 public abstract class ScreenMultipart extends LogisticsMultipart implements IByteBufTile, INormallyOccludingPart, IInfoDisplay, IOperatorTile, IFlexibleGui<ScreenMultipart> {
 
-	public SyncEnum<ScreenLayout> layout = new SyncEnum(ScreenLayout.values(), 1);
 	public SyncTagType.BOOLEAN defaultData = new SyncTagType.BOOLEAN(2); // set default info
 	public ILogicMonitor monitor = null;
 	public EnumFacing rotation, face;
@@ -158,11 +157,6 @@ public abstract class ScreenMultipart extends LogisticsMultipart implements IByt
 	}
 
 	@Override
-	public ScreenLayout getLayout() {
-		return layout.getObject();
-	}
-
-	@Override
 	public void writePacket(ByteBuf buf, int id) {
 		switch (id) {
 		case 0:
@@ -199,7 +193,6 @@ public abstract class ScreenMultipart extends LogisticsMultipart implements IByt
 		super.writeData(tag, type);
 		tag.setByte("rotation", (byte) rotation.ordinal());
 		tag.setByte("face", (byte) face.ordinal());
-		layout.writeData(tag, type);
 		// container().writeData(tag, type);
 		return tag;
 	}
@@ -209,7 +202,6 @@ public abstract class ScreenMultipart extends LogisticsMultipart implements IByt
 		super.readData(tag, type);
 		rotation = EnumFacing.VALUES[tag.getByte("rotation")];
 		face = EnumFacing.VALUES[tag.getByte("face")];
-		layout.readData(tag, type);
 		// container().readData(tag, type);
 	}
 
@@ -218,7 +210,6 @@ public abstract class ScreenMultipart extends LogisticsMultipart implements IByt
 		super.writeUpdatePacket(buf);
 		buf.writeByte((byte) rotation.ordinal());
 		buf.writeByte((byte) face.ordinal());
-		layout.writeToBuf(buf);
 		// ByteBufUtils.writeTag(buf, container().writeData(new NBTTagCompound(), SyncType.SAVE));
 	}
 
@@ -227,7 +218,6 @@ public abstract class ScreenMultipart extends LogisticsMultipart implements IByt
 		super.readUpdatePacket(buf);
 		rotation = EnumFacing.VALUES[buf.readByte()];
 		face = EnumFacing.VALUES[buf.readByte()];
-		layout.readFromBuf(buf);
 		// container().readData(ByteBufUtils.readTag(buf), SyncType.SAVE);
 	}
 
@@ -252,31 +242,16 @@ public abstract class ScreenMultipart extends LogisticsMultipart implements IByt
 		return face;
 	}
 
-	@Override
-	public boolean performOperation(AdvancedRayTraceResultPart rayTrace, OperatorMode mode, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-		if (!getWorld().isRemote) {
-			layout.incrementEnum();
-			while (!(layout.getObject().maxInfo <= this.maxInfo())) {
-				layout.incrementEnum();
-			}
-			sendSyncPacket();
-			sendUpdatePacket(true);
-			FontHelper.sendMessage("Screen Layout: " + layout.getObject(), getWorld(), player);
-		}
-
-		return true;
-	}
-
 	public void addInfo(List<String> info) {
 		super.addInfo(info);
 	}
 
 	@Override
-	public void onViewerAdded(EntityPlayer player, List<MonitorTally> type) {
+	public void onViewerAdded(EntityPlayer player, List<ViewerTally> type) {
 	}
 
 	@Override
-	public void onViewerRemoved(EntityPlayer player, List<MonitorTally> type) {
+	public void onViewerRemoved(EntityPlayer player, List<ViewerTally> type) {
 	}
 
 	public Object getServerElement(ScreenMultipart obj, int id, World world, EntityPlayer player, NBTTagCompound tag) {

@@ -23,15 +23,6 @@ public class InfoRenderer {
 
 	public static final double zLevel = 0, barOffset = 0.001;
 
-	public static void renderCenteredString(String string, float x, float y, float width, float scale, int color) {
-		GlStateManager.pushMatrix();
-		GlStateManager.scale(scale, scale, 1.0f);
-		int length = RenderHelper.fontRenderer.getStringWidth(string);
-		int height = RenderHelper.fontRenderer.FONT_HEIGHT;
-		RenderHelper.fontRenderer.drawString(string, Math.round((x + width / 2) / scale - length / 2), Math.round(y / scale - height / 2), color);
-		GlStateManager.popMatrix();
-	}
-
 	public static void renderNormalInfo(DisplayType type, String... toDisplay) {
 		renderNormalInfo(type, type.width, type.height, type.scale, SonarHelper.convertArray(toDisplay));
 	}
@@ -41,7 +32,7 @@ public class InfoRenderer {
 	}
 
 	public static double getYCentre(DisplayType type, double height) {
-		return ((0.12 * height) * (0.12 * height)) + (0.41 * height) - 0.58; // quadratic equation to solve the scale
+		return ((0.12 * height) * (0.12 * height)) + (0.35 * height) - 0.58; // quadratic equation to solve the scale
 	}
 
 	public static void renderNormalInfo(DisplayType displayType, double width, double height, double scale, String... toDisplay) {
@@ -51,14 +42,37 @@ public class InfoRenderer {
 	public static void renderNormalInfo(DisplayType displayType, double width, double height, double scale, List<String> toDisplay) {
 		GlStateManager.disableLighting();
 		GlStateManager.enableCull();
-		float offset = (float) ((float) (0.09F + scale * 6));
-		double yCentre = getYCentre(displayType, height + offset);
-		double centre = ((double) (toDisplay.size()) / 2) - yCentre;
+		float offset = (float) (12/(1/scale));
+		double yCentre = 0;
+		double centre =  (double)toDisplay.size() / 2  -0.5;
+		int fontHeight = RenderHelper.fontRenderer.FONT_HEIGHT;
+		//GlStateManager.translate(0, height/2 - scale/1, 0);
 		for (int i = 0; i < toDisplay.size(); i++) {
-			renderCenteredString(toDisplay.get(i), -1, (float) (i == centre ? yCentre : i < centre ? yCentre - offset * -(i - centre) : yCentre + offset * (i - centre)), (float) (width + 0.0625 * 2), (float) scale, -1);
+			GlStateManager.pushMatrix();
+			GlStateManager.translate(0, (-1 + height / 2 + 0.23) + (i == centre ? 0 : i < centre ? yCentre - offset * -(i - centre) : yCentre + offset * (i - centre)), 0);
+			GlStateManager.scale(scale, scale, 1.0f);
+			String string = toDisplay.get(i);
+			int length = RenderHelper.fontRenderer.getStringWidth(string);
+			
+			//renderCenteredString(toDisplay.get(i), -1, (float) (i == centre ? yCentre : i < centre ? yCentre - offset * -(i - centre) : yCentre + offset * (i - centre)), (float) (width + 0.0625 * 2), (float) scale, -1);
+
+			RenderHelper.fontRenderer.drawString(string, (float) ((-1+0.0625 + width / 2) / scale - length / 2), (float) 0.625, -1, false);
+			GlStateManager.popMatrix();
 		}
 		GlStateManager.disableCull();
 		GlStateManager.enableLighting();
+
+	}
+
+	/** NEED TO WORK OUT A FORMULA! */
+	public static double yCentreScale(double height) {
+		/* int newHeight = (int) (height + 0.0625 * 2) - 1; switch (newHeight) { case 0: return -16; case 1: return 2.9375; case 2: return 9.4375; case 3: return 12.7375; case 4: return 14.6375; case 5: return 16.0375; case 6: return 16.9375; case 7: return 17.6375; case 8: return 18.1375; case 9: return 0; case 14: return 20; } return 0; */
+
+		// y = -0.0023x^6 + 0.067x^5 - 0.774x^4 + 4.6276x^3 - 15.524x^2 + 30.49^5x - 15.993
+
+		double y = -0.0023 * Math.pow(height, 6) + 0.067 * Math.pow(height, 5) - 0.774 * Math.pow(height, 4) + 4.6276 * Math.pow(height, 3) - 15.524 * Math.pow(height, 2) + 30.49 * (height) - 15.993;
+
+		return y;
 	}
 
 	public static void renderProgressBar(double width, double height, double scale, double d, double e) {
@@ -89,8 +103,8 @@ public class InfoRenderer {
 		double barWidth = ((double) progress * (maxX - minX)) / maxProgress;
 		double divide = Math.max((maxX - minX), (maxY - minY));
 
-		double widthnew = (sprite.getMinU() + (barWidth * (sprite.getMaxU() - sprite.getMinU() )/ (maxX - minX)));
-		double heightnew = (sprite.getMinV() + ((maxY - minY) * (sprite.getMaxV() - sprite.getMinV())/ (maxX - minX)));
+		double widthnew = (sprite.getMinU() + (barWidth * (sprite.getMaxU() - sprite.getMinU()) / (maxX - minX)));
+		double heightnew = (sprite.getMinV() + ((maxY - minY) * (sprite.getMaxV() - sprite.getMinV()) / (maxX - minX)));
 		vertexbuffer.pos((double) (minX + 0), maxY, zLevel).tex((double) sprite.getMinU(), heightnew).endVertex();
 		vertexbuffer.pos((double) (minX + barWidth), maxY, zLevel).tex(widthnew, heightnew).endVertex();
 		vertexbuffer.pos((double) (minX + barWidth), (double) (minY + 0), zLevel).tex(widthnew, (double) sprite.getMinV()).endVertex();
