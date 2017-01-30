@@ -22,4 +22,6 @@ public interface IInfoManager {
 	public void addMonitor(ILogicMonitor monitor);
 
 	public void removeMonitor(ILogicMonitor monitor);
+	
+	public void removeAll();
 }

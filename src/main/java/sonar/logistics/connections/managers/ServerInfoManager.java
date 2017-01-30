@@ -32,6 +32,7 @@ import sonar.logistics.api.connecting.ClientLogicMonitor;
 import sonar.logistics.api.display.ConnectedDisplayScreen;
 import sonar.logistics.api.display.IInfoDisplay;
 import sonar.logistics.api.display.ILargeDisplay;
+import sonar.logistics.api.display.ScreenInteractionEvent;
 import sonar.logistics.api.info.IInfoContainer;
 import sonar.logistics.api.info.IInfoManager;
 import sonar.logistics.api.info.InfoUUID;
@@ -67,20 +68,36 @@ public class ServerInfoManager implements IInfoManager {
 
 	public ConcurrentHashMap<Integer, ConnectedDisplayScreen> connectedDisplays = new ConcurrentHashMap<Integer, ConnectedDisplayScreen>();
 
+	public HashMap<Integer, ScreenInteractionEvent> clickEvents = new HashMap();
+
 	public int ticks;
 	public boolean updateViewingMonitors;
 
-	public void onServerClosed() {
-		monitors.clear();
-		displays.clear();
-		monitoredLists.clear();
+	public void removeAll() {
 		changedInfo.clear();
+		displays.clear();
+		requireUpdates.clear();
+		viewables.clear();
+		monitoredLists.clear();
+		monitors.clear();
 		lastInfo.clear();
 		info.clear();
+		connectedDisplays.clear();
+		clickEvents.clear();
 	}
 
 	public boolean enableEvents() {
 		return !displays.isEmpty();
+	}
+
+	public ConnectedDisplayScreen getOrCreateDisplayScreen(World world, ILargeDisplay display, int registryID) {
+		ConcurrentHashMap<Integer, ConnectedDisplayScreen> displays = getConnectedDisplays();
+		ConnectedDisplayScreen toSet = displays.get(registryID);
+		if (toSet == null) {
+			displays.put(registryID, new ConnectedDisplayScreen(display));
+			toSet = displays.get(registryID);
+		}
+		return toSet;
 	}
 
 	public void addMonitor(ILogicMonitor monitor) {
@@ -227,7 +244,7 @@ public class ServerInfoManager implements IInfoManager {
 			for (IInfoDisplay display : displays) {
 				for (int i = 0; i < display.container().getMaxCapacity(); i++) {
 					InfoUUID uuid = display.container().getInfoUUID(i);
-					MonitoredList<?> list =	monitoredLists.get(uuid);
+					MonitoredList<?> list = monitoredLists.get(uuid);
 					if (list != null) {
 						ILogicMonitor monitor = CableHelper.getMonitorFromHashCode(uuid.hashCode, false);
 						if (monitor != null) {

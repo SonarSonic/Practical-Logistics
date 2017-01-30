@@ -14,14 +14,17 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import sonar.core.network.sync.SyncNBTAbstractList;
 import sonar.core.network.sync.SyncUnidentifiedObject;
 import sonar.core.network.utils.IByteBufTile;
 import sonar.logistics.LogisticsItems;
+import sonar.logistics.api.logistics.RedstoneEmitterStatement;
 
 public class RedstoneSignallerPart extends SidedMultipart implements IRedstonePart, IByteBufTile {
 
 	public static final PropertyBool ACTIVE = PropertyBool.create("active");
 	public SyncUnidentifiedObject object = new SyncUnidentifiedObject(1);
+	//public SyncNBTAbstractList<RedstoneEmitterStatement> statements = new SyncNBTAbstractList(2);
 
 	public RedstoneSignallerPart() {
 		super(3 * 0.0625, 0.0625 * 1, 0.0625 * 6);

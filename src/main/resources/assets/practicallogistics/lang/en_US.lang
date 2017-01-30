@@ -38,6 +38,7 @@ item.Sapphire.name=Sapphire
 item.SapphireDust.name=Sapphire Dust
 item.StonePlate.name=Stone Plate
 item.Transceiver.name=Transceiver
+item.EntityTransceiver.name=Entity Transceiver
 item.Operator.name=Operator Tool
 item.DisplayScreen.name=Display Screen
 item.LargeDisplayScreen.name=Large Display Screen
@@ -56,6 +57,8 @@ pl.inv.sort.stored=Items Stored
 pl.inv.sort.name=Item Name
 pl.inv.sort.modid=Mod Name
 
+pl.item.storage=Items Stored
+
 //fluid reader
 pl.fluid.mode.selected=Fluid
 pl.fluid.mode.pos=Pos
@@ -71,6 +74,8 @@ pl.fluid.sort.stored=Fluids Stored
 pl.fluid.sort.name=Fluid Name
 pl.fluid.sort.modid=Mod Name
 pl.fluid.sort.temperature=Temperature
+
+pl.fluid.storage=Fluids Stored
 
 //redstone signaller
 pl.signaller.default=Default
@@ -117,11 +122,11 @@ pl.Fluid.getTemperature=Temperature
 pl.Fluid.getViscosity=Viscosity
 
 //entities
+pl.Entity.getName=Name
 pl.EntityLivingBase.getHealth=Health
 pl.EntityLivingBase.getMaxHealth=Max Health
 pl.EntityLivingBase.getAge=Age
 pl.EntityLivingBase.getTotalArmorValue=Total Armor Value
-pl.EntityLivingBase.getName=Name
 pl.EntityAgeable.getGrowingAge=Growing Age
 pl.EntityPlayer.isCreative=Creative Mode
 pl.EntityPlayer.isSpectator=Spectator Mode

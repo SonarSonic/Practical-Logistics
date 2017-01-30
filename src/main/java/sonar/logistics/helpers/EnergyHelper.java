@@ -8,6 +8,7 @@ import sonar.core.SonarCore;
 import sonar.core.api.energy.EnergyType;
 import sonar.core.api.energy.ISonarEnergyHandler;
 import sonar.core.api.energy.StoredEnergyStack;
+import sonar.core.helpers.SonarHelper;
 import sonar.core.utils.SortingDirection;
 import sonar.logistics.api.settings.EnergyReader.SortingType;
 import sonar.logistics.api.wrappers.EnergyWrapper;
@@ -32,17 +33,17 @@ public class EnergyHelper extends EnergyWrapper {
 				StoredEnergyStack item1 = str1.energyStack.getObject(), item2 = str2.energyStack.getObject();
 				switch (type) {
 				case CAPACITY:
-					return InfoHelper.compareWithDirection(item1.capacity, item2.capacity, dir);
+					return SonarHelper.compareWithDirection(item1.capacity, item2.capacity, dir);
 				case INPUT:
-					return InfoHelper.compareWithDirection(item1.input, item2.input, dir);
+					return SonarHelper.compareWithDirection(item1.input, item2.input, dir);
 				case NAME:
 					String modid1 = str1.coords.getMonitoredInfo().unlocalizedName.getObject();
 					String modid2 = str2.coords.getMonitoredInfo().unlocalizedName.getObject();
-					return InfoHelper.compareStringsWithDirection(modid1, modid2, dir);
+					return SonarHelper.compareStringsWithDirection(modid1, modid2, dir);
 				case STORED:
-					return InfoHelper.compareWithDirection(item1.stored, item2.stored, dir);
+					return SonarHelper.compareWithDirection(item1.stored, item2.stored, dir);
 				case TYPE:
-					return InfoHelper.compareStringsWithDirection(item1.energyType.getName(), item2.energyType.getName(), dir);
+					return SonarHelper.compareStringsWithDirection(item1.energyType.getName(), item2.energyType.getName(), dir);
 				}
 				return 0;
 			}

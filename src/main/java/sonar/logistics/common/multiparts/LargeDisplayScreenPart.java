@@ -58,7 +58,7 @@ public class LargeDisplayScreenPart extends ScreenMultipart implements ILargeDis
 	public int registryID = -1;
 	public boolean wasAdded = false;
 	public static final PropertyEnum<DisplayConnections> TYPE = PropertyEnum.<DisplayConnections>create("type", DisplayConnections.class);
-	public ConnectedDisplayScreen connectedDisplay = null;
+	// public ConnectedDisplayScreen connectedDisplay = null;
 	public NBTTagCompound savedTag = null;
 	public SyncTagType.BOOLEAN shouldRender = (BOOLEAN) new SyncTagType.BOOLEAN(3); // set default info
 	public boolean onRenderChange = true;
@@ -155,7 +155,6 @@ public class LargeDisplayScreenPart extends ScreenMultipart implements ILargeDis
 	public void addToNetwork() {
 		if (isServer()) {
 			Logistics.getDisplayManager().addConnection(this);
-			this.sendSyncPacket();
 		}
 	}
 
@@ -186,19 +185,20 @@ public class LargeDisplayScreenPart extends ScreenMultipart implements ILargeDis
 		if (stack != null && stack.getItem() instanceof IOperatorTool) {
 			return false;
 		}
+		if (isClient()) {
+			return true;
+		}
 		if (hit.sideHit != face) {
-			if (isServer()) {
-				LargeDisplayScreenPart part = (LargeDisplayScreenPart) this.getDisplayScreen().getTopLeftScreen();
-				if (part != null) {
-					SonarMultipartHelper.sendMultipartSyncToPlayer(this, (EntityPlayerMP) player);
-					Logistics.network.sendTo(new PacketConnectedDisplayScreen(this.getDisplayScreen(), registryID), (EntityPlayerMP) player);
-					Logistics.getServerManager().sendLocalMonitorsToClient(part, player);
-					part.openFlexibleGui(player, 0);
-				}
+			LargeDisplayScreenPart part = (LargeDisplayScreenPart) this.getDisplayScreen().getTopLeftScreen();
+			if (part != null) {
+				SonarMultipartHelper.sendMultipartSyncToPlayer(this, (EntityPlayerMP) player);
+				Logistics.network.sendTo(new PacketConnectedDisplayScreen(this.getDisplayScreen(), registryID), (EntityPlayerMP) player);
+				Logistics.getServerManager().sendLocalMonitorsToClient(part, player);
+				part.openFlexibleGui(player, 0);
 			}
 			return true;
 		}
-		return this.container().onClicked(player.isSneaking() ? BlockInteractionType.SHIFT_RIGHT : BlockInteractionType.RIGHT, getWorld(), player, hand, stack, hit);
+		return this.container().onClicked(this, player.isSneaking() ? BlockInteractionType.SHIFT_RIGHT : BlockInteractionType.RIGHT, getWorld(), player, hand, stack, hit);
 	}
 
 	public void setLocalNetworkCache(INetworkCache network) {
@@ -217,9 +217,7 @@ public class LargeDisplayScreenPart extends ScreenMultipart implements ILargeDis
 		}
 		if (this.isServer() && type.isType(SyncType.SAVE) && nbt.hasKey("connected")) {
 			this.savedTag = nbt;
-			// this.getDisplayScreen().readData(nbt, type);
 		}
-		/* if (this.isServer() && this.shouldRender.getObject() && type.isType(SyncType.SAVE)) { if (this.connectedDisplay == null && nbt.hasKey("connected")) { this.savedTag = nbt.getCompoundTag("connected"); } } if (this.isClient() && this.shouldRender.getObject() && type.isType(SyncType.SAVE)) { if (nbt.hasKey("connected")) { this.savedTag = nbt.getCompoundTag("connected"); } } */
 	}
 
 	@Override
@@ -351,7 +349,14 @@ public class LargeDisplayScreenPart extends ScreenMultipart implements ILargeDis
 
 	@Override
 	public void setConnectedDisplay(ConnectedDisplayScreen connectedDisplay) {
-		this.connectedDisplay = connectedDisplay;
+		if (isServer() && shouldRender()) {
+			if (this.savedTag != null && !savedTag.hasNoTags()) {
+				connectedDisplay.readData(savedTag, SyncType.SAVE);
+				savedTag = null;
+				connectedDisplay.sendViewers();
+				Logistics.getServerManager().updateViewingMonitors = true;
+			}
+		}
 		/* if (savedTag != null && registryID != -1) { connectedDisplay.readData(savedTag, SyncType.SAVE); savedTag = null; } if (shouldRender.getObject()) { syncList.addPart(connectedDisplay); } else { syncList.removePart(connectedDisplay); } */
 	}
 
@@ -362,17 +367,8 @@ public class LargeDisplayScreenPart extends ScreenMultipart implements ILargeDis
 
 	@Override
 	public ConnectedDisplayScreen getDisplayScreen() {
-		if (connectedDisplay == null && registryID != -1) {
-			setConnectedDisplay(connectedDisplay = DisplayManager.getOrCreateDisplayScreen(getWorld(), this, registryID));
-			if (this.savedTag != null) {
-				connectedDisplay.readData(savedTag, SyncType.SAVE);
-				savedTag = null;
-			}
-			if (isServer()) {
-				Logistics.getServerManager().updateViewingMonitors = true;
-			}
-		}
-		return connectedDisplay;
+		return this.isClient() ? Logistics.getClientManager().getOrCreateDisplayScreen(getWorld(), this, registryID) : Logistics.getServerManager().getOrCreateDisplayScreen(getWorld(), this, registryID);
+		/* if (connectedDisplay == null && registryID != -1) { if (this.isClient()) { connectedDisplay = ; } else { connectedDisplay = ; } if (isServer() && shouldRender()) { if (this.savedTag != null && !savedTag.hasNoTags()) { connectedDisplay.readData(savedTag, SyncType.SAVE); savedTag = null; connectedDisplay.sendViewers(); Logistics.getServerManager().updateViewingMonitors = true; } } } return connectedDisplay; */
 	}
 
 	@Override
@@ -385,7 +381,7 @@ public class LargeDisplayScreenPart extends ScreenMultipart implements ILargeDis
 			Logistics.getServerManager().updateViewingMonitors = true;
 		}
 		//// this.sendSyncPacket();
-		//// this.markDirty();
+		this.markDirty();
 	}
 
 	@Override
@@ -410,19 +406,19 @@ public class LargeDisplayScreenPart extends ScreenMultipart implements ILargeDis
 
 	@Override
 	public ScreenLayout getLayout() {
-		
-		return connectedDisplay==null?ScreenLayout.ONE : connectedDisplay.getLayout();
+		ConnectedDisplayScreen screen = getDisplayScreen();
+		return screen == null ? ScreenLayout.ONE : screen.getLayout();
 	}
 
 	@Override
 	public boolean performOperation(AdvancedRayTraceResultPart rayTrace, OperatorMode mode, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-		if (getDisplayScreen()!=null && !getWorld().isRemote) {
+		if (getDisplayScreen() != null && !getWorld().isRemote) {
 			getDisplayScreen().layout.incrementEnum();
 			while (!(getDisplayScreen().layout.getObject().maxInfo <= this.maxInfo())) {
 				getDisplayScreen().layout.incrementEnum();
 			}
 			sendSyncPacket();
-			connectedDisplay.sendViewers();
+			getDisplayScreen().sendViewers();
 			FontHelper.sendMessage("Screen Layout: " + getDisplayScreen().layout.getObject(), getWorld(), player);
 		}
 		return false;

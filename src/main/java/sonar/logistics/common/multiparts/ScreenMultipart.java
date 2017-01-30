@@ -8,6 +8,7 @@ import io.netty.buffer.ByteBuf;
 import mcmultipart.MCMultiPartMod;
 import mcmultipart.multipart.INormallyOccludingPart;
 import mcmultipart.raytrace.PartMOP;
+import mcmultipart.raytrace.RayTraceUtils;
 import mcmultipart.raytrace.RayTraceUtils.AdvancedRayTraceResultPart;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.BlockStateContainer;
@@ -21,6 +22,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import sonar.core.api.IFlexibleGui;
@@ -92,6 +94,9 @@ public abstract class ScreenMultipart extends LogisticsMultipart implements IByt
 		if (stack != null && stack.getItem() instanceof IOperatorTool) {
 			return false;
 		}
+		if(isClient()){
+			return true;
+		}
 		if (hit.sideHit != face) {
 			if (isServer()) {
 				Logistics.getServerManager().sendLocalMonitorsToClient(this, player);
@@ -100,20 +105,20 @@ public abstract class ScreenMultipart extends LogisticsMultipart implements IByt
 			}
 			return true;
 		}
-		return container().onClicked(player.isSneaking() ? BlockInteractionType.SHIFT_RIGHT : BlockInteractionType.RIGHT, getWorld(), player, hand, stack, hit);
+		return container().onClicked(this, player.isSneaking() ? BlockInteractionType.SHIFT_RIGHT : BlockInteractionType.RIGHT, getWorld(), player, hand, stack, hit);
 	}
 
 	@Override
 	public void harvest(EntityPlayer player, PartMOP hit) {
 		if (hit.sideHit == face) {
-			container().onClicked(player.isSneaking() ? BlockInteractionType.SHIFT_LEFT : BlockInteractionType.LEFT, getWorld(), player, player.getActiveHand(), player.getActiveItemStack(), hit);
+			container().onClicked(this, player.isSneaking() ? BlockInteractionType.SHIFT_LEFT : BlockInteractionType.LEFT, getWorld(), player, player.getActiveHand(), player.getActiveItemStack(), hit);
 			return;
 		}
 		super.harvest(player, hit);
 	}
 
 	public void markChanged(IDirtyPart part) {
-		super.markChanged(part);		
+		super.markChanged(part);
 		ArrayList<EntityPlayer> viewers = getViewersList().getViewers(false, ViewerType.INFO);
 		for (EntityPlayer player : viewers) {
 			SonarMultipartHelper.sendMultipartSyncToPlayer(this, (EntityPlayerMP) player);
@@ -122,14 +127,17 @@ public abstract class ScreenMultipart extends LogisticsMultipart implements IByt
 
 	public void onSyncPacketRequested(EntityPlayer player) {
 		super.onSyncPacketRequested(player);
-		this.getViewersList().addViewer(player, ViewerType.INFO);
+		if (isServer()) {
+			this.getViewersList().addViewer(player, ViewerType.FULL_INFO);
+			Logistics.getServerManager().sendLocalMonitorsToClient(this, player);
+		}
 	}
 
 	public void onFirstTick() {
 		super.onFirstTick();
 		if (!this.getWorld().isRemote)
 			Logistics.getServerManager().addDisplay(this);
-		if (this.isClient())
+		else
 			this.requestSyncPacket();
 	}
 
@@ -175,10 +183,12 @@ public abstract class ScreenMultipart extends LogisticsMultipart implements IByt
 		switch (id) {
 		case 0:
 			currentSelected = buf.readInt();
-			container().setUUID(InfoUUID.getUUID(buf), currentSelected);
-			if (FMLCommonHandler.instance().getEffectiveSide().isServer())
+			InfoUUID uuid = InfoUUID.getUUID(buf);
+			container().setUUID(uuid, currentSelected);
+			if (isServer()) {
 				Logistics.getServerManager().updateViewingMonitors = true;
-			this.sendSyncPacket();
+				this.sendSyncPacket();
+			}
 			break;
 		case 1:
 			currentSelected = buf.readInt();
@@ -240,6 +250,13 @@ public abstract class ScreenMultipart extends LogisticsMultipart implements IByt
 	@Override
 	public EnumFacing getFace() {
 		return face;
+	}
+	
+	public PartMOP getPartHit(EntityPlayer player){
+        Vec3d start = RayTraceUtils.getStart(player);
+        Vec3d end = RayTraceUtils.getEnd(player);
+        AdvancedRayTraceResultPart result = collisionRayTrace(start, end);
+        return result == null ? null : result.hit;
 	}
 
 	public void addInfo(List<String> info) {

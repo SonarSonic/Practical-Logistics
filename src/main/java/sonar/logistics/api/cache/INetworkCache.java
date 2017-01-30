@@ -3,8 +3,10 @@ package sonar.logistics.api.cache;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map.Entry;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumFacing;
 import sonar.core.api.utils.BlockCoords;
 import sonar.core.utils.IWorldPosition;
@@ -23,6 +25,10 @@ public interface INetworkCache {
 	/** @param includeChannels normally true, false if you are retrieving blocks from multiple connected networks, which have already been logged
 	 * @return the {@link LinkedHashMap} of {@link BlockCoords} paired with {@link EnumFacing} */
 	public HashMap<BlockCoords, EnumFacing> getExternalBlocks(boolean includeChannels);
+
+	/** @param includeChannels normally true, false if you are retrieving blocks from multiple connected networks, which have already been logged
+	 * @return the {@link LinkedHashMap} of {@link BlockCoords} paired with {@link EnumFacing} */
+	public ArrayList<Entity> getExternalEntities(boolean includeChannels);
 
 	/** gets the full list of Cached Coordinates for a given {@link CacheType}.
 	 * 

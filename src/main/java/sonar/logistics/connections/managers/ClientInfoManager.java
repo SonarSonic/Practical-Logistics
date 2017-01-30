@@ -9,12 +9,14 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
 import sonar.core.helpers.NBTHelper;
 import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.logistics.api.connecting.ClientDataEmitter;
 import sonar.logistics.api.connecting.ClientLogicMonitor;
 import sonar.logistics.api.display.ConnectedDisplayScreen;
+import sonar.logistics.api.display.ILargeDisplay;
 import sonar.logistics.api.info.IInfoManager;
 import sonar.logistics.api.info.InfoUUID;
 import sonar.logistics.api.info.monitor.ILogicMonitor;
@@ -39,7 +41,19 @@ public class ClientInfoManager implements IInfoManager {
 	
 	//emitters
 	public ArrayList<ClientDataEmitter> clientEmitters = new ArrayList<ClientDataEmitter>();
-	
+
+
+	@Override
+	public void removeAll() {
+		connectedDisplays.clear();
+		info.clear();
+		sortedLogicMonitors.clear();
+		clientLogicMonitors.clear();
+		monitoredLists.clear();
+		monitors.clear();
+		coordMap.clear();
+		clientEmitters.clear();
+	}
 
 	public void onInfoPacket(NBTTagCompound packetTag, SyncType type) {
 		NBTTagList packetList = packetTag.getTagList("infoList", NBT.TAG_COMPOUND);
@@ -92,6 +106,16 @@ public class ClientInfoManager implements IInfoManager {
 		return list;
 	}
 
+
+	public ConnectedDisplayScreen getOrCreateDisplayScreen(World world, ILargeDisplay display, int registryID) {
+		ConcurrentHashMap<Integer, ConnectedDisplayScreen> displays = getConnectedDisplays();
+		ConnectedDisplayScreen toSet = displays.get(registryID);
+		if (toSet == null) {
+			displays.put(registryID, new ConnectedDisplayScreen(display));
+			toSet = displays.get(registryID);
+		}
+		return toSet;
+	}
 
 	@Override
 	public ConcurrentHashMap<Integer, ConnectedDisplayScreen> getConnectedDisplays() {

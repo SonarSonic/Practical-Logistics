@@ -20,7 +20,8 @@ import sonar.core.api.inventories.ISonarInventoryHandler;
 import sonar.core.api.inventories.StoredItemStack;
 import sonar.core.api.utils.ActionType;
 import sonar.core.api.utils.BlockCoords;
-import sonar.core.handlers.inventories.IInventoryProvider;
+import sonar.core.handlers.inventories.IInventoryHandler;
+import sonar.core.helpers.SonarHelper;
 import sonar.core.network.PacketInvUpdate;
 import sonar.core.utils.SortingDirection;
 import sonar.logistics.api.LogisticsAPI;
@@ -117,7 +118,7 @@ public class ItemHelper extends ItemWrapper {
 				continue;
 			}
 			for (ISonarInventoryHandler provider : SonarCore.inventoryHandlers) {
-				if(provider instanceof IInventoryProvider){
+				if(provider instanceof IInventoryHandler){
 					continue;
 				}
 				if (provider.canHandleItems(tile, entry.getValue())) {
@@ -148,7 +149,8 @@ public class ItemHelper extends ItemWrapper {
 
 	public StoredItemStack getEntityStack(IEntityNode node, int slot) {
 		List<StoredItemStack> storedStacks = new ArrayList();
-		List<Entity> entityList = node.getEntities();
+		List<Entity> entityList = new ArrayList();
+		node.addEntities(entityList);
 		for (Entity entity : entityList) {
 			if (entity instanceof EntityPlayer) {
 				EntityPlayer player = (EntityPlayer) entity;
@@ -344,7 +346,7 @@ public class ItemHelper extends ItemWrapper {
 		info.sort(new Comparator<MonitoredItemStack>() {
 			public int compare(MonitoredItemStack str1, MonitoredItemStack str2) {
 				StoredItemStack item1 = str1.itemStack.getObject(), item2 = str2.itemStack.getObject();
-				return InfoHelper.compareStringsWithDirection(item1.getItemStack().getDisplayName(), item2.getItemStack().getDisplayName(), dir);
+				return SonarHelper.compareStringsWithDirection(item1.getItemStack().getDisplayName(), item2.getItemStack().getDisplayName(), dir);
 			}
 		});
 
@@ -353,7 +355,7 @@ public class ItemHelper extends ItemWrapper {
 			info.sort(new Comparator<MonitoredItemStack>() {
 				public int compare(MonitoredItemStack str1, MonitoredItemStack str2) {
 					StoredItemStack item1 = str1.itemStack.getObject(), item2 = str2.itemStack.getObject();
-					return InfoHelper.compareWithDirection(item1.stored, item2.stored, dir);
+					return SonarHelper.compareWithDirection(item1.stored, item2.stored, dir);
 				}
 			});
 			break;
@@ -363,7 +365,7 @@ public class ItemHelper extends ItemWrapper {
 					StoredItemStack item1 = str1.itemStack.getObject(), item2 = str2.itemStack.getObject();
 					String modid1 = item1.getItemStack().getItem().getRegistryName().getResourceDomain();
 					String modid2 = item2.getItemStack().getItem().getRegistryName().getResourceDomain();
-					return InfoHelper.compareStringsWithDirection(modid1, modid2, dir);
+					return SonarHelper.compareStringsWithDirection(modid1, modid2, dir);
 				}
 			});
 		default:

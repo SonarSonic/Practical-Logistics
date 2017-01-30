@@ -22,11 +22,6 @@ public class EntityNodePart extends SidedMultipart implements IEntityNode {
 		super(face, 5*0.0625, 0.0625*1, 0.0625*4);
 	}
 
-	@Override
-	public List<Entity> getEntities() {
-		return new ArrayList();
-	}
-
     @Override
     public boolean onActivated(EntityPlayer player, EnumHand hand, ItemStack heldItem, PartMOP hit) {
         return false;
@@ -35,5 +30,10 @@ public class EntityNodePart extends SidedMultipart implements IEntityNode {
 	@Override
 	public ItemStack getItemStack() {
 		return new ItemStack(LogisticsItems.partEntityNode);
+	}
+
+	@Override
+	public void addEntities(List<Entity> entities) {
+		
 	}
 }

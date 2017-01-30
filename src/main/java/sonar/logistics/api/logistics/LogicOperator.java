@@ -42,6 +42,5 @@ public enum LogicOperator {
 			break;
 		}
 		return false;
-
 	}
 }

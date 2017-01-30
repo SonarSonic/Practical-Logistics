@@ -10,12 +10,15 @@ import sonar.core.helpers.ASMLoader;
 import sonar.core.utils.Pair;
 import sonar.logistics.api.asm.CustomEntityHandler;
 import sonar.logistics.api.asm.CustomTileHandler;
+import sonar.logistics.api.asm.EntityMonitorHandler;
 import sonar.logistics.api.asm.InfoRegistry;
 import sonar.logistics.api.asm.LogicInfoType;
-import sonar.logistics.api.asm.MonitorHandler;
+import sonar.logistics.api.asm.TileMonitorHandler;
 import sonar.logistics.api.info.ICustomEntityHandler;
 import sonar.logistics.api.info.ICustomTileHandler;
+import sonar.logistics.api.info.IEntityMonitorHandler;
 import sonar.logistics.api.info.IInfoRegistry;
+import sonar.logistics.api.info.ITileMonitorHandler;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
 import sonar.logistics.api.info.monitor.LogicMonitorHandler;
 
@@ -24,34 +27,47 @@ public class LogisticsASMLoader {
 	public static LinkedHashMap<Integer, String> infoNames = new LinkedHashMap();
 	public static LinkedHashMap<String, Integer> infoIds = new LinkedHashMap();
 	public static LinkedHashMap<String, Class<? extends IMonitorInfo>> infoClasses = new LinkedHashMap();
-	public static LinkedHashMap<String, LogicMonitorHandler> monitorHandlers = new LinkedHashMap();
+	public static LinkedHashMap<String, ITileMonitorHandler> tileMonitorHandlers = new LinkedHashMap();
+	public static LinkedHashMap<String, IEntityMonitorHandler> entityMonitorHandlers = new LinkedHashMap();
 
-	private LogisticsASMLoader() {
-	}
+	private LogisticsASMLoader() {}
 
 	public static List<IInfoRegistry> getInfoRegistries(@Nonnull ASMDataTable asmDataTable) {
-		return ASMLoader.getInstances(asmDataTable, InfoRegistry.class, IInfoRegistry.class, true);
+		return ASMLoader.getInstances(asmDataTable, InfoRegistry.class, IInfoRegistry.class, true, false);
 	}
 
 	public static List<ICustomTileHandler> getCustomTileHandlers(@Nonnull ASMDataTable asmDataTable) {
-		return ASMLoader.getInstances(asmDataTable, CustomTileHandler.class, ICustomTileHandler.class, true);
+		return ASMLoader.getInstances(asmDataTable, CustomTileHandler.class, ICustomTileHandler.class, true, false);
 	}
 
 	public static List<ICustomEntityHandler> getCustomEntityHandlers(@Nonnull ASMDataTable asmDataTable) {
-		return ASMLoader.getInstances(asmDataTable, CustomEntityHandler.class, ICustomEntityHandler.class, true);
+		return ASMLoader.getInstances(asmDataTable, CustomEntityHandler.class, ICustomEntityHandler.class, true, false);
 	}
 
-	public static void loadMonitorHandlers(@Nonnull ASMDataTable asmDataTable) {
-		List<Pair<ASMDataTable.ASMData, Class<? extends LogicMonitorHandler>>> infoTypes = ASMLoader.getClasses(asmDataTable, MonitorHandler.class, LogicMonitorHandler.class, true);
-		for (Pair<ASMDataTable.ASMData, Class<? extends LogicMonitorHandler>> info : infoTypes) {
+	public static void loadTileMonitorHandlers(@Nonnull ASMDataTable asmDataTable) {
+		List<Pair<ASMDataTable.ASMData, Class<? extends ITileMonitorHandler>>> infoTypes = ASMLoader.getClasses(asmDataTable, TileMonitorHandler.class, ITileMonitorHandler.class, true);
+		for (Pair<ASMDataTable.ASMData, Class<? extends ITileMonitorHandler>> info : infoTypes) {
 			String name = (String) info.a.getAnnotationInfo().get("handlerID");
 			try {
-				monitorHandlers.put(name, info.b.newInstance());
+				tileMonitorHandlers.put(name, info.b.newInstance());
 			} catch (InstantiationException | IllegalAccessException e) {
-				Logistics.logger.error("FAILED: To Load Monitor Handler - " + name);
+				Logistics.logger.error("FAILED: To Load Tile Monitor Handler - " + name);
 			}
 		}
-		Logistics.logger.info("Loaded: " + monitorHandlers.size() + " Monitor Handlers");
+		Logistics.logger.info("Loaded: " + tileMonitorHandlers.size() + " Tile Monitor Handlers");
+	}
+
+	public static void loadEntityMonitorHandlers(@Nonnull ASMDataTable asmDataTable) {
+		List<Pair<ASMDataTable.ASMData, Class<? extends IEntityMonitorHandler>>> infoTypes = ASMLoader.getClasses(asmDataTable, EntityMonitorHandler.class, IEntityMonitorHandler.class, true);
+		for (Pair<ASMDataTable.ASMData, Class<? extends IEntityMonitorHandler>> info : infoTypes) {
+			String name = (String) info.a.getAnnotationInfo().get("handlerID");
+			try {
+				entityMonitorHandlers.put(name, info.b.newInstance());
+			} catch (InstantiationException | IllegalAccessException e) {
+				Logistics.logger.error("FAILED: To Load Entity Monitor Handler - " + name);
+			}
+		}
+		Logistics.logger.info("Loaded: " + entityMonitorHandlers.size() + " Entity Monitor Handlers");
 	}
 
 	public static void loadInfoTypes(@Nonnull ASMDataTable asmDataTable) {

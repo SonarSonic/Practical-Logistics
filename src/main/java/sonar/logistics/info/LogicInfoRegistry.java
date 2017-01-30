@@ -127,7 +127,7 @@ public class LogicInfoRegistry {
 	public static void reload() {
 		registeredReturnTypes.clear();
 		infoMethods.clear();
-		infoFields.clone();
+		infoFields.clear();
 		invFields.clear();
 		infoAdjustments.clear();
 
@@ -355,6 +355,18 @@ public class LogicInfoRegistry {
 		return null;
 	}
 
+	public static List<LogicInfo> getEntityInfo(final List<LogicInfo> infoList, Entity entity) {
+		Class<?> argClass;
+		if (entity != null && containsAssignableType(argClass = entity.getClass(), acceptedTypes)) {
+			EnumFacing currentFace = null;
+			RegistryType type = RegistryType.getRegistryType(argClass);
+			getAssignableMethods(argClass, type).forEach(method -> getClassInfo(infoList, type, entity, method));
+			getAccessibleFields(argClass, type).forEach(field -> getFieldInfo(infoList, type, entity, field));
+			addCapabilities(infoList, entity, currentFace);
+		}
+		return infoList;
+	}
+
 	/** @param infoList the list to add to
 	 * @param available all available info about the tile, typically will include the World, BlockPos, IBlockState, EnumFacing, the Block and the tile entity
 	 * @return all the available info */
@@ -371,24 +383,28 @@ public class LogicInfoRegistry {
 						fields.entrySet().forEach(field -> infoList.add(LogicInfo.buildDirectInfo(argClass.getSimpleName() + "." + field.getKey(), type, ((IInventory) arg).getField(field.getValue()))));
 					}
 				}
-				if (arg instanceof ICapabilityProvider && !registeredCapabilities.isEmpty()) {
-					ICapabilityProvider provider = (ICapabilityProvider) arg;
-					ArrayList<Capability> capabilities = new ArrayList();
-					for (Capability cap : registeredCapabilities) {
-						if (provider.hasCapability(cap, currentFace)) {
-							Capability providedCap = (Capability) provider.getCapability(cap, currentFace);
-							if (providedCap != null) {
-								capabilities.add(cap);
-							}
-						}
-					}
-					for (Capability cap : capabilities) {
-						getAssignableMethods(cap.getClass(), RegistryType.CAPABILITY).forEach(method -> getClassInfo(infoList, RegistryType.CAPABILITY, cap, method, available));
-						getAccessibleFields(cap.getClass(), RegistryType.CAPABILITY).forEach(field -> getFieldInfo(infoList, RegistryType.CAPABILITY, cap, field));
-					}
-				}
+				addCapabilities(infoList, arg, currentFace, available);
 			}
 		}
 		return infoList;
+	}
+
+	public static void addCapabilities(final List<LogicInfo> infoList, Object obj, EnumFacing currentFace, Object... available) {
+		if (obj instanceof ICapabilityProvider && !registeredCapabilities.isEmpty()) {
+			ICapabilityProvider provider = (ICapabilityProvider) obj;
+			ArrayList<Capability> capabilities = new ArrayList();
+			for (Capability cap : registeredCapabilities) {
+				if (provider.hasCapability(cap, currentFace)) {
+					Capability providedCap = (Capability) provider.getCapability(cap, currentFace);
+					if (providedCap != null) {
+						capabilities.add(cap);
+					}
+				}
+			}
+			for (Capability cap : capabilities) {
+				getAssignableMethods(cap.getClass(), RegistryType.CAPABILITY).forEach(method -> getClassInfo(infoList, RegistryType.CAPABILITY, cap, method, available));
+				getAccessibleFields(cap.getClass(), RegistryType.CAPABILITY).forEach(field -> getFieldInfo(infoList, RegistryType.CAPABILITY, cap, field));
+			}
+		}
 	}
 }

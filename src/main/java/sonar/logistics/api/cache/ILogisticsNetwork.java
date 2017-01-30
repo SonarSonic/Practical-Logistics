@@ -2,10 +2,12 @@ package sonar.logistics.api.cache;
 
 import java.util.Map;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumFacing;
 import sonar.core.api.utils.BlockCoords;
 import sonar.core.utils.Pair;
 import sonar.logistics.api.display.IInfoDisplay;
+import sonar.logistics.api.info.ITileMonitorHandler;
 import sonar.logistics.api.info.monitor.ILogicMonitor;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
 import sonar.logistics.api.info.monitor.LogicMonitorHandler;
@@ -30,15 +32,17 @@ public interface ILogisticsNetwork extends INetworkCache {
 
 	/** gathers the monitored list required by the {@link ILogicMonitor} which is then cached 
 	 * @param connections TODO
-	 * @return TODO*/
-	public <T extends IMonitorInfo> MonitoredList<T> updateMonitoredList(ILogicMonitor<T> monitor, int infoID, Map<Pair<BlockCoords, EnumFacing>, MonitoredList<?>> connections);
+	 * @return the updated monitored list*/
+	public <T extends IMonitorInfo> MonitoredList<T> updateMonitoredList(ILogicMonitor<T> monitor, int infoID, Map<Pair<BlockCoords, EnumFacing>, MonitoredList<?>> tileconnections, Map<Entity, MonitoredList<?>> entityConnections);
 
 	/**gets the full monitored list for the Handler type
 	 * @param type the type of handler to get a list for
 	 * @return a full list of data
 	 */
-	public <T extends IMonitorInfo> Map<Pair<BlockCoords, EnumFacing>, MonitoredList<?>> getMonitoredList(LogicMonitorHandler<T> type);
+	public <T extends IMonitorInfo> Map<Pair<BlockCoords, EnumFacing>, MonitoredList<?>> getTileMonitoredList(LogicMonitorHandler<T> type);
 
+	public <T extends IMonitorInfo> Map<Entity, MonitoredList<?>> getEntityMonitoredList(LogicMonitorHandler<T> type);
+	
 	//public MonitoredList<?> getListForMonitor(ILogicMonitor monitor);
 	
 }

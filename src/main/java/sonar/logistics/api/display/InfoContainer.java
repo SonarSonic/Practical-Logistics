@@ -8,6 +8,7 @@ import org.lwjgl.opengl.GL11;
 import io.netty.buffer.ByteBuf;
 import mcmultipart.raytrace.PartMOP;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumHand;
@@ -22,14 +23,18 @@ import sonar.core.network.sync.IDirtyPart;
 import sonar.core.network.sync.ISyncPart;
 import sonar.core.network.sync.SyncableList;
 import sonar.logistics.Logistics;
-import sonar.logistics.api.info.IClickableInfo;
+import sonar.logistics.api.info.IAdvancedClickableInfo;
+import sonar.logistics.api.info.IBasicClickableInfo;
 import sonar.logistics.api.info.IInfoContainer;
 import sonar.logistics.api.info.InfoUUID;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
 import sonar.logistics.api.info.types.InfoError;
+import sonar.logistics.common.multiparts.ScreenMultipart;
 import sonar.logistics.helpers.InfoHelper;
+import sonar.logistics.network.PacketClickEventClient;
+import sonar.logistics.network.PacketClickEventServer;
 
-/** used to store {@link IMonitorInfo} along with their respective {@link DisplayInfo} for rendering on a {@link IInfoDisplay}*/
+/** used to store {@link IMonitorInfo} along with their respective {@link DisplayInfo} for rendering on a {@link IInfoDisplay} */
 public class InfoContainer extends DirtyPart implements IInfoContainer, ISyncPart {
 
 	public static final ResourceLocation colour1 = new ResourceLocation(Logistics.MODID + ":textures/model/" + "progress1.png");
@@ -120,27 +125,31 @@ public class InfoContainer extends DirtyPart implements IInfoContainer, ISyncPar
 	}
 
 	@Override
-	public boolean onClicked(BlockInteractionType type, World world, EntityPlayer player, EnumHand hand, ItemStack stack, PartMOP hit) {
+	public boolean onClicked(ScreenMultipart part, BlockInteractionType type, World world, EntityPlayer player, EnumHand hand, ItemStack stack, PartMOP hit) {
 		boolean doubleClick = false;
 		if (world.getTotalWorldTime() - lastClickTime < 10 && player.getPersistentID().equals(lastClickUUID)) {
 			doubleClick = true;
 		}
-		boolean bool = !world.isRemote;
-		if (world.isRemote) {
-			lastClickTime = world.getTotalWorldTime();
-			lastClickUUID = player.getPersistentID();
-			for (int i = 0; i < display.maxInfo(); i++) {
-				IDisplayInfo info = storedInfo.get(i);
-				IMonitorInfo cachedInfo = info.getCachedInfo();
-				if (cachedInfo instanceof IClickableInfo) {
-					boolean clicked = ((IClickableInfo) cachedInfo).onClicked(type, doubleClick, info, player, hand, stack, hit, this);
-					if (clicked) {
-						return true;
-					}
+		lastClickTime = world.getTotalWorldTime();
+		lastClickUUID = player.getPersistentID();
+
+		for (int i = 0; i < display.maxInfo(); i++) {
+			IDisplayInfo info = storedInfo.get(i);
+			IMonitorInfo cachedInfo = info.getCachedInfo();
+			if (cachedInfo instanceof IAdvancedClickableInfo) {
+				if (!world.isRemote) {
+					IAdvancedClickableInfo clickable = ((IAdvancedClickableInfo) cachedInfo);
+					int hashCode = UUID.randomUUID().hashCode();
+					ScreenInteractionEvent event = new ScreenInteractionEvent(hashCode, cachedInfo, i, player, type, doubleClick, hand, hit);
+					Logistics.getServerManager().clickEvents.put(hashCode, event);
+					Logistics.network.sendTo(new PacketClickEventClient(part.getUUID(), part.getPos(), event), (EntityPlayerMP) player);
 				}
+			} else if (cachedInfo instanceof IBasicClickableInfo) {
+				IBasicClickableInfo clickable = ((IBasicClickableInfo) cachedInfo);
+				return clickable.onStandardClick(type, doubleClick, info, player, hand, stack, hit, this);
 			}
 		}
-		return false;
+		return true;
 	}
 
 	@Override
@@ -155,9 +164,9 @@ public class InfoContainer extends DirtyPart implements IInfoContainer, ISyncPar
 	@Override
 	public NBTTagCompound writeData(NBTTagCompound nbt, SyncType type) {
 		NBTTagCompound tag = NBTHelper.writeSyncParts(new NBTTagCompound(), type, syncParts, type == SyncType.SYNC_OVERRIDE);
-		if (!tag.hasNoTags())
+		if (!tag.hasNoTags()) {
 			nbt.setTag(this.getTagName(), tag);
-
+		}
 		return nbt;
 
 	}
@@ -205,7 +214,7 @@ public class InfoContainer extends DirtyPart implements IInfoContainer, ISyncPar
 	@Override
 	public void markChanged(IDirtyPart part) {
 		syncParts.markSyncPartChanged(part);
-		listener.markChanged(part);
+		listener.markChanged(this);
 	}
 
 }

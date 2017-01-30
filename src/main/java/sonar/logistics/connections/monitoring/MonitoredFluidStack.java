@@ -19,7 +19,7 @@ import sonar.logistics.Logistics;
 import sonar.logistics.api.asm.LogicInfoType;
 import sonar.logistics.api.display.IDisplayInfo;
 import sonar.logistics.api.display.InfoContainer;
-import sonar.logistics.api.info.IClickableInfo;
+import sonar.logistics.api.info.IAdvancedClickableInfo;
 import sonar.logistics.api.info.INameableInfo;
 import sonar.logistics.api.info.monitor.IJoinableInfo;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
@@ -28,7 +28,7 @@ import sonar.logistics.api.info.types.BaseInfo;
 import sonar.logistics.helpers.InfoRenderer;
 
 @LogicInfoType(id = MonitoredFluidStack.id, modid = Logistics.MODID)
-public class MonitoredFluidStack extends BaseInfo<MonitoredFluidStack> implements IJoinableInfo<MonitoredFluidStack>, IClickableInfo, INameableInfo<MonitoredFluidStack> {
+public class MonitoredFluidStack extends BaseInfo<MonitoredFluidStack> implements IJoinableInfo<MonitoredFluidStack>, INameableInfo<MonitoredFluidStack> {
 
 	public static final String id = "fluid";
 	public static LogicMonitorHandler<MonitoredFluidStack> handler = LogicMonitorHandler.instance(FluidMonitorHandler.id);
@@ -107,12 +107,6 @@ public class MonitoredFluidStack extends BaseInfo<MonitoredFluidStack> implement
 			InfoRenderer.renderNormalInfo(container.display.getDisplayType(), width, height, scale, displayInfo.getFormattedStrings());
 			GL11.glPopMatrix();
 		}
-	}
-
-	@Override
-	public boolean onClicked(BlockInteractionType type, boolean doubleClick, IDisplayInfo renderInfo, EntityPlayer player, EnumHand hand, ItemStack stack, PartMOP hit, InfoContainer container) {
-		//FluidHelper.		
-		return false;
 	}
 
 	@Override

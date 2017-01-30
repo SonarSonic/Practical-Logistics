@@ -1,6 +1,9 @@
-package sonar.logistics.api.logistics;
+package sonar.logistics.logic.comparators;
 
 import java.util.List;
+
+import sonar.logistics.api.logistics.LogicOperator;
+import sonar.logistics.api.logistics.LogicState;
 
 public interface ILogicComparator<T> {
 

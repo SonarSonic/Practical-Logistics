@@ -3,6 +3,7 @@ package sonar.logistics.api.info.types;
 import java.util.ArrayList;
 
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import sonar.core.helpers.NBTHelper;
 import sonar.core.helpers.NBTHelper.SyncType;
 import sonar.core.network.sync.ICheckableSyncPart;
@@ -10,7 +11,9 @@ import sonar.core.network.sync.IDirtyPart;
 import sonar.core.network.sync.ISyncPart;
 import sonar.core.network.sync.ISyncableListener;
 import sonar.core.network.sync.SyncableList;
+import sonar.logistics.Logistics;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
+import sonar.logistics.network.PacketClickEventServer;
 
 /** typical implementation of IMonitorInfo which has a sync parts list for all the Info things it also has the required constructor which required empty constructor */
 public abstract class BaseInfo<T extends IMonitorInfo> implements IMonitorInfo<T>, ISyncableListener {
@@ -43,6 +46,7 @@ public abstract class BaseInfo<T extends IMonitorInfo> implements IMonitorInfo<T
 		return false;
 	}
 
+	
 	public void markChanged(IDirtyPart part){
 		syncParts.markSyncPartChanged(part);
 	}
@@ -63,4 +67,5 @@ public abstract class BaseInfo<T extends IMonitorInfo> implements IMonitorInfo<T
 			}
 		}
 	}
+
 }

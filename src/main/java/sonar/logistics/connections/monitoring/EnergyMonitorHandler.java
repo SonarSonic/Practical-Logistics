@@ -9,12 +9,13 @@ import sonar.core.api.energy.ISonarEnergyHandler;
 import sonar.core.api.energy.StoredEnergyStack;
 import sonar.core.api.utils.BlockCoords;
 import sonar.logistics.Logistics;
-import sonar.logistics.api.asm.MonitorHandler;
+import sonar.logistics.api.asm.TileMonitorHandler;
 import sonar.logistics.api.cache.INetworkCache;
+import sonar.logistics.api.info.ITileMonitorHandler;
 import sonar.logistics.api.info.monitor.LogicMonitorHandler;
 
-@MonitorHandler(handlerID = EnergyMonitorHandler.id, modid = Logistics.MODID)
-public class EnergyMonitorHandler extends LogicMonitorHandler<MonitoredEnergyStack> {
+@TileMonitorHandler(handlerID = EnergyMonitorHandler.id, modid = Logistics.MODID)
+public class EnergyMonitorHandler extends LogicMonitorHandler<MonitoredEnergyStack> implements ITileMonitorHandler<MonitoredEnergyStack> {
 
 	public static final String id = "energy";
 

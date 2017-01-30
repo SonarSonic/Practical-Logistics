@@ -25,15 +25,15 @@ public class ContainerArray extends ContainerMultipartSync {
 		}
 	}
 
-	public ItemStack transferStackInSlot(EntityPlayer p_82846_1_, int p_82846_2_) {
+	public ItemStack transferStackInSlot(EntityPlayer player, int slotID) {
 		ItemStack itemstack = null;
-		Slot slot = (Slot) this.inventorySlots.get(p_82846_2_);
+		Slot slot = (Slot) this.inventorySlots.get(slotID);
 
 		if (slot != null && slot.getHasStack()) {
 			ItemStack itemstack1 = slot.getStack();
 			itemstack = itemstack1.copy();
 
-			if (p_82846_2_ < 8) {
+			if (slotID < 8) {
 				if (!this.mergeItemStack(itemstack1, 8, this.inventorySlots.size(), true)) {
 					return null;
 				}

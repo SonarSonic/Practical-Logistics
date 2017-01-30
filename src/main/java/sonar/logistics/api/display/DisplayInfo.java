@@ -30,18 +30,16 @@ public class DisplayInfo extends SyncPart implements IDisplayInfo, ISyncableList
 	public SyncNBTAbstract<InfoUUID> uuid = new SyncNBTAbstract<InfoUUID>(InfoUUID.class, 1);
 	public SyncNBTAbstract<CustomColour> textColour = new SyncNBTAbstract<CustomColour>(CustomColour.class, 2), backgroundColour = new SyncNBTAbstract<CustomColour>(CustomColour.class, 3);
 	public InfoContainer container;
-	public SyncableList syncParts;
+	public SyncableList syncParts = new SyncableList(this);
 	{
 		textColour.setObject(LogisticsColours.white_text);
 		backgroundColour.setObject(LogisticsColours.grey_base);
+		syncParts.addParts(formatList, uuid, textColour, backgroundColour);
 	}
 
 	public DisplayInfo(InfoContainer container, int id) {
 		super(id);
-		syncParts = new SyncableList(this);
-		syncParts.addParts(formatList, uuid, textColour, backgroundColour);
 		this.container = container;
-
 	}
 
 	public RenderInfoProperties setRenderInfoProperties(RenderInfoProperties renderInfo) {

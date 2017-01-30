@@ -31,7 +31,10 @@ public class EmptyViewersList implements IViewersList {
 	}
 
 	@Override
-	public void addViewer(EntityPlayer player, ViewerType type) {}
+	public void addViewer(EntityPlayer player, ViewerType type) {
+		System.out.println(player);
+		
+	}
 
 	@Override
 	public void addViewer(EntityPlayer player, ArrayList<ViewerType> typesToAdd) {}

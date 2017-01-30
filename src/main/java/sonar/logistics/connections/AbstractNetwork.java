@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
@@ -18,7 +19,9 @@ import sonar.logistics.Logistics;
 import sonar.logistics.api.cache.ILogisticsNetwork;
 import sonar.logistics.api.display.IInfoDisplay;
 import sonar.logistics.api.display.InfoContainer;
+import sonar.logistics.api.info.IEntityMonitorHandler;
 import sonar.logistics.api.info.IInfoContainer;
+import sonar.logistics.api.info.ITileMonitorHandler;
 import sonar.logistics.api.info.InfoUUID;
 import sonar.logistics.api.info.monitor.ChannelType;
 import sonar.logistics.api.info.monitor.ILogicMonitor;
@@ -37,7 +40,8 @@ import sonar.logistics.network.PacketMonitoredList;
 public abstract class AbstractNetwork implements ILogisticsNetwork {
 
 	public boolean resendAllLists = false;
-	public final Map<LogicMonitorHandler, Map<Pair<BlockCoords, EnumFacing>, MonitoredList<?>>> connectionInfo = new LinkedHashMap(); // block coords stored with the info gathered
+	public final Map<IEntityMonitorHandler, Map<Entity, MonitoredList<?>>> entityConnectionInfo = new LinkedHashMap();
+	public final Map<ITileMonitorHandler, Map<Pair<BlockCoords, EnumFacing>, MonitoredList<?>>> tileConnectionInfo = new LinkedHashMap(); // block coords stored with the info gathered
 	public final Map<LogicMonitorHandler, Map<ILogicMonitor, MonitoredList<?>>> monitorInfo = new LinkedHashMap();
 	public final Map<IInfoDisplay, IInfoContainer> connectedDisplays = new LinkedHashMap();
 	public final ArrayList<ILogicMonitor> localMonitors = new ArrayList();
@@ -60,19 +64,30 @@ public abstract class AbstractNetwork implements ILogisticsNetwork {
 		if (!monitorInfo.get(monitor.getHandler()).containsKey(monitor)) {
 			monitorInfo.get(monitor.getHandler()).put(monitor, MonitoredList.<T>newMonitoredList(getNetworkID()));
 		}
-		compileCoordsList(monitor.getHandler());
+		compileConnectionList(monitor.getHandler());
 	}
 
 	public <T extends IMonitorInfo> void removeMonitor(ILogicMonitor<T> monitor) {
 		monitorInfo.get(monitor.getHandler()).remove(monitor);
-		compileCoordsList(monitor.getHandler());
+		compileConnectionList(monitor.getHandler());
 	}
 
-	public <T extends IMonitorInfo> MonitoredList<T> updateMonitoredList(ILogicMonitor<T> monitor, int infoID, Map<Pair<BlockCoords, EnumFacing>, MonitoredList<?>> connections) {
+	public <T extends IMonitorInfo> MonitoredList<T> updateMonitoredList(ILogicMonitor<T> monitor, int infoID, Map<Pair<BlockCoords, EnumFacing>, MonitoredList<?>> connections, Map<Entity, MonitoredList<?>> entityConnections) {
 		MonitoredList<T> updateList = MonitoredList.<T>newMonitoredList(getNetworkID());
 		IdentifiedCoordsList channels = monitor.getChannels(infoID); // TODO
 		for (Entry<Pair<BlockCoords, EnumFacing>, MonitoredList<?>> entry : connections.entrySet()) {
 			if ((entry.getValue() != null && !entry.getValue().isEmpty()) && (channels.isEmpty() || channels.contains(entry.getKey().a))) {
+				for (T coordInfo : (MonitoredList<T>) entry.getValue()) {
+					updateList.addInfoToList(coordInfo, (MonitoredList<T>) entry.getValue());
+				}
+				updateList.sizing.add(entry.getValue().sizing);
+				if (monitor.channelType() == ChannelType.SINGLE) {
+					break;
+				}
+			}
+		}
+		for (Entry<Entity, MonitoredList<?>> entry : entityConnections.entrySet()) {
+			if ((entry.getValue() != null && !entry.getValue().isEmpty())){ //&& (channels.isEmpty() || channels.contains(entry.getKey().a))) { TODO
 				for (T coordInfo : (MonitoredList<T>) entry.getValue()) {
 					updateList.addInfoToList(coordInfo, (MonitoredList<T>) entry.getValue());
 				}
@@ -87,12 +102,12 @@ public abstract class AbstractNetwork implements ILogisticsNetwork {
 
 	public void sendPacketsToViewers(ILogicMonitor monitor, MonitoredList saveList, MonitoredList lastList) {
 		IViewersList viewers = monitor.getViewersList();
-		ArrayList<EntityPlayer> players = viewers.getViewers(true, ViewerType.FULL_INFO, ViewerType.INFO,ViewerType.TEMPORARY);
+		ArrayList<EntityPlayer> players = viewers.getViewers(true, ViewerType.INFO, ViewerType.FULL_INFO, ViewerType.TEMPORARY);
 		MonitoredList<MonitoredBlockCoords> coords = Logistics.getNetworkManager().getCoordMap().get(getNetworkID());
 		NBTTagCompound coordTag = !viewers.getViewers(true, ViewerType.CHANNEL).isEmpty() ? InfoHelper.writeMonitoredList(new NBTTagCompound(), coords.isEmpty(), coords.copyInfo(), SyncType.DEFAULT_SYNC) : null;
 		NBTTagCompound saveTag = !viewers.getViewers(true, ViewerType.FULL_INFO, ViewerType.TEMPORARY).isEmpty() ? InfoHelper.writeMonitoredList(new NBTTagCompound(), lastList.isEmpty(), saveList, SyncType.DEFAULT_SYNC) : null;
 		NBTTagCompound tag = !viewers.getViewers(true, ViewerType.INFO).isEmpty() ? InfoHelper.writeMonitoredList(new NBTTagCompound(), lastList.isEmpty(), saveList, SyncType.SPECIAL) : null;
-		if (saveTag != null || tag != null || coordTag != null) {
+		if ((saveTag != null && !saveTag.hasNoTags()) || (tag != null && !tag.hasNoTags()) || (coordTag != null && !coordTag.hasNoTags())) {
 			// if (resendAllLists) {
 			for (Entry<EntityPlayer, ArrayList<ViewerTally>> entry : ((HashMap<EntityPlayer, ArrayList<ViewerTally>>) viewers.getViewers(true).clone()).entrySet()) {
 				for (ViewerTally tally : (ArrayList<ViewerTally>) entry.getValue().clone()) {
@@ -105,14 +120,17 @@ public abstract class AbstractNetwork implements ILogisticsNetwork {
 						if (!tag.hasNoTags() && (!saveList.changed.isEmpty() || !saveList.removed.isEmpty()))
 							Logistics.network.sendTo(new PacketMonitoredList(monitor, new InfoUUID(monitor.getIdentity().hashCode(), 0), saveList.networkID, tag, SyncType.SPECIAL), (EntityPlayerMP) entry.getKey());
 						break;
+
 					case FULL_INFO:
 						Logistics.network.sendTo(new PacketMonitoredList(monitor, new InfoUUID(monitor.getIdentity().hashCode(), 0), saveList.networkID, saveTag, SyncType.DEFAULT_SYNC), (EntityPlayerMP) entry.getKey());
-						viewers.removeViewer(entry.getKey(), ViewerType.FULL_INFO);
-						viewers.addViewer(entry.getKey(), ViewerType.INFO);
+						tally.origin.removeViewer(entry.getKey(), ViewerType.FULL_INFO);
+						tally.origin.addViewer(entry.getKey(), ViewerType.INFO);
+
+						//// THIS IS ADDED TO THE WRONG LIST. NOT THE CONNECTED DISPLAY
 						break;
 					case TEMPORARY:
 						Logistics.network.sendTo(new PacketMonitoredList(monitor, new InfoUUID(monitor.getIdentity().hashCode(), 0), saveList.networkID, saveTag, SyncType.DEFAULT_SYNC), (EntityPlayerMP) entry.getKey());
-						viewers.removeViewer(entry.getKey(), ViewerType.TEMPORARY);
+						tally.origin.removeViewer(entry.getKey(), ViewerType.TEMPORARY);
 						NBTTagList list = new NBTTagList();
 						for (int i = 0; i < monitor.getMaxInfo(); i++) {
 							InfoUUID id = new InfoUUID(monitor.getIdentity().hashCode(), i);
@@ -138,16 +156,31 @@ public abstract class AbstractNetwork implements ILogisticsNetwork {
 		return monitorInfo.get(monitor.getHandler()).get(monitor);
 	}
 
-	public <T extends IMonitorInfo> Map<Pair<BlockCoords, EnumFacing>, MonitoredList<?>> getMonitoredList(LogicMonitorHandler<T> type) {
-		Map<Pair<BlockCoords, EnumFacing>, MonitoredList<?>> infoList = connectionInfo.getOrDefault(type, new LinkedHashMap());
+	public <T extends IMonitorInfo> Map<Pair<BlockCoords, EnumFacing>, MonitoredList<?>> getTileMonitoredList(LogicMonitorHandler<T> type) {
 		Map<Pair<BlockCoords, EnumFacing>, MonitoredList<?>> coordInfo = new LinkedHashMap();
-		for (Entry<Pair<BlockCoords, EnumFacing>, MonitoredList<?>> entry : infoList.entrySet()) {
-			MonitoredList<T> oldList = entry.getValue() == null ? MonitoredList.<T>newMonitoredList(getNetworkID()) : (MonitoredList<T>) entry.getValue();
-			MonitoredList<T> list = type.updateInfo(this, oldList, entry.getKey().a, entry.getKey().b);
-			coordInfo.put(entry.getKey(), list);
-		}
+		if (type instanceof ITileMonitorHandler) {
+			Map<Pair<BlockCoords, EnumFacing>, MonitoredList<?>> infoList = tileConnectionInfo.getOrDefault(type, new LinkedHashMap());
+			for (Entry<Pair<BlockCoords, EnumFacing>, MonitoredList<?>> entry : infoList.entrySet()) {
+				MonitoredList<T> oldList = entry.getValue() == null ? MonitoredList.<T>newMonitoredList(getNetworkID()) : (MonitoredList<T>) entry.getValue();
+				MonitoredList<T> list = ((ITileMonitorHandler) type).updateInfo(this, oldList, entry.getKey().a, entry.getKey().b);
+				coordInfo.put(entry.getKey(), list);
+			}
+		}		
 		return coordInfo;
 	}
 
-	public abstract <T extends IMonitorInfo> void compileCoordsList(LogicMonitorHandler<T> type);
+	public <T extends IMonitorInfo> Map<Entity, MonitoredList<?>> getEntityMonitoredList(LogicMonitorHandler<T> type) {
+		Map<Entity, MonitoredList<?>> coordInfo = new LinkedHashMap();
+		if (type instanceof IEntityMonitorHandler) {
+			Map<Entity, MonitoredList<?>> infoList = entityConnectionInfo.getOrDefault(type, new LinkedHashMap());
+			for (Entry<Entity, MonitoredList<?>> entry : infoList.entrySet()) {
+				MonitoredList<T> oldList = entry.getValue() == null ? MonitoredList.<T>newMonitoredList(getNetworkID()) : (MonitoredList<T>) entry.getValue();
+				MonitoredList<T> list = ((IEntityMonitorHandler) type).updateInfo(this, oldList, entry.getKey());
+				coordInfo.put(entry.getKey(), list);
+			}
+		}		
+		return coordInfo;
+	}
+
+	public abstract <T extends IMonitorInfo> void compileConnectionList(LogicMonitorHandler<T> type);
 }

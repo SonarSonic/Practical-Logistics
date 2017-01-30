@@ -2,6 +2,8 @@ package sonar.logistics.common.multiparts;
 
 import java.util.List;
 
+import com.google.common.collect.Lists;
+
 import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -53,9 +55,14 @@ public abstract class LogisticsMultipart extends SonarMultipart implements ILogi
 
 	public int getNetworkID() {
 		return networkID.getObject();
-	}	
+	}
 
-	public void updateOperatorInfo(){
+	public void updateOperatorInfo() {
 		this.requestSyncPacket();
+	}
+
+	@Override
+	public List<ItemStack> getDrops() {
+		return Lists.newArrayList(this.getItemStack());
 	}
 }

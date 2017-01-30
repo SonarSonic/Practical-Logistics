@@ -20,9 +20,9 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import sonar.core.api.utils.BlockCoords;
 import sonar.core.common.item.SonarItem;
 import sonar.core.helpers.FontHelper;
-import sonar.logistics.api.connecting.ITransceiver;
+import sonar.logistics.api.connecting.ITileTransceiver;
 
-public class WirelessTransceiver extends SonarItem implements ITransceiver {
+public class WirelessItemTransceiver extends SonarItem implements ITileTransceiver {
 
 	@Override
 	public EnumActionResult onItemUse(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
@@ -41,9 +41,7 @@ public class WirelessTransceiver extends SonarItem implements ITransceiver {
 				stack.setTagCompound(tag);
 			}
 		}
-
 		return EnumActionResult.SUCCESS;
-
 	}
 
 	@Override

@@ -16,20 +16,12 @@ import sonar.logistics.api.display.ILargeDisplay;
 
 public class DisplayManager extends AbstractConnectionManager<ILargeDisplay> {
 	
-	public static ConnectedDisplayScreen getOrCreateDisplayScreen(World world, ILargeDisplay display, int registryID) {
-		ConcurrentHashMap<Integer, ConnectedDisplayScreen> displays = Logistics.getInfoManager(world.isRemote).getConnectedDisplays();
-		ConnectedDisplayScreen toSet = displays.get(registryID);
-		if (toSet == null) {
-			toSet = new ConnectedDisplayScreen(display);
-			displays.put(registryID, toSet);
-		}
-		return toSet;
-	}
+	
 
 	@Override
 	public void onNetworksConnected(int newID, int oldID) {
-		ConnectedDisplayScreen screen = Logistics.getInfoManager(false).getConnectedDisplays().get(newID);
-		Logistics.getInfoManager(false).getConnectedDisplays().remove(oldID);
+		ConnectedDisplayScreen screen = Logistics.getServerManager().getConnectedDisplays().get(newID);
+		Logistics.getServerManager().getConnectedDisplays().remove(oldID);
 		if (screen != null) {
 			screen.setHasChanged();
 		} else
@@ -38,9 +30,9 @@ public class DisplayManager extends AbstractConnectionManager<ILargeDisplay> {
 
 	@Override
 	public void onConnectionAdded(int registryID, ILargeDisplay added) {
-		ConnectedDisplayScreen screen = Logistics.getInfoManager(false).getConnectedDisplays().get(registryID);
+		ConnectedDisplayScreen screen = Logistics.getServerManager().getConnectedDisplays().get(registryID);
 		if (screen == null) {
-			Logistics.getInfoManager(false).getConnectedDisplays().put(registryID, screen = new ConnectedDisplayScreen(added));
+			Logistics.getServerManager().getConnectedDisplays().put(registryID, screen = new ConnectedDisplayScreen(added));
 		}
 		screen.setHasChanged();
 	}
@@ -61,16 +53,16 @@ public class DisplayManager extends AbstractConnectionManager<ILargeDisplay> {
 	}
 
 	public void tick() {
-		Logistics.getInfoManager(false).getConnectedDisplays().entrySet().forEach(entry -> entry.getValue().update(entry.getKey()));
+		Logistics.getServerManager().getConnectedDisplays().entrySet().forEach(entry -> entry.getValue().update(entry.getKey()));
 	}
 
 	@Override
 	public void onConnectionRemoved(int registryID, ILargeDisplay added) {
 		Logistics.getServerManager().removeDisplay(added);
 		if (this.getConnections(registryID).isEmpty()) {
-			Logistics.getInfoManager(false).getConnectedDisplays().remove(registryID);
+			Logistics.getServerManager().getConnectedDisplays().remove(registryID);
 		} else {
-			ConnectedDisplayScreen screen = Logistics.getInfoManager(false).getConnectedDisplays().get(registryID);
+			ConnectedDisplayScreen screen = Logistics.getServerManager().getConnectedDisplays().get(registryID);
 			screen.setHasChanged();
 		}
 

@@ -8,9 +8,11 @@ import mcmultipart.raytrace.PartMOP;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumHand;
 import sonar.core.api.inventories.StoredItemStack;
 import sonar.core.api.utils.BlockInteractionType;
+import sonar.core.helpers.NBTHelper;
 import sonar.core.helpers.RenderHelper;
 import sonar.core.network.sync.SyncNBTAbstract;
 import sonar.core.network.sync.SyncTagType;
@@ -20,7 +22,9 @@ import sonar.logistics.api.asm.LogicInfoType;
 import sonar.logistics.api.display.DisplayType;
 import sonar.logistics.api.display.IDisplayInfo;
 import sonar.logistics.api.display.InfoContainer;
-import sonar.logistics.api.info.IClickableInfo;
+import sonar.logistics.api.display.ScreenInteractionEvent;
+import sonar.logistics.api.info.IAdvancedClickableInfo;
+import sonar.logistics.api.info.IBasicClickableInfo;
 import sonar.logistics.api.info.IComparableInfo;
 import sonar.logistics.api.info.INameableInfo;
 import sonar.logistics.api.info.monitor.IJoinableInfo;
@@ -30,7 +34,7 @@ import sonar.logistics.api.info.types.BaseInfo;
 import sonar.logistics.helpers.InfoHelper;
 
 @LogicInfoType(id = MonitoredItemStack.id, modid = Logistics.MODID)
-public class MonitoredItemStack extends BaseInfo<MonitoredItemStack> implements IJoinableInfo<MonitoredItemStack>, IClickableInfo, INameableInfo<MonitoredItemStack>, IComparableInfo<MonitoredItemStack> {
+public class MonitoredItemStack extends BaseInfo<MonitoredItemStack> implements IJoinableInfo<MonitoredItemStack>, IBasicClickableInfo, INameableInfo<MonitoredItemStack>, IComparableInfo<MonitoredItemStack> {
 
 	public static final String id = "item";
 	public static LogicMonitorHandler<MonitoredItemStack> handler = LogicMonitorHandler.instance(ItemMonitorHandler.id);
@@ -40,7 +44,8 @@ public class MonitoredItemStack extends BaseInfo<MonitoredItemStack> implements 
 		syncParts.addParts(itemStack, networkID);
 	}
 
-	public MonitoredItemStack() {}
+	public MonitoredItemStack() {
+	}
 
 	public MonitoredItemStack(StoredItemStack stack, int networkID) {
 		this(stack);
@@ -111,15 +116,13 @@ public class MonitoredItemStack extends BaseInfo<MonitoredItemStack> implements 
 			StoredItemStack stack = itemStack.getObject();
 			ItemStack item = stack.item;
 			GL11.glPushMatrix();
-			GL11.glTranslated(-(1 - width / 2 - 0.0625),  -0.68 + height/2, 0.00);
+			GL11.glTranslated(-(1 - width / 2 - 0.0625), -0.68 + height / 2, 0.00);
 			GL11.glRotated(180, 0, 1, 0);
 			GL11.glScaled(-1, 1, 1);
-			double actualScale = type == DisplayType.LARGE ? scale*3 : scale * 2;
-			
-			
-			
+			double actualScale = type == DisplayType.LARGE ? scale * 3 : scale * 2;
+
 			GL11.glScaled(actualScale, actualScale, 0.01);
-			double trans = type == DisplayType.SMALL ? 4 : - (7);
+			double trans = type == DisplayType.SMALL ? 4 : -(7);
 			GL11.glTranslated(-8, -8, 0);
 			GlStateManager.disableLighting();
 			GlStateManager.enablePolygonOffset();
@@ -137,11 +140,10 @@ public class MonitoredItemStack extends BaseInfo<MonitoredItemStack> implements 
 	}
 
 	@Override
-	public boolean onClicked(BlockInteractionType type, boolean doubleClick, IDisplayInfo renderInfo, EntityPlayer player, EnumHand hand, ItemStack stack, PartMOP hit, InfoContainer container) {
+	public boolean onStandardClick(BlockInteractionType type, boolean doubleClick, IDisplayInfo renderInfo, EntityPlayer player, EnumHand hand, ItemStack stack, PartMOP hit, InfoContainer container) {
 		if (InfoHelper.canBeClickedStandard(renderInfo.getRenderProperties(), player, hand, stack, hit)) {
-			if (!player.getEntityWorld().isRemote) {
+			if (!player.getEntityWorld().isRemote)
 				InfoHelper.screenItemStackClicked(itemStack.getObject(), networkID.getObject(), type, doubleClick, renderInfo.getRenderProperties(), player, hand, stack, hit);
-			}
 			return true;
 		}
 		return false;
@@ -164,10 +166,13 @@ public class MonitoredItemStack extends BaseInfo<MonitoredItemStack> implements 
 
 	@Override
 	public void getComparableObjects(Map<String, Object> objects) {
-		ItemStack stack = itemStack.getObject().getActualStack();
-		//objects.put("itemstack", stack.get);
-		objects.put("damage", stack != null ? stack.getItemDamage() : 0);
+		StoredItemStack stack = itemStack.getObject();
+		objects.put("items", stack);
 		
+		objects.put("nbt", stack!=null? stack.getTagCompound() : new NBTTagCompound());
+		
+		objects.put("damage", stack != null ? stack.getItemDamage() : -1);
+
 	}
 
 }

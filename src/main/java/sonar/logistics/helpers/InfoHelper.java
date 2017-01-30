@@ -42,7 +42,7 @@ public class InfoHelper {
 	public static final String SPECIAL = "spe";
 
 	public static void screenItemStackClicked(StoredItemStack itemstack, int networkID, BlockInteractionType type, boolean doubleClick, RenderInfoProperties renderInfo, EntityPlayer player, EnumHand hand, ItemStack stack, PartMOP hit) {
-		Pair<Integer, ItemInteractionType> toRemove = InfoHelper.getItemsToRemove(type);
+		Pair<Integer, ItemInteractionType> toRemove = getItemsToRemove(type);
 		if (toRemove.a != 0 && networkID != -1) {
 			INetworkCache cache = Logistics.instance.networkManager.getNetwork(networkID);
 			switch (toRemove.b) {
@@ -91,26 +91,28 @@ public class InfoHelper {
 				return tag;
 			}
 		} else if (type.isType(SyncType.SPECIAL)) {
-			stacks.sizing.writeData(tag, SyncType.DEFAULT_SYNC);
-			if ((stacks == null || stacks.isEmpty())) {
-				if (!lastWasNull)
-					tag.setBoolean(DELETE, true);
-				return tag;
-			}
-			NBTTagList list = new NBTTagList();
-			for (int listType = 0; listType < 2; listType++) {
-				ArrayList<T> stackList = listType == 0 ? stacks.changed : stacks.removed;
-				for (int i = 0; i < stackList.size(); i++) {
-					T info = stackList.get(i);
-					if (info != null && info.isValid()) {
-						NBTTagCompound compound = new NBTTagCompound();
-						compound.setBoolean(REMOVED, listType == 1);
-						list.appendTag(InfoHelper.writeInfoToNBT(compound, info, SyncType.SAVE));
+			if (!stacks.changed.isEmpty() || !stacks.removed.isEmpty()) {
+				stacks.sizing.writeData(tag, SyncType.DEFAULT_SYNC);
+				if ((stacks == null || stacks.isEmpty())) {
+					if (!lastWasNull)
+						tag.setBoolean(DELETE, true);
+					return tag;
+				}
+				NBTTagList list = new NBTTagList();
+				for (int listType = 0; listType < 2; listType++) {
+					ArrayList<T> stackList = listType == 0 ? stacks.changed : stacks.removed;
+					for (int i = 0; i < stackList.size(); i++) {
+						T info = stackList.get(i);
+						if (info != null && info.isValid()) {
+							NBTTagCompound compound = new NBTTagCompound();
+							compound.setBoolean(REMOVED, listType == 1);
+							list.appendTag(InfoHelper.writeInfoToNBT(compound, info, SyncType.SAVE));
+						}
 					}
 				}
-			}
-			if (list.tagCount() != 0) {
-				tag.setTag(SPECIAL, list);
+				if (list.tagCount() != 0) {
+					tag.setTag(SPECIAL, list);
+				}
 			}
 		}
 		return tag;
@@ -157,22 +159,6 @@ public class InfoHelper {
 		return stacks;
 	}
 
-	public static int compareWithDirection(long stored1, long stored2, SortingDirection dir) {
-		if (stored1 < stored2)
-			return dir == SortingDirection.DOWN ? 1 : -1;
-		if (stored1 == stored2)
-			return 0;
-		return dir == SortingDirection.DOWN ? -1 : 1;
-	}
-
-	public static int compareStringsWithDirection(String string1, String string2, SortingDirection dir) {
-		int res = String.CASE_INSENSITIVE_ORDER.compare(string1, string2);
-		if (res == 0) {
-			res = string1.compareTo(string2);
-		}
-		return dir == SortingDirection.DOWN ? res : -res;
-	}
-
 	public static ArrayList<LogicInfo> sortInfoList(ArrayList<LogicInfo> oldInfo) {
 		ArrayList<LogicInfo> providerInfo = (ArrayList<LogicInfo>) oldInfo.clone();
 		Collections.sort(providerInfo, new Comparator<LogicInfo>() {
@@ -183,11 +169,13 @@ public class InfoHelper {
 		ArrayList<LogicInfo> sortedInfo = new ArrayList();
 		LogicInfo lastInfo = null;
 		for (LogicInfo blockInfo : (ArrayList<LogicInfo>) providerInfo.clone()) {
-			if (lastInfo == null || (!lastInfo.isHeader() && !lastInfo.getRegistryType().equals(blockInfo.getRegistryType()))) {
-				sortedInfo.add(LogicInfo.buildCategoryInfo(blockInfo.getRegistryType()));
+			if (blockInfo != null && !blockInfo.isHeader()) {
+				if (lastInfo == null || (!lastInfo.isHeader() && !lastInfo.getRegistryType().equals(blockInfo.getRegistryType()))) {
+					sortedInfo.add(LogicInfo.buildCategoryInfo(blockInfo.getRegistryType()));
+				}
+				sortedInfo.add(blockInfo);
+				lastInfo = blockInfo;
 			}
-			sortedInfo.add(blockInfo);
-			lastInfo = blockInfo;
 		}
 		return sortedInfo;
 	}
@@ -228,7 +216,7 @@ public class InfoHelper {
 		case DUAL:
 			return new double[] { 0, pos == 1 ? height / 2 : 0, 0 };
 		case GRID:
-			return new double[] { pos == 1 || pos == 3 ? (double)width / 2 : 0, (double)pos > 1 ? height / 2 : 0, 0 };
+			return new double[] { pos == 1 || pos == 3 ? (double) width / 2 : 0, (double) pos > 1 ? height / 2 : 0, 0 };
 		case LIST:
 			return new double[] { 0, pos * (height / 4), 0 };
 		default:

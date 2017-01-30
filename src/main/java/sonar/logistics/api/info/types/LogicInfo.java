@@ -5,7 +5,9 @@ import java.util.Map;
 import mcmultipart.raytrace.PartMOP;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumHand;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import sonar.core.api.utils.BlockInteractionType;
 import sonar.core.helpers.FontHelper;
 import sonar.core.network.sync.ObjectType;
@@ -18,7 +20,8 @@ import sonar.logistics.api.asm.LogicInfoType;
 import sonar.logistics.api.display.IDisplayInfo;
 import sonar.logistics.api.display.ISuffixable;
 import sonar.logistics.api.display.InfoContainer;
-import sonar.logistics.api.info.IClickableInfo;
+import sonar.logistics.api.display.ScreenInteractionEvent;
+import sonar.logistics.api.info.IAdvancedClickableInfo;
 import sonar.logistics.api.info.IComparableInfo;
 import sonar.logistics.api.info.INameableInfo;
 import sonar.logistics.api.info.monitor.IMonitorInfo;
@@ -31,7 +34,7 @@ import sonar.logistics.info.LogicInfoRegistry.RegistryType;
 
 /** default info type, created by the LogicRegistry */
 @LogicInfoType(id = LogicInfo.id, modid = Logistics.MODID)
-public class LogicInfo extends BaseInfo<LogicInfo> implements INameableInfo<LogicInfo>, IClickableInfo, ISuffixable, IComparableInfo<LogicInfo> {
+public class LogicInfo extends BaseInfo<LogicInfo> implements INameableInfo<LogicInfo>,  ISuffixable, IComparableInfo<LogicInfo> {
 
 	public static final String id = "logic";
 	public static final LogicMonitorHandler<LogicInfo> handler = LogicMonitorHandler.instance(InfoMonitorHandler.id);
@@ -161,15 +164,6 @@ public class LogicInfo extends BaseInfo<LogicInfo> implements INameableInfo<Logi
 	public void renderInfo(InfoContainer container, IDisplayInfo displayInfo, double width, double height, double scale, int infoPos) {
 		// InfoRenderer.renderNormalInfo(displayType, width, height, scale, getClientIdentifier(), getClientObject());
 		InfoRenderer.renderNormalInfo(container.display.getDisplayType(), width, height, scale, displayInfo.getFormattedStrings());
-	}
-
-	@Override
-	public boolean onClicked(BlockInteractionType type, boolean doubleClick, IDisplayInfo renderInfo, EntityPlayer player, EnumHand hand, ItemStack stack, PartMOP hit, InfoContainer container) {
-		if (InfoHelper.canBeClickedStandard(renderInfo.getRenderProperties(), player, hand, stack, hit)) {
-			FontHelper.sendMessage(getClientIdentifier() + ": " + obj.objectType + " - " + getClientObject(), player.getEntityWorld(), player);
-			return true;
-		}
-		return false;
 	}
 
 	@Override

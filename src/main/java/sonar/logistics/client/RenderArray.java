@@ -16,7 +16,7 @@ public class RenderArray extends MultipartSpecialRenderer<ArrayPart> {
 	@Override
 	public void renderMultipartAt(ArrayPart part, double x, double y, double z, float partialTicks, int destroyStage) {
 		RenderHelper.offsetRendering(part.getPos(), partialTicks);
-		InfoRenderer.rotateDisplayRendering(part.face, EnumFacing.NORTH);
+		InfoRenderer.rotateDisplayRendering(part.face, EnumFacing.NORTH, 0, 0);
 		GL11.glRotated(90, 1, 0, 0);
 		GL11.glScaled(0.7, 0.7, 0.7);
 		GL11.glTranslated(-8.91, -8.0, 0.45);

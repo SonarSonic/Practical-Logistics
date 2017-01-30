@@ -3,6 +3,7 @@ package sonar.logistics.api.viewers;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import com.google.common.collect.Lists;
@@ -13,16 +14,22 @@ import sonar.logistics.api.info.monitor.ILogicViewable;
 public class ViewersList implements IViewersList {
 
 	// protected ArrayList<MonitorViewer> viewers = new ArrayList<MonitorViewer>();
-	protected HashMap<EntityPlayer, ArrayList<ViewerTally>> viewers = new HashMap();
+	public HashMap<EntityPlayer, ArrayList<ViewerTally>> viewers = new HashMap();
 	public List<ViewerType> validTypes;
 	public ILogicViewable viewable;
 	public ArrayList<ILogicViewable> connectedDisplays = new ArrayList();
+	public ViewersList origin;
 
-
+	public ViewersList(ViewersList origin, ILogicViewable viewable, List<ViewerType> validTypes) {
+		this.viewable = viewable;
+		this.validTypes = validTypes;
+		this.origin = origin;
+	}
 
 	public ViewersList(ILogicViewable viewable, List<ViewerType> validTypes) {
 		this.viewable = viewable;
 		this.validTypes = validTypes;
+		this.origin = this;
 	}
 
 	public void cloneFrom(ViewersList list) {
@@ -36,21 +43,25 @@ public class ViewersList implements IViewersList {
 	}
 
 	public HashMap<EntityPlayer, ArrayList<ViewerTally>> getViewers(boolean includeDisplays) {
+
 		if (includeDisplays) {
-			ViewersList viewerList = new ViewersList(this.viewable, this.validTypes);
-			viewerList.viewers = (HashMap<EntityPlayer, ArrayList<ViewerTally>>) this.viewers.clone();
-			viewerList.connectedDisplays = (ArrayList<ILogicViewable>) this.connectedDisplays.clone();
-			if (includeDisplays) {
-				connectedDisplays.forEach(viewable -> {
-					if (viewable != null) {
-						viewable.getViewersList().getViewers(false).entrySet().forEach(viewer -> {
-							addTalliesToMap(viewerList, viewer.getKey(), viewer.getValue());
-						});
-					}
-				});
+			ViewersList viewerList = new ViewersList(this, this.viewable, this.validTypes);
+
+			HashMap<EntityPlayer, ArrayList<ViewerTally>> viewerCopy = new HashMap<EntityPlayer, ArrayList<ViewerTally>>();
+			for (Map.Entry<EntityPlayer, ArrayList<ViewerTally>> entry : viewers.entrySet()) {
+				viewerCopy.put(entry.getKey(), new ArrayList<ViewerTally>(entry.getValue()));
 			}
+			viewerList.viewers = viewerCopy;			
+			connectedDisplays.forEach(viewable -> {
+				if (viewable != null) {
+					viewable.getViewersList().getViewers(false).entrySet().forEach(viewer -> {
+						addTalliesToMap(viewerList, viewer.getKey(), viewer.getValue());
+					});
+				}
+			});
 			return viewerList.viewers;
 		}
+
 		return viewers;
 	}
 
@@ -96,7 +107,7 @@ public class ViewersList implements IViewersList {
 			ArrayList<ViewerTally> newTallies = new ArrayList();
 			for (ViewerType type : currentTypes) {
 				if (viewerList.validTypes.contains(type)) {
-					newTallies.add(new ViewerTally(type, 1));
+					newTallies.add(new ViewerTally(viewerList.origin, type, 1));
 				}
 			}
 			viewerList.viewers.put(player, newTallies);
@@ -114,7 +125,7 @@ public class ViewersList implements IViewersList {
 						}
 					}
 					if (!added) {
-						toAdd.add(new ViewerTally(type, 1));
+						toAdd.add(new ViewerTally(viewerList.origin, type, 1));
 					}
 				}
 			}

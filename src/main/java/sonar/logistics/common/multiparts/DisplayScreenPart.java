@@ -28,7 +28,7 @@ import sonar.logistics.api.viewers.ViewersList;
 public class DisplayScreenPart extends ScreenMultipart {
 
 	public SyncEnum<ScreenLayout> layout = new SyncEnum(ScreenLayout.values(), 1);
-	public ViewersList viewers = new ViewersList(this, Lists.newArrayList(ViewerType.INFO));
+	public ViewersList viewers = new ViewersList(this, Lists.newArrayList(ViewerType.FULL_INFO, ViewerType.INFO));
 	public InfoContainer container = new InfoContainer(this);
 
 	public DisplayScreenPart() {

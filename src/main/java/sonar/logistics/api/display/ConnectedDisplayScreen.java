@@ -13,6 +13,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumFacing.Axis;
 import net.minecraft.util.EnumFacing.AxisDirection;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import sonar.core.api.nbt.INBTSyncable;
 import sonar.core.api.utils.BlockCoords;
@@ -38,13 +39,13 @@ import sonar.logistics.api.viewers.ViewersList;
 import sonar.logistics.common.multiparts.ScreenMultipart;
 import sonar.logistics.network.PacketConnectedDisplayScreen;
 
-/**used with Large Display Screens so they all have one uniform InfoContainer, Viewer list etc.*/
+/** used with Large Display Screens so they all have one uniform InfoContainer, Viewer list etc. */
 public class ConnectedDisplayScreen implements IInfoDisplay, INetworkConnectable, INBTSyncable, IScaleableDisplay, ISyncPart {
 
-	public ViewersList viewers = new ViewersList(this, Lists.newArrayList(ViewerType.INFO));
+	public ViewersList viewers = new ViewersList(this, Lists.newArrayList(ViewerType.INFO, ViewerType.FULL_INFO));
 	private int registryID = -1;
 	public ILargeDisplay topLeftScreen = null;
-	public SyncableList syncParts = new SyncableList(this);;
+	public SyncableList syncParts = new SyncableList(this);
 	public SyncEnum<EnumFacing> face = new SyncEnum(EnumFacing.VALUES, 0);
 	public SyncEnum<ScreenLayout> layout = new SyncEnum(ScreenLayout.values(), 1);
 	public SyncTagType.INT width = new SyncTagType.INT(2), height = new SyncTagType.INT(3);
@@ -85,8 +86,8 @@ public class ConnectedDisplayScreen implements IInfoDisplay, INetworkConnectable
 					setDisplayScaling(displays.get(0), displays);
 				}
 			}
-
 			hasChanged = false;
+			sendViewers = true;
 		}
 	}
 
@@ -277,7 +278,7 @@ public class ConnectedDisplayScreen implements IInfoDisplay, INetworkConnectable
 		if (nbt.hasKey(this.getTagName())) {
 			NBTTagCompound tag = nbt.getCompoundTag(this.getTagName());
 			NBTHelper.readSyncParts(tag, type, this.syncParts);
-			layout.readData(tag, type);
+			// layout.readData(tag, type);
 			container.resetRenderProperties();
 		}
 	}
@@ -286,14 +287,14 @@ public class ConnectedDisplayScreen implements IInfoDisplay, INetworkConnectable
 	public NBTTagCompound writeData(NBTTagCompound nbt, SyncType type) {
 		NBTTagCompound tag = new NBTTagCompound();
 		NBTHelper.writeSyncParts(tag, type, this.syncParts, true);
-		layout.writeData(tag, type);
+		// layout.writeData(tag, type);
 		if (!tag.hasNoTags())
 			nbt.setTag(this.getTagName(), tag);
 		return nbt;
 	}
 
 	public ILargeDisplay getTopLeftScreen() {
-		if (topLeftScreen == null && topLeftCoords.getCoords() != null) {
+		if (topLeftCoords.getCoords() != null) {
 			this.topLeftScreen = (ILargeDisplay) LogisticsAPI.getCableHelper().getDisplayScreen(topLeftCoords.getCoords(), face.getObject());
 		}
 		return topLeftScreen;
@@ -301,8 +302,8 @@ public class ConnectedDisplayScreen implements IInfoDisplay, INetworkConnectable
 
 	@Override
 	public double[] getScaling() {
-		double max = Math.min(this.height.getObject().intValue() + 1, this.width.getObject().intValue()+1);
-		return new double[] { this.getDisplayType().width + this.width.getObject().intValue(), this.getDisplayType().height + this.height.getObject().intValue(),  max/100};
+		double max = Math.min(this.height.getObject().intValue() + 1, this.width.getObject().intValue() + 1);
+		return new double[] { this.getDisplayType().width + this.width.getObject().intValue(), this.getDisplayType().height + this.height.getObject().intValue(), max / 100 };
 	}
 
 	@Override
@@ -344,8 +345,9 @@ public class ConnectedDisplayScreen implements IInfoDisplay, INetworkConnectable
 	@Override
 	public void markChanged(IDirtyPart part) {
 		syncParts.markSyncPartChanged(part);
-		if (topLeftScreen != null)
-			topLeftScreen.markChanged(this);
+		if (this.getTopLeftScreen() != null) {
+			this.getTopLeftScreen().markChanged(this);
+		}
 	}
 
 	@Override

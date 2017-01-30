@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumFacing;
 import sonar.core.api.utils.BlockCoords;
 import sonar.core.utils.IWorldPosition;
@@ -28,6 +29,11 @@ public class EmptyNetworkCache implements INetworkCache {
 	@Override
 	public LinkedHashMap<BlockCoords, EnumFacing> getExternalBlocks(boolean includeChannels) {
 		return new LinkedHashMap();
+	}
+
+	@Override
+	public ArrayList<Entity> getExternalEntities(boolean includeChannels) {
+		return new ArrayList();
 	}
 
 	@Override

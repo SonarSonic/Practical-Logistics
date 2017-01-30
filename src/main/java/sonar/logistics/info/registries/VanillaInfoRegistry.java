@@ -7,6 +7,7 @@ import com.google.common.collect.Maps;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockCrops;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityAgeable;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -42,6 +43,7 @@ public class VanillaInfoRegistry extends IInfoRegistry {
 		LogicInfoRegistry.registerReturn(FoodStats.class);
 		LogicInfoRegistry.registerReturn(Team.class);
 		LogicInfoRegistry.registerReturn(NBTTagCompound.class);
+		LogicInfoRegistry.registerReturn(BlockPos.class);
 	}
 
 	@Override
@@ -57,7 +59,8 @@ public class VanillaInfoRegistry extends IInfoRegistry {
 		LogicInfoRegistry.registerMethods(WorldInfo.class, RegistryType.WORLD, Lists.newArrayList("isRaining", "isThundering", "getWorldName"));
 		LogicInfoRegistry.registerMethods(WorldProvider.class, RegistryType.WORLD, Lists.newArrayList("getDimension", "getDimensionType"));
 		LogicInfoRegistry.registerMethods(DimensionType.class, RegistryType.WORLD, Lists.newArrayList("getName"));
-		LogicInfoRegistry.registerMethods(EntityLivingBase.class, RegistryType.ENTITY, Lists.newArrayList("getHealth", "getMaxHealth", "getAge", "getTotalArmorValue", "getPosition", "getName"));
+		LogicInfoRegistry.registerMethods(Entity.class, RegistryType.ENTITY, Lists.newArrayList("getPosition", "getName"));
+		LogicInfoRegistry.registerMethods(EntityLivingBase.class, RegistryType.ENTITY, Lists.newArrayList("getHealth", "getMaxHealth", "getAge", "getTotalArmorValue"));
 		LogicInfoRegistry.registerMethods(EntityAgeable.class, RegistryType.ENTITY, Lists.newArrayList("getGrowingAge"));
 		LogicInfoRegistry.registerMethods(EntityPlayer.class, RegistryType.ENTITY, Lists.newArrayList("isCreative", "isSpectator", "getFoodStats", "getAbsorptionAmount", "getTeam", "getExperiencePoints"));
 		LogicInfoRegistry.registerMethods(FoodStats.class, RegistryType.ENTITY, Lists.newArrayList("getFoodLevel", "needFood", "getSaturationLevel"));

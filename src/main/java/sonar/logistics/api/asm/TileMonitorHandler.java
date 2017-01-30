@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 /**use this with Monitor Handlers*/
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface MonitorHandler {
+public @interface TileMonitorHandler {
 
 	/**specify the MODID required for the handler to load, note if you want it to always load use the Practical Logistics MODID*/
 	String modid();

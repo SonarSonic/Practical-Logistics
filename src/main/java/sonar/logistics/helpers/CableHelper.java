@@ -100,6 +100,10 @@ public class CableHelper extends CablingWrapper {
 		return getConnectedTiles(cable, new SonarValidation.CLASS(type));
 	}
 
+	public static ArrayList getConnectedTilesOfTypes(DataCablePart cable, Class... type) {
+		return getConnectedTiles(cable, new SonarValidation.CLASSLIST(type));
+	}
+
 	public static <T> ArrayList<T> getConnectedTiles(DataCablePart cable, SonarValidation validate) {
 		ArrayList<T> logicTiles = new ArrayList();
 		for (IMultipart part : cable.getContainer().getParts()) {

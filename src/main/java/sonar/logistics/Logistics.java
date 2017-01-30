@@ -20,6 +20,7 @@ import net.minecraftforge.fml.common.event.FMLServerStoppingEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.oredict.OreDictionary;
 import sonar.logistics.api.LogisticsAPI;
 import sonar.logistics.api.info.IInfoManager;
@@ -45,21 +46,21 @@ public class Logistics {
 
 	public static SimpleNetworkWrapper network;
 	public static Logger logger = (Logger) LogManager.getLogger(MODID);
-	
+
 	@Instance(MODID)
 	public static Logistics instance;
 
-	//@SideOnly(Side.SERVER)
+	// @SideOnly(Side.SERVER)
 	public NetworkManager networkManager = new NetworkManager();
-	//@SideOnly(Side.SERVER)
+	// @SideOnly(Side.SERVER)
 	public CableManager cableManager = new CableManager();
-	//@SideOnly(Side.SERVER)
+	// @SideOnly(Side.SERVER)
 	public DisplayManager displayManager = new DisplayManager();
-	//@SideOnly(Side.SERVER)
-	public ServerInfoManager serverManager = new ServerInfoManager();	
-	//@SideOnly(Side.CLIENT)
+	// @SideOnly(Side.SERVER)
+	public ServerInfoManager serverManager = new ServerInfoManager();
+	// @SideOnly(Side.CLIENT)
 	public ClientInfoManager clientManager = new ClientInfoManager();
-	
+
 	public static CreativeTabs creativeTab = new CreativeTabs("Practical Logistics") {
 		@Override
 		public Item getTabIconItem() {
@@ -104,7 +105,8 @@ public class Logistics {
 
 		ASMDataTable asmDataTable = event.getAsmData();
 		LogisticsASMLoader.loadInfoTypes(asmDataTable);
-		LogisticsASMLoader.loadMonitorHandlers(asmDataTable);
+		LogisticsASMLoader.loadTileMonitorHandlers(asmDataTable);
+		LogisticsASMLoader.loadEntityMonitorHandlers(asmDataTable);
 		LogicInfoRegistry.infoRegistries.addAll(LogisticsASMLoader.getInfoRegistries(asmDataTable));
 		LogicInfoRegistry.customTileHandlers.addAll(LogisticsASMLoader.getCustomTileHandlers(asmDataTable));
 		LogicInfoRegistry.customEntityHandlers.addAll(LogisticsASMLoader.getCustomEntityHandlers(asmDataTable));
@@ -146,52 +148,39 @@ public class Logistics {
 	@EventHandler
 	public void serverClose(FMLServerStoppingEvent event) {
 		EmitterManager.removeAll();
-		
+		getNetworkManager().removeAll();
+		getCableManager().removeAll();
+		getDisplayManager().removeAll();
+		getClientManager().removeAll();
+		getServerManager().removeAll();
 	}
 
-	//@SideOnly(Side.SERVER)
-	public static NetworkManager getNetworkManager(){
-		if(Thread.currentThread().getName()!="Server thread"){
-			return null;
-		}
+	// @SideOnly(Side.SERVER)
+	public static NetworkManager getNetworkManager() {
 		return Logistics.instance.networkManager;
 	}
 
-	//@SideOnly(Side.SERVER)
-	public static CableManager getCableManager(){
-		if(Thread.currentThread().getName()!="Server thread"){
-			return null;
-		}
+	// @SideOnly(Side.SERVER)
+	public static CableManager getCableManager() {
 		return Logistics.instance.cableManager;
 	}
 
-	//@SideOnly(Side.SERVER)
-	public static DisplayManager getDisplayManager(){
-		if(Thread.currentThread().getName()!="Server thread"){
-			return null;
-		}
+	// @SideOnly(Side.SERVER)
+	public static DisplayManager getDisplayManager() {
 		return Logistics.instance.displayManager;
 	}
 
-	//@SideOnly(Side.CLIENT)
-	public static ServerInfoManager getServerManager(){
-		if(Thread.currentThread().getName()!="Server thread"){
-			return null;
-		}
+	// @SideOnly(Side.CLIENT)
+	public static ServerInfoManager getServerManager() {
 		return Logistics.instance.serverManager;
 	}
 
-	//@SideOnly(Side.CLIENT)
-	public static ClientInfoManager getClientManager(){
-		if(Thread.currentThread().getName()=="Server thread"){
-			return null;
-		}
+	// @SideOnly(Side.CLIENT)
+	public static ClientInfoManager getClientManager() {
 		return Logistics.instance.clientManager;
 	}
-	
-	public static IInfoManager getInfoManager(boolean isRemote){
-		
-		
-		return !isRemote ? getServerManager() : getClientManager();		
+
+	public static IInfoManager getInfoManager(boolean isRemote) {
+		return !isRemote ? getServerManager() : getClientManager();
 	}
 }
